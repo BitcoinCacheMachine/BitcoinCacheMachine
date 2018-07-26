@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# source the parameters
-source ~/.bcm/multipass.env.sh
+set -e
+
+# quit if there are no multipass environment variables loaded.
+if [[ $(env | grep MULTIPASS_) = '' ]]; then
+  echo "MULTIPASS environment variables not set. Please source update and source ~/bcm/lxd_endpoints.sh"
+  exit 1
+fi
 
 # Stopping multipass vm $MULTIPASS_VM_NAME
 if [[ $(multipass list | grep $MULTIPASS_VM_NAME) ]]; then

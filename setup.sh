@@ -14,5 +14,6 @@ else
   echo "Creating Bitcoin Cache Machine config directory at ~/.bcm"
   mkdir -p ~./bcm
 
-  echo "Copying "
+  #cp ./resources/.bcm/lxd_endpoints.sh ~/.bcm/lxd_endpoints.sh
+  #cp ./resources/.bcm/llxd_env.sh ~/.bcm/lxd.env.sh
 fi

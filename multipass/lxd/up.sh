@@ -1,13 +1,16 @@
 #!/bin/bash
 
 # stop scrtip if error is encountered.
-set -e
+#set -e
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-# Source the LXD environment variables maintained by the user in ~/.bcm/lxd.env.sh
-source ~/.bcm/lxd.env.sh
+# quit if there are no BC environment variables
+if [[ -z $(env | grep BC) ]]; then
+  echo "BC variables not set. Please source ~/.bcm/lxd_endpoints.sh"
+  exit
+fi
 
 # get or update the BCM host template git repo
 if [[ $BC_INSTALLATION_PATH = "bcm" ]]; then
@@ -30,14 +33,13 @@ elif [[ $BC_INSTALLATION_PATH = "bcs" ]]; then
     fi
 
     # if the template doesn't exist, publish it create it.
-    if [[ -z $(list image list | grep bctemplate) ]]; then
+    if [[ -z $(lxc image list | grep bctemplate) ]]; then
       echo "Publishing dockertemplate/dockerSnapshot snapshot as bctemplate lxd image."
       lxc publish $(lxc remote get-default):dockertemplate/dockerSnapshot --alias bctemplate
     fi    
   else
     echo "Skipping creation of the host template. Snapshot already exists."
   fi  
-
 
   echo "Calling Bitcoin Cache Stack Installation Script."
   bash -c ./bcs/up_lxd.sh

@@ -1,13 +1,16 @@
 #!/bin/bash
 
-# stop scrtip if error is encountered.
-set -e
+# stop script if error is encountered.
+#set -e
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-# Source the LXD environment variables maintained by the user in ~/.bcm/lxd.env.sh
-source ~/.bcm/lxd.env.sh
+# quit if there are no BC environment variables
+if [[ -z $(env | grep BC) ]]; then
+  echo "BC variables not set. Please source ~/.bcm/lxd_endpoints.sh"
+  exit
+fi
 
 # get or update the BCM host template git repo
 if [[ $BC_INSTALLATION_PATH = "bcm" ]]; then
