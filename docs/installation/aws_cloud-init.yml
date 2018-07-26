@@ -1,0 +1,21 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+# all lxc system images are backed by ZFS
+# but each system container /var/lib/docker is bind mounted
+packages:
+  - zfsutils-linux
+
+## BCM_CACHE_STACK can be 'gw' which assumes you have the bcm_cache_stack software running on
+## the host running the BCM multipass VM. If 'none', BCM will download everything from the Internet,
+## lastly you can put an IP address that hosts the bcm_cache_stack software -- perhaps another machine
+## on your local network.  TODO eventually I'll transition all this to IPFS.
+write_files:
+  - path: /etc/environment
+    permissions: 0644
+    content: |
+      BCM_BITCOIN_CHAIN=testnet
+      BCM_DEBUG=true
+      BCM_CACHE_STACK=192.168.86.26
+
