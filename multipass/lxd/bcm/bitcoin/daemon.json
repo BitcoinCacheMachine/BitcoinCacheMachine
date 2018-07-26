@@ -1,0 +1,6 @@
+{
+    "registry-mirrors": ["http://10.254.254.2:5000"],
+    "labels": [
+        "purpose=bitcoin"
+    ]
+}

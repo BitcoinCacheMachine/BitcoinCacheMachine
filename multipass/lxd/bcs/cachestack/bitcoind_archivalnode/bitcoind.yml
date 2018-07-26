@@ -1,0 +1,40 @@
+version: '3.6'
+services:
+  bitcoind:
+    image: farscapian/bitcoind:latest
+    ports:
+      - "18333:18333"
+    volumes:
+      - bitcoind-data:/data
+      - bitcoind-log-data:/var/log/bitcoind
+      - bitcoind-cookie-data:/cookie
+    environment:
+      BITCOIND_CHAIN: ${BCM_BITCOIN_CHAIN:-testnet}
+    secrets:
+      - source: bitcoin_config
+        target: /data/bitcoin.conf
+        uid: '0'
+        gid: '0'
+        mode: 0400
+    configs:
+      - source: bitcoindtorproxy-config
+        target: /etc/tor/torrc
+        uid: '0'
+        gid: '0'
+        mode: 0644
+    deploy:
+      mode: replicated
+      replicas: 1
+
+volumes:
+  bitcoind-data:    
+  bitcoind-log-data:
+  bitcoind-cookie-data:
+
+secrets:
+  bitcoin_config:
+    file: "./bitcoind-${CHAIN:-testnet}.conf"
+
+configs:
+  bitcoindtorproxy-config:
+    file: ./bitcoind-torrc.conf

@@ -1,0 +1,210 @@
+version: '3.4'
+services:
+  # listens on alias schemaregistry:8081
+  schema-registry:
+    image: confluentinc/cp-schema-registry:4.1.1-1
+    ports:
+      - "8081:8081"
+    networks:
+      schemaregistrynet:
+        aliases:
+          - schemaregistry
+      kafka_kafkanet:
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper1:2181,zookeeper1:2181,zookeeper1:2181
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_DEBUG: "true"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+
+  # listens on 8000 by default
+  schema-registry-ui:
+    image: landoop/schema-registry-ui:latest
+    # ports:
+    #   - "8000:8000"
+    networks:
+      - schemaregistrynet
+    environment:
+      SCHEMAREGISTRY_URL: http://schemaregistry:8081
+      PROXY: "true"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  #listens on 8082
+  kafka-rest:
+    image: confluentinc/cp-kafka-rest:4.1.1-1
+    ports:
+      - "8082:8082"
+    networks:
+      kafka_kafkanet:
+      kafkarestnet:
+        aliases:
+          - kafkarest
+    depends_on:
+      - schema-registry
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper1:2181,zookeeper1:2181
+      KAFKA_REST_LISTENERS: http://0.0.0.0:8082
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schemaregistry:8081
+      KAFKA_REST_HOST_NAME: kafkarest
+      # KAFKA_REST_BOOTSTRAP_SERVERS: broker1:9092,broker2:9092,broker3:9092
+      # KAFKA_REST_ACCESS_CONTROL_ALLOW_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+      # KAFKA_REST_ACCESS_CONTROL_ALLOW_ORIGIN: "*"
+      # KAFKA_REST_ACCESS_CONTROL_ALLOW_HEADERS: "Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Mx-ReqToken,X-Requested-With"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+
+  #listens on 8000
+  #PROXY: true makes to so topicsUI proxies kafka-rest calls so we don't have to expose kafka rest to network
+  topics-ui:
+    image: landoop/kafka-topics-ui:latest
+    # ports:
+    #   - "8001:8000"
+    networks:
+      - kafkarestnet
+    depends_on:
+      - kafka-rest
+    environment:
+      KAFKA_REST_PROXY_URL: http://kafkarest:8082
+      PROXY: "true"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  # Listens for gelf messages on TCP
+  gelflistener:
+    image: farscapian/logstash:latest
+    ports:
+      - "12201:12201/tcp"
+    networks:
+      kafka_kafkanet:
+    configs:
+      - source: logstash_config
+        target: /etc/logstash.conf
+        uid: '33'
+        gid: '33'
+        mode: 0755
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  # # REST commands come over 8083 to control the configuratino of kafka connect
+  # # Listens on TCP 514 (syslog)
+  # kafka-connect:
+  #   image: farscapian/kafkaconnect:latest
+  #   ports:
+  #     - "8083:8083"
+  #     - "514:5514"
+  #   networks:
+  #     kafka_kafkanet:
+  #     schemaregistrynet:
+  #     kafkaconnectnet:
+  #       aliases:
+  #         - kafkaconnect
+  #   depends_on:
+  #     - schema-registry
+  #   environment:
+  #     CONNECT_BOOTSTRAP_SERVERS: broker1:9092,broker2:9092,broker3:9092
+  #     CONNECT_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2182,zoo3:2183
+  #     CONNECT_REST_ADVERTISED_HOST_NAME: kafkaconnect
+  #     CONNECT_REST_PORT: 8083
+  #     CONNECT_GROUP_ID: kafka-connect-group
+  #     CONNECT_CONFIG_STORAGE_TOPIC: kafka-connect-configs
+  #     CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+  #     CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+  #     CONNECT_OFFSET_STORAGE_TOPIC: kafka-connect-offsets
+  #     CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+  #     CONNECT_STATUS_STORAGE_TOPIC: kafka-connect-status
+  #     CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+  #     CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+  #     CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schemaregistry:8081
+  #     CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+  #     CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schemaregistry:8081
+  #     CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+  #     CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+  #     CONNECT_INTERNAL_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+  #     CONNECT_INTERNAL_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+  #     CONNECT_PLUGIN_PATH: /etc/kafka-connect/jars
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.hostname == manager1
+
+  # # container listens on 8000
+  # kafka-connect-ui:
+  #   image: landoop/kafka-connect-ui:latest
+  #   ports:
+  #     - "8002:8000"
+  #   depends_on:
+  #     - kafka-connect
+  #   networks:
+  #     - kafkaconnectnet
+  #   environment:
+  #     CONNECT_URL: http://kafkaconnect:8083
+  #     PROXY: "true"
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager
+
+
+  # #listens on 9021
+  # control-center:
+  #   image: confluentinc/cp-enterprise-control-center
+  #   ports:
+  #     - "9021:9021"
+  #   networks:
+  #     - kafka_kafkanet
+  #     - kafkaconnectnet
+  #   environment:
+  #     #CONTROL_CENTER_BOOTSTRAP_SERVERS: broker1:9092,broker2:9092,broker3:9092
+  #     CONTROL_CENTER_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper1:2181,zookeeper1:2181
+  #     #CONTROL_CENTER_CONNECT_CLUSTER: http://kafka-connect:8083
+  #     CONTROL_CENTER_REPLICATION_FACTOR: 1
+  #     CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1s
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+  #     CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+  #     PORT: 9021
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager
+
+networks:
+  kafka_kafkanet:
+    external: true
+
+  schemaregistrynet:
+
+  kafkarestnet:
+
+configs:
+  logstash_config:
+    file: ./logstash.conf

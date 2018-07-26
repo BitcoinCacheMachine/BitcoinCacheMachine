@@ -1,0 +1,43 @@
+version: '3.4'
+services:
+  # c-lightning https://github.com/ElementsProject/lightning
+  lightningd:
+    image: farscapian/lightningd:latest
+    networks:
+      bitcoind_bitcoindrpcnet:
+      lightningdrpcnet:
+        aliases:
+          - lightningdrpc
+    environment:
+      BITCOIND_CHAIN: ${CHAIN:-testnet}
+    volumes:
+      - lightningd-data:/root/.lightning
+      - lightningd-log-data:/var/logs/lightningd
+      - bitcoind-data:/etc/bitcoin
+    secrets:
+      - source: lightningd_conf
+        target: /root/.lightning/config
+        uid: '0'
+        gid: '0'
+        mode: 0444
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: 
+          - engine.labels.purpose == bitcoin
+
+volumes:
+  lightningd-data:
+  lightningd-log-data:
+  bitcoind-data:
+    external: true
+
+networks:
+  lightningdrpcnet: #connect to talk to clightning/lightningd
+  bitcoind_bitcoindrpcnet:
+    external: true
+
+secrets:
+  lightningd_conf:
+    file: ./lightningd-${CHAIN:-testnet}.conf

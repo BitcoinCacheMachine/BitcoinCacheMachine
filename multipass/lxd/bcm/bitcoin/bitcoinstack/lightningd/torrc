@@ -1,0 +1,6 @@
+
+# no exits allowed
+ExitPolicy reject
+
+# auto service configuration
+set ControlPort 9051 CookieAuthentication 1 CookieAuthFileGroupReadable 1

@@ -1,0 +1,14 @@
+version: '3.6'
+services:
+  squid:
+    image: minimum2scp/squid:latest
+    ports:
+      - "3128:3128"
+    volumes:
+       - squid-data:/var/spool/squid3
+    deploy:
+      mode: replicated
+      replicas: 1
+
+volumes:
+  squid-data:

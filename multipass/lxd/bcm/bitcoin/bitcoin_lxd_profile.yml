@@ -1,0 +1,53 @@
+config:
+  limits.cpu: "4"
+  limits.memory: "2048MB"    
+
+  user.network-config: |
+    version: 1
+    config:      
+      # outbound Internet
+      - type: physical
+        name: eth0
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto   
+      # for registry images
+      - type: physical
+        name: eth1
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto
+      # managernet
+      - type: physical
+        name: eth2
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto  
+description:
+devices:
+  
+  # bitcoin host needs outbound access to expose TOR services
+  eth0:
+    nictype: bridged
+    parent: lxdbrBitcoin
+    type: nic
+
+  # for registry images
+  eth1:
+    nictype: bridged
+    parent: proxyhostnet
+    type: nic
+
+  # for connection to managers
+  eth2:
+    nictype: bridged
+    parent: managernet
+    type: nic
+  root:
+    path: /
+    pool: bcm_data
+    type: disk
+name: lxd_profile_proxy_host

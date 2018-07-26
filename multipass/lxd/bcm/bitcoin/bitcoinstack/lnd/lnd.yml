@@ -1,0 +1,124 @@
+version: '3.4'
+services:
+
+  #lightning network daemon
+  lnd:
+    image: farscapian/lnd:latest
+    #hostname required for lncl-web certificate hostname purposes (see ./lnd/start-lnd.sh)
+    hostname: lnd
+    ports:
+      - "9735:9735"
+    # TODO ensure LND is going over TOR (when avaialable)
+    networks:
+      bitcoindrpcnet:
+      lndrpcnet:
+        aliases:
+          - lndrpc
+    environment:
+      #LND_BITCOIND_REST_RPC_CREDENTIALS: "bitcoinrpcuser:qwc52LTHRa0w0UGiUr2z7fTz7JvqtxjULZ_2jaZvqmA="
+      LND_CERTIFICATE_HOSTNAME: "lnd"  #this is so there are no certificate verification issues on lncli-web
+      BITCOIND_CHAIN: ${CHAIN:-testnet}
+    volumes:
+      - lnd-data:/root/.lnd
+      - lnd-certificate-data:/config
+      - lnd-macaroon-data:/macaroons
+      - lnd-log-data:/var/logs/lnd
+    depends_on:
+      - bitcoind
+    secrets:
+      - source: lnd_conf
+        target: /root/.lnd/lnd.conf
+        uid: '0'
+        gid: '0'
+        mode: 0444
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: 
+          - engine.labels.purpose == bitcoin
+
+
+  # Provides admin interface to lnd
+  # listens on 8280
+  lncli-web:
+    image: farscapian/lncliweb:latest
+    networks:
+      - bitcoindrpcnet
+      - webproxynet
+    depends_on:
+      - lnd
+    volumes:
+      - lnd-certificate-data:/config:ro
+      - lnd-macaroon-data:/macaroons
+      - lnd-log-data:/logs/lnd
+    configs:
+      - source: lncli-web_config
+        target: /lncli-web/config/defaults.js
+        uid: '0'
+        gid: '0'
+        mode: 0644
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: 
+          - engine.label == bitcoin
+
+  # an nginx proxy that is hit after reaching onionservice.
+  # performs SSL termination, basic HTTP authentication, proxying to backend services
+  lncliwebonionproxy:
+    image: nginx:1.13.9-perl
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - webproxynet
+      - onionnet
+    depends_on:
+      - lncli-web
+    configs:
+      - source: onionproxyconf
+        target: /etc/nginx/nginx.conf
+        uid: '33'
+        gid: '33'
+        mode: 0640
+    # secrets:
+    #   - source: nginxbasicauth
+    #     target: /run/secrets/httpusers.txt
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: 
+          - engine.label == bitcoin
+
+
+  # public accessibity to downstream nginx server
+  onionservice:
+    image: goldy/tor-hidden-service
+    environment:
+      LNCLIWEBONIONPROXY_PORTS: 80:80
+      LNCLIWEBONIONPROXY_SERVICE_NAME: lncliwebonionproxy
+    depends_on:
+      - lncliwebonionproxy
+    volumes:
+      - onionservice-data:/var/lib/tor/hidden_service/
+    networks:
+      - onionnet
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: 
+          - engine.label == bitcoin
+
+networks:
+  webproxynet:
+  onionnet:
+
+  lndrpcnet:  #connect to this if you need to communicate with lnd RPC
+    attachable: true
+
+  bitcoindrpcnet:
+    external: true
+

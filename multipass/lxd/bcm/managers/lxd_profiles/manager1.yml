@@ -1,0 +1,36 @@
+config:
+  limits.cpu: "2"
+  limits.memory: "2048MB"      
+  
+  user.network-config: |
+    version: 1
+    config:      
+      #proxyhostnet
+      - type: physical
+        name: eth0
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto   
+      
+      # managernet
+      - type: physical
+        name: eth1
+        subnets:
+          - type: static
+            ipv4: true
+            address: 10.0.0.11
+            netmask: 255.255.255.0
+            control: auto
+      
+description:
+devices:
+  eth0:
+    nictype: bridged
+    parent: proxyhostnet
+    type: nic
+  eth1:
+    nictype: bridged
+    parent: managernet
+    type: nic
+name: manager1.yml
