@@ -1,1 +1,0 @@
-TODO: PIN all docker BCS cache services to proper LXD interface (eth1)

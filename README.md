@@ -13,7 +13,7 @@ BCM deploys in a fully automated way and runs on bare-metal Ubuntu 18.04, in a V
 
 ## Why Bitcoin Cache Machine Exists
 
-If you're involved with Bitcoin or consider yourself a Bitcoin Maximalist, you will undoubtedly understand the importance of running your own fully-validating bitcoin node and running your own IT infrastructure. Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your wallet software configured to consult your trusted full node? Has TOR for these services been tested properly? Are you routing your DNS queries over TOR?
+If you're involved with Bitcoin, you will undoubtedly understand the importance of running your own fully-validating bitcoin node and operating your own IT infrastructure. Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your wallet software configured to consult your trusted full node? Has TOR for these services been tested properly? Are you routing your DNS queries over TOR?
 
 There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined home or office automation network.
 

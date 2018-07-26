@@ -46,9 +46,9 @@ if [[ $BC_HOST_TEMPLATE_DELETE = "true" ]]; then\
 fi
 
 
-if [[ $(lxc storage list | grep $BC_ZFS_POOL_NAME) ]]; then
-    echo "Deleting lxd storage pool $BC_ZFS_POOL_NAME."
-    lxc storage rm $BC_ZFS_POOL_NAME
+if [[ $(lxc storage list | grep "bcm-data") ]]; then
+    echo "Deleting lxd storage pool 'bcm-data'"
+    lxc storage rm bcm-data
 else
-    echo "Skipping deletion of lxd xd storage pool $BC_ZFS_POOL_NAME."
+    echo "Skipping deletion of lxd xd storage pool bcm-data."
 fi

@@ -13,21 +13,16 @@ if [[ -z $(env | grep BC) ]]; then
 fi
 
 # get or update the BCM host template git repo
-if [[ $BC_INSTALLATION_PATH = "bcm" ]]; then
+if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
   echo "Calling Bitcoin Cache Machine destruction script."
-  
-  export BC_ZFS_POOL_NAME="bcm_data"
-
+  bash -c ./bcs/down_lxd.sh
+else
+  echo "Calling Bitcoin Cache Machine down script."
   bash -c ./bcm/down_lxd.sh
-elif [[ $BC_INSTALLATION_PATH = "bcs" ]]; then
-  echo "Calling Bitcoin Cache Stack destruction script."
 
-  export BC_ZFS_POOL_NAME="bcs_data"
-
+  echo "Calling Bitcoin Cache Machine Cache Stack down script."
   bash -c ./bcs/down_lxd.sh
 fi
-
-
 
 # delete the host template if configured
 if [[ $BC_HOST_TEMPLATE_DELETE = 'true' ]]; then
@@ -48,3 +43,4 @@ if [[ $BC_LXD_IMAGE_BCTEMPLATE_DELETE = 'true' ]]; then
     lxc image delete bctemplate
   fi
 fi
+

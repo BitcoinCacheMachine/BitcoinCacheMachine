@@ -17,7 +17,7 @@ fi
 # create the zfs cluster if it doesn't exist.
 # $ZFS_POOL_NAME should be set before being called to allow for separation
 # between applications.
-if [[ -z $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
+if [[ -z $(lxc storage list | grep "bcm-data") ]]; then
   lxc storage create "$BC_ZFS_POOL_NAME" zfs size=10GB
 else
   echo "$BC_ZFS_POOL_NAME already exists, skipping pool creation."

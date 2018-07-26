@@ -1,37 +1,18 @@
 #!/bin/bash
 
 # exit script if there's an error anywhere
-set -e
+#set -e
 
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
 # quit if the BCM environment variables havne't been loaded.
-if [[ $(env | grep BCM) = '' ]] 
-then
+if [[ $(env | grep BCM) = '' ]]; then
   echo "BCM variables not set. Please source a .env file."
   exit 1
 fi
 
-# if we're inside a VM, we assume LXD is not configured. 
-# This sets to default config for BCM.
-if [[ $BCM_ENVIRONMENT = 'vm' ]]; then
-# set lxd to defaults
-cat <<EOF | lxd init --preseed
-config:
-cluster: null
-networks:
-- name: lxdbr0
-  type: bridge
-  config:
-    ipv4.address: auto
-    ipv6.address: none
-EOF
-
-fi
-
-#lxc list >>/dev/null
 
 if [[ $BCM_CACHE_STACK = 'gw' ]]; then
   # set BCM_CACHE_STACK_IP to the gateway
