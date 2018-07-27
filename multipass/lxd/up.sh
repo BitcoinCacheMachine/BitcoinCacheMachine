@@ -23,6 +23,8 @@ else
   echo "Installing Bitcoin Cache Stack + Bitcoin Cache Machine. Starting Cache Stack installation."
   bash -c ./bcs/up_lxd.sh
 
+  export BCM_CACHE_STACK="cachestack"
+  
   echo "Installing Bitcoin Cache Machine components."
   bash -c ./bcm/up_lxd.sh
 fi

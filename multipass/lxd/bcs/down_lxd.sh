@@ -47,6 +47,14 @@ else
     echo "Skipping deletion of lxd network lxdbrCacheStack."
 fi
 
+# delete lxd network lxdbrBCMBridge 
+if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
+    echo "Deleting lxd network 'lxdbrBCMBridge'."
+    lxc network delete lxdbrBCMBridge
+else
+    echo "Skipping deletion of lxd network lxdbrBCMBridge."
+fi
+
 # delete lxd network lxdBCSMgrnet 
 if [[ $(lxc network list | grep lxdBCSMgrnet) ]]; then
     echo "Deleting lxd network 'lxdBCSMgrnet'."

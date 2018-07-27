@@ -37,7 +37,7 @@ fi
 
 # create the lxdbrCacheStack network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrCacheStack) ]]; then
-    # a bridged network created for outbound nAT.
+    # a bridged network created for outbound NAT for services on cachestack.
     lxc network create lxdbrCacheStack ipv4.nat=true
 else
     echo "lxdbrCacheStack already exists."
@@ -46,9 +46,9 @@ fi
 # create the lxdbrBCMBridge network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrBCMBridge) ]]; then
     # lxdbrBCMBridge connects cachestack services to BCM instances running in the same LXD daemon.
-    lxc network create lxdbrBCMBridge ipv4.nat=false
+    lxc network create lxdbrBCMBridge ipv4.nat=false ipv4.address=10.254.254.1/24 ipv6.nat=false ipv6.address=none
 else
-    echo "lxdbrCacheStack already exists."
+    echo "lxdbrBCMBridge already exists."
 fi
 
 # create the lxdBCSMgrnet network if it doesn't exist.
@@ -106,8 +106,14 @@ if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
     # push docker.json. Not actually needed for cachestack at the moment.
     lxc file push ./daemon.json cachestack/etc/docker/daemon.json
 
+    lxc config device set cachestack bcmbridge ipv4.address 10.254.254.2
+
     lxc start cachestack
+
     sleep 30
+
+    # get rid of superflous default route
+    lxc exec cachestack -- route del default eth2
 else
     echo "LXD host 'cachestack' is already in a running state. Exiting."
     exit 1

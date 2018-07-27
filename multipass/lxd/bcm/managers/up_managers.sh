@@ -10,7 +10,7 @@ cd "$(dirname "$0")"
 
 # Managernet is used by any docker host that joins the swarm.
 echo "Creating managernet."
-lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false
+lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=false
 
 ## Create the manager template
 # Create the manager template from a snapshot that includes docker
@@ -23,29 +23,28 @@ lxc file push ./daemon.json manager-template/etc/docker/daemon.json
 lxc snapshot manager-template "managerTemplate"
 
 ## Start and configure the managers.
-# create manager1, manager2, and manager3 from the template snapshot
-for MANAGER in manager1 manager2 manager3
-do	
-    lxc profile create $MANAGER
-    cat ./lxd_profiles/"$MANAGER".yml | lxc profile edit $MANAGER
+# create manager1
 
-    lxc copy manager-template/managerTemplate $MANAGER
-    lxc profile apply $MANAGER docker,$MANAGER
+lxc profile create manager1
+cat ./lxd_profiles/manager1.yml | lxc profile edit manager1
 
-    # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
-    lxc storage create $MANAGER-dockervol dir
-    lxc config device add $MANAGER dockerdisk disk source=/var/lib/lxd/storage-pools/$MANAGER-dockervol path=/var/lib/docker 
+lxc copy manager-template/managerTemplate manager1
+lxc profile apply manager1 docker,manager1
 
-    lxc start $MANAGER
+# Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
+lxc storage create manager1-dockervol dir
+lxc config device add manager1 dockerdisk disk source=/var/lib/lxd/storage-pools/manager1-dockervol path=/var/lib/docker 
 
-    # wait for the machine to start
-    # TODO find a better way to wait
-    sleep 5
+lxc start manager1
 
-    # this kind of feels like a bind mount.
-    lxc exec $MANAGER -- mkdir -p /apps/kafka
-    lxc config device add $MANAGER code_kafka disk path=/apps/kafka source=$(pwd)/kafka
-done
+# wait for the machine to start
+# TODO find a better way to wait
+sleep 5
+
+# this kind of feels like a bind mount.
+lxc exec manager1 -- mkdir -p /apps/kafka
+lxc config device add manager1 code_kafka disk path=/apps/kafka source=$(pwd)/kafka
+
 
 sleep 10
 
@@ -53,17 +52,7 @@ lxc exec manager1 -- docker swarm init --advertise-addr=10.0.0.11
 
 wait-for-it -t 20 10.0.0.11:2377
 
-MANAGER_TOKEN=$(lxc exec manager1 -- docker swarm join-token manager | grep token | awk '{ print $5 }')
-
-lxc exec manager2 -- docker swarm join --token $MANAGER_TOKEN 10.0.0.11:2377
-
-wait-for-it -t 20 10.0.0.12:2377
-
-lxc exec manager3 -- docker swarm join --token $MANAGER_TOKEN 10.0.0.11:2377
-
-wait-for-it -t 0 10.0.0.13:2377
-
-echo "Deploying Kafka stack to managers."
+echo "Deploying Kafka stack to manager1."
 lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka.yml kafka
 
 lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka-tools.yml kafkatools

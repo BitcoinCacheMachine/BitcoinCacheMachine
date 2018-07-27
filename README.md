@@ -26,6 +26,7 @@ Below you will find some of the development goals for BCM.
 * Provide a self-contained, event-driven, software-defined IT infrastructure for potential Bitcoin and Lightning-related applications.
 * Be able to run entirely on commodity x86_x64 hardware for home and small office settings. You can run BCM on an old computer!
 * Integrate exclusively free and open source software!
+* Create a composable framework for deploying Bitcoin and Lightning-related components.
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of each BCM deployment.
 * Embrace hardware wallets for cryptographic operations where possible (e.g., Trezor-generated SSH keys or PGP certificates for authentication and encryption).
 * Pre-configure all software to protect user's privacy (e.g., TOR for communication, disk encryption, minimal attack surface, etc.).
@@ -48,11 +49,13 @@ BCM is meant for home and small office use which aligns with the spirit of decen
 
 ## BCM Components
 
-Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware (planned). Each BCM instance can operate with or without a [Cache Stack](https://github.com/farscapian/bcm_cachestack) deployed on your local network (RECOMMENDED). Each BCM instance consists of three required LXD system containers:
+Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware. 
 
-* `proxyhost` [required] -- provides BCM-instance-local caching services for dependent downstream lxd hosts. `proxyhost` also runs one or more docker registr mirrors each configured as a pull-through cache. `Proxyhost` connects to the `lxdbr0` network bridge which NATs to the hosts IP address. Docker registries on `proxyhost` can be configured to use a Cache Stack (recommended for development) by updating the software-defined features list (see ./docs/installation)
+Each BCM is composed of the following:
 
-* `manager1` [required], `manager2` [optional], `manager3` [optional] -- There are three manager hosts to facilitate the Docker Swarm manager role for the rest of the swarm. The docker daemon on each manager host is configured to use `proxyhost` as the registry mirror. A Kafka messaging stack is deployed to each manager node for distributed messaging and is the system-of-record for user data. Manager LXC containers are planned to be deployable to independent x86_x64 hardware for high-availability.
+* `cachestack` - a set of LXD components (networks, storage pool, profiles, etc.) and LXD containers that provide caching and underlay services for BCM components. You can install `cachestack` in standalone mode to provide network services to your LAN components. If there is no CacheStack on your LAN segment, Bitcoin Cache Machine installs a local copy and uses it internally. Cache Stack serves LXD images to your local network (when in standalone mode), hosts one or more Docker Registries configured as a pull-through cache, provides HTTP/HTTPS proxy services, and hosts an outbound SOCKS5 TOR proxy.
+
+* `manager1` [required] -- There are manager hosts to facilitate the Docker Swarm manager role for the rest of the swarm. The docker daemon on each manager host is configured to use `cachestack:5000` as the Docker registry mirror. A Kafka messaging stack is deployed to each manager node for distributed messaging and is the system-of-record for user data. Manager LXC containers are planned to be deployable to independent x86_x64 hardware for high-availability.
 
 * `bitcoin` [required] -- the `bitcoin` lxd host is built for bitcoin-related services: A Bitcoin Core version 16.1 running as a fully validating node provides the root of trust for global consensus operations [required]. One or more Lightning Daemons (currently c-lightning and lnd) can be deployed to the bitcoin host as well. The docker daemon on each app host is configured to obtain images from a docker registry mirror running on the proxyhost (since proxyhost serves a local registry cache).
 

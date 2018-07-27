@@ -1,14 +1,45 @@
 #!/bin/bash
 
-lxc exec manager1 -- bash -c /apps/bitcoin/down.sh
+set -e
 
-lxc delete --force bitcoin >/dev/null
+if [[ $(lxc list | grep bitcoin) ]]; then
+    echo "Destroying lxd container 'bitcoin'."
+    lxc delete --force bitcoin 
+else
+    echo "LXC container 'bitcoin' not found. Skipping."
+fi
 
-lxc profile delete bitcoinprofile >/dev/null
 
-lxc network delete lxdbrBitcoin
 
-# wait for the node to go down them remove the node from the stack
-lxc exec manager1 -- docker node rm bitcoin
 
-lxc storage delete bitcoin-dockervol
+if [[ $(lxc profile list | grep bitcoinprofile) ]]; then
+    echo "Destroying lxd profile 'bitcoinprofile'."
+   lxc profile delete bitcoinprofile
+else
+    echo "LXC profile 'bitcoinprofile' not found. Skipping."
+fi
+
+
+
+
+if [[ $(lxc network list | grep lxdbrBitcoin) ]]; then
+    echo "Destroying lxd network 'lxdbrBitcoin'."
+   lxc network delete lxdbrBitcoin
+else
+    echo "LXC network 'lxdbrBitcoin' not found. Skipping."
+fi
+
+
+
+if [[ $(lxc storage list | grep "bitcoin-dockervol") ]]; then
+    echo "Destroying lxd storage pool 'bitcoin-dockervol'."
+   lxc storage delete bitcoin-dockervol
+else
+    echo "LXC storage pool 'bitcoin-dockervol' not found. Skipping."
+fi
+
+
+
+
+
+
