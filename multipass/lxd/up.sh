@@ -12,17 +12,29 @@ if [[ -z $(env | grep BC) ]]; then
   exit
 fi
 
+
 # Installation branching logic. 
 if [[ $BC_CACHESTACK_STANDALONE="true" ]]; then
   echo "Performing a Cache Stack standalone installation."
+  echo "Installing Bitcoin Cache Stack in standalone mode. Cache Stack will attach to physical interface $BCS_TRUSTED_HOST_INTERFACE".
 
   #TODO check to ensure the the macvlan interface is set.
   bash -c ./bcs/up_lxd.sh
   exit
 fi
 
-
+# # create the lxdbrCacheStack network if it doesn't exist.
+# if [[ -z $(lxc network list | grep lxdbrCacheStack) ]]; then
+#   # lxdbrCacheStack is used to connect the Cache Stack and the Bitcoin Cache Machine components.
+#   lxc network create lxdbrCacheStack ipv4.nat=false
+  
+#   #TODO check to ensure the the macvlan interface is set.
+#   bash -c ./bcs/up_lxd.sh
 # else
+#   echo "lxdbrCacheStack already exists."
+# fi
+
+# # else
 
 
 
@@ -33,25 +45,3 @@ fi
 #   lxc config set core.proxy_https ""
 #   lxc config set core.proxy_http ""
 #   lxc config set core.proxy_ignore_hosts ""
-
-#   # Create a docker host template if it doesn't exist already
-#   if [[ -z $(lxc list | grep dockertemplate) ]]; then
-#     export BC_ZFS_POOL_NAME="bcs_data"
-#       # Create a docker host template if it doesn't exist already
-#     if [[ -z $(lxc list | grep $BC_ZFS_POOL_NAME) ]]; then
-#       # create the host template if it doesn't exist already.
-#       bash -c ./host_template/up_lxd.sh
-#     fi
-
-#     # if the template doesn't exist, publish it create it.
-#     if [[ -z $(lxc image list | grep bctemplate) ]]; then
-#       echo "Publishing dockertemplate/dockerSnapshot snapshot as bctemplate lxd image."
-#       lxc publish $(lxc remote get-default):dockertemplate/dockerSnapshot --alias bctemplate
-#     fi    
-#   else
-#     echo "Skipping creation of the host template. Snapshot already exists."
-#   fi  
-
-#   echo "Calling Bitcoin Cache Stack Installation Script."
-#   bash -c ./bcs/up_lxd.sh
-# fi

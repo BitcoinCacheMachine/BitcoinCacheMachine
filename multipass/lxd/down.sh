@@ -24,16 +24,6 @@ else
   bash -c ./bcs/down_lxd.sh
 fi
 
-# delete the host template if configured
-if [[ $BC_HOST_TEMPLATE_DELETE = 'true' ]]; then
-  echo "Destrying host template"
-  bash -c ./host_template/down_lxd.sh
-else
-  if [[ $(lxc image list | grep bctemplate) ]]; then
-    echo "Keeping the lxd host template."
-  fi
-fi
-
 
 
 # bctemplate

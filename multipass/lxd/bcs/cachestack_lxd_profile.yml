@@ -1,5 +1,5 @@
 config:
-  limits.cpu: "4"
+  limits.cpu: "2"
   limits.memory: "2048MB"    
 
   user.network-config: |
@@ -12,24 +12,23 @@ config:
           - type: dhcp
             ipv4: true
             control: auto
-
-      # data path
-      - type: physical
-        name: eth1
-        subnets:
-          - type: dhcp
-            ipv4: true
-            control: auto
-
             
       # swarm managernet
       - type: physical
-        name: eth2
+        name: eth1
         subnets:
           - type: static
             ipv4: true
             address: 10.0.0.11
             netmask: 255.255.255.0
+            control: auto
+
+      # data path
+      - type: physical
+        name: eth2
+        subnets:
+          - type: dhcp
+            ipv4: true
             control: auto
 
 description:
@@ -41,17 +40,8 @@ devices:
     parent: lxdbrCacheStack
     type: nic
 
-  # Obtains an IP address via MACVLAN, i.e., second IP address on the defined physical network interface (parent)
-  # this is effectively our data plane.
-  eth1:
-    nictype: macvlan
-    parent: BCS_TRUSTED_HOST_INTERFACE
-    type: nic
-    # limits.ingress: 10Mbit
-    # limits.egress: 10Mbit
-
   # managernet
-  eth2:
+  eth1:
     nictype: bridged
     parent: lxdBCSMgrnet
     type: nic

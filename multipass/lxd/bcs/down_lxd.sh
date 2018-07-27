@@ -62,3 +62,13 @@ if [[ $(lxc storage list | grep "cachestack-dockervol") ]]; then
 else
     echo "Skipping deletion of lxd stroage pool cachestack-dockervol."
 fi
+
+# delete the host template if configured
+if [[ $BC_HOST_TEMPLATE_DELETE = 'true' ]]; then
+  echo "Destrying host template"
+  bash -c ./host_template/down_lxd.sh
+else
+  if [[ $(lxc image list | grep bctemplate) ]]; then
+    echo "Keeping the lxd host template."
+  fi
+fi
