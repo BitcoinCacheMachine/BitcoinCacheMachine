@@ -11,7 +11,8 @@ config:
         subnets:
           - type: dhcp
             ipv4: true
-            control: auto    
+            control: auto   
+             
       # proxyhostnet
       - type: physical
         name: eth1

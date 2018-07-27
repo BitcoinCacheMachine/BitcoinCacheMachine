@@ -58,18 +58,7 @@ else
 fi
 
 
-##############################################
 
-# clone the host_template repo, which is shared with Cache Stack
-git clone https://github.com/farscapian/bcm_host_template
-
-echo "Creating an LXD system container template."
-chmod +x ./bcm_host_template/up_host_template.sh
-./bcm_host_template/up_host_template.sh
-
-# proxyhost is mandatory for each BCM instance
-echo "Deploying proxyhost."
-./proxyhost/up_proxyhost.sh
 
 # a manager is required for each BCM instance.
 # TODO add more managers across independent hardware

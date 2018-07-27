@@ -18,7 +18,6 @@ cd "$(dirname "$0")"
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-
 # Create a docker host template if it doesn't exist already
 if [[ -z $(lxc list | grep dockertemplate) ]]; then
     # Create a docker host template if it doesn't exist already
@@ -35,7 +34,6 @@ if [[ -z $(lxc list | grep dockertemplate) ]]; then
 else
     echo "Skipping creation of the host template. Snapshot already exists."
 fi
-
 
 # create the lxdbrCacheStack network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrCacheStack) ]]; then
@@ -62,7 +60,6 @@ else
     echo "lxdBCSMgrnet already exists."
 fi
 
-
 # create the cachestack container.
 if [[ -z $(lxc list | grep cachestack) ]]; then
   lxc copy dockertemplate/dockerSnapshot cachestack
@@ -70,11 +67,6 @@ else
   echo "cachestack lxd container already exists."
 fi
 
-
-
-
-
-
 # create the cachestackprofile profile if it doesn't exist.
 if [[ -z $(lxc profile list | grep cachestackprofile) ]]; then
     lxc profile create cachestackprofile
@@ -82,17 +74,6 @@ if [[ -z $(lxc profile list | grep cachestackprofile) ]]; then
 else
     echo "cachestackprofile lxd profile already exists."
 fi
-
-
-
-# create the cachestackprofile profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep cachestackprofile) ]]; then
-    lxc profile create cachestackprofile
-    cat ./cachestack_lxd_profile.yml | lxc profile edit cachestackprofile
-else
-    echo "cachestackprofile lxd profile already exists."
-fi
-
 
 # Cache Stack Standalone 
 if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
