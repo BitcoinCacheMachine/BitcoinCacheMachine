@@ -1,0 +1,22 @@
+version: '3.6'
+services:
+  # listens on 8000 by default
+  schema-registry-ui:
+    image: landoop/schema-registry-ui:latest
+    # ports:
+    #   - "8000:8000"
+    networks:
+      - schemaregistry_schemaregistrynet
+    environment:
+      SCHEMAREGISTRY_URL: http://schemaregistry:8081
+      PROXY: "true"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  schemaregistry_schemaregistrynet:
+    external: true

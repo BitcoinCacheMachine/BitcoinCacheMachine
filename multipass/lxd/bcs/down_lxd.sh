@@ -68,7 +68,7 @@ if [[ $(lxc storage list | grep "cachestack-dockervol") ]]; then
     echo "Deleting lxd storage pool 'cachestack-dockervol'."
     lxc storage delete cachestack-dockervol
 else
-    echo "Skipping deletion of lxd stroage pool cachestack-dockervol."
+    echo "Skipping deletion of lxd storage pool cachestack-dockervol."
 fi
 
 # delete the host template if configured

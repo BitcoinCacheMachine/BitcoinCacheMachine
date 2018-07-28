@@ -3,6 +3,9 @@
 # stop scrtip if error is encountered.
 set -e
 
+# load the environment variables for the current LXD remote.
+source ~/.bcm/lxd_endpoints.sh $(lxc remote get-default)
+
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
@@ -15,13 +18,15 @@ fi
 
 # Installation branching logic. 
 if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
-  echo "Installing Bitcoin Cache Stack in standalone mode. Cache Stack will attach to physical interface $BCS_TRUSTED_HOST_INTERFACE".
+  echo "Installing Bitcoin Cache Stack in standalone mode. Cache Stack will attach to the underlay via physical interface $BCS_TRUSTED_HOST_INTERFACE on $LXD_ENDPOINT."
   #TODO check to ensure the the macvlan interface is set.
   bash -c ./bcs/up_lxd.sh
-  exit
 else
-  echo "Installing Bitcoin Cache Stack + Bitcoin Cache Machine. Starting Cache Stack installation."
-  bash -c ./bcs/up_lxd.sh
+
+  if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
+    echo "Installing Bitcoin Cache Stack + Bitcoin Cache Machine. Starting Cache Stack installation."
+    bash -c ./bcs/up_lxd.sh
+  fi
 
   export BCM_CACHE_STACK="cachestack"
   

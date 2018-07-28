@@ -1,0 +1,55 @@
+version: '3.6'
+services:
+
+
+#  server.2=zookeeper2:2888:3888 server.3=zookeeper3:2888:3888
+  # zoo2:
+  #   image: zookeeper
+  #   hostname: zoo2
+  #   networks:
+  #     kafkanet:
+  #       aliases:
+  #         - zookeeper2
+  #   volumes:
+  #     - zoo2-data:/var/lib/zookeeper/data
+  #     - zoo2-logs:/var/lib/zookeeper/log
+  #   environment:
+  #     ZOO_MY_ID: 2
+  #     ZOO_SERVERS: server.1=zookeeper1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zookeeper3:2888:3888
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.hostname == manager2
+
+
+   # #listens on 9092
+  # kafka-broker2:
+  #   image: confluentinc/cp-kafka:4.1.1-1
+  #   networks:
+  #     kafkanet:
+  #       aliases:
+  #         - broker2
+  #   volumes:
+  #     - broker2-data:/var/lib/kafka/data
+  #   environment:
+  #     KAFKA_BROKER_ID: 2
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,PLAINTEXT:PLAINTEXT
+  #     KAFKA_ADVERTISED_LISTENERS: INSIDE://broker2:9092,PLAINTEXT://broker2:9090
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #     CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     placement:
+  #       constraints:
+  #         - node.hostname == manager2
+
+volumes:
+  zoo2-data:
+  zoo2-logs:
+  broker2-data:

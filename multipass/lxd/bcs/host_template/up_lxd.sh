@@ -3,7 +3,7 @@
 set -e
 
 echo ""
-echo "---------- bcm/bcs host template ----------------"
+echo "-----------------------------------------------"
 echo "Creating BCM/BCS LXD host template."
 
 # set the working directory to the location where the script is located
@@ -63,21 +63,20 @@ fi
 
 sleep 5
 
-if [[ ! -z $BCM_CACHE_STACK_IP ]]; then
-  echo "Running apt update on dockertemplate using HTTP_PROXY of http://$BCM_CACHE_STACK_IP:3128"
-  lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://$BCM_CACHE_STACK_IP:3128 -- apt update
+echo "Running apt update on dockertemplate using HTTP_PROXY of http://cachestack:3128"
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt update
 
-  echo "Installing required software on dockertemplate using HTTP_PROXY of http://$BCM_CACHE_STACK_IP:3128"
-  lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://$BCM_CACHE_STACK_IP:3128 -- apt-get install wait-for-it -y
-  lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
-  lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://$BCM_CACHE_STACK_IP:3128 -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
-  lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://$BCM_CACHE_STACK_IP:3128 -- sh get-docker.sh >/dev/null
-else
-  echo "Installing docker by downloading content from the Internet."
-  lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
-  lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
-  lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- sh get-docker.sh >/dev/null
-fi
+echo "Installing required software on dockertemplate using HTTP_PROXY of http://cachestack:3128"
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt-get install wait-for-it tor ifmetric -y
+lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- sh get-docker.sh >/dev/null
+# else
+#   echo "Installing docker by downloading content from the Internet."
+#   lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
+#   lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
+#   lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- sh get-docker.sh >/dev/null
+# fi
 
 # stop the current template dockerd instance since we're about to create a snapshot
 # Enable the docker daemon to start by default.

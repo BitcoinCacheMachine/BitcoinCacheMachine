@@ -46,7 +46,8 @@ fi
 # create the lxdbrBCMBridge network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrBCMBridge) ]]; then
     # lxdbrBCMBridge connects cachestack services to BCM instances running in the same LXD daemon.
-    lxc network create lxdbrBCMBridge ipv4.nat=false ipv4.address=10.254.254.1/24 ipv6.nat=false ipv6.address=none
+    lxc network create lxdbrBCMBridge ipv4.nat=false ipv6.nat=false ipv6.address=none
+    #ipv4.address=10.254.254.1/24
 else
     echo "lxdbrBCMBridge already exists."
 fi
@@ -70,20 +71,24 @@ fi
 # create the cachestackprofile profile if it doesn't exist.
 if [[ -z $(lxc profile list | grep cachestackprofile) ]]; then
     lxc profile create cachestackprofile
-    cat ./cachestack_lxd_profile.yml | lxc profile edit cachestackprofile
-else
-    echo "cachestackprofile lxd profile already exists."
 fi
 
+    
+echo "Applying ./cachestack_lxd_profile.yml to lxd profile 'cachestackprofile'."
+cat ./cachestack_lxd_profile.yml | lxc profile edit cachestackprofile
+
 # Cache Stack Standalone 
-if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
-    # if we're in standalone mode, eth2 in cachestack will connect to the underlay
-    # via a physical interface as provided by the user in BCS_TRUSTED_HOST_INTERFACE
-    echo "Attaching cachestack to the underlay via $BCS_TRUSTED_HOST_INTERFACE on $(lxc remote get-default)."
-    lxc network attach-profile eno1 cachestackprofile eth2 eth2
+if [[ $BC_ATTACH_TO_UNDERLAY = "true" ]]; then
+    # if we're in standalone mode, then we attach eth3 in the container via MACVLAN
+    # to the user-provided physical network interface that provides access to the network underlay. 
+    # cachestack will obtain a unique IP address on the underlay and register its name as 'cachestack' 
+    # with the local DNS server, if any.
+    lxc profile device set cachestackprofile eth3 nictype macvlan
+    lxc profile device set cachestackprofile eth3 parent $BCS_TRUSTED_HOST_INTERFACE
 else
-    echo "Attaching Cache Stack lxd host to lxdbrBCMBridge to provide services to resident Bitcoin Cache Machine instances."
-    lxc network attach lxdbrBCMBridge cachestack bcmbridge eth2
+    lxc network create lxdBrNowhere ipv4.nat=false ipv6.nat=false
+    lxc profile device set cachestackprofile eth3 nictype bridged
+    lxc profile device set cachestackprofile eth3 parent lxdBrNowhere
 fi
 
 # create the cachestack-dockervol storage pool.
@@ -95,25 +100,18 @@ else
   echo "cachestack-dockervol lxd storage pool already exists."
 fi
 
-
-
 # Apply the resulting profile and start the container.
 if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
     # create a root device backed by the ZFS pool name passed in BC_ZFS_POOL_NAME.
-    lxc profile device add cachestackprofile root disk path=/ pool=$BC_ZFS_POOL_NAME
+    #lxc profile device add cachestackprofile root disk path=/ pool=$BC_ZFS_POOL_NAME
     lxc profile apply cachestack docker,cachestackprofile
-
-    # push docker.json. Not actually needed for cachestack at the moment.
-    lxc file push ./daemon.json cachestack/etc/docker/daemon.json
-
-    lxc config device set cachestack bcmbridge ipv4.address 10.254.254.2
 
     lxc start cachestack
 
     sleep 30
 
-    # get rid of superflous default route
-    lxc exec cachestack -- route del default eth2
+    # update routes to prefer eth0 for outbound access.
+    lxc exec cachestack -- ifmetric eth0 0
 else
     echo "LXD host 'cachestack' is already in a running state. Exiting."
     exit 1

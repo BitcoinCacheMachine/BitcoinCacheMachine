@@ -6,6 +6,7 @@
 packages:
   - zfsutils-linux
   - wait-for-it
+  - tor
 
 
 # enable lxd and remote management

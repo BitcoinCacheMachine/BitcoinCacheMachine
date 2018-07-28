@@ -23,9 +23,17 @@ config:
             netmask: 255.255.255.0
             control: auto
 
-      # data path
+      # data path for services originating on the same LXD daemon.
       - type: physical
         name: eth2
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto
+
+      # data path for services originating on the underlay.
+      - type: physical
+        name: eth3
         subnets:
           - type: dhcp
             ipv4: true
@@ -46,4 +54,20 @@ devices:
     parent: lxdBCSMgrnet
     type: nic
 
+  # bcmbridge
+  eth2:
+    nictype: bridged
+    parent: lxdbrBCMBridge
+    type: nic
+
+  # access to underlay network
+  eth3:
+    nictype: macvlan
+    parent: eno1
+    type: nic
+
+  root:
+    path: /
+    pool: bc_data
+    type: disk
 name: lxd_profile_proxy_host

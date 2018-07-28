@@ -39,30 +39,38 @@ lxc start manager1
 
 # wait for the machine to start
 # TODO find a better way to wait
-sleep 5
-
-# this kind of feels like a bind mount.
-lxc exec manager1 -- mkdir -p /apps/kafka
-lxc config device add manager1 code_kafka disk path=/apps/kafka source=$(pwd)/kafka
-
-
 sleep 10
 
-lxc exec manager1 -- docker swarm init --advertise-addr=10.0.0.11
 
-wait-for-it -t 20 10.0.0.11:2377
+lxc exec manager1 -- docker swarm init --advertise-addr=10.0.0.11 >/dev/null
 
-echo "Deploying Kafka stack to manager1."
-lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka.yml kafka
+echo "Waiting for manager1 docker swarm service."
 
-lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka-tools.yml kafkatools
+sleep 5
 
+
+
+
+echo "Deploying a Kafka-based message bus."
+lxc exec manager1 -- mkdir -p /apps/kafka
+lxc file push ./kafka/zookeeper1.yml manager1/apps/kafka/zookeeper1.yml
+lxc file push ./kafka/kafka1.yml manager1/apps/kafka/kafka1.yml
+lxc file push ./kafka/schema-registry.yml manager1/apps/kafka/schema-registry.yml
+lxc file push ./kafka/logstash.conf manager1/apps/kafka/logstash.conf
+
+echo "Deploying zookeeper and kafka to manager1."
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/zookeeper1.yml kafka
+sleep 3
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka1.yml kafka
+
+echo "Deploying kafka ETL stack to manager1."
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/schema-registry.yml schemaregistry
 
 echo "Waiting for Kafka schema-registry"
-wait-for-it -t 0 10.0.0.11:8081
+lxc exec manager1 -- wait-for-it -t 0 10.0.0.11:8081
 
 echo "Waiting for kafka-rest"
-wait-for-it -t 0 10.0.0.11:8082 
+lxc exec manager1 -- wait-for-it -t 0 10.0.0.11:8082 
 
 echo "Waiting for gelf-listener to come online."
-wait-for-it -t 0 10.0.0.11:12201
+lxc exec manager1 -- wait-for-it -t 0 10.0.0.11:12201
