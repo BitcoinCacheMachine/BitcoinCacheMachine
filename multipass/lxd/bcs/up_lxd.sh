@@ -43,14 +43,7 @@ else
     echo "lxdbrCacheStack already exists."
 fi
 
-# create the lxdbrBCMBridge network if it doesn't exist.
-if [[ -z $(lxc network list | grep lxdbrBCMBridge) ]]; then
-    # lxdbrBCMBridge connects cachestack services to BCM instances running in the same LXD daemon.
-    lxc network create lxdbrBCMBridge ipv4.nat=false ipv6.nat=false ipv6.address=none
-    #ipv4.address=10.254.254.1/24
-else
-    echo "lxdbrBCMBridge already exists."
-fi
+
 
 # create the lxdBCSMgrnet network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdBCSMgrnet) ]]; then

@@ -17,31 +17,22 @@ fi
 # create the zfs cluster if it doesn't exist.
 # $ZFS_POOL_NAME should be set before being called to allow for separation
 # between applications.
-if [[ -z $(lxc storage list | grep "bcm-data") ]]; then
+if [[ -z $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
   lxc storage create "$BC_ZFS_POOL_NAME" zfs size=10GB
 else
   echo "$BC_ZFS_POOL_NAME already exists, skipping pool creation."
 fi
 
-# create the docker profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep docker) ]]; then
-  # default profile has our root block device mapped to ZFS $ZFS_POOL_NAME
-  lxc profile create docker
-  cat ./docker_lxd_profile.yml | lxc profile edit docker
-else
-  echo "Applying docker_lxd_profile.yml to lxd profile 'docker'."
-  cat ./docker_lxd_profile.yml | lxc profile edit docker
-fi
+# # create the docker profile if it doesn't exist.
+# if [[ -z $(lxc profile list | grep docker) ]]; then
+#   # default profile has our root block device mapped to ZFS $ZFS_POOL_NAME
+#   lxc profile create docker
+#   cat ./docker_lxd_profile.yml | lxc profile edit docker
+# else
+#   echo "Applying docker_lxd_profile.yml to lxd profile 'docker'."
+#   cat ./docker_lxd_profile.yml | lxc profile edit docker
+# fi
 
-
-# create the dockertemplate_profile profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep dockertemplate_profile) ]]; then
-  # create necessary templates
-  lxc profile create dockertemplate_profile
-  cat ./lxd_profile_docker_template.yml | lxc profile edit dockertemplate_profile
-else
-  echo "LXD profile 'dockertemplate_profile' already exists, skipping profile creation."
-fi
 
 # get the active LXD endpoint so we don't have to reference it all the time.
 ACTIVE_LXD_ENDPOINT=$(lxc remote get-default)

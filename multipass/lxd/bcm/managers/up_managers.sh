@@ -12,9 +12,16 @@ cd "$(dirname "$0")"
 echo "Creating managernet."
 lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=false
 
-## Create the manager template
-# Create the manager template from a snapshot that includes docker
-lxc copy dockertemplate/dockerSnapshot manager-template
+
+# create the storage pool if it doesn't exist.
+if [[ -z $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
+  lxc storage create "$BC_ZFS_POOL_NAME" zfs size=10GB
+else
+  echo "$BC_ZFS_POOL_NAME already exists, skipping pool creation."
+fi
+
+## Create the manager1 host from the lxd image template.
+lxc init bctemplate manager-template -p docker -p dockertemplate_profile -s $BC_ZFS_POOL_NAME
 
 # push necessary files to the template including daemon.json
 lxc file push ./daemon.json manager-template/etc/docker/daemon.json

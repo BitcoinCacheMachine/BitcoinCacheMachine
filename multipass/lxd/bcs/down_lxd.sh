@@ -47,13 +47,6 @@ else
     echo "Skipping deletion of lxd network lxdbrCacheStack."
 fi
 
-# delete lxd network lxdbrBCMBridge 
-if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
-    echo "Deleting lxd network 'lxdbrBCMBridge'."
-    lxc network delete lxdbrBCMBridge
-else
-    echo "Skipping deletion of lxd network lxdbrBCMBridge."
-fi
 
 # delete lxd network lxdBCSMgrnet 
 if [[ $(lxc network list | grep lxdBCSMgrnet) ]]; then
@@ -79,4 +72,12 @@ else
   if [[ $(lxc image list | grep bctemplate) ]]; then
     echo "Keeping the lxd host template."
   fi
+fi
+
+
+if [[ $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
+    echo "Deleting lxd storage pool '$BC_ZFS_POOL_NAME'"
+    lxc storage rm $BC_ZFS_POOL_NAME
+else
+    echo "Skipping deletion of lxd xd storage pool $BC_ZFS_POOL_NAME."
 fi

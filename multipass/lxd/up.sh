@@ -15,6 +15,33 @@ if [[ -z $(env | grep BC) ]]; then
   exit
 fi
 
+# create the docker profile if it doesn't exist.
+if [[ -z $(lxc profile list | grep docker) ]]; then
+  lxc profile create docker
+  cat ./shared/docker_lxd_profile.yml | lxc profile edit docker
+else
+  echo "Applying docker_lxd_profile.yml to lxd profile 'docker'."
+  cat ./shared/docker_lxd_profile.yml | lxc profile edit docker
+fi
+
+
+# create the dockertemplate_profile profile if it doesn't exist.
+if [[ -z $(lxc profile list | grep dockertemplate_profile) ]]; then
+  # create necessary templates
+  lxc profile create dockertemplate_profile
+  cat ./shared/lxd_profile_docker_template.yml | lxc profile edit dockertemplate_profile
+else
+  echo "LXD profile 'dockertemplate_profile' already exists, skipping profile creation."
+fi
+
+# create the lxdbrBCMBridge network if it doesn't exist.
+if [[ -z $(lxc network list | grep lxdbrBCMBridge) ]]; then
+    # lxdbrBCMBridge connects cachestack services to BCM instances running in the same LXD daemon.
+    lxc network create lxdbrBCMBridge ipv4.nat=false ipv6.nat=false ipv6.address=none
+    #ipv4.address=10.254.254.1/24
+else
+    echo "lxdbrBCMBridge already exists."
+fi
 
 # Installation branching logic. 
 if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
@@ -23,9 +50,15 @@ if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
   bash -c ./bcs/up_lxd.sh
 else
 
-  if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
-    echo "Installing Bitcoin Cache Stack + Bitcoin Cache Machine. Starting Cache Stack installation."
-    bash -c ./bcs/up_lxd.sh
+  # if BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT is unset, then provision Cache Stack.
+  if [[ -z $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT ]]; then
+    if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
+      echo "Installing Bitcoin Cache Stack + Bitcoin Cache Machine. Starting Cache Stack installation."
+      bash -c ./bcs/up_lxd.sh
+    fi
+  else
+    echo "Copying a prepared LXD system host image from $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT"
+    lxc image copy $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT:bctemplate $LXD_ENDPOINT: --auto-update --copy-aliases
   fi
 
   export BCM_CACHE_STACK="cachestack"
