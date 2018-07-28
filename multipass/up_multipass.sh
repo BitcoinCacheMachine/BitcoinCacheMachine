@@ -26,8 +26,8 @@ multipass launch \
   bionic
 
 # #restart the VM for updates to take effect
-# #multipass stop $MULTIPASS_VM_NAME
-# #multipass start $MULTIPASS_VM_NAME
+multipass stop $MULTIPASS_VM_NAME
+multipass start $MULTIPASS_VM_NAME
 
 # Get the IP address that was given to the multipass VM and add it 
 # as a remote LXD endpoint and configure the local client to execute 

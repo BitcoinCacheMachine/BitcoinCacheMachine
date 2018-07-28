@@ -7,9 +7,7 @@ services:
     ports:
       - "8001:8000"
     networks:
-      - kafkarestnet
-    depends_on:
-      - kafka-rest
+      kafka_kafkarestnet:
     environment:
       KAFKA_REST_PROXY_URL: http://kafkarest:8082
       PROXY: "true"
@@ -19,3 +17,7 @@ services:
       placement:
         constraints:
           - node.role == manager
+
+networks:
+  kafka_kafkarestnet:
+    external: true

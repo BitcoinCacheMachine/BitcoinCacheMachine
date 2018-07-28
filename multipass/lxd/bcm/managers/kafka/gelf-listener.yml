@@ -1,5 +1,6 @@
 version: '3.6'
 services:
+
   # Listens for gelf messages on TCP
   gelflistener:
     image: farscapian/logstash:latest
@@ -19,3 +20,11 @@ services:
       placement:
         constraints:
           - node.role == manager
+
+configs:
+  logstash_config:
+    file: ./logstash.conf
+
+networks:
+  kafka_kafkanet:
+    external: true

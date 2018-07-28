@@ -49,19 +49,23 @@ if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
   #TODO check to ensure the the macvlan interface is set.
   bash -c ./bcs/up_lxd.sh
 else
+  # in this section, we're installing BCM, which requires at least 1 Cachestack
+  # There are two options, either an external Cachestack is provided by the user
+  # or there is no external cachestack, and hence we deploy one.
 
-  # if BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT is unset, then provision Cache Stack.
-  if [[ -z $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT ]]; then
-    if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
-      echo "Installing Bitcoin Cache Stack + Bitcoin Cache Machine. Starting Cache Stack installation."
-      bash -c ./bcs/up_lxd.sh
-    fi
+  if [[ $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT = "none" ]]; then
+    # in this case, we deploy cachestack.
+    echo "Deploying local cachestack for BCM instance."
+    bash -c ./bcs/up_lxd.sh
   else
+    # in this assume the cachestack is defined in $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT
+    echo "Assuming external LXD endpoint '$BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT' is hosting a cachestack."
     echo "Copying a prepared LXD system host image from $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT"
     lxc image copy $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT:bctemplate $LXD_ENDPOINT: --auto-update --copy-aliases
-  fi
+  fi 
 
-  export BCM_CACHE_STACK="cachestack"
+
+  export BCM_CACHE_STACK="$BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT"
   
   echo "Installing Bitcoin Cache Machine components."
   bash -c ./bcm/up_lxd.sh

@@ -1,6 +1,0 @@
-
-
-
-configs:
-  logstash_config:
-    file: ./logstash.conf

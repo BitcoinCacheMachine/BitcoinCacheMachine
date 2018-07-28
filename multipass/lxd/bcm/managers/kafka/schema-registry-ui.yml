@@ -1,12 +1,11 @@
 version: '3.6'
 services:
-  # listens on 8000 by default
   schema-registry-ui:
     image: landoop/schema-registry-ui:latest
-    # ports:
-    #   - "8000:8000"
+    ports:
+      - "8000:8000"
     networks:
-      - schemaregistry_schemaregistrynet
+      - kafka_schemaregistrynet
     environment:
       SCHEMAREGISTRY_URL: http://schemaregistry:8081
       PROXY: "true"
@@ -18,5 +17,5 @@ services:
           - node.role == manager
 
 networks:
-  schemaregistry_schemaregistrynet:
+  kafka_schemaregistrynet:
     external: true

@@ -19,11 +19,12 @@ fi
 echo "Creating manager hosts."
 bash -c ./managers/up_managers.sh
 
+echo "Waiting for the GELF listener to come online."
+lxc exec manager1 -- wait-for-it -t 0 10.0.0.11:12201
+
+
 # Bitcoin infrastructure is required. Will probably implement some kind of primary/backup
 # configuration for the trusted bitcoin full node.
-# echo "Deploying Bitcoin infrastructure."
-# ./bitcoin/up_bitcoin.sh
-
-  # # echo "deploying an elastic infrastructure."
-  # ./elastic/up_elastic.sh
+echo "Calling up_bitcoin.sh."
+./bitcoin/up_bitcoin.sh
 

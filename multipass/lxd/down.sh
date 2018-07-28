@@ -28,6 +28,15 @@ function deleteCacheStack ()
 }
 
 
+# get or update the BCM host template git repo
+if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
+  deleteCacheStack
+else
+  echo "Calling Bitcoin Cache Machine down script."
+  bash -c ./bcm/down_lxd.sh
+
+  deleteCacheStack
+fi
 
 
 # delete lxd profile dockertemplate_profile
@@ -54,21 +63,3 @@ else
     echo "Skipping deletion of lxd network lxdbrBCMBridge."
 fi
 
-# bctemplate
-if [[ $BC_LXD_IMAGE_BCTEMPLATE_DELETE = 'true' ]]; then
-  if [[ $(lxc image list | grep bctemplate) ]]; then
-    echo "Destrying lxd image 'bctemplate'."
-    lxc image delete bctemplate
-  fi
-fi
-
-
-# get or update the BCM host template git repo
-if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
-  deleteCacheStack
-else
-  echo "Calling Bitcoin Cache Machine down script."
-  bash -c ./bcm/down_lxd.sh
-
-  deleteCacheStack
-fi

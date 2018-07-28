@@ -26,8 +26,6 @@ services:
 #,zookeeper2:2181,zookeeper3:2181
  
 volumes:
-  zoo1-data:
-  zoo1-logs:
   broker1-data:
 
 # created by zookeeper1.yml

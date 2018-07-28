@@ -58,26 +58,40 @@ sleep 5
 
 
 
-echo "Deploying a Kafka-based message bus."
+echo "Creating /apps/kafka inside manager1."
 lxc exec manager1 -- mkdir -p /apps/kafka
-lxc file push ./kafka/zookeeper1.yml manager1/apps/kafka/zookeeper1.yml
-lxc file push ./kafka/kafka1.yml manager1/apps/kafka/kafka1.yml
-lxc file push ./kafka/schema-registry.yml manager1/apps/kafka/schema-registry.yml
-lxc file push ./kafka/logstash.conf manager1/apps/kafka/logstash.conf
 
-echo "Deploying zookeeper and kafka to manager1."
+
+
+
+
+echo "Deploying zookeeper and kafka to the swarm."
+lxc file push ./kafka/zookeeper1.yml manager1/apps/kafka/zookeeper1.yml
 lxc exec manager1 -- docker stack deploy -c /apps/kafka/zookeeper1.yml kafka
-sleep 3
+
+echo "Deploying a Kafka broker to the swarm."
+lxc file push ./kafka/kafka1.yml manager1/apps/kafka/kafka1.yml
 lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka1.yml kafka
 
-echo "Deploying kafka ETL stack to manager1."
-lxc exec manager1 -- docker stack deploy -c /apps/kafka/schema-registry.yml schemaregistry
+echo "Deploying Kafka schema-registry to the swarm."
+lxc file push ./kafka/schema-registry.yml manager1/apps/kafka/schema-registry.yml
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/schema-registry.yml kafka
 
-echo "Waiting for Kafka schema-registry"
-lxc exec manager1 -- wait-for-it -t 0 10.0.0.11:8081
+echo "Deploying Kafka schema-registry-ui to the swarm."
+lxc file push ./kafka/schema-registry-ui.yml manager1/apps/kafka/schema-registry-ui.yml
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/schema-registry-ui.yml kafka
 
-echo "Waiting for kafka-rest"
-lxc exec manager1 -- wait-for-it -t 0 10.0.0.11:8082 
+echo "Deploying Kafka rest to the swarm."
+lxc file push ./kafka/kafka-rest.yml manager1/apps/kafka/kafka-rest.yml
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka-rest.yml kafka
 
-echo "Waiting for gelf-listener to come online."
-lxc exec manager1 -- wait-for-it -t 0 10.0.0.11:12201
+echo "Deploying Kafka topics-ui to the swarm."
+lxc file push ./kafka/kafka-topics-ui.yml manager1/apps/kafka/kafka-topics-ui.yml
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/kafka-topics-ui.yml kafka
+
+echo "Deploying logstash to the swarm configured for gelf on TCP 12201."
+lxc file push ./kafka/gelf-listener.yml manager1/apps/kafka/gelf-listener.yml
+lxc file push ./kafka/logstash.conf manager1/apps/kafka/logstash.conf
+lxc exec manager1 -- docker stack deploy -c /apps/kafka/gelf-listener.yml gelf
+
+

@@ -23,7 +23,7 @@ services:
 volumes:
   zoo1-data:
   zoo1-logs:
-  broker1-data:
+
 
 # overlay network that swarm hosts can use to contact kafka, if needed
 networks:

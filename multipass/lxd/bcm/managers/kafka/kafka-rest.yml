@@ -6,7 +6,7 @@ services:
       - "8082:8082"
     networks:
       kafka_kafkanet:
-      schemaregistry_schemaregistrynet:
+      kafka_schemaregistrynet:
       kafkarestnet:
         aliases:
           - kafkarest
@@ -27,7 +27,9 @@ services:
           - node.role == manager
 
 networks:
+  kafkarestnet:
+    attachable: true
   kafka_kafkanet:
     external: true
-  schemaregistry_schemaregistrynet:
+  kafka_schemaregistrynet:
     external: true

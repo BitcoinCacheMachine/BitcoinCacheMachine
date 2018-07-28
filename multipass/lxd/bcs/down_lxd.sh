@@ -56,6 +56,14 @@ else
     echo "Skipping deletion of lxd network lxdBCSMgrnet."
 fi
 
+# delete lxd network lxdbrBCMBridge 
+if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
+    echo "Deleting lxd network 'lxdbrBCMBridge'."
+    lxc network delete lxdbrBCMBridge
+else
+    echo "Skipping deletion of lxd network lxdbrBCMBridge."
+fi
+
 # delete lxd storage cachestack-dockervol 
 if [[ $(lxc storage list | grep "cachestack-dockervol") ]]; then
     echo "Deleting lxd storage pool 'cachestack-dockervol'."
@@ -74,10 +82,18 @@ else
   fi
 fi
 
+# bctemplate
+if [[ $BC_LXD_IMAGE_BCTEMPLATE_DELETE = 'true' ]]; then
+  if [[ $(lxc image list | grep bctemplate) ]]; then
+    echo "Destrying lxd image 'bctemplate'."
+    lxc image delete bctemplate
+  fi
+fi
+
 
 if [[ $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
     echo "Deleting lxd storage pool '$BC_ZFS_POOL_NAME'"
-    lxc storage rm $BC_ZFS_POOL_NAME
+    lxc storage delete $BC_ZFS_POOL_NAME
 else
     echo "Skipping deletion of lxd xd storage pool $BC_ZFS_POOL_NAME."
 fi
