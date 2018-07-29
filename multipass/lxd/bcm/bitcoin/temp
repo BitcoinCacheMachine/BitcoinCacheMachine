@@ -1,5 +1,0 @@
-    // ,
-    // "log-driver": "gelf",
-    // "log-opts": {
-    //     "gelf-address": "tcp://manager1:12201"
-    // }

@@ -48,42 +48,84 @@ lxc profile apply bitcoin docker,bitcoinprofile
 lxc storage create bitcoin-dockervol dir
 lxc config device add bitcoin dockerdisk disk source=/var/lib/lxd/storage-pools/bitcoin-dockervol path=/var/lib/docker
 
-# push docker.json for registry mirror settings
-lxc file push ./daemon.json bitcoin/etc/docker/daemon.json
+
+if [[ $BCM_DISABLE_DOCKER_GELF = "true" ]]; then
+  # push docker.json for registry mirror settings
+  lxc file push ./dockerd_nogelf.json bitcoin/etc/docker/daemon.json
+else
+  # push docker.json for registry mirror settings
+  lxc file push ./dockerd.json bitcoin/etc/docker/daemon.json
+fi
+
 
 lxc start bitcoin
 
 sleep 10
 
+# update routing table in bitcoin lxd host to prefer eth0 for outbound access.
+lxc exec bitcoin -- ifmetric eth0 0
+
 WORKER_TOKEN=$(lxc exec manager1 -- docker swarm join-token worker | grep token | awk '{ print $5 }')
 
 lxc exec bitcoin -- docker swarm join 10.0.0.11 --token $WORKER_TOKEN
-
-
 
 # create the external bitcoind data volume
 lxc exec bitcoin -- docker volume create bitcoind-data
 
 
+############################
+############################
+
+# install bitcoid if specified
+if [[ $BCM_INSTALL_BITCOIN_BITCOIND = "true" ]]; then
+  echo "Deploying bitcoind services to lxd host 'bitcoin'."
+  lxc exec manager1 -- mkdir -p /apps/bitcoind
+
+  lxc file push ./stacks/bitcoind/bitcoind-mainnet.conf manager1/apps/bitcoind/bitcoind-mainnet.conf
+  lxc file push ./stacks/bitcoind/bitcoind-testnet.conf manager1/apps/bitcoind/bitcoind-testnet.conf
+  lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/bitcoind.yml
+  lxc file push ./stacks/bitcoind/torrc.conf manager1/apps/bitcoind/torrc.conf
+
+  lxc exec manager1 -- docker stack deploy -c /apps/bitcoind/bitcoind.yml bitcoind
+fi
 
 
 
+# install lightningd (c-lightning) if specified
+if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD = "true" ]]; then
+  echo "Deploying lightningd (c-lightning) to lxd host 'bitcoin'."
+  lxc exec manager1 -- mkdir -p /apps/lightningd
+
+  lxc file push ./stacks/lightningd/lightningd-mainnet.conf manager1/apps/lightningd/lightningd-mainnet.conf
+  lxc file push ./stacks/lightningd/lightningd-testnet.conf manager1/apps/lightningd/lightningd-testnet.conf
+  lxc file push ./stacks/lightningd/lightningd.yml manager1/apps/lightningd/lightningd.yml
+  lxc file push ./stacks/lightningd/torrc.conf manager1/apps/lightningd/torrc.conf
+
+  lxc exec manager1 -- docker stack deploy -c /apps/lightningd/lightningd.yml lightningd
+fi
+
+
+# install lnd if specified
+if [[ $BCM_INSTALL_BITCOIN_LND = "true" ]]; then
+echo "Deploying lightning network daemon (lnd) to lxd host 'bitcoin'."
+lxc exec manager1 -- mkdir -p /apps/lnd
+
+lxc file push ./stacks/lnd/lnd-mainnet.conf manager1/apps/lnd/lnd-mainnet.conf
+lxc file push ./stacks/lnd/lnd-testnet.conf manager1/apps/lnd/lnd-testnet.conf
+lxc file push ./stacks/lnd/lnd.yml manager1/apps/lnd/lnd.yml
+
+lxc exec manager1 -- docker stack deploy -c /apps/lnd/lnd.yml lnd
 
 
 
+echo "Deploying lncli-web web interface (for lnd) lxd host 'bitcoin'."
+lxc exec manager1 -- mkdir -p /apps/lncliweb
 
+lxc file push ./stacks/lncliweb/lncli-web.yml manager1/apps/lncliweb/lncli-web.yml
+lxc file push ./stacks/lncliweb/lncli-web.lncliweb.conf.js manager1/apps/lncliweb/lncli-web.lncliweb.conf.js
+lxc file push ./stacks/lncliweb/nginx.conf manager1/apps/lncliweb/nginx.conf
 
-
-
-echo "Deploying bitcoin services to lxd host `bitcoin`."
-lxc exec manager1 -- mkdir -p /apps/bitcoind
-
-lxc file push ./stacks/bitcoind/bitcoind-mainnet.conf manager1/apps/bitcoind/bitcoind-mainnet.conf
-lxc file push ./stacks/bitcoind/bitcoind-testnet.conf manager1/apps/bitcoind/bitcoind-testnet.conf
-lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/bitcoind.yml
-lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/torrc.conf
-
-lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/bitcoind.yml bitcoind
+lxc exec manager1 -- docker stack deploy -c /apps/lncliweb/lncli-web.yml lncli-web
 
 
 
@@ -92,7 +134,7 @@ lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/bitcoind.yml bitcoind
 # # if IPFS_bootstrap is true, then we will download pre-indexed blockchain data, etc, via IPFS
 # # consider running a bitcoin cache stack on your local network to speed up deployment and avoid
 # # use of your internet connection.
-# if [[ $BCM_BITCOIN_IPFS_BOOTSTRAP = "true" ]]; then
+# if [[ $BCM_DEPLOYMENT_IPFS_BOOTSTRAP = "true" ]]; then
 #     echo "Downloading a pre-validated and pre-indexed copy of the bitcoin blockchain."
 #     echo "WARNING: By using this method, you are trusting the developers of BCM as well as the computer that created the IPFS Hash!"
 #     echo "         Use for development purposes only unless you understand the risks and need to get a working BCM fast!  Consider adding"
@@ -117,14 +159,3 @@ lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/bitcoind.yml bitcoind
 # echo "Deploying bitcoind."
 # lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/bitcoind/bitcoind.yml bitcoind
 
-# # Deploy lightningd
-# if [[ $BCM_BITCOIN_LIGHTNINGD = "true" ]]; then
-#     echo "BCM_BITCOIN_LIGHTNINGD set to true. Deploying lightningd."
-#     lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/lightningd/lightningd.yml lightningd
-# fi
-
-# # Deploy lnd
-# if [[ $BCM_BITCOIN_LND = "true" ]]; then
-#     echo "BCM_BITCOIN_LND set to true. Deploying lnd."
-#     lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/lnd/lnd.yml lnd
-# fi

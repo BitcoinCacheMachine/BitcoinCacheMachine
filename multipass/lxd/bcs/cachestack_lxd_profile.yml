@@ -19,7 +19,7 @@ config:
         subnets:
           - type: static
             ipv4: true
-            address: 10.0.0.11
+            address: 10.254.253.11
             netmask: 255.255.255.0
             control: auto
 

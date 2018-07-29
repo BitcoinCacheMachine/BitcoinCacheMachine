@@ -115,7 +115,7 @@ fi
 
 # convert the host to allow swarm services. We only need the docker
 # endpoint to be accessible locally since we control everything through lxd API.
-lxc exec cachestack -- docker swarm init --advertise-addr=10.0.0.11 >>/dev/null
+lxc exec cachestack -- docker swarm init --advertise-addr=10.254.253.11 >>/dev/null
 
 echo "Deploying Cache Stack services."
 

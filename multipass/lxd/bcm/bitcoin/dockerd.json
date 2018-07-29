@@ -1,0 +1,10 @@
+{
+    "registry-mirrors": ["http://cachestack:5000"],
+    "labels": [
+        "purpose=bitcoin"
+    ],
+    "log-driver": "gelf",
+    "log-opts": {
+        "gelf-address": "tcp://manager1:12201"
+    }
+}
