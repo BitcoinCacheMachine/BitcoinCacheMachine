@@ -162,8 +162,17 @@ if [[ $BCS_INSTALL_SQUID = 'true' ]]; then
 fi
 
 
+# Deploy a tor SOCKS5 proxy
+if [[ $BCS_INSTALL_TOR_SOCKS5_PROXY = 'true' ]]; then
+    echo "Deploying TOR SOCKS5 proxy to the Cache Stack."
+    lxc exec cachestack -- mkdir -p /apps/tor_socks5_proxy
+    lxc file push ./stacks/tor_socks5_proxy/tor_socks5_proxy.yml cachestack/apps/tor_socks5_proxy/tor_socks5_proxy.yml
+    lxc exec cachestack -- docker stack deploy -c /apps/tor_socks5_proxy/tor_socks5_proxy.yml torSOCKS5proxy
+fi
+
+
 ##################################
-## THis is where we wait for services to come online before we declear the script 
+## THis is where we wait for services to come online before we declare the script 
 ## to be successful.
 
 # Wait for archival node services

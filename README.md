@@ -37,7 +37,7 @@ The trusted root of each BCM deployment from a [global consensus perspective](ht
 
 ## How to Run BCM
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. You can run BCM in a hardware-based VM (see ./docs/installation/multipass.md), directly on bare-metal (see ./docs/baremetal.md), or on someone elses computer (discouraged, but if you must) (see ./docs/installation/inthecloud_aws.md for an example). Bitcoin Cache Machine is deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you deploy BCM to any LXD endpoint! LXD widely available on various linux platforms. BCM has been developed and primarily tested using Ubuntu 18.04.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. You can run BCM in a hardware-based VM (see ./docs/installation/multipass.md), directly on bare-metal (see ./docs/baremetal.md), or on someone elses computer (discouraged, but if you must) (see ./docs/installation/inthecloud_aws.md for an example). Bitcoin Cache Machine is deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can deploy BCM to any LXD-capable endpoint! LXD is widely available on various free and open-source linux platforms. BCM has been developed and primarily tested using Ubuntu 18.04.
 
 `REPEAT!!!! BCM SHOULD BE CONSIDERED FOR TESTING PURPOSES ONLY!`
 
@@ -47,7 +47,7 @@ BCM is meant for home and small office use which aligns with the spirit of decen
 
 ## BCM Components
 
-Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware by using LXD clustering and VXLAN.
+Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware.
 
 Each BCM is composed of the following:
 
@@ -61,7 +61,7 @@ Each BCM is composed of the following:
 
 * `app-hosts` -- hosts designed for user-specific code. Examples include hosting an Elastic database for visualizing data originating from a Kafka topic, stream processing to/from Kafka topics, or application-level event-based workflows. Developers choosing BCM as an operating platform create custom code and organize it here.
 
-As mentioned, `cachestack` can be deployed in standalone mode, which is recommended when doing development on Bitcoin Cache Machine. In these cases, `cachestack` requires access to the underlay network to provide caching services clients on your LAN.
+As mentioned, `cachestack` can be deployed in standalone mode, which is recommended when doing development on Bitcoin Cache Machine. In these cases, `cachestack` requires access to the underlay network to provide caching services to clients on your LAN (e.g., Bitcoin Cache Machine core components).
 
 ## Project Status
 

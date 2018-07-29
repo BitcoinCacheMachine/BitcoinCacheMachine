@@ -1,0 +1,9 @@
+version: '3.6'
+services:
+  tor-socks-proxy:
+    image: osminogin/tor-simple
+    ports: 
+      - "9050:9050"
+    deploy:
+      mode: replicated
+      replicas: 1

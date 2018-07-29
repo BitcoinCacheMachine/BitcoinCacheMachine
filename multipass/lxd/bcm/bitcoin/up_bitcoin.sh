@@ -53,7 +53,7 @@ lxc file push ./daemon.json bitcoin/etc/docker/daemon.json
 
 lxc start bitcoin
 
-
+sleep 10
 
 WORKER_TOKEN=$(lxc exec manager1 -- docker swarm join-token worker | grep token | awk '{ print $5 }')
 
@@ -75,9 +75,15 @@ lxc exec bitcoin -- docker volume create bitcoind-data
 
 
 
-echo "Deploying zookeeper and kafka to the swarm."
-lxc file push ./bitcoinstack/zookeeper1.yml manager1/apps/kafka/zookeeper1.yml
-lxc exec manager1 -- docker stack deploy -c /apps/kafka/zookeeper1.yml kafka
+echo "Deploying bitcoin services to lxd host `bitcoin`."
+lxc exec manager1 -- mkdir -p /apps/bitcoind
+
+lxc file push ./stacks/bitcoind/bitcoind-mainnet.conf manager1/apps/bitcoind/bitcoind-mainnet.conf
+lxc file push ./stacks/bitcoind/bitcoind-testnet.conf manager1/apps/bitcoind/bitcoind-testnet.conf
+lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/bitcoind.yml
+lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/torrc.conf
+
+lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/bitcoind.yml bitcoind
 
 
 
