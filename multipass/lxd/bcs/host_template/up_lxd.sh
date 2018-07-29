@@ -43,7 +43,7 @@ lxc image copy ubuntu:18.04 $ACTIVE_LXD_ENDPOINT:
 # only execute if BC_ZFS_POOL_NAME is non-zero
 if [ ! -z $BC_ZFS_POOL_NAME ]; then
   # initialize the LXD container to the active lxd endpoint. 
-  # -p tells it to connect to the user-defined ZFS storage pool (e.g., bcm_data/bcs_data)
+  # -p tells it to connect to the user-defined ZFS storage pool (e.g., bc_data/bcs_data)
   lxc init ubuntu:18.04 $ACTIVE_LXD_ENDPOINT:dockertemplate \
     -p docker \
     -p dockertemplate_profile \

@@ -11,21 +11,24 @@ config:
         subnets:
           - type: dhcp
             ipv4: true
-            control: auto   
-      # for registry images
+            control: auto
+
+      # for access to cachestack
       - type: physical
         name: eth1
         subnets:
           - type: dhcp
             ipv4: true
             control: auto
-      # managernet
+      
+      # swarm managernet
       - type: physical
         name: eth2
         subnets:
           - type: dhcp
             ipv4: true
-            control: auto  
+            control: auto
+
 description:
 devices:
   
@@ -35,10 +38,10 @@ devices:
     parent: lxdbrBitcoin
     type: nic
 
-  # for registry images
+  # for access to cachestack
   eth1:
     nictype: bridged
-    parent: proxyhostnet
+    parent: lxdbrBCMBridge
     type: nic
 
   # for connection to managers
@@ -46,8 +49,9 @@ devices:
     nictype: bridged
     parent: managernet
     type: nic
+
   root:
     path: /
-    pool: bcm_data
+    pool: bc_data
     type: disk
 name: lxd_profile_proxy_host

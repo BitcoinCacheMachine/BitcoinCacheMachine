@@ -26,7 +26,7 @@ Below you will find some of the development goals for BCM.
 * Provide a self-contained, event-driven, software-defined IT infrastructure for potential Bitcoin and Lightning-related applications.
 * Be able to run entirely on commodity x86_x64 hardware for home and small office settings. You can run BCM on an old computer!
 * Integrate exclusively free and open source software!
-* Create a composable framework for deploying Bitcoin and Lightning-related components.
+* Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc..
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of each BCM deployment.
 * Embrace hardware wallets for cryptographic operations where possible (e.g., Trezor-generated SSH keys or PGP certificates for authentication and encryption).
 * Pre-configure all software to protect user's privacy (e.g., TOR for communication, disk encryption, minimal attack surface, etc.).
@@ -37,31 +37,31 @@ The trusted root of each BCM deployment from a [global consensus perspective](ht
 
 ## How to Run BCM
 
-If you can run modern Ubuntu, you can run BCM. BCM runs on bare-metal Ubuntu 18.04 or can operate inside a hardware-based VM. Please remember that BCM is for testing purposes only and is under heavy development. REPEAT!!!! BCM SHOULD BE CONSIDERED FOR TESTING PURPOSES ONLY!
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. You can run BCM in a hardware-based VM (see ./docs/installation/multipass.md), directly on bare-metal (see ./docs/baremetal.md), or on someone elses computer (discouraged, but if you must) (see ./docs/installation/inthecloud_aws.md for an example). Bitcoin Cache Machine is deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you deploy BCM to any LXD endpoint! LXD widely available on various linux platforms. BCM has been developed and primarily tested using Ubuntu 18.04.
 
-You can run BCM in several ways:
+`REPEAT!!!! BCM SHOULD BE CONSIDERED FOR TESTING PURPOSES ONLY!`
 
-* In a QEMU/KVM-based VM (see ./docs/installation/multipass.md)
-* On bare-metal (see ./docs/baremetal.md) running Ubuntu 18.04.
-* On someone elses computer (discouraged, but if you must) (see ./docs/installation/inthecloud_aws.md)
+BCM is designed to be composable. For the most part, you can pick and choose your various infrastructure components to run for your required use case. This makes Bitcoin Cache Machine a great choice when developing a new bitcoin-related business idea!
 
-BCM is meant for home and small office use which aligns with the spirit of decentralization. BCM is meant to provide a performant and secure software-defined network for LAN segments (Layer 3 broadcast domains).
+BCM is meant for home and small office use which aligns with the spirit of decentralization.
 
 ## BCM Components
 
-Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware. 
+Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware by using LXD clustering and VXLAN.
 
 Each BCM is composed of the following:
 
-* `cachestack` - a set of LXD components (networks, storage pool, profiles, etc.) and LXD containers that provide caching and underlay network services for Bitcoin Cache Machine components. You can install `cachestack` in standalone mode to provide network and caching services to your LAN components. If there is no CacheStack on your LAN segment, Bitcoin Cache Machine installs a local copy and uses it internally. Cache Stack serves LXD images to your local network (when in standalone mode), hosts one or more Docker Registries configured as a pull-through cache, provides HTTP/HTTPS proxy services. Other services such as a Bitcoin archival node can be deployed to `cachestack`. This can be useful during development; you can have an archival node serve blocks to more trusted full nodes. More information about the Cache Stack and its components can be found in ./docs/architecture/cache_stack.md.
+* `cachestack` - a set of LXD components (networks, storage pool, profiles, etc.) and LXD containers that provide caching and underlay network services for Bitcoin Cache Machine components. You can install `cachestack` in standalone mode to provide network and caching services to your LAN components. If there is no CacheStack on your LAN segment, Bitcoin Cache Machine installs a local copy and uses it internally. Cache Stack serves LXD images to your local network (when in standalone mode), hosts one or more Docker Registries configured as a pull-through cache, and provides HTTP/HTTPS proxy services. Other services such as a Bitcoin archival node can be deployed to `cachestack`. This can be useful during development; you can have an archival node serve blocks to more trusted full nodes. More information about the Cache Stack and its components can be found in ./docs/architecture/cache_stack.md. Future versions of cachestack will include DHCP with hostname autoregistration and a DNS cache configured to use TOR.
 
-* `manager1` [required] -- There are manager LXD hosts to facilitate the Docker Swarm manager role for the rest of the swarm. The docker daemon on each manager host is configured to use `cachestack:5000` as the Docker registry mirror. A Kafka messaging stack is deployed to each manager node for distributed messaging and is the system-of-record for user data. Manager LXC containers are planned to be deployable to independent x86_x64 hardware for high-availability.
+* `manager1` [required], `manager2` [optional], `manager3` [optional] -- There are manager LXD hosts to to facilitate the Docker Swarm manager role for the rest of the swarm. The docker daemon on each manager host is configured to use `cachestack` as the Docker registry mirror. A Kafka messaging stack is deployed to each manager node for distributed messaging and is the system-of-record for user data. Manager LXC containers MAY be deployed to independent x86_x64 hardware for local high-availability using LXD clustering.  (PLANNED) `manager1` is deployed with an administrative web interface exposed over a TOR hidden service. Administrative interfaces (e.g., wallet for lnd, Grafana dashboards, etc.) are exposed behind this TOR site.
 
-* `bitcoin` [required] -- the `bitcoin` lxd host is built for bitcoin-related services: A Bitcoin Core version 16.1 running as a fully validating node provides the root of trust for global consensus operations [required]. One or more Lightning Daemons (currently c-lightning and lnd) can be deployed to the bitcoin host as well. The docker daemon on each app host is configured to obtain images from a docker registry mirror running on the proxyhost (since proxyhost serves a local registry cache).
+* `bitcoin` [required] -- the `bitcoin` lxd host is built for bitcoin-related services: A Bitcoin Core version 16.1 running as a fully-validating node provides the root of trust for global consensus operations [required]. One or more Lightning daemons may be deployed to the `bitcoin` lxd host as well. Users may choose which additional components should be deployed depending the expected use case, e.g., fully-validating node in pruned mode with c-lightning and BTCPay for a point-of-sale application). In all cases, daemon P2P services are configured to use TOR. Individual RPC interfaces may be exposed to distinct TOR onion sites. Like manager LXD containers, `bitcoin` uses `cachestack` to pull docker images.
 
-* `app-hosts` -- special hosts designed for application-specific use cases. Examples include hosting an Elastic database for visualizing data originating from a Kafka topic, stream processing to/from Kafka topics, or application-level event-based workflows. Developers choosing BCM as an operating platform create custom code and organize it here.
+* [NOT IMPLEMENTED] `elastic` -- you can deploy an elastic database and associated dashboards (grafana, kinbana). Other databases (e.g., graph database for lightning) will be made available as BCM is developed. All databases are fed with data from the Kafka messaging stack on the manager hosts.
 
-Each the LXD host types is based on a LXD host template called [bcm_host_template](https://github.com/farscapian/bcm_host_template) which is shared by Bitcoin Cache Machine and the independently deployable Cache Stack.
+* `app-hosts` -- hosts designed for user-specific code. Examples include hosting an Elastic database for visualizing data originating from a Kafka topic, stream processing to/from Kafka topics, or application-level event-based workflows. Developers choosing BCM as an operating platform create custom code and organize it here.
+
+As mentioned, `cachestack` can be deployed in standalone mode, which is recommended when doing development on Bitcoin Cache Machine. In these cases, `cachestack` requires access to the underlay network to provide caching services clients on your LAN.
 
 ## Project Status
 
