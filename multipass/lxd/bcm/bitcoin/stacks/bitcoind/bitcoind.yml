@@ -41,7 +41,6 @@ secrets:
 
 volumes:
   bitcoind-data:
-    external: true
     
   bitcoind-log-data:
   bitcoind-cookie-data:

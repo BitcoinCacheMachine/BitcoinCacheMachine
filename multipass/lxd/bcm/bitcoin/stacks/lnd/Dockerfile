@@ -1,4 +1,5 @@
-FROM golang:1.10.3
+FROM golang:latest
+#1.10.3
 
 # lnd p2p, grpc server
 EXPOSE 9735 10009

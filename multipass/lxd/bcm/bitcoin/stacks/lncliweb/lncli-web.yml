@@ -5,14 +5,12 @@ services:
   lncli-web:
     image: farscapian/lncliweb:latest
     networks:
-      - bitcoindrpcnet
+      - lnd_lndrpcnet
       - webproxynet
-    depends_on:
-      - lnd
     volumes:
-      - lnd-certificate-data:/config:ro
-      - lnd-macaroon-data:/macaroons
-      - lnd-log-data:/logs/lnd
+      - lnd_lnd-certificate-data:/config:ro
+      - lnd_lnd-macaroon-data:/macaroons:ro
+      - lnd_lnd-log-data:/logs/lnd:ro
     configs:
       - source: lncli-web_config
         target: /lncli-web/config/defaults.js
@@ -75,20 +73,20 @@ services:
 
 networks:
   webproxynet:
-  onionnet: #how external peers reach bitcoind for block relay and peer network
-  bitcoindrpcnet:
-    attachable: true
+  onionnet:
+  lnd_lndrpcnet:
+    external: true
 
 volumes:
   onionservice-data:
     driver: local
   
   # anyone who needs to access lnd's gRPC or REST interface must have access to this data.
-  lnd-certificate-data:
-    external: true 
-  lnd-macaroon-data:
-    external: true 
-  lnd-log-data:
+  lnd_lnd-certificate-data:
+    external: true
+  lnd_lnd-macaroon-data:
+    external: true
+  lnd_lnd-log-data:
     external: true
 
 configs:

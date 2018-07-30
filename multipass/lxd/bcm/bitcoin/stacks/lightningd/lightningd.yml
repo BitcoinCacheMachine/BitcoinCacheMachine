@@ -13,7 +13,7 @@ services:
     volumes:
       - lightningd-data:/root/.lightning
       - lightningd-log-data:/var/logs/lightningd
-      - bitcoind-data:/etc/bitcoin
+      - bitcoind_bitcoind-data:/etc/bitcoin
     secrets:
       - source: lightningd_conf
         target: /root/.lightning/config
@@ -30,7 +30,7 @@ services:
 volumes:
   lightningd-data:
   lightningd-log-data:
-  bitcoind-data:
+  bitcoind_bitcoind-data:
     external: true
 
 networks:

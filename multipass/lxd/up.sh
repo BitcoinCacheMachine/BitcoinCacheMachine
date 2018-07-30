@@ -4,7 +4,7 @@
 set -e
 
 # load the environment variables for the current LXD remote.
-source ~/.bcm/bcm_env.sh $(lxc remote get-default)
+source ~/.bcm/bcm_env.sh
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"

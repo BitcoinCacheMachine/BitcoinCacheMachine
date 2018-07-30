@@ -6,6 +6,9 @@ set -e
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
+# load the environment variables for the current LXD remote.
+source ~/.bcm/bcm_env.sh
+
 # create the lxdbrBitcoin network, which is used for all outbound access
 # by services residing on the lxd host `bitcoin`
 if [[ -z $(lxc network list | grep lxdbrBitcoin) ]]; then
@@ -69,10 +72,6 @@ WORKER_TOKEN=$(lxc exec manager1 -- docker swarm join-token worker | grep token 
 
 lxc exec bitcoin -- docker swarm join 10.0.0.11 --token $WORKER_TOKEN
 
-# create the external bitcoind data volume
-lxc exec bitcoin -- docker volume create bitcoind-data
-
-
 ############################
 ############################
 
@@ -91,9 +90,9 @@ fi
 
 
 
-# install lightningd (c-lightning) if specified
-if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD = "true" ]]; then
-  echo "Deploying lightningd (c-lightning) to lxd host 'bitcoin'."
+# install lightningd (c-lightning) if specified (testnet)
+if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD_TESTNET = "true" ]]; then
+  echo "Deploying testnet lightningd (c-lightning) to lxd host 'bitcoin'."
   lxc exec manager1 -- mkdir -p /apps/lightningd
 
   lxc file push ./stacks/lightningd/lightningd-mainnet.conf manager1/apps/lightningd/lightningd-mainnet.conf
@@ -106,56 +105,24 @@ fi
 
 
 # install lnd if specified
-if [[ $BCM_INSTALL_BITCOIN_LND = "true" ]]; then
-echo "Deploying lightning network daemon (lnd) to lxd host 'bitcoin'."
-lxc exec manager1 -- mkdir -p /apps/lnd
+if [[ $BCM_INSTALL_BITCOIN_LND_TESTNET = "true" ]]; then
+  echo "Deploying testnet lightning network daemon (lnd) to lxd host 'bitcoin'."
+  lxc exec manager1 -- mkdir -p /apps/lnd
 
-lxc file push ./stacks/lnd/lnd-mainnet.conf manager1/apps/lnd/lnd-mainnet.conf
-lxc file push ./stacks/lnd/lnd-testnet.conf manager1/apps/lnd/lnd-testnet.conf
-lxc file push ./stacks/lnd/lnd.yml manager1/apps/lnd/lnd.yml
+  lxc file push ./stacks/lnd/lnd-mainnet.conf manager1/apps/lnd/lnd-mainnet.conf
+  lxc file push ./stacks/lnd/lnd-testnet.conf manager1/apps/lnd/lnd-testnet.conf
+  lxc file push ./stacks/lnd/lnd.yml manager1/apps/lnd/lnd.yml
 
-lxc exec manager1 -- docker stack deploy -c /apps/lnd/lnd.yml lnd
+  lxc exec manager1 -- docker stack deploy -c /apps/lnd/lnd.yml lnd
+fi
 
+if [[ $BCM_INSTALL_BITCOIN_LND_LNCLIWEB = "true" ]]; then
+  echo "Deploying lncli-web web interface (for lnd) to lxd host 'bitcoin'."
+  lxc exec manager1 -- mkdir -p /apps/lncliweb
 
+  lxc file push ./stacks/lncliweb/lncli-web.yml manager1/apps/lncliweb/lncli-web.yml
+  lxc file push ./stacks/lncliweb/lncli-web.lncliweb.conf.js manager1/apps/lncliweb/lncli-web.lncliweb.conf.js
+  lxc file push ./stacks/lncliweb/nginx.conf manager1/apps/lncliweb/nginx.conf
 
-echo "Deploying lncli-web web interface (for lnd) lxd host 'bitcoin'."
-lxc exec manager1 -- mkdir -p /apps/lncliweb
-
-lxc file push ./stacks/lncliweb/lncli-web.yml manager1/apps/lncliweb/lncli-web.yml
-lxc file push ./stacks/lncliweb/lncli-web.lncliweb.conf.js manager1/apps/lncliweb/lncli-web.lncliweb.conf.js
-lxc file push ./stacks/lncliweb/nginx.conf manager1/apps/lncliweb/nginx.conf
-
-lxc exec manager1 -- docker stack deploy -c /apps/lncliweb/lncli-web.yml lncli-web
-
-
-
-
-
-# # if IPFS_bootstrap is true, then we will download pre-indexed blockchain data, etc, via IPFS
-# # consider running a bitcoin cache stack on your local network to speed up deployment and avoid
-# # use of your internet connection.
-# if [[ $BCM_DEPLOYMENT_IPFS_BOOTSTRAP = "true" ]]; then
-#     echo "Downloading a pre-validated and pre-indexed copy of the bitcoin blockchain."
-#     echo "WARNING: By using this method, you are trusting the developers of BCM as well as the computer that created the IPFS Hash!"
-#     echo "         Use for development purposes only unless you understand the risks and need to get a working BCM fast!  Consider adding"
-#     echo "         a bcm_cache_stack to your local network to improve deployment time and avoid Internet connection use."
-#     lxc exec bitcoin -- docker run -d --rm --name bitcoin_ipfs_bootstrapper -v bitcoind-data:/bitcoindata ipfs/go-ipfs:latest
-    
-#     # wait for ipfs services to come online
-#     sleep 30
-
-#     if [ $BCM_BITCOIN_CHAIN = "testnet" ]; then
-#         echo "Calling ipfs get to download the bitcoin testnet pre-indexed block data."
-#         lxc exec bitcoin -- docker exec -it bitcoin_ipfs_bootstrapper ipfs get --output=/bitcoindata QmQftBHZwTa3phAEDLp1Cdx5pJG3gexjbeooZw9ogU1WcG
-#     elif [ $BCM_BITCOIN_CHAIN = "mainnet" ]; then
-#         # TODO - get hash of mainnet data for IPFS bootstrap
-#         lxc exec bitcoin -- docker exec -it bitcoin_ipfs_bootstrapper ipfs get GETHASHFORMAINNETDATA
-#     else
-#         echo "Wrong value set for BCM_BITCOIN_CHAIN environment variable."
-#         exit 1
-#     fi
-# fi
-
-# echo "Deploying bitcoind."
-# lxc exec manager1 -- docker stack deploy -c /apps/bitcoin/bitcoind/bitcoind.yml bitcoind
-
+  lxc exec manager1 -- docker stack deploy -c /apps/lncliweb/lncli-web.yml lncli-web
+fi

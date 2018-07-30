@@ -1,5 +1,5 @@
 {
-    "registry-mirrors": ["http://cachestack:5000"],
+    "registry-mirrors": ["http://cachestack.lan:5000"],
     "labels": [
         "purpose=bitcoin"
     ]

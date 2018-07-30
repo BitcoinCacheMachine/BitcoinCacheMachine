@@ -2,6 +2,8 @@
 
 set -e
 
+# load the environment variables for the current LXD remote.
+source ~/.bcm/bcm_env.sh
 
 if [[ $(lxc exec manager1 -- docker stack ls | grep bitcoind) ]]; then
     echo "Removing docker stack 'bitcoind' from the swarm."
