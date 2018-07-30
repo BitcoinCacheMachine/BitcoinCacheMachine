@@ -120,7 +120,7 @@ lxc exec cachestack -- docker swarm init --advertise-addr=10.254.253.11 >>/dev/n
 echo "Deploying Cache Stack services."
 
 # Deploy the bitcoind archival node if specified.
-if [[ $BCS_INSTALL_BITCOIND = 'true' ]]; then
+if [[ $BCS_INSTALL_BITCOIND_TESTNET = 'true' ]]; then
     echo "Deploying a bitcoind archival node to the Cache Stack."
     lxc exec cachestack -- mkdir -p /apps/bitcoind_archivalnode
     lxc file push ./stacks/bitcoind_archivalnode/bitcoind.yml cachestack/apps/bitcoind_archivalnode/bitcoind.yml
@@ -176,7 +176,7 @@ fi
 ## to be successful.
 
 # Wait for archival node services
-if [[ $BCS_INSTALL_BITCOIND = 'true' ]]; then
+if [[ $BCS_INSTALL_BITCOIND_TESTNET = 'true' ]]; then
     # waiting for bitcoind P2P port TCP 18333.
     lxc exec cachestack -- wait-for-it -t 0 127.0.0.1:18333
 fi
