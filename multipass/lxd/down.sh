@@ -7,11 +7,11 @@ set -e
 cd "$(dirname "$0")"
 
 # load the environment variables for the current LXD remote.
-source ~/.bcm/lxd_endpoints.sh $(lxc remote get-default)
+source ~/.bcm/bcm_env.sh $(lxc remote get-default)
 
 # quit if there are no BC environment variables
 if [[ -z $(env | grep BC) ]]; then
-  echo "BC variables not set. Please source ~/.bcm/lxd_endpoints.sh"
+  echo "BC variables not set. Please source ~/.bcm/bcm_env.sh"
   exit
 fi
 

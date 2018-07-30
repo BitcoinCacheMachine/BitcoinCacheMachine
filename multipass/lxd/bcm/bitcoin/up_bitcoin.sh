@@ -46,7 +46,7 @@ lxc profile apply bitcoin docker,bitcoinprofile
 
 # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
 lxc storage create bitcoin-dockervol dir
-lxc config device add bitcoin dockerdisk disk source=/var/lib/lxd/storage-pools/bitcoin-dockervol path=/var/lib/docker
+lxc config device add bitcoin dockerdisk disk source=$(lxc storage show bitcoin-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 
 
 if [[ $BCM_DISABLE_DOCKER_GELF = "true" ]]; then

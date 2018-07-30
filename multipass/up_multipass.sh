@@ -9,7 +9,7 @@ cd "$(dirname "$0")"
 
 # quit if there are no multipass environment variables
 if [[ -z $(env | grep MULTIPASS) ]]; then
-  echo "MULTIPASS_ variables not set. Please source ~/.bcm/lxd_endpoints.sh"
+  echo "MULTIPASS_ variables not set. Please source ~/.bcm/bcm_env.sh"
   exit
 fi
 

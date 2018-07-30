@@ -15,9 +15,9 @@ BCM deploys in a fully automated way and runs on bare-metal Ubuntu 18.04, in a V
 
 If you're involved with Bitcoin, you will undoubtedly understand the importance of running your own fully-validating bitcoin node and operating your own IT infrastructure. Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your wallet software configured to consult your trusted full node? Has TOR for these services been tested properly? Are you routing your DNS queries over TOR?
 
-There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined home or office automation network.
+There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined automation network.
 
-Bitcoin Cache Machine dramatically lowers the barrier to deploying and operating your own privacy-centric bitcoin payment infrastructure. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an Internet gateway, BCM can do much of the rest. Improve performance and privacy of your BCM deployment by installing a [Cache Stack](https://github.com/farscapian/bcm_cachestack)! The Cache Stack is especially useful when developing new line of business application on top of Bitcoin Cache Machine, but is entirely optional!
+Bitcoin Cache Machine dramatically lowers the barriers to deploying and operating your own privacy-centric bitcoin payment infrastructure. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest. You can improve overall performance and enable more rapid development by installing a standalone `cachestack` component on your network! `cachestack` is especially useful when developing new line of business application on top of Bitcoin Cache Machine!
 
 ## Goals of Bitcoin Cache Machine
 

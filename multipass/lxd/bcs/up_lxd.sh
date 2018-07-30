@@ -88,7 +88,7 @@ fi
 if [[ -z $(lxc storage list | grep "cachestack-dockervol") ]]; then
     # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
     lxc storage create cachestack-dockervol dir
-    lxc config device add cachestack dockerdisk disk source=/var/lib/lxd/storage-pools/cachestack-dockervol path=/var/lib/docker
+    lxc config device add cachestack dockerdisk disk source=$(lxc storage show cachestack-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 else
   echo "cachestack-dockervol lxd storage pool already exists."
 fi
