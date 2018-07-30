@@ -4,10 +4,18 @@ config:
   
   user.network-config: |
     version: 1
-    config:      
-      #proxyhostnet
+    config:  
+      # outbound NAT to host IP
       - type: physical
         name: eth0
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto  
+
+      # lxdbrBCMBridge, connection to local cachestack
+      - type: physical
+        name: eth1
         subnets:
           - type: dhcp
             ipv4: true
@@ -15,7 +23,7 @@ config:
       
       # managernet
       - type: physical
-        name: eth1
+        name: eth2
         subnets:
           - type: static
             ipv4: true
@@ -27,9 +35,13 @@ description:
 devices:
   eth0:
     nictype: bridged
-    parent: lxdbrBCMBridge
+    parent: lxdbrManager1
     type: nic
   eth1:
+    nictype: bridged
+    parent: lxdbrBCMBridge
+    type: nic
+  eth2:
     nictype: bridged
     parent: managernet
     type: nic

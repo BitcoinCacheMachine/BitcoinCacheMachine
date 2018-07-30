@@ -77,7 +77,7 @@ lxc exec bitcoin -- docker volume create bitcoind-data
 ############################
 
 # install bitcoid if specified
-if [[ $BCM_INSTALL_BITCOIN_BITCOIND = "true" ]]; then
+if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET = "true" ]]; then
   echo "Deploying bitcoind services to lxd host 'bitcoin'."
   lxc exec manager1 -- mkdir -p /apps/bitcoind
 

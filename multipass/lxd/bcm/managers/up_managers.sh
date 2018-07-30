@@ -8,10 +8,13 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# Managernet is used by any docker host that joins the swarm.
+# for outbound NAT in case services on manager1 need to access a cachestack services on underlay
+echo "Creating lxdbrManager1."
+lxc network create lxdbrManager1
+
+# Managernet is used by any docker host that joins the swarm hosted by the managers.
 echo "Creating managernet."
 lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=false
-
 
 # create the storage pool if it doesn't exist.
 if [[ -z $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
@@ -40,7 +43,7 @@ lxc profile apply manager1 docker,manager1
 
 # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
 lxc storage create manager1-dockervol dir
-lxc config device add manager1 dockerdisk disk source=$(lxc storage show manager1-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker 
+lxc config device add manager1 dockerdisk disk source="$(lxc storage show manager1-dockervol | grep source | awk 'NF>1{print $NF}')" path=/var/lib/docker 
 
 lxc start manager1
 
@@ -48,15 +51,13 @@ lxc start manager1
 # TODO find a better way to wait
 sleep 10
 
+lxc exec manager1 -- ifmetric eth0 0
 
 lxc exec manager1 -- docker swarm init --advertise-addr=10.0.0.11 >/dev/null
 
 echo "Waiting for manager1 docker swarm service."
 
 sleep 5
-
-
-
 
 echo "Creating /apps/kafka inside manager1."
 lxc exec manager1 -- mkdir -p /apps/kafka

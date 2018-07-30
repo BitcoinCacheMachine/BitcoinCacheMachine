@@ -63,3 +63,10 @@ else
     echo "Skipping deletion of lxd network lxdbrBCMBridge."
 fi
 
+# delete lxd storage pool $BC_ZFS_POOL_NAME 
+if [[ $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
+    echo "Deleting lxd storage pool '$BC_ZFS_POOL_NAME'."
+    lxc storage delete $BC_ZFS_POOL_NAME
+else
+    echo "Skipping deletion of lxd storage pool $BC_ZFS_POOL_NAME."
+fi

@@ -20,6 +20,13 @@ else
     echo "LXD network 'managernet' not found. Skipping."
 fi
 
+# delete lxd network managernet
+if [[ $(lxc network list | grep lxdbrManager1) ]]; then
+    echo "Destroying lxd network 'lxdbrManager1'."
+    lxc network delete lxdbrManager1
+else
+    echo "LXD network 'lxdbrManager1' not found. Skipping."
+fi
 
 # delete lxd storage pool manager1-dockervol
 if [[ $(lxc storage list | grep "manager1-dockervol") ]]; then
