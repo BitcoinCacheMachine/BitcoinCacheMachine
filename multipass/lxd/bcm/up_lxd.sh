@@ -13,7 +13,7 @@ source ~/.bcm/bcm_env.sh
 # quit if the BCM environment variables havne't been loaded.
 if [[ $(env | grep BCM) = '' ]]; then
   echo "BCM variables not set. Please source a .env file."
-  exit 1
+  exit 1 
 fi
 
 
