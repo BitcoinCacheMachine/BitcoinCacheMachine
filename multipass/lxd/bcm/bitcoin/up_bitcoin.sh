@@ -77,6 +77,19 @@ lxc exec bitcoin -- docker swarm join 10.0.0.11 --token $WORKER_TOKEN
 
 # install bitcoid if specified
 if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET = "true" ]]; then
+
+  # determine if we need to build the image.
+  if [[ $BCM_INSTALL_BITCOIN_BITCOIND_BUILD = "true" ]]; then
+    echo "Building and pushing bitcoind."
+    lxc file push ./stacks/bitcoind/Dockerfile manager1/apps/bitcoind/Dockerfile
+    lxc file push ./stacks/bitcoind/docker-entrypoint.sh manager1/apps/bitcoind/docker-entrypoint.sh
+    #this step prepares custom images
+
+    lxc exec manager1 -- docker build -t cachestack.lan/lnd:latest /apps/bitcoind
+    lxc exec manager1 -- docker push cachestack.lan/lnd:latest
+  fi
+
+
   echo "Deploying bitcoind services to lxd host 'bitcoin'."
   lxc exec manager1 -- mkdir -p /apps/bitcoind
 
@@ -84,45 +97,51 @@ if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET = "true" ]]; then
   lxc file push ./stacks/bitcoind/bitcoind-testnet.conf manager1/apps/bitcoind/bitcoind-testnet.conf
   lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/bitcoind.yml
   lxc file push ./stacks/bitcoind/torrc.conf manager1/apps/bitcoind/torrc.conf
+  
+  mkdir -p /tmp/multipass/lxd/bcm/bitcoind
+  touch /tmp/multipass/lxd/bcm/bitcoind/env
+  echo "export BCM_BITCOIN_BITCOIND_DOCKER_IMAGE=$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE" >/tmp/multipass/lxd/bcm/bitcoind/env
+  lxc file push /tmp/multipass/lxd/bcm/bitcoind/env manager1/apps/bitcoind/env
 
-  lxc exec manager1 -- docker stack deploy -c /apps/bitcoind/bitcoind.yml bitcoind
+  # pass BCM_BITCOIN_BITCOIND_DOCKER_IMAGE to the stack.
+  lxc exec manager1 -- env BCM_BITCOIN_BITCOIND_DOCKER_IMAGE=$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE docker stack deploy -c /apps/bitcoind/bitcoind.yml bitcoind
 fi
 
 
 
-# install lightningd (c-lightning) if specified (testnet)
-if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD_TESTNET = "true" ]]; then
-  echo "Deploying testnet lightningd (c-lightning) to lxd host 'bitcoin'."
-  lxc exec manager1 -- mkdir -p /apps/lightningd
+# # install lightningd (c-lightning) if specified (testnet)
+# if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD_TESTNET = "true" ]]; then
+#   echo "Deploying testnet lightningd (c-lightning) to lxd host 'bitcoin'."
+#   lxc exec manager1 -- mkdir -p /apps/lightningd
 
-  lxc file push ./stacks/lightningd/lightningd-mainnet.conf manager1/apps/lightningd/lightningd-mainnet.conf
-  lxc file push ./stacks/lightningd/lightningd-testnet.conf manager1/apps/lightningd/lightningd-testnet.conf
-  lxc file push ./stacks/lightningd/lightningd.yml manager1/apps/lightningd/lightningd.yml
-  lxc file push ./stacks/lightningd/torrc.conf manager1/apps/lightningd/torrc.conf
+#   lxc file push ./stacks/lightningd/lightningd-mainnet.conf manager1/apps/lightningd/lightningd-mainnet.conf
+#   lxc file push ./stacks/lightningd/lightningd-testnet.conf manager1/apps/lightningd/lightningd-testnet.conf
+#   lxc file push ./stacks/lightningd/lightningd.yml manager1/apps/lightningd/lightningd.yml
+#   lxc file push ./stacks/lightningd/torrc.conf manager1/apps/lightningd/torrc.conf
 
-  lxc exec manager1 -- docker stack deploy -c /apps/lightningd/lightningd.yml lightningd
-fi
+#   lxc exec manager1 -- docker stack deploy -c /apps/lightningd/lightningd.yml lightningd
+# fi
 
 
-# install lnd if specified
-if [[ $BCM_INSTALL_BITCOIN_LND_TESTNET = "true" ]]; then
-  echo "Deploying testnet lightning network daemon (lnd) to lxd host 'bitcoin'."
-  lxc exec manager1 -- mkdir -p /apps/lnd
+# # install lnd if specified
+# if [[ $BCM_INSTALL_BITCOIN_LND_TESTNET = "true" ]]; then
+#   echo "Deploying testnet lightning network daemon (lnd) to lxd host 'bitcoin'."
+#   lxc exec manager1 -- mkdir -p /apps/lnd
 
-  lxc file push ./stacks/lnd/lnd-mainnet.conf manager1/apps/lnd/lnd-mainnet.conf
-  lxc file push ./stacks/lnd/lnd-testnet.conf manager1/apps/lnd/lnd-testnet.conf
-  lxc file push ./stacks/lnd/lnd.yml manager1/apps/lnd/lnd.yml
+#   lxc file push ./stacks/lnd/lnd-mainnet.conf manager1/apps/lnd/lnd-mainnet.conf
+#   lxc file push ./stacks/lnd/lnd-testnet.conf manager1/apps/lnd/lnd-testnet.conf
+#   lxc file push ./stacks/lnd/lnd.yml manager1/apps/lnd/lnd.yml
 
-  lxc exec manager1 -- docker stack deploy -c /apps/lnd/lnd.yml lnd
-fi
+#   lxc exec manager1 -- docker stack deploy -c /apps/lnd/lnd.yml lnd
+# fi
 
-if [[ $BCM_INSTALL_BITCOIN_LND_LNCLIWEB = "true" ]]; then
-  echo "Deploying lncli-web web interface (for lnd) to lxd host 'bitcoin'."
-  lxc exec manager1 -- mkdir -p /apps/lncliweb
+# if [[ $BCM_INSTALL_BITCOIN_LND_LNCLIWEB = "true" ]]; then
+#   echo "Deploying lncli-web web interface (for lnd) to lxd host 'bitcoin'."
+#   lxc exec manager1 -- mkdir -p /apps/lncliweb
 
-  lxc file push ./stacks/lncliweb/lncli-web.yml manager1/apps/lncliweb/lncli-web.yml
-  lxc file push ./stacks/lncliweb/lncli-web.lncliweb.conf.js manager1/apps/lncliweb/lncli-web.lncliweb.conf.js
-  lxc file push ./stacks/lncliweb/nginx.conf manager1/apps/lncliweb/nginx.conf
+#   lxc file push ./stacks/lncliweb/lncli-web.yml manager1/apps/lncliweb/lncli-web.yml
+#   lxc file push ./stacks/lncliweb/lncli-web.lncliweb.conf.js manager1/apps/lncliweb/lncli-web.lncliweb.conf.js
+#   lxc file push ./stacks/lncliweb/nginx.conf manager1/apps/lncliweb/nginx.conf
 
-  lxc exec manager1 -- docker stack deploy -c /apps/lncliweb/lncli-web.yml lncli-web
-fi
+#   lxc exec manager1 -- docker stack deploy -c /apps/lncliweb/lncli-web.yml lncli-web
+# fi

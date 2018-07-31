@@ -3,7 +3,7 @@ services:
   private-registry:
     image: registry:2.6.2
     ports: 
-      - "5005:5000"
+      - "80:5000"
     volumes:
       - private-registry-data:/data
     environment:

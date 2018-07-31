@@ -2,6 +2,13 @@
 
 set -e
 
+
+echo "Building and pushing lnd."
+#this step prepares custom images
+docker build -t cachestack.lan/lnd:latest ./lnd/
+docker push farscapian/lnd:latest
+
+
 echo "Building and pushing lnd."
 #this step prepares custom images
 docker build -t farscapian/lnd:latest ./lnd/

@@ -1,10 +1,11 @@
-version: '3.4'
+version: '3.6'
 services:
 
   # TODO initialize wallet interface.
   bitcoind:
-    image: farscapian/bitcoind:latest
+    image: ${BCM_BITCOIN_BITCOIND_DOCKER_IMAGE}
     hostname: bitcoind
+    #:-farscapian/bitcoind:latest
     volumes:
       - bitcoind-data:/data
       - bitcoind-log-data:/var/log/bitcoind
@@ -34,14 +35,12 @@ services:
         constraints: 
           - engine.labels.purpose == bitcoin
 
-
 secrets:
   bitcoin_config:
     file: "./bitcoind-${CHAIN:-testnet}.conf"
 
 volumes:
   bitcoind-data:
-    
   bitcoind-log-data:
   bitcoind-cookie-data:
 

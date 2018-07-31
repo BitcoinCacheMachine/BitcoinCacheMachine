@@ -16,12 +16,12 @@ services:
         uid: '0'
         gid: '0'
         mode: 0400
-    configs:
-      - source: bitcoindtorproxy-config
-        target: /etc/tor/torrc
-        uid: '0'
-        gid: '0'
-        mode: 0644
+    # configs:
+    #   - source: bitcoindtorproxy-config
+    #     target: /etc/tor/torrc
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0644
     deploy:
       mode: replicated
       replicas: 1
@@ -35,6 +35,6 @@ secrets:
   bitcoin_config:
     file: "./bitcoind-${CHAIN:-testnet}.conf"
 
-configs:
-  bitcoindtorproxy-config:
-    file: ./bitcoind-torrc.conf
+# configs:
+#   bitcoindtorproxy-config:
+#     file: ./bitcoind-torrc.conf
