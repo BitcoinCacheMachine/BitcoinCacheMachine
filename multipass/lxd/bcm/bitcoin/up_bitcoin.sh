@@ -18,8 +18,6 @@ else
   echo "LXD network lxdbrBitcoin already exists, skipping initial creation."
 fi
 
-
-
 # create the profile 'bitcoinprofile'
 if [[ -z $(lxc profile list | grep bitcoinprofile) ]]; then
     # create the bitcoin profile
@@ -28,18 +26,9 @@ else
   echo "LXD profile bitcoinprofile already exists, skipping initial creation."
 fi
 
-echo "Applying ./bitcoin_lxd_profile.yml to lxd profile 'bitcoinprofile'."
+
+echo "Applying bitcoin lxd profile file to lxd profile 'bitcoinprofile'."
 cat ./bitcoin_lxd_profile.yml | lxc profile edit bitcoinprofile
-
-
-# create the profile 'bitcoinprofile'
-if [[ -z $(lxc profile list | grep bitcoinprofile) ]]; then
-    # create the bitcoin profile
-    lxc profile create bitcoinprofile
-else
-  echo "LXD profile bitcoinprofile already exists, skipping initial creation."
-fi
-
 
 ## Create the manager1 host from the lxd image template.
 lxc init bctemplate bitcoin -p docker -p dockertemplate_profile -s $BC_ZFS_POOL_NAME
@@ -88,45 +77,14 @@ lxc exec bitcoin -- docker swarm join 10.0.0.11 --token $WORKER_TOKEN
 
 # install bitcoid if specified
 if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET = "true" ]]; then
-
-  # determine if we need to build the image.
-  if [[ $BCM_INSTALL_BITCOIN_BITCOIND_BUILD = "true" ]]; then
-    echo "Building and pushing bitcoind."
-    lxc file push ./stacks/bitcoind/Dockerfile manager1/apps/bitcoind/Dockerfile
-    lxc file push ./stacks/bitcoind/docker-entrypoint.sh manager1/apps/bitcoind/docker-entrypoint.sh
-    #this step prepares custom images
-
-    lxc exec manager1 -- docker build -t cachestack.lan/lnd:latest /apps/bitcoind
-    lxc exec manager1 -- docker push cachestack.lan/lnd:latest
-  fi
-
-
-  echo "Deploying bitcoind services to lxd host 'bitcoin'."
-  lxc exec manager1 -- mkdir -p /apps/bitcoind
-
-  lxc file push ./stacks/bitcoind/bitcoind-mainnet.conf manager1/apps/bitcoind/bitcoind-mainnet.conf
-  lxc file push ./stacks/bitcoind/bitcoind-testnet.conf manager1/apps/bitcoind/bitcoind-testnet.conf
-  lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/bitcoind.yml
-  lxc file push ./stacks/bitcoind/torrc manager1/apps/bitcoind/torrc
-  
-  # pass BCM_BITCOIN_BITCOIND_DOCKER_IMAGE to the stack.
-  lxc exec manager1 -- env BCM_BITCOIN_BITCOIND_DOCKER_IMAGE=$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE \
-                            docker stack deploy -c /apps/bitcoind/bitcoind.yml bitcoind
+  bash -c ./stacks/bitcoind/up_lxd_bitcoind.sh
 fi
 
 
 
 # install lightningd (c-lightning) if specified (testnet)
 if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD_TESTNET = "true" ]]; then
-  echo "Deploying testnet lightningd (c-lightning) to lxd host 'bitcoin'."
-  lxc exec manager1 -- mkdir -p /apps/lightningd
-
-  lxc file push ./stacks/lightningd/lightningd-mainnet.conf manager1/apps/lightningd/lightningd-mainnet.conf
-  lxc file push ./stacks/lightningd/lightningd-testnet.conf manager1/apps/lightningd/lightningd-testnet.conf
-  lxc file push ./stacks/lightningd/lightningd.yml manager1/apps/lightningd/lightningd.yml
-  lxc file push ./stacks/lightningd/torrc manager1/apps/lightningd/torrc
-
-  lxc exec manager1 -- docker stack deploy -c /apps/lightningd/lightningd.yml lightningd
+  bash -c ./stacks/lightningd/up_lxd_lightningd.sh
 fi
 
 

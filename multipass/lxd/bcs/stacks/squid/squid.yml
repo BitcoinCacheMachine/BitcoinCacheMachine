@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   squid:
-    image: minimum2scp/squid:latest
+    image: minimum2scp/squid
     ports:
       - "3128:3128"
     volumes:

@@ -28,15 +28,13 @@ else
     echo "LXD network 'lxdbrManager1' not found. Skipping."
 fi
 
-# delete lxd storage pool manager1-dockervol
-if [[ $(lxc storage list | grep "manager1-dockervol") ]]; then
-    echo "Destroying lxd network 'managernet'."
-    lxc storage delete manager1-dockervol
-else
-    echo "Storage pool 'manager1-dockervol' not found. Skipping."
+if [[ $BCM_MANAGER1_DELETE_DOCKERVOL = "true" ]]; then
+    # delete lxd storage pool manager1-dockervol
+    if [[ $(lxc storage list | grep "manager1-dockervol") ]]; then
+        echo "Destroying lxd network 'managernet'."
+        lxc storage delete manager1-dockervol
+    fi
 fi
-
-
 
 # delete lxd profile manager1 
 if [[ $(lxc profile list | grep manager1) ]]; then

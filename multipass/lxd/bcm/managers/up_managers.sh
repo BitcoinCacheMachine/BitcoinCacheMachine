@@ -13,7 +13,7 @@ echo "Creating lxdbrManager1."
 lxc network create lxdbrManager1
 
 # Managernet is used by any docker host that joins the swarm hosted by the managers.
-echo "Creating managernet."
+echo "Creating lxd network 'managernet' for swarm members."
 lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=false
 
 # create the storage pool if it doesn't exist.
@@ -94,5 +94,3 @@ echo "Deploying logstash to the swarm configured for gelf on TCP 12201."
 lxc file push ./kafka/gelf-listener.yml manager1/apps/kafka/gelf-listener.yml
 lxc file push ./kafka/logstash.conf manager1/apps/kafka/logstash.conf
 lxc exec manager1 -- docker stack deploy -c /apps/kafka/gelf-listener.yml gelf
-
-

@@ -2,9 +2,7 @@
 
 set -e
 
-echo ""
-echo "-----------------------------------------------"
-echo "Creating BCM/BCS LXD host template."
+echo "Creating a LXD host template."
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
@@ -54,20 +52,17 @@ fi
 
 sleep 5
 
-echo "Running apt update on dockertemplate using HTTP_PROXY of http://cachestack:3128"
-lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt update
+echo "Running apt update on dockertemplate."
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt update
 
-echo "Installing required software on dockertemplate using HTTP_PROXY of http://cachestack:3128"
-lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt-get install wait-for-it tor jq curl ifmetric slurm tcptrack -y
+# TODO provide configuration item to route these requests over local TOR proxy
+echo "Installing required software on dockertemplate."
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt-get install wait-for-it tor jq curl ifmetric slurm tcptrack -y
+
+# install docker
 lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
-lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
-lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- sh get-docker.sh >/dev/null
-# else
-#   echo "Installing docker by downloading content from the Internet."
-#   lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
-#   lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
-#   lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- sh get-docker.sh >/dev/null
-# fi
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- sh get-docker.sh >/dev/null
 
 # stop the current template dockerd instance since we're about to create a snapshot
 # Enable the docker daemon to start by default.
@@ -80,7 +75,7 @@ lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- systemctl enable docker
 lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- touch /.dockerenv
 
 lxc file push ./sysctl.conf dockertemplate/etc/sysctl.conf
-lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- chmod 0644 /etc/sysctl.conf
+lxc exec "$ACTIVE_LXD_ENDPOINT":dockertemplate -- chmod 0644 /etc/sysctl.conf
 
 sleep 5
 

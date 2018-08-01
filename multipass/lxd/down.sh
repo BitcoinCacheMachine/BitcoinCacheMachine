@@ -7,7 +7,7 @@ set -e
 cd "$(dirname "$0")"
 
 # load the environment variables for the current LXD remote.
-source ~/.bcm/bcm_env.sh $(lxc remote get-default)
+source ~/.bcm/bcm_env.sh
 
 # quit if there are no BC environment variables
 if [[ -z $(env | grep BC) ]]; then
@@ -15,13 +15,12 @@ if [[ -z $(env | grep BC) ]]; then
   exit
 fi
 
-
 # delete's the cache stack if defined by user.
 function deleteCacheStack ()
 {
   if [[ $BC_DELETE_CACHESTACK = "true" ]]; then
     echo "Calling Bitcoin Cache Machine down script."
-    bash -c ./bcs/down_lxd.sh
+    bash -c ./bcs/down_lxd_cachestack.sh
   fi
 }
 
@@ -31,7 +30,7 @@ if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
   deleteCacheStack
 else
   echo "Calling Bitcoin Cache Machine down script."
-  bash -c ./bcm/down_lxd.sh
+  bash -c ./bcm/down_lxd_bcm.sh
 
   deleteCacheStack
 fi

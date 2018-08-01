@@ -17,8 +17,8 @@ services:
         aliases:
           - bitcoindrpc
       torproxynet:
-    depends_on:
-      - tor-proxy
+        aliases:
+          - bitcoindtorproxy
     secrets:
       - source: bitcoin_config
         target: /data/bitcoin.conf
@@ -60,7 +60,7 @@ services:
 
 secrets:
   bitcoin_config:
-    file: "./bitcoind-${CHAIN:-testnet}.conf"
+    file: "./bitcoind-${BCM_BITCOIN_BITCOIND_CHAIN}.conf"
 
 configs:
   bitcoin_tor_config:
@@ -73,5 +73,10 @@ volumes:
 
 networks:
   bitcoindrpcnet:
+    driver: overlay
     attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
   torproxynet:
