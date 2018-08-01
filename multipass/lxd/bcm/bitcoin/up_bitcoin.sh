@@ -47,10 +47,18 @@ lxc init bctemplate bitcoin -p docker -p dockertemplate_profile -s $BC_ZFS_POOL_
 echo "Applying the lxd profiles 'bitcoinprofile' and 'docker' to the lxd host 'bitcoin'."
 lxc profile apply bitcoin docker,bitcoinprofile
 
-# Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
-lxc storage create bitcoin-dockervol dir
-lxc config device add bitcoin dockerdisk disk source=$(lxc storage show bitcoin-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 
+
+# create the bitcoin-dockervol storage pool.
+## TODO refactor this method out for re-use (any up/down 'host-dockervol')
+if [[ -z $(lxc storage list | grep "bitcoin-dockervol") ]]; then
+    # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
+    lxc storage create bitcoin-dockervol dir
+    lxc config device add bitcoin dockerdisk disk source=$(lxc storage show bitcoin-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
+else
+    echo "bitcoin-dockervol lxd storage pool already exists; attaching it to LXD container 'bitcoin'."
+    lxc config device add bitcoin dockerdisk disk source=$(lxc storage show bitcoin-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
+fi
 
 if [[ $BCM_DISABLE_DOCKER_GELF = "true" ]]; then
   # push docker.json for registry mirror settings
@@ -67,6 +75,9 @@ sleep 10
 
 # update routing table in bitcoin lxd host to prefer eth0 for outbound access.
 lxc exec bitcoin -- ifmetric eth0 0
+
+
+
 
 WORKER_TOKEN=$(lxc exec manager1 -- docker swarm join-token worker | grep token | awk '{ print $5 }')
 
@@ -96,31 +107,27 @@ if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET = "true" ]]; then
   lxc file push ./stacks/bitcoind/bitcoind-mainnet.conf manager1/apps/bitcoind/bitcoind-mainnet.conf
   lxc file push ./stacks/bitcoind/bitcoind-testnet.conf manager1/apps/bitcoind/bitcoind-testnet.conf
   lxc file push ./stacks/bitcoind/bitcoind.yml manager1/apps/bitcoind/bitcoind.yml
-  lxc file push ./stacks/bitcoind/torrc.conf manager1/apps/bitcoind/torrc.conf
+  lxc file push ./stacks/bitcoind/torrc manager1/apps/bitcoind/torrc
   
-  mkdir -p /tmp/multipass/lxd/bcm/bitcoind
-  touch /tmp/multipass/lxd/bcm/bitcoind/env
-  echo "export BCM_BITCOIN_BITCOIND_DOCKER_IMAGE=$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE" >/tmp/multipass/lxd/bcm/bitcoind/env
-  lxc file push /tmp/multipass/lxd/bcm/bitcoind/env manager1/apps/bitcoind/env
-
   # pass BCM_BITCOIN_BITCOIND_DOCKER_IMAGE to the stack.
-  lxc exec manager1 -- env BCM_BITCOIN_BITCOIND_DOCKER_IMAGE=$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE docker stack deploy -c /apps/bitcoind/bitcoind.yml bitcoind
+  lxc exec manager1 -- env BCM_BITCOIN_BITCOIND_DOCKER_IMAGE=$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE \
+                            docker stack deploy -c /apps/bitcoind/bitcoind.yml bitcoind
 fi
 
 
 
-# # install lightningd (c-lightning) if specified (testnet)
-# if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD_TESTNET = "true" ]]; then
-#   echo "Deploying testnet lightningd (c-lightning) to lxd host 'bitcoin'."
-#   lxc exec manager1 -- mkdir -p /apps/lightningd
+# install lightningd (c-lightning) if specified (testnet)
+if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD_TESTNET = "true" ]]; then
+  echo "Deploying testnet lightningd (c-lightning) to lxd host 'bitcoin'."
+  lxc exec manager1 -- mkdir -p /apps/lightningd
 
-#   lxc file push ./stacks/lightningd/lightningd-mainnet.conf manager1/apps/lightningd/lightningd-mainnet.conf
-#   lxc file push ./stacks/lightningd/lightningd-testnet.conf manager1/apps/lightningd/lightningd-testnet.conf
-#   lxc file push ./stacks/lightningd/lightningd.yml manager1/apps/lightningd/lightningd.yml
-#   lxc file push ./stacks/lightningd/torrc.conf manager1/apps/lightningd/torrc.conf
+  lxc file push ./stacks/lightningd/lightningd-mainnet.conf manager1/apps/lightningd/lightningd-mainnet.conf
+  lxc file push ./stacks/lightningd/lightningd-testnet.conf manager1/apps/lightningd/lightningd-testnet.conf
+  lxc file push ./stacks/lightningd/lightningd.yml manager1/apps/lightningd/lightningd.yml
+  lxc file push ./stacks/lightningd/torrc manager1/apps/lightningd/torrc
 
-#   lxc exec manager1 -- docker stack deploy -c /apps/lightningd/lightningd.yml lightningd
-# fi
+  lxc exec manager1 -- docker stack deploy -c /apps/lightningd/lightningd.yml lightningd
+fi
 
 
 # # install lnd if specified

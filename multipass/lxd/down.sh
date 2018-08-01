@@ -22,8 +22,6 @@ function deleteCacheStack ()
   if [[ $BC_DELETE_CACHESTACK = "true" ]]; then
     echo "Calling Bitcoin Cache Machine down script."
     bash -c ./bcs/down_lxd.sh
-  else
-    echo "Skipping deletion of Bitcoin Cache Stack due to BC_DELETE_CACHESTACK not being 'true'."
   fi
 }
 
@@ -38,35 +36,29 @@ else
   deleteCacheStack
 fi
 
+# delete lxd profile dockertemplate_profile
+if [[ $(lxc profile list | grep "dockertemplate_profile") ]]; then
+    echo "Deleting dockertemplate_profile lxd profile."
+    lxc profile delete dockertemplate_profile
+fi
+
+
 
 # delete lxd profile dockertemplate_profile
 if [[ $(lxc profile list | grep docker) ]]; then
     echo "Deleting docker lxd profile."
     lxc profile delete docker
-else
-    echo "Skipping deletion of docker lxd profile."
 fi
 
-# delete lxd profile dockertemplate_profile
-if [[ $(lxc profile list | grep "dockertemplate_profile") ]]; then
-    echo "Deleting dockertemplate_profile lxd profile."
-    lxc profile delete dockertemplate_profile
-else
-    echo "Skipping deletion of dockertemplate_profile lxd profile."
-fi
 
 # delete lxd network lxdbrBCMBridge 
 if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
     echo "Deleting lxd network 'lxdbrBCMBridge'."
     lxc network delete lxdbrBCMBridge
-else
-    echo "Skipping deletion of lxd network lxdbrBCMBridge."
 fi
 
 # delete lxd storage pool $BC_ZFS_POOL_NAME 
 if [[ $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
     echo "Deleting lxd storage pool '$BC_ZFS_POOL_NAME'."
     lxc storage delete $BC_ZFS_POOL_NAME
-else
-    echo "Skipping deletion of lxd storage pool $BC_ZFS_POOL_NAME."
 fi

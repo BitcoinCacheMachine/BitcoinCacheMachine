@@ -16,6 +16,9 @@ services:
       bitcoindrpcnet:
         aliases:
           - bitcoindrpc
+      torproxynet:
+    depends_on:
+      - tor-proxy
     secrets:
       - source: bitcoin_config
         target: /data/bitcoin.conf
@@ -23,7 +26,27 @@ services:
         gid: '0'
         mode: 0400
     configs:
-      - source: bitcoindtorproxy-config
+      - source: bitcoin_tor_config
+        target: /etc/tor/torrc
+        uid: '0'
+        gid: '0'
+        mode: 0644
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: 
+          - engine.labels.purpose == bitcoin
+
+  # tor proxy for outbound P2P services only (bitcoinrpc is exposed outside of this stack.)
+  tor-proxy:
+    image: osminogin/tor-simple
+    networks:
+      torproxynet:
+        aliases:
+          - torproxy
+    configs:
+      - source: bitcoin_tor_config
         target: /etc/tor/torrc
         uid: '0'
         gid: '0'
@@ -39,15 +62,16 @@ secrets:
   bitcoin_config:
     file: "./bitcoind-${CHAIN:-testnet}.conf"
 
+configs:
+  bitcoin_tor_config:
+    file: "./torrc"
+
 volumes:
   bitcoind-data:
   bitcoind-log-data:
   bitcoind-cookie-data:
 
-configs:
-  bitcoindtorproxy-config:
-    file: ./torrc.conf
-
 networks:
   bitcoindrpcnet:
     attachable: true
+  torproxynet:

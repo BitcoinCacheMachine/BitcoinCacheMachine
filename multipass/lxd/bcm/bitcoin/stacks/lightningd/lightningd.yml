@@ -2,9 +2,10 @@ version: '3.6'
 services:
   # c-lightning https://github.com/ElementsProject/lightning
   lightningd:
-    image: farscapian/lightningd:latest
+    image: elementsproject/lightningd
     networks:
       bitcoind_bitcoindrpcnet:
+      torproxynet:
       lightningdrpcnet:
         aliases:
           - lightningdrpc
@@ -27,6 +28,31 @@ services:
         constraints: 
           - engine.labels.purpose == bitcoin
 
+  # tor proxy for outbound P2P services only (bitcoinrpc is exposed outside of this stack.)
+  tor-proxy:
+    image: osminogin/tor-simple
+    networks:
+      torproxynet:
+        aliases:
+          - torproxy
+    configs:
+      - source: lightningd_tor_config
+        target: /etc/tor/torrc
+        uid: '0'
+        gid: '0'
+        mode: 0644
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: 
+          - engine.labels.purpose == bitcoin
+
+configs:
+  lightningd_tor_config:
+    file: "./torrc"
+
+
 volumes:
   lightningd-data:
   lightningd-log-data:
@@ -34,9 +60,11 @@ volumes:
     external: true
 
 networks:
-  lightningdrpcnet: #connect to talk to clightning/lightningd
+  lightningdrpcnet:
+    attachable: true
   bitcoind_bitcoindrpcnet:
     external: true
+  torproxynet:
 
 secrets:
   lightningd_conf:

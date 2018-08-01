@@ -58,7 +58,7 @@ echo "Running apt update on dockertemplate using HTTP_PROXY of http://cachestack
 lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt update
 
 echo "Installing required software on dockertemplate using HTTP_PROXY of http://cachestack:3128"
-lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt-get install wait-for-it tor jq curl ifmetric -y
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt-get install wait-for-it tor jq curl ifmetric slurm tcptrack -y
 lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
 lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
 lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate --env HTTP_PROXY=http://cachestack:3128 -- sh get-docker.sh >/dev/null

@@ -66,7 +66,6 @@ if [[ -z $(lxc profile list | grep cachestackprofile) ]]; then
     lxc profile create cachestackprofile
 fi
 
-    
 echo "Applying ./cachestack_lxd_profile.yml to lxd profile 'cachestackprofile'."
 cat ./cachestack_lxd_profile.yml | lxc profile edit cachestackprofile
 
@@ -90,7 +89,8 @@ if [[ -z $(lxc storage list | grep "cachestack-dockervol") ]]; then
     lxc storage create cachestack-dockervol dir
     lxc config device add cachestack dockerdisk disk source=$(lxc storage show cachestack-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 else
-  echo "cachestack-dockervol lxd storage pool already exists."
+    echo "cachestack-dockervol lxd storage pool already exists; attaching it to LXD container 'cachestack'."
+    lxc config device add cachestack dockerdisk disk source=$(lxc storage show cachestack-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 fi
 
 # Apply the resulting profile and start the container.
@@ -115,7 +115,10 @@ fi
 
 # convert the host to allow swarm services. We only need the docker
 # endpoint to be accessible locally since we control everything through lxd API.
-lxc exec cachestack -- docker swarm init --advertise-addr=10.254.253.11 >>/dev/null
+if [[ -z $(docker info | grep "Swarm: active") ]]; then
+    echo "Initializing the docker swarm."
+    lxc exec cachestack -- docker swarm init --advertise-addr=10.254.253.11 >>/dev/null
+fi
 
 echo "Deploying Cache Stack services."
 
@@ -169,28 +172,3 @@ if [[ $BCS_INSTALL_TOR_SOCKS5_PROXY = 'true' ]]; then
     lxc file push ./stacks/tor_socks5_proxy/tor_socks5_proxy.yml cachestack/apps/tor_socks5_proxy/tor_socks5_proxy.yml
     lxc exec cachestack -- docker stack deploy -c /apps/tor_socks5_proxy/tor_socks5_proxy.yml torSOCKS5proxy
 fi
-
-
-##################################
-## THis is where we wait for services to come online before we declare the script 
-## to be successful.
-
-# Wait for archival node services
-if [[ $BCS_INSTALL_BITCOIND_TESTNET = 'true' ]]; then
-    # waiting for bitcoind P2P port TCP 18333.
-    lxc exec cachestack -- wait-for-it -t 0 127.0.0.1:18333
-fi
-
-
-
-
-# # provides local docker registry, elastic registry, and squid HTTP/HTTPS proxy/cache
-# docker stack deploy -c ./bcm_cachestack.yml bcm_cachestack
-
-# # wait for IPFS to come online
-# wait-for-it -t 0 127.0.0.1:4001
-# wait-for-it -t 0 127.0.0.1:8080
-# wait-for-it -t 0 127.0.0.1:8081
-# wait-for-it -t 0 127.0.0.1:4002
-
-
