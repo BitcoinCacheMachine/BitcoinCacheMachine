@@ -41,9 +41,17 @@ cat ./lxd_profiles/manager1.yml | lxc profile edit manager1
 lxc copy manager-template/managerTemplate manager1
 lxc profile apply manager1 docker,manager1
 
-# Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
-lxc storage create manager1-dockervol dir
-lxc config device add manager1 dockerdisk disk source="$(lxc storage show manager1-dockervol | grep source | awk 'NF>1{print $NF}')" path=/var/lib/docker 
+if [[ -z $(lxc storage list | grep "manager1-dockervol") ]]; then
+  # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
+  lxc storage create manager1-dockervol dir
+fi
+
+# attach the dockerdisk to manager1 assuming 'manager1-dockervol' exists.
+## TODO AND it's not already attached.
+if [[ $(lxc storage list | grep "manager1-dockervol") ]]; then
+  lxc config device add manager1 dockerdisk disk source="$(lxc storage show manager1-dockervol | grep source | awk 'NF>1{print $NF}')" path=/var/lib/docker 
+fi
+
 
 lxc start manager1
 

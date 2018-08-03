@@ -15,6 +15,8 @@ if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET_BUILD = "true" ]]; then
 
     lxc exec bitcoin -- docker build -t "$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE" /apps/bitcoind
     lxc exec bitcoin -- docker push "$BCM_BITCOIN_BITCOIND_DOCKER_IMAGE"
+else
+    BCM_BITCOIN_BITCOIND_DOCKER_IMAGE="farscapian/bitcoind:16.1"
 fi
 
 echo "Deploying bitcoind services to lxd host 'bitcoin'."

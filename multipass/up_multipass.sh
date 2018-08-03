@@ -37,11 +37,10 @@ MULTIPASS_VM_IP_ADDRESS=$(multipass list | grep $MULTIPASS_VM_NAME | awk '{ prin
 echo "Waiting for the remote lxd daemon to become avaialable."
 wait-for-it -t 0 $MULTIPASS_VM_IP_ADDRESS:8443
 
+echo "Adding a lxd remote for $MULTIPASS_VM_NAME at $MULTIPASS_VM_IP_ADDRESS:8443."
 lxc remote add $MULTIPASS_VM_NAME $MULTIPASS_VM_IP_ADDRESS:8443 --accept-certificate --password=$BC_LXD_SECRET
 lxc remote set-default $MULTIPASS_VM_NAME
 
-echo "Multipass VM and LXD remote created for $MULTIPASS_VM_NAME."
-echo "Current lxd remote set to $MULTIPASS_VM_NAME at $MULTIPASS_VM_IP_ADDRESS:8443."
-
+echo "Current lxd remote default is $MULTIPASS_VM_NAME."
 echo "Cleaning up."
 rm -rf "/tmp/multipass/$MULTIPASS_VM_NAME"
