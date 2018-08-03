@@ -70,7 +70,7 @@ echo "Applying ./cachestack_lxd_profile.yml to lxd profile 'cachestackprofile'."
 cat ./cachestack_lxd_profile.yml | lxc profile edit cachestackprofile
 
 # Cache Stack Standalone 
-if [[ $BC_ATTACH_TO_UNDERLAY = "true" ]]; then
+if [[ $BCS_ATTACH_TO_UNDERLAY = "true" ]]; then
     # if we're in standalone mode, then we attach eth3 in the container via MACVLAN
     # to the user-provided physical network interface that provides access to the network underlay. 
     # cachestack will obtain a unique IP address on the underlay and register its name as 'cachestack' 
@@ -122,6 +122,18 @@ fi
 
 echo "Deploying Cache Stack services."
 
+# Deploy the private registry if specified.
+if [[ $BCS_INSTALL_PRIVATEREGISTRY = 'true' ]]; then
+    bash -c ./stacks/private_registry/up_lxd_private_registry.sh
+    lxc exec cachestack -- wait-for-it 127.0.0.1:80
+fi
+
+# Deploy the registry mirrors if specified.
+if [[ $BCS_INSTALL_REGISTRYMIRRORS = 'true' ]]; then
+    bash -c ./stacks/registry_mirrors/up_lxd_registrymirrors.sh
+    lxc exec cachestack -- wait-for-it 127.0.0.1:5000
+fi
+
 # Deploy the bitcoind archival node if specified.
 if [[ $BCS_INSTALL_BITCOIND_TESTNET = 'true' ]]; then
     # TODO refactor to subdirectory
@@ -142,16 +154,6 @@ if [[ $BCS_INSTALL_IPFSCACHE = 'true' ]]; then
     lxc exec cachestack -- docker stack deploy -c /apps/ipfs_cache/ipfs_cache.yml ipfscache
 fi
 
-# Deploy the private registry if specified.
-if [[ $BCS_INSTALL_PRIVATEREGISTRY = 'true' ]]; then
-    bash -c ./stacks/private_registry/up_lxd_private_registry.sh
-fi
-
-# Deploy the registry mirrors if specified.
-if [[ $BCS_INSTALL_REGISTRYMIRRORS = 'true' ]]; then
-    bash -c ./stacks/registry_mirrors/up_lxd_registrymirrors.sh
-fi
-
 # Deploy a HTTP/HTTPS proxy based on squid if requested.
 if [[ $BCS_INSTALL_SQUID = 'true' ]]; then
     bash -c ./stacks/squid/up_lxd_squid.sh
@@ -160,4 +162,9 @@ fi
 # Deploy a tor SOCKS5 proxy
 if [[ $BCS_INSTALL_TOR_SOCKS5_PROXY = 'true' ]]; then
     bash -c ./stacks/tor_socks5_proxy/up_lxd_torsocks5.sh
+fi
+
+# Deploy RSYNCD
+if [[ $BCS_INSTALL_RSYNCD = 'true' ]]; then
+    bash -c ./stacks/rsyncd/up_lxd_rsyncd.sh
 fi

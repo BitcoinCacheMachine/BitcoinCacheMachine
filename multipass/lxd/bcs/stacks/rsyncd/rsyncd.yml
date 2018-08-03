@@ -1,0 +1,14 @@
+version: '3.6'
+services:
+  rsyncd:
+    image: ${BCS_INSTALL_RSYNCD_BUILD_IMAGE}
+    ports: 
+      - "873:873"
+    volumes:
+      - rsync-data:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+
+volumes:
+  rsync-data:

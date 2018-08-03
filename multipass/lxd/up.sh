@@ -15,24 +15,6 @@ if [[ -z $(env | grep BC) ]]; then
   exit
 fi
 
-# create the docker profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep docker) ]]; then
-  lxc profile create docker
-  cat ./shared/docker_lxd_profile.yml | lxc profile edit docker
-else
-  echo "Applying docker_lxd_profile.yml to lxd profile 'docker'."
-  cat ./shared/docker_lxd_profile.yml | lxc profile edit docker
-fi
-
-
-# create the dockertemplate_profile profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep dockertemplate_profile) ]]; then
-  # create necessary templates
-  lxc profile create dockertemplate_profile
-  cat ./shared/lxd_profile_docker_template.yml | lxc profile edit dockertemplate_profile
-else
-  echo "LXD profile 'dockertemplate_profile' already exists, skipping profile creation."
-fi
 
 # create the lxdbrBCMBridge network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrBCMBridge) ]]; then
@@ -44,7 +26,7 @@ else
 fi
 
 # Installation branching logic. 
-if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
+if [[ $BCS_CACHESTACK_STANDALONE = "true" ]]; then
   echo "Installing Bitcoin Cache Stack in standalone mode. Cache Stack will attach to the underlay via physical interface $BCS_TRUSTED_HOST_INTERFACE on $LXD_ENDPOINT."
   #TODO check to ensure the the macvlan interface is set.
   bash -c ./bcs/up_lxd_cachestack.sh

@@ -21,18 +21,27 @@ else
   echo "$BC_ZFS_POOL_NAME already exists, skipping pool creation."
 fi
 
-# # create the docker profile if it doesn't exist.
-# if [[ -z $(lxc profile list | grep docker) ]]; then
-#   # default profile has our root block device mapped to ZFS $ZFS_POOL_NAME
-#   lxc profile create docker
-#   cat ./docker_lxd_profile.yml | lxc profile edit docker
-# else
-#   echo "Applying docker_lxd_profile.yml to lxd profile 'docker'."
-#   cat ./docker_lxd_profile.yml | lxc profile edit docker
-# fi
+# create the docker profile if it doesn't exist.
+if [[ -z $(lxc profile list | grep docker) ]]; then
+  lxc profile create docker
+else
+  echo "Applying docker_lxd_profile.yml to lxd profile 'docker'."
+  cat ./docker_lxd_profile.yml | lxc profile edit docker
+fi
 
+cat ./docker_lxd_profile.yml | lxc profile edit docker
 
-# get the active LXD endpoint so we don't have to reference it all the time.
+# create the dockertemplate_profile profile if it doesn't exist.
+if [[ -z $(lxc profile list | grep "dockertemplate_profile") ]]; then
+  # create necessary templates
+  lxc profile create dockertemplate_profile
+else
+  echo "LXD profile 'dockertemplate_profile' already exists, skipping profile creation."
+fi
+
+cat ./lxd_profile_docker_template.yml | lxc profile edit dockertemplate_profile
+
+# cache the active LXD endpoint so we don't have to use the LXD API mulitple times.
 ACTIVE_LXD_ENDPOINT=$(lxc remote get-default)
 
 echo "Copying lxd ubuntu:18.04 cloud image from the Internet."

@@ -18,7 +18,7 @@ fi
 # delete's the cache stack if defined by user.
 function deleteCacheStack ()
 {
-  if [[ $BC_DELETE_CACHESTACK = "true" ]]; then
+  if [[ $BCS_DELETE_CACHESTACK = "true" ]]; then
     echo "Calling Bitcoin Cache Machine down script."
     bash -c ./bcs/down_lxd_cachestack.sh
   fi
@@ -26,7 +26,7 @@ function deleteCacheStack ()
 
 
 # get or update the BCM host template git repo
-if [[ $BC_CACHESTACK_STANDALONE = "true" ]]; then
+if [[ $BCS_CACHESTACK_STANDALONE = "true" ]]; then
   deleteCacheStack
 else
   echo "Calling Bitcoin Cache Machine down script."
@@ -43,21 +43,16 @@ fi
 
 
 
-# delete lxd profile dockertemplate_profile
-if [[ $(lxc profile list | grep docker) ]]; then
-    echo "Deleting docker lxd profile."
-    lxc profile delete docker
-fi
-
-
 # delete lxd network lxdbrBCMBridge 
 if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
     echo "Deleting lxd network 'lxdbrBCMBridge'."
     lxc network delete lxdbrBCMBridge
 fi
 
-# delete lxd storage pool $BC_ZFS_POOL_NAME 
-if [[ $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
-    echo "Deleting lxd storage pool '$BC_ZFS_POOL_NAME'."
-    lxc storage delete $BC_ZFS_POOL_NAME
+# delete lxd storage pool 
+if [[ ! -z $(lxc storage list | grep "$BC_ZFS_POOL_NAME" | grep "| 0") ]]; then
+    echo "Deleting lxd storage pool '$BC_ZFS_POOL_NAME."
+    lxc storage delete "$BC_ZFS_POOL_NAME"
+else
+  echo "Keeping lxc storage pool $BC_ZFS_POOL_NAME"
 fi
