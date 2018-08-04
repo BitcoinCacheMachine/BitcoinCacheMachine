@@ -125,13 +125,13 @@ echo "Deploying Cache Stack services."
 # Deploy the private registry if specified.
 if [[ $BCS_INSTALL_PRIVATEREGISTRY = 'true' ]]; then
     bash -c ./stacks/private_registry/up_lxd_private_registry.sh
-    lxc exec cachestack -- wait-for-it 127.0.0.1:80
+    lxc exec cachestack -- wait-for-it -t 0 127.0.0.1:80
 fi
 
 # Deploy the registry mirrors if specified.
 if [[ $BCS_INSTALL_REGISTRYMIRRORS = 'true' ]]; then
     bash -c ./stacks/registry_mirrors/up_lxd_registrymirrors.sh
-    lxc exec cachestack -- wait-for-it 127.0.0.1:5000
+    lxc exec cachestack -- wait-for-it -t 0 127.0.0.1:5000
 fi
 
 # Deploy the bitcoind archival node if specified.

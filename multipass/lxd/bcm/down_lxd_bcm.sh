@@ -6,9 +6,6 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# load the environment variables for the current LXD remote.
-source ~/.bcm/bcm_env.sh
-
 echo "Destroying lxd host bitcoin"
 bash -c ./bitcoin/down_bitcoin.sh
 

@@ -1,9 +1,6 @@
 #!/bin/bash
 
-set -e
-
-# load the environment variables for the current LXD remote.
-source ~/.bcm/bcm_env.sh
+set -eu
 
 if [[ $(lxc exec manager1 -- docker stack ls | grep "lncli-web") ]]; then
     echo "Removing docker stack 'lncli-web' from the swarm."

@@ -6,9 +6,6 @@ set -e
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-# load the environment variables for the current LXD remote.
-source ~/.bcm/bcm_env.sh
-
 # create the lxdbrBitcoin network, which is used for all outbound access
 # by services residing on the lxd host `bitcoin`
 if [[ -z $(lxc network list | grep lxdbrBitcoin) ]]; then
