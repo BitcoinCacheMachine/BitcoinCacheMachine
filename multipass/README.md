@@ -18,14 +18,8 @@ sudo snap install multipass --beta --classic
 
 Let's assume you want to deploy BCM in a standalone multipass VM called `bcm-01`. Create a file at ~/.bcm/endpoints/bcm-01.env. Next, edit the file to define your BCM deployment. You MUST set BCM environment variables that start with "MULTIPASS_" for multipass VMs. You may set other BCM-related variables in the same file. The [default BCM environment variables](../resources/defaults.env) for more details on possible BCM deployment options.
 
-## Choose which software-defined features you want deployed to your network
+## Step 3: Source your variables
 
-    Modify the relevant .env (`multipass_cloud-init.yml` if using multipass, `lxc.env` if running on bare-metal) file to specify which software-defined features to deploy. The values specified here guide the initial BCM installation script `lxc_up.sh`. More info can be found in ./docs/env.md
+If you ran ~/git/github/bcm/setup.sh, 
 
-    After multipass is installed and you have updated and saved the .env file, you can start BCM deployment/installation (BASH) script:
-
-    ```bash
-    ./multipass_up.sh
-    ```
-
-Your console will show the progress of the BCM deployment. After completion, a QR code and TOR .onion address should appear which will allow you to administer your BCM.
+## Step 3: run ~/git/github/bcm/multipass/up_multipass.sh

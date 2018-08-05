@@ -24,7 +24,7 @@ fi
 
 # Installation branching logic. 
 if [[ $BCS_CACHESTACK_STANDALONE = "true" ]]; then
-  echo "Installing Bitcoin Cache Stack in standalone mode. Cache Stack will attach to the underlay via physical interface $BCS_TRUSTED_HOST_INTERFACE on $LXD_ENDPOINT."
+  echo "Installing Bitcoin Cache Stack in standalone mode. Cache Stack will attach to the underlay via physical interface '$BCS_TRUSTED_HOST_INTERFACE' on '$(lxc remote get-default)'."
   #TODO check to ensure the the macvlan interface is set.
   bash -c ./bcs/up_lxd_cachestack.sh
 else

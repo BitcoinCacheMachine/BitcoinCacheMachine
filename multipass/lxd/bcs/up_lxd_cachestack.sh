@@ -99,6 +99,9 @@ if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
     #lxc profile device add cachestackprofile root disk path=/ pool=$BC_ZFS_POOL_NAME
     lxc profile apply cachestack docker,cachestackprofile
 
+    # push necessary files to the template including daemon.json
+    lxc file push ./daemon.json cachestack/etc/docker/daemon.json
+
     lxc start cachestack
 
     sleep 30
@@ -134,15 +137,9 @@ if [[ $BCS_INSTALL_REGISTRYMIRRORS = 'true' ]]; then
     lxc exec cachestack -- wait-for-it -t 0 127.0.0.1:5000
 fi
 
-# Deploy the bitcoind archival node if specified.
-if [[ $BCS_INSTALL_BITCOIND_TESTNET = 'true' ]]; then
-    # TODO refactor to subdirectory
-    echo "Deploying a bitcoind archival node to the Cache Stack."
-    lxc exec cachestack -- mkdir -p /apps/bitcoind_archivalnode
-    lxc file push ./stacks/bitcoind_archivalnode/bitcoind.yml cachestack/apps/bitcoind_archivalnode/bitcoind.yml
-    lxc file push ./stacks/bitcoind_archivalnode/bitcoind-testnet.conf cachestack/apps/bitcoind_archivalnode/bitcoind-testnet.conf
-    lxc file push ./stacks/bitcoind_archivalnode/bitcoind-torrc.conf cachestack/apps/bitcoind_archivalnode/bitcoind-torrc.conf
-    lxc exec cachestack -- docker stack deploy -c /apps/bitcoind_archivalnode/bitcoind.yml bitcoind
+# Deploy RSYNCD
+if [[ $BCS_INSTALL_RSYNCD = 'true' ]]; then
+    bash -c ./stacks/rsyncd/up_lxd_rsyncd.sh
 fi
 
 # Deploy IPFS Cache if specified.
@@ -164,7 +161,8 @@ if [[ $BCS_INSTALL_TOR_SOCKS5_PROXY = 'true' ]]; then
     bash -c ./stacks/tor_socks5_proxy/up_lxd_torsocks5.sh
 fi
 
-# Deploy RSYNCD
-if [[ $BCS_INSTALL_RSYNCD = 'true' ]]; then
-    bash -c ./stacks/rsyncd/up_lxd_rsyncd.sh
+
+# Deploy the bitcoind archival node if specified.
+if [[ $BCS_INSTALL_BITCOIND_TESTNET = 'true' ]]; then
+    bash -c ./stacks/bitcoind_archivalnode/up_lxd_bitcoind.sh
 fi

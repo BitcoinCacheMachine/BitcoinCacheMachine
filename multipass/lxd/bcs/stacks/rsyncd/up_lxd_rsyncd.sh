@@ -10,13 +10,30 @@ if [[ $BCS_INSTALL_RSYNCD_BUILD = "true" ]]; then
 
     lxc exec cachestack -- mkdir -p /apps/rsyncd
     lxc file push ./Dockerfile cachestack/apps/rsyncd/Dockerfile
-    lxc file push ./rsyncd.conf cachestack/apps/rsyncd/rsyncd.conf
+    lxc file push ./entrypoint.sh cachestack/apps/rsyncd/entrypoint.sh
 
+    # build the rsync image. We don't need to put it in a private registry I don't think.
     lxc exec cachestack -- docker build -t "$BCS_INSTALL_RSYNCD_BUILD_IMAGE" /apps/rsyncd
     lxc exec cachestack -- docker push "$BCS_INSTALL_RSYNCD_BUILD_IMAGE"
 fi
 
-echo "Deploying docker rsyncd to the Cache Stack."
+echo "Deploying rsyncd to 'cachestack'."
 lxc exec cachestack -- mkdir -p /apps/rsyncd
+lxc exec cachestack -- mkdir -p /apps/rsyncd/.ssh
+lxc file push ~/.ssh/authorized_hosts cachestack/apps/rsyncd/.ssh/authorized_keys
+lxc file push ./rsyncd.conf cachestack/apps/rsyncd/rsyncd.conf
 lxc file push ./rsyncd.yml cachestack/apps/rsyncd/rsyncd.yml
-lxc exec cachestack -- docker stack deploy -c /apps/rsyncd/rsyncd.yml rsyncd
+lxc exec cachestack -- env BCS_INSTALL_RSYNCD_BUILD_IMAGE=$BCS_INSTALL_RSYNCD_BUILD_IMAGE docker stack deploy -c /apps/rsyncd/rsyncd.yml rsyncd
+
+lxc exec cachestack -- wait-for-it -t 0 127.0.0.1:873
+
+if [[ $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED = "true" ]]; then
+    lxc exec cachestack -- mkdir -p cachestack/apps/bitcoind/data
+
+    # if the directory exists, then we're good to go.
+    if [ -d "$BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR" ]; then
+        # TODO ugprade basic authentication to SSH keys
+        echo "$BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR on $HOSTNAME will be pushed to cachestack rsyncd."
+        sshpass -p "pass" rsync -av $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR rsync://user@cachestack/volume/bitcoind_testnet_fullblocks
+    fi
+fi
