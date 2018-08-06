@@ -24,9 +24,6 @@ fi
 # create the docker profile if it doesn't exist.
 if [[ -z $(lxc profile list | grep docker) ]]; then
   lxc profile create docker
-else
-  echo "Applying docker_lxd_profile.yml to lxd profile 'docker'."
-  cat ./docker_lxd_profile.yml | lxc profile edit docker
 fi
 
 cat ./docker_lxd_profile.yml | lxc profile edit docker
@@ -72,6 +69,7 @@ lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt-get install wait-for-it tor 
 lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
 lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
 lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- sh get-docker.sh >/dev/null
+lxc exec $ACTIVE_LXD_ENDPOINT:dockertemplate -- rm -rf /tmp/*
 
 # stop the current template dockerd instance since we're about to create a snapshot
 # Enable the docker daemon to start by default.

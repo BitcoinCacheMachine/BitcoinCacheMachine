@@ -62,7 +62,7 @@ Each Bitcoin Cache Machine deployment includes one or more of the following comp
 3) [required] hosts a [private registry](https://docs.docker.com/registry/deploying/) for Docker images built during the BCM deployment process,
 4) [required] provides HTTP/HTTPS proxy/cache based on [Squid](http://www.squid-cache.org/),
 5) [optional] IPFS node for 1) serving cached data to IPFS nodes on the LAN and 2) and pinning static content to /ipfs,
-6) [optional] TOR SOCKS5 proxy for BCM components making client-server requests,
+6) [optional] TOR SOCKS5 proxy for BCM components making outbound client-server requests on the Internet,
 6) [optional] RSYNCD server to serve bulk data to LAN clients, such as pre-indexed Bitcoin blockchain data (useful for development),
 5) [optional] Bitcoin border node / archival node serving and downloading block over TOR. This can be useful during development; you can have an archival node serve blocks to more trusted full nodes. More information about the Cache Stack and its components can be found in ./docs/architecture/cache_stack.md. Future versions of cachestack will include DHCP with hostname autoregistration and a DNS cache configured to use TOR.
 

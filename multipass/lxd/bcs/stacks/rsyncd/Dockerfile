@@ -1,16 +1,32 @@
 FROM ubuntu:bionic
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV LANG C.UTF-8
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    net-tools \
+    openssh-server \
+    rsync \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y rsync \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-        
-# Setup rsync
-EXPOSE 873
+RUN mkdir /var/run/sshd
 
-CMD ["rsync_server"]
-ENTRYPOINT ["/entrypoint.sh"]
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+# Prevent the creation of ~/.cache/motd.legal-displayed
+RUN sed 's@session\s*optional\s*pam_motd.so.*@#&@g' -i /etc/pam.d/sshd
+
+RUN echo 'AuthorizedKeysFile /etc/ssh/%u/authorized_keys' >> /etc/ssh/sshd_config
+
+RUN groupadd -g 1000 rsync \
+  && useradd -d /rsync -u 1000 -g 1000 -m -s /bin/bash rsync
+
+RUN mkdir -p /etc/ssh/rsync \
+  && chown rsync.rsync /etc/ssh/rsync
+
+VOLUME /rsync
+
+EXPOSE 22
+
 COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod 744 /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]

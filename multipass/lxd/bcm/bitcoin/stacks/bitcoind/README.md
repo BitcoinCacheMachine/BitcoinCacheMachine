@@ -1,3 +1,3 @@
-# Onion Sites
+# Bitcoind
 
-This stack can be used across many different interfaces. Just update the external network and service and port to use.
+This Docker Stack contains the YAML and related files for running the fully trusted Bitcoin Core 16.1 full node.

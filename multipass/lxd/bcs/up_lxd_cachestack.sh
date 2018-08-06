@@ -166,3 +166,4 @@ fi
 if [[ $BCS_INSTALL_BITCOIND_TESTNET = 'true' ]]; then
     bash -c ./stacks/bitcoind_archivalnode/up_lxd_bitcoind.sh
 fi
+

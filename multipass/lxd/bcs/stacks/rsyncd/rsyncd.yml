@@ -2,11 +2,14 @@ version: '3.6'
 services:
   rsyncd:
     image: ${BCS_INSTALL_RSYNCD_BUILD_IMAGE:-cachestack.lan/rsyncd:latest}
+    #werekraken/rsync-over-ssh
+      #
     ports: 
+      - "2222:22"
       - "873:873"
-      - "9000:22"
     volumes:
-      - rsync-data:/data
+      - rsync-data:/rsync
+    #  - /apps/rsyncd/authorized_keys:/etc/ssh/rsync/authorized_keys:ro
     configs:
       - source: rsync_conf
         target: /etc/rsyncd.conf
@@ -15,9 +18,9 @@ services:
         mode: 0400
     secrets:
       - source: ssh_pubkeys
-        target: /secrets/authorized_hosts
-        uid: '0'
-        gid: '0'
+        target: /etc/ssh/rsync/authorized_keys
+        uid: '1000'
+        gid: '1000'
         mode: 0644
     deploy:
       mode: replicated
@@ -28,7 +31,7 @@ volumes:
 
 secrets:
   ssh_pubkeys:
-    file: "./.ssh/authorized_keys"
+    file: "./authorized_keys"
 
 configs:
   rsync_conf:

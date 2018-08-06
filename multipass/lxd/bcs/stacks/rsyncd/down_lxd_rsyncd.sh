@@ -13,5 +13,5 @@ lxc exec cachestack -- docker system prune -f
 
 
 if [[ $BCS_DELETE_RSYNC_DATA_DOCKER_VOL = "true" ]]; then
-    lxc exec cachestack -- docker volume rm rsyncd_rsyncd-data
+    lxc exec cachestack -- docker volume rm rsyncd_rsync-data
 fi

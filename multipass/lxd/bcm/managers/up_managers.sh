@@ -23,6 +23,20 @@ else
   echo "$BC_ZFS_POOL_NAME already exists, skipping pool creation."
 fi
 
+# create the docker profile if it doesn't exist. This may happen when we have an external cachestack 
+# and we didn't create the profile during the host_template creation.
+if [[ -z $(lxc profile list | grep docker) ]]; then
+  lxc profile create docker
+  cat ../../bcs/host_template/docker_lxd_profile.yml | lxc profile edit docker
+fi
+
+
+# create the dockertemplate_profile profile if it doesn't exist, which might happen when we're using an external cachestack
+if [[ -z $(lxc profile list | grep "dockertemplate_profile") ]]; then
+  lxc profile create dockertemplate_profile
+  cat ../../bcs/host_template/lxd_profile_docker_template.yml | lxc profile edit dockertemplate_profile
+fi
+
 ## Create the manager1 host from the lxd image template.
 lxc init bctemplate manager-template -p docker -p dockertemplate_profile -s $BC_ZFS_POOL_NAME
 

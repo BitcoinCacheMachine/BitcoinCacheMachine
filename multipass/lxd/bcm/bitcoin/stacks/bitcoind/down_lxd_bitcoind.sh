@@ -9,3 +9,5 @@ if [[ $(lxc exec manager1 -- docker stack ls | grep bitcoind) ]]; then
 fi
 
 lxc exec bitcoin -- docker system prune -f
+
+lxc exec bitcoin -- docker volume rm bitcoind_testnet_data

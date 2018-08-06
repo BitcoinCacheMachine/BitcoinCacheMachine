@@ -40,7 +40,7 @@ else
     # in this assume the cachestack is defined in $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT
     echo "Assuming external LXD endpoint '$BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT' is hosting a cachestack."
     echo "Copying a prepared LXD system host image from $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT"
-    lxc image copy $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT:bctemplate $LXD_ENDPOINT: --auto-update --copy-aliases
+    lxc image copy $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT:bctemplate $(lxc remote get-default): --auto-update --copy-aliases
   fi
 
   export BCM_CACHE_STACK="$BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT"
