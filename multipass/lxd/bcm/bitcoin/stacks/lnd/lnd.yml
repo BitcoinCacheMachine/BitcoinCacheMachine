@@ -1,14 +1,11 @@
 version: '3.6'
 services:
 
-  #lightning network daemon
+  # https://github.com/lightningnetwork/lnd
   lnd:
-    image: farscapian/lnd:latest
+    image: ${BCM_BITCOIN_LND_DOCKER_IMAGE}
     #hostname required for lncl-web certificate hostname purposes (see ./lnd/start-lnd.sh)
     hostname: lnd
-    ports:
-      - "9735:9735"
-    # TODO ensure LND is going over TOR (when avaialable)
     networks:
       bitcoind_bitcoindrpcnet:
       lndrpcnet:
@@ -23,8 +20,6 @@ services:
       - lnd-certificate-data:/config
       - lnd-macaroon-data:/macaroons
       - lnd-log-data:/var/logs/lnd
-    depends_on:
-      - bitcoind
     secrets:
       - source: lnd_conf
         target: /root/.lnd/lnd.conf
@@ -39,7 +34,7 @@ services:
           - engine.labels.purpose == bitcoin
 
 networks:
-  lndrpcnet:  #connect to this if you need to communicate with lnd RPC
+  lndrpcnet:  #connect to this if you need to communicate with lnd gRPC
     attachable: true
 
   bitcoind_bitcoindrpcnet:

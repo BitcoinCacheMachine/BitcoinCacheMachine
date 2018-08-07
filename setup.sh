@@ -37,4 +37,4 @@ cp ./resources/defaults.env ~/.bcm/defaults.env
 
 # client `admin machine` client requirements
 
-sshpass and rsync
+#sshpass and rsync

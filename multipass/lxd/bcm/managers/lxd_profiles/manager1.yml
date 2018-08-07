@@ -1,6 +1,6 @@
 config:
-  limits.cpu: "2"
-  limits.memory: "2048MB"      
+  limits.cpu: "4"
+  limits.memory: "4096MB"      
   
   user.network-config: |
     version: 1

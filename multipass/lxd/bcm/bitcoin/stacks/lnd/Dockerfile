@@ -31,7 +31,7 @@ VOLUME /logs
 
 WORKDIR /root/.lnd
 
-ADD ./entrypoint.sh /entrypoint.sh
+ADD ./docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

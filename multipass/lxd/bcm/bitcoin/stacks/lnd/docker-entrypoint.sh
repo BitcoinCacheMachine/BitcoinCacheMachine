@@ -71,11 +71,10 @@ if [ ! -f /config/tls.cert ]; then
     echo "Generating special TLS certificates for LND and lnd-cli web."
     #put the LND_CERTIFICATE_HOSTNAME env in there.
     openssl ecparam -genkey -name prime256v1 -out /config/tls.key
-    openssl req -new -sha256 -key /config/tls.key -out /config/csr.csr -subj "/CN=$LND_CERTIFICATE_HOSTNAME/O=lnd"
+    openssl req -new -sha256 -key /config/tls.key -out /config/csr.csr -subj "/CN=$LND_CERTIFICATE_HOSTNAME/CN=localhost/O=lnd"
     openssl req -x509 -sha256 -days 36500 -key /config/tls.key -in /config/csr.csr -out /config/tls.cert
 
     #copy the cert to /root/.lnd/tls.cert so lncli command line works correctly.
-
 
     rm /config/csr.csr
 fi

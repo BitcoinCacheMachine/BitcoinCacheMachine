@@ -22,7 +22,7 @@ fi
 lxc exec bitcoin -- docker volume create bitcoind_testnet_data
 
 if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET_RSYNC_BOOTSTRAP = "true" ]]; then
-    echo "Bootstrapping bitcoind data directory with rsync."
+    echo "Bootstrapping bitcoind testnet data directory using rsync from files hosted on $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT."
     lxc exec bitcoin -- docker pull cachestack.lan/rsyncd:latest
 
     # next, run the container with the rsync client on it and do a remote-to-local rsync pull

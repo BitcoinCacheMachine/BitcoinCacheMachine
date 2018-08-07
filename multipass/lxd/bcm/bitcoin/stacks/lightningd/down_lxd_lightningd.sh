@@ -9,3 +9,7 @@ if [[ $(lxc exec manager1 -- docker stack ls | grep lightningd) ]]; then
 fi
 
 lxc exec bitcoin -- docker system prune -f
+
+sleep 15
+
+#lxc exec bitcoin -- docker volume rm lightningd_lightningd-data lightningd_lightningd-log-data
