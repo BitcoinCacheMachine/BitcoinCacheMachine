@@ -47,6 +47,8 @@ git clone https://github.com/BitcoinCacheMachine/BitcoinCacheMachine ~/git/githu
 cd ~/git/github/bcm
 ```
 
+Next, run `./setup.sh` on the `admin machine`. This script creates the directory ~/.bcm, which is where you BCM scripts source BCM deployment options and to store runtime files. Click [here](./resources/README.md) for more information.
+
 To continue, consider running [BCM in a multipass-based VM](./multipass). Click [here](./docs/installation/baremetal.md) if you want to run BCM on a computer running Linux (i.e., bare-metal).
 
 ## BCM Components
@@ -57,7 +59,7 @@ Each Bitcoin Cache Machine deployment includes one or more of the following comp
 
 * `cachestack` - a set of LXD components (networks, storage pool, profiles, etc.) and LXD containers that provide caching and underlay network services for dependent BCM components. You can install `cachestack` in standalone mode to provide network and caching services hosts on your LAN or corporate network. If there is no standalone `cachestack` on your LAN segment, Bitcoin Cache Machine installs a local copy and uses it internally; that is, BCM is dependent on a `cachestack`.
 
-1) [required] serves LXD images to clients (when in standalone mode),
+1) [required when in standalone mode] prepares and serves trusted LXD images to LXD clients,
 2) [required] hosts one or more Docker Registry mirrors configured as [a pull-through cache](https://docs.docker.com/registry/recipes/mirror/),
 3) [required] hosts a [private registry](https://docs.docker.com/registry/deploying/) for Docker images built during the BCM deployment process,
 4) [required] provides HTTP/HTTPS proxy/cache based on [Squid](http://www.squid-cache.org/),

@@ -84,26 +84,8 @@ if [[ $BCM_INSTALL_BITCOIN_LIGHTNINGD_TESTNET = "true" ]]; then
   bash -c ./stacks/lightningd/up_lxd_lightningd.sh
 fi
 
+# install lightningd (c-lightning) if specified (testnet)
+if [[ $BCM_INSTALL_BITCOIN_LND_TESTNET = "true" ]]; then
+  bash -c ./stacks/lnd/up_lxd_lnd.sh
+fi
 
-# # install lnd if specified
-# if [[ $BCM_INSTALL_BITCOIN_LND_TESTNET = "true" ]]; then
-#   echo "Deploying testnet lightning network daemon (lnd) to lxd host 'bitcoin'."
-#   lxc exec manager1 -- mkdir -p /apps/lnd
-
-#   lxc file push ./stacks/lnd/lnd-mainnet.conf manager1/apps/lnd/lnd-mainnet.conf
-#   lxc file push ./stacks/lnd/lnd-testnet.conf manager1/apps/lnd/lnd-testnet.conf
-#   lxc file push ./stacks/lnd/lnd.yml manager1/apps/lnd/lnd.yml
-
-#   lxc exec manager1 -- docker stack deploy -c /apps/lnd/lnd.yml lnd
-# fi
-
-# if [[ $BCM_INSTALL_BITCOIN_LND_LNCLIWEB = "true" ]]; then
-#   echo "Deploying lncli-web web interface (for lnd) to lxd host 'bitcoin'."
-#   lxc exec manager1 -- mkdir -p /apps/lncliweb
-
-#   lxc file push ./stacks/lncliweb/lncli-web.yml manager1/apps/lncliweb/lncli-web.yml
-#   lxc file push ./stacks/lncliweb/lncli-web.lncliweb.conf.js manager1/apps/lncliweb/lncli-web.lncliweb.conf.js
-#   lxc file push ./stacks/lncliweb/nginx.conf manager1/apps/lncliweb/nginx.conf
-
-#   lxc exec manager1 -- docker stack deploy -c /apps/lncliweb/lncli-web.yml lncli-web
-# fi
