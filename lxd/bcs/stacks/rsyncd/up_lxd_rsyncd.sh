@@ -31,7 +31,7 @@ lxc file push ./rsyncd.conf cachestack/apps/rsyncd/rsyncd.conf
 lxc file push ./rsyncd.yml cachestack/apps/rsyncd/rsyncd.yml
 lxc exec cachestack -- env BCS_INSTALL_RSYNCD_BUILD_IMAGE=$BCS_INSTALL_RSYNCD_BUILD_IMAGE docker stack deploy -c /apps/rsyncd/rsyncd.yml rsyncd
 
-wait-for-it -t 0 cachestack.lan:2222
+wait-for-it -t 0 cachestack.lxd:2222
 # sleep 15
 
 if [[ $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED = "true" ]]; then
@@ -44,6 +44,6 @@ if [[ $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED = "true" ]]; then
         echo "$BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR on $HOSTNAME will be pushed to cachestack rsyncd."
         SSH_KEY_PATH="~/.bcm/endpoints/lexx/.ssh/cachestack-rsync-key"
 
-        rsync -av -e "ssh -i $SSH_KEY_PATH -p 2222 -l rsync -o StrictHostKeyChecking=no" $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR/ cachestack.lan:bitcoind_testnet_data
+        rsync -av -e "ssh -i $SSH_KEY_PATH -p 2222 -l rsync -o StrictHostKeyChecking=no" $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR/ cachestack.lxd:bitcoind_testnet_data
     fi
 fi

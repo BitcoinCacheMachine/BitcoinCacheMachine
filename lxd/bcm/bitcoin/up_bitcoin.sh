@@ -60,6 +60,7 @@ lxc start bitcoin
 sleep 10
 
 # update routing table in bitcoin lxd host to prefer eth0 for outbound access.
+# TODO Find a better way to pin outbound traffic to eth0
 lxc exec bitcoin -- ifmetric eth0 0
 
 

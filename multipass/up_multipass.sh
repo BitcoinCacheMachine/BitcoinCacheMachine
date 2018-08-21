@@ -16,12 +16,13 @@ fi
 mkdir -p ~/.bcm/runtime/$MULTIPASS_VM_NAME
 touch ~/.bcm/runtime/$MULTIPASS_VM_NAME/cloud-init.yml
 
-# if the user has not specified BCM_LXD_SECRET, generate a secure one and save it
-if [[ $BCM_LXD_SECRET = "" ]]; then
-  BCM_LXD_SECRET=$(apg -n 1 -m 40 -x 50 -M CN)
+# if the user has not specified BCM_LXD_SECRET, generate a secure one
+if [ -z $BCM_LXD_SECRET ]; then
+  BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
 fi
 
-sed 's/CHANGEME/'$BCS_LXD_SECRET'/g' ./multipass_cloud-init.yml  > ~/.bcm/runtime/$MULTIPASS_VM_NAME/cloud-init.yml
+# update the cloud-init template and save a local copy in ~/.bcm/runtime/...
+sed 's/CHANGEME/'$BCM_LXD_SECRET'/g' ./multipass_cloud-init.yml  > ~/.bcm/runtime/$MULTIPASS_VM_NAME/cloud-init.yml
 
 ## launch the VM based on Ubuntu Bionic
 multipass launch \
@@ -45,7 +46,7 @@ echo "Waiting for the remote lxd daemon to become avaialable."
 wait-for-it -t 0 $MULTIPASS_VM_IP_ADDRESS:8443
 
 echo "Adding a lxd remote for $MULTIPASS_VM_NAME at $MULTIPASS_VM_IP_ADDRESS:8443."
-lxc remote add $MULTIPASS_VM_NAME "$MULTIPASS_VM_IP_ADDRESS:8443" --accept-certificate --password="$BCS_LXD_SECRET"
+lxc remote add $MULTIPASS_VM_NAME "$MULTIPASS_VM_IP_ADDRESS:8443" --accept-certificate --password="$BCM_LXD_SECRET"
 lxc remote set-default "$MULTIPASS_VM_NAME"
 
 echo "Current lxd remote default is $MULTIPASS_VM_NAME."

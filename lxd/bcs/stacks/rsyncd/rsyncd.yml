@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   rsyncd:
-    image: ${BCS_INSTALL_RSYNCD_BUILD_IMAGE:-cachestack.lan/rsyncd:latest}
+    image: ${BCS_INSTALL_RSYNCD_BUILD_IMAGE:-cachestack.lxd/rsyncd:latest}
     #werekraken/rsync-over-ssh
       #
     ports: 
