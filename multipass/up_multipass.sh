@@ -15,8 +15,13 @@ fi
 
 mkdir -p ~/.bcm/runtime/$MULTIPASS_VM_NAME
 touch ~/.bcm/runtime/$MULTIPASS_VM_NAME/cloud-init.yml
-sed 's/CHANGEME/'$BCS_LXD_SECRET'/g' ./multipass_cloud-init.yml  > ~/.bcm/runtime/$MULTIPASS_VM_NAME/cloud-init.yml
 
+# if the user has not specified BCM_LXD_SECRET, generate a secure one and save it
+if [[ $BCM_LXD_SECRET = "" ]]; then
+  BCM_LXD_SECRET=$(apg -n 1 -m 40 -x 50 -M CN)
+fi
+
+sed 's/CHANGEME/'$BCS_LXD_SECRET'/g' ./multipass_cloud-init.yml  > ~/.bcm/runtime/$MULTIPASS_VM_NAME/cloud-init.yml
 
 ## launch the VM based on Ubuntu Bionic
 multipass launch \
@@ -47,5 +52,5 @@ echo "Current lxd remote default is $MULTIPASS_VM_NAME."
 
 if [[ $MULTIPASS_PROVISION_LXD = "true" ]]; then
   echo "Running ./lxd/up.sh against active LXD remote endpoint."
-  bash -c ./lxd/up_bcs_bcm.sh
+  bash -c ../lxd/up_lxd_endpoint.sh
 fi

@@ -31,3 +31,5 @@ if [[ $(lxc remote get-default) = $MULTIPASS_VM_NAME ]]; then
 else
     echo "No lxc remote called $MULTIPASS_VM_NAME to delete."
 fi
+
+echo "Note! You MUST DELETE ~/.bcm/runtime/$MULTIPASS_VM_NAME/cloud-init.yml MANUALLY!!!"
