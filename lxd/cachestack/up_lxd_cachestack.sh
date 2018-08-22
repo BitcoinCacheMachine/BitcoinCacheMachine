@@ -18,22 +18,8 @@ cd "$(dirname "$0")"
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-# Create a docker host template if it doesn't exist already
-if [[ -z $(lxc list | grep dockertemplate) ]]; then
-    # Create a docker host template if it doesn't exist already
-    if [[ -z $(lxc list | grep $BC_ZFS_POOL_NAME) ]]; then
-        # create the host template if it doesn't exist already.
-        bash -c ./host_template/up_lxd.sh
-    fi
-
-    # if the template doesn't exist, publish it create it.
-    if [[ -z $(lxc image list | grep bctemplate) ]]; then
-        echo "Publishing dockertemplate/dockerSnapshot snapshot as bctemplate lxd image."
-        lxc publish $(lxc remote get-default):dockertemplate/dockerSnapshot --alias bctemplate
-    fi
-else
-    echo "Skipping creation of the host template. Snapshot already exists."
-fi
+# ensure the host_template is available.
+bash -c ../shared/create_host_template.sh
 
 # create the lxdbrCacheStack network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrCacheStack) ]]; then
@@ -82,6 +68,25 @@ else
     lxc profile device set cachestackprofile eth3 nictype bridged
     lxc profile device set cachestackprofile eth3 parent lxdBrNowhere
 fi
+
+
+# If we're running the DHCP/DNS/ROUTING stack, run this
+if [[ $BCS_INSTALL_DHCP_DNS_ROUTING_ON_UNDERLAY = "true" ]]; then
+    # if we're in standalone mode, then we attach eth3 in the container via MACVLAN
+    # to the user-provided physical network interface that provides access to the network underlay. 
+    # cachestack will obtain a unique IP address on the underlay and register its name as 'cachestack' 
+    # with the local DNS server, if any.
+    lxc profile device set cachestackprofile eth3 nictype macvlan
+    lxc profile device set cachestackprofile eth3 parent $BCS_TRUSTED_HOST_INTERFACE
+else
+    lxc network create lxdBrNowhere ipv4.nat=false ipv6.nat=false
+    lxc profile device set cachestackprofile eth3 nictype bridged
+    lxc profile device set cachestackprofile eth3 parent lxdBrNowhere
+fi
+
+
+
+
 
 # create the cachestack-dockervol storage pool.
 if [[ -z $(lxc storage list | grep "cachestack-dockervol") ]]; then

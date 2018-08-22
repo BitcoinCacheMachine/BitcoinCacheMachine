@@ -1,0 +1,45 @@
+version: '3.6'
+services:
+  dnsmaq:
+    image: bcm/dnsmasq:latest
+    command: dnsmasq -q -d --conf-file=/run/dnsmasq.conf --dhcp-broadcast
+    ports:
+      - target: 67
+        published: 67
+        protocol: udp
+      - target: 53
+        published: 53
+        protocol: udp
+      - target: 53
+        published: 53
+        protocol: tcp
+    networks: 
+      hostnet: {}
+    environment:
+      - HTTP_PASS=${HTTP_PASS}
+      - HTTP_USER=user
+    deploy:
+      mode: replicated
+      replicas: 1
+    configs:
+      - source: dnsmasqconfig  #TODO check file permissions to least prviliege
+        target: /run/dnsmasq.conf
+        uid: '33'
+        gid: '33'
+        mode: 0640
+      # - source: hostsconfig  #TODO check file permissions to least prviliege
+      #   target: /etc/dnsmasq_static_hosts.conf
+      #   uid: '33'
+      #   gid: '33'
+      #   mode: 0640
+
+networks:
+  hostnet:
+    external:
+      name: host
+
+configs:
+  dnsmasqconfig:
+    file: ./dnsmasq.conf
+  # hostsconfig:
+  #   file: ./dnsmasq_static_hosts.conf

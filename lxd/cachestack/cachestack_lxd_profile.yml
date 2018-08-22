@@ -39,6 +39,16 @@ config:
             ipv4: true
             control: auto
 
+      # static IP given to cachestack for running DHCP/DNS/ROUTING - This would be Data plane
+      - type: physical
+        name: eth4
+        subnets:
+          - type: static
+            ipv4: true
+            address: 192.168.99.1
+            netmask: 255.255.255.0
+            control: auto
+
 description:
 devices:
   
@@ -63,6 +73,12 @@ devices:
   # access to underlay network
   eth3:
     nictype: macvlan
+    parent: eno1
+    type: nic
+
+  # access to underlay network
+  eth4:
+    nictype: physical
     parent: eno1
     type: nic
 

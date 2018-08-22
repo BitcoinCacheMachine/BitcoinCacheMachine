@@ -1,0 +1,48 @@
+config:
+  limits.cpu: "2"
+  limits.memory: "512MB"    
+
+  user.network-config: |
+    version: 1
+    config:      
+
+      # untrusted outside; gets IP via DHCP run by upstream gateway
+      - type: physical
+        name: eth0
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto
+
+      # private network -- data path, where we respond to DHCP and DNS requests
+      # and act as a gateway for all DHCP recipients.
+      - type: physical
+        name: eth2
+        subnets:
+          - type: static
+            ipv4: true
+            address: 192.168.0.1
+            netmask: 255.255.255.0
+            control: auto
+
+description:
+devices:
+
+  # Used for services requiring outbound internet
+  # really we just need a temporary gateway to bootstrap the thing.
+  eth0:
+    nictype: bridged
+    parent: lxdbrUnderlay
+    type: nic
+
+  # access to underlay network
+  eth1:
+    nictype: physical
+    parent: eno1
+    type: nic
+
+  root:
+    path: /
+    pool: bc_data
+    type: disk
+name: lxd_profile_proxy_host

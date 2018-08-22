@@ -13,7 +13,6 @@ if [[ $(env | grep BCM) = '' ]]; then
   exit 1 
 fi
 
-
 # a manager is required for each BCM instance.
 # TODO add more managers across independent hardware
 echo "Creating manager host(s)."
