@@ -19,7 +19,7 @@ cd "$(dirname "$0")"
 SCRIPT_DIR=$(pwd)
 
 # ensure the host_template is available.
-bash -c ../shared/create_host_template.sh
+bash -c ../create_host_template.sh
 
 # create the lxdbrCacheStack network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrCacheStack) ]]; then
@@ -29,7 +29,14 @@ else
     echo "lxdbrCacheStack already exists."
 fi
 
-
+# create the lxdbrBCMBridge network if it doesn't exist.
+if [[ -z $(lxc network list | grep lxdbrBCMBridge) ]]; then
+    # lxdbrBCMBridge connects cachestack services to BCM instances running in the same LXD daemon.
+    lxc network create lxdbrBCMBridge ipv4.nat=false ipv6.nat=false ipv6.address=none
+    #ipv4.address=10.254.254.1/24
+else
+    echo "lxdbrBCMBridge already exists."
+fi
 
 # create the lxdBCSMgrnet network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdBCSMgrnet) ]]; then
@@ -64,28 +71,14 @@ if [[ $BCS_ATTACH_TO_UNDERLAY = "true" ]]; then
     lxc profile device set cachestackprofile eth3 nictype macvlan
     lxc profile device set cachestackprofile eth3 parent $BCS_TRUSTED_HOST_INTERFACE
 else
-    lxc network create lxdBrNowhere ipv4.nat=false ipv6.nat=false
+    if [[ -z $(lxc network list | grep lxdBrNowhere) ]]; then
+        lxc network create lxdBrNowhere ipv4.nat=false ipv6.nat=false
+    fi
+
+    
     lxc profile device set cachestackprofile eth3 nictype bridged
     lxc profile device set cachestackprofile eth3 parent lxdBrNowhere
 fi
-
-
-# If we're running the DHCP/DNS/ROUTING stack, run this
-if [[ $BCS_INSTALL_DHCP_DNS_ROUTING_ON_UNDERLAY = "true" ]]; then
-    # if we're in standalone mode, then we attach eth3 in the container via MACVLAN
-    # to the user-provided physical network interface that provides access to the network underlay. 
-    # cachestack will obtain a unique IP address on the underlay and register its name as 'cachestack' 
-    # with the local DNS server, if any.
-    lxc profile device set cachestackprofile eth3 nictype macvlan
-    lxc profile device set cachestackprofile eth3 parent $BCS_TRUSTED_HOST_INTERFACE
-else
-    lxc network create lxdBrNowhere ipv4.nat=false ipv6.nat=false
-    lxc profile device set cachestackprofile eth3 nictype bridged
-    lxc profile device set cachestackprofile eth3 parent lxdBrNowhere
-fi
-
-
-
 
 
 # create the cachestack-dockervol storage pool.
@@ -100,8 +93,7 @@ fi
 
 # Apply the resulting profile and start the container.
 if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
-    # create a root device backed by the ZFS pool name passed in BC_ZFS_POOL_NAME.
-    #lxc profile device add cachestackprofile root disk path=/ pool=$BC_ZFS_POOL_NAME
+    #lxc profile device add cachestackprofile root disk path=/ pool=$bcm_data
     lxc profile apply cachestack docker,cachestackprofile
 
     # push necessary files to the template including daemon.json

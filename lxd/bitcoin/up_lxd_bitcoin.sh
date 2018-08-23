@@ -28,7 +28,7 @@ echo "Applying bitcoin lxd profile file to lxd profile 'bitcoinprofile'."
 cat ./bitcoin_lxd_profile.yml | lxc profile edit bitcoinprofile
 
 ## Create the manager1 host from the lxd image template.
-lxc init bctemplate bitcoin -p docker -p dockertemplate_profile -s $BC_ZFS_POOL_NAME
+lxc init bctemplate bitcoin -p docker -p dockertemplate_profile -s $bcm_data
 
 echo "Applying the lxd profiles 'bitcoinprofile' and 'docker' to the lxd host 'bitcoin'."
 lxc profile apply bitcoin docker,bitcoinprofile
@@ -46,7 +46,7 @@ else
     lxc config device add bitcoin dockerdisk disk source=$(lxc storage show bitcoin-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 fi
 
-if [[ $BCM_DISABLE_DOCKER_GELF = "true" ]]; then
+if [[ $BCM_BITCOIN_DISABLE_DOCKER_GELF = "true" ]]; then
   # push docker.json for registry mirror settings
   lxc file push ./dockerd_nogelf.json bitcoin/etc/docker/daemon.json
 else

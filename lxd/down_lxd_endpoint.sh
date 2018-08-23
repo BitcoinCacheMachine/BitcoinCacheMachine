@@ -12,17 +12,31 @@ if [[ -z $(env | grep BC) ]]; then
   exit
 fi
 
-echo "Calling Bitcoin Cache Machine down script."
-bash -c ./bcm/down_lxd_bcm.sh
-
-echo "Calling Bitcoin Cache Machine down script."
-bash -c ./bcs/down_lxd_cachestack.sh
-
-# delete lxd profile dockertemplate_profile
-if [[ $(lxc profile list | grep "dockertemplate_profile") ]]; then
-    echo "Deleting dockertemplate_profile lxd profile."
-    lxc profile delete dockertemplate_profile
+if [[ $BCM_BITCOIN_DELETE = "true" ]]; then
+  echo "Calling ./bitcoin/down_lxd_bitcoin.sh"
+  bash -c ./bitcoin/down_lxd_bitcoin.sh
 fi
+
+if [[ $BCM_MANAGERS_DELETE = "true" ]]; then
+  echo "Calling ./managers/down_lxd_managers.sh"
+  bash -c ./managers/down_lxd_managers.sh
+fi
+
+if [[ $BCM_CACHESTACK_DELETE = "true" ]]; then
+  echo "Calling ./cachestack/down_lxd_cachestack.sh"
+  bash -c ./cachestack/down_lxd_cachestack.sh
+fi
+
+if [[ $BCM_UNDERLAY_DELETE = "true" ]]; then
+  echo "Calling ./underlay/down_lxd_underlay.sh"
+  bash -c ./underlay/down_lxd_underlay.sh
+fi
+
+if [[ $BCM_HOST_TEMPLATE_DELETE = "true" ]]; then
+  echo "Calling ./host_template/down_lxd_host_template.sh"
+  bash -c ./host_template/down_lxd_host_template.sh
+fi
+
 
 # delete lxd network lxdbrBCMBridge 
 if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
@@ -30,10 +44,8 @@ if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
     lxc network delete lxdbrBCMBridge
 fi
 
-# delete lxd storage pool 
-if [[ ! -z $(lxc storage list | grep "$BC_ZFS_POOL_NAME" | grep "| 0") ]]; then
-    echo "Deleting lxd storage pool '$BC_ZFS_POOL_NAME."
-    lxc storage delete "$BC_ZFS_POOL_NAME"
-else
-  echo "Keeping lxc storage pool $BC_ZFS_POOL_NAME"
+if [[ $(lxc image list | grep bbb592c417b6) ]]; then
+    echo "Deleting lxc image bbb592c417b6"
+    lxc image delete bbb592c417b6
 fi
+

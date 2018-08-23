@@ -10,8 +10,10 @@ lxc exec underlay -- docker pull ubuntu:bionic
 lxc exec underlay -- mkdir -p /apps/dnsmasq
 lxc file push ./Dockerfile underlay/apps/dnsmasq/Dockerfile
 lxc file push ./dnsmasq.conf underlay/apps/dnsmasq/dnsmasq.conf
-lxc exec underlay -- docker build -t bcm/dnsmasq:latest /apps/dnsmasq
-lxc exec underlay -- docker run -it --rm bcm/dnsmasq:latest dnsmasq -q -d --conf-file=/etc/dnsmasq.conf --dhcp-broadcast
+lxc exec underlay -- docker build -t dnsmasq:latest /apps/dnsmasq
+
+
+lxc exec underlay -- docker run --name dnsmasq --rm -d --cap-add=NET_ADMIN --net=host dnsmasq:latest dnsmasq -d --conf-file=/etc/dnsmasq.conf
 
 
 

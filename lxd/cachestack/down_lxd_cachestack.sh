@@ -9,8 +9,6 @@
 # exit script if there's an error anywhere
 set -e
 
-echo "Starting ./down_lxd.sh for Cache Stack."
-
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
 cd "$(dirname "$0")"
@@ -55,30 +53,11 @@ if [[ $(lxc network list | grep lxdBrNowhere) ]]; then
 fi
 
 # if the user has instructed us to delete the dockervol backing.
-if [[ $BCS_DELETE_DOCKERVOL = "true" ]]; then
+if [[ $BCM_CACHESTACK_DOCKERVOL_DELETE = "true" ]]; then
     # delete lxd storage cachestack-dockervol 
     if [[ $(lxc storage list | grep "cachestack-dockervol") ]]; then
         echo "Deleting lxd storage pool 'cachestack-dockervol'."
         lxc storage delete cachestack-dockervol
     fi
 fi
-
-# delete the host template if configured
-if [[ $BC_HOST_TEMPLATE_DELETE = 'true' ]]; then
-  echo "Destrying host template"
-  bash -c ./host_template/down_lxd.sh
-else
-  if [[ $(lxc image list | grep bctemplate) ]]; then
-    echo "Keeping the lxd host template."
-  fi
-fi
-
-# bctemplate
-if [[ $BC_LXD_IMAGE_BCTEMPLATE_DELETE = 'true' ]]; then
-  if [[ $(lxc image list | grep bctemplate) ]]; then
-    echo "Destrying lxd image 'bctemplate'."
-    lxc image delete bctemplate
-  fi
-fi
-
 

@@ -10,4 +10,4 @@ echo "Destroying lxd host bitcoin"
 bash -c ./bitcoin/down_bitcoin.sh
 
 echo "Destroying manager1 lxd host and associated lxd components."
-bash -c ./managers/down_managers.sh
+bash -c ./managers/down_lxd_managers.sh

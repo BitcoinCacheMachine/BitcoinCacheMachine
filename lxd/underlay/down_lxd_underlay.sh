@@ -47,8 +47,9 @@ if [[ $(lxc network list | grep lxdBrNowhere) ]]; then
     lxc network delete lxdBrNowhere
 fi
 
+
 # if the user has instructed us to delete the dockervol backing.
-if [[ $BCS_DELETE_DOCKERVOL = "true" ]]; then
+if [[ $BCM_UNDERLAY_DELETE_DOCKERVOL = "true" ]]; then
     # delete lxd storage underlay-dockervol 
     if [[ $(lxc storage list | grep "underlay-dockervol") ]]; then
         echo "Deleting lxd storage pool 'underlay-dockervol'."
@@ -56,20 +57,4 @@ if [[ $BCS_DELETE_DOCKERVOL = "true" ]]; then
     fi
 fi
 
-# delete the host template if configured
-if [[ $BC_HOST_TEMPLATE_DELETE = 'true' ]]; then
-  echo "Destrying host template"
-  bash -c ../shared/host_template/down_lxd.sh
-else
-  if [[ $(lxc image list | grep bctemplate) ]]; then
-    echo "Keeping the lxd host template."
-  fi
-fi
 
-# bctemplate
-if [[ $BC_LXD_IMAGE_BCTEMPLATE_DELETE = 'true' ]]; then
-  if [[ $(lxc image list | grep bctemplate) ]]; then
-    echo "Destrying lxd image 'bctemplate'."
-    lxc image delete bctemplate
-  fi
-fi

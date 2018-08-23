@@ -52,6 +52,6 @@ devices:
 
   root:
     path: /
-    pool: bc_data
+    pool: bcm_data
     type: disk
 name: lxd_profile_proxy_host

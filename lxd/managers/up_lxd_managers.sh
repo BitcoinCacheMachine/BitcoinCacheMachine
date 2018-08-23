@@ -17,10 +17,10 @@ echo "Creating lxd network 'managernet' for swarm members."
 lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=false
 
 # create the storage pool if it doesn't exist.
-if [[ -z $(lxc storage list | grep "$BC_ZFS_POOL_NAME") ]]; then
-  lxc storage create "$BC_ZFS_POOL_NAME" zfs size=10GB
+if [[ -z $(lxc storage list | grep "$bcm_data") ]]; then
+  lxc storage create "$bcm_data" zfs size=10GB
 else
-  echo "$BC_ZFS_POOL_NAME already exists, skipping pool creation."
+  echo "$bcm_data already exists, skipping pool creation."
 fi
 
 # create the docker profile if it doesn't exist. This may happen when we have an external cachestack 
@@ -38,7 +38,7 @@ if [[ -z $(lxc profile list | grep "dockertemplate_profile") ]]; then
 fi
 
 ## Create the manager1 host from the lxd image template.
-lxc init bctemplate manager-template -p docker -p dockertemplate_profile -s $BC_ZFS_POOL_NAME
+lxc init bctemplate manager-template -p docker -p dockertemplate_profile -s $bcm_data
 
 # push necessary files to the template including daemon.json
 lxc file push ./daemon.json manager-template/etc/docker/daemon.json

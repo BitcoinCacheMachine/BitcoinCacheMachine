@@ -1,12 +1,12 @@
 config:
   limits.cpu: "2"
   limits.memory: "512MB"    
-
+  linux.kernel_modules: nf_nat
   user.network-config: |
     version: 1
     config:      
 
-      # untrusted outside; gets IP via DHCP run by upstream gateway
+      # initial mgmt interface for bootstrapping.
       - type: physical
         name: eth0
         subnets:
@@ -14,8 +14,16 @@ config:
             ipv4: true
             control: auto
 
-      # private network -- data path, where we respond to DHCP and DNS requests
-      # and act as a gateway for all DHCP recipients.
+      # untrusted outside; gets IP via DHCP run by upstream gateway
+      - type: physical
+        name: eth1
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto
+
+      # inside underlay network -- data path, where we forward incoming DHCP and DNS requests
+      # to lxdbrUndLANsvcs and act as a gateway for underlay hosts.
       - type: physical
         name: eth2
         subnets:
@@ -28,21 +36,27 @@ config:
 description:
 devices:
 
-  # Used for services requiring outbound internet
-  # really we just need a temporary gateway to bootstrap the thing.
+  # Used for management and initial downloading of software
   eth0:
     nictype: bridged
     parent: lxdbrUnderlay
     type: nic
 
-  # access to underlay network
+  # physical access to untrusted outside
   eth1:
+    nictype: physical
+    parent: eno1
+    type: nic
+
+  # physical access to trusted inside where we run DHCP, etc.
+  eth2:
     nictype: physical
     parent: eno1
     type: nic
 
   root:
     path: /
-    pool: bc_data
+    pool: bcm_data
     type: disk
-name: lxd_profile_proxy_host
+
+name: underlay_lxd_profile.yml

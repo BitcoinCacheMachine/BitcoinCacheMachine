@@ -16,15 +16,9 @@ cd "$(dirname "$0")"
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-# ensure the host_template is available.
-bash -c ../shared/create_host_template.sh
-
-# set the current directory to ./
-cd "$(dirname "$0")"
-
 # create the lxdbrUnderlay network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrUnderlay) ]]; then
-    # a bridged network created for outbound NAT for services on underlay.
+    # a bridged network network for mgmt and outbound NAT by hosts.
     lxc network create lxdbrUnderlay ipv4.nat=true
 else
     echo "lxdbrUnderlay already exists."
@@ -46,8 +40,12 @@ echo "Applying ./underlay_lxd_profile.yml to lxd profile 'underlayprofile'."
 cat ./underlay_lxd_profile.yml | lxc profile edit underlayprofile
 
 #lxc profile device set underlayprofile eth1 nictype physical
-echo "Updating lxc profile 'underlayprofile' eth1 parent to '$BCM_UNDERLAY_PHYSICAL_NETWORK_INTERFACE'."
-lxc profile device set underlayprofile eth1 parent $BCM_UNDERLAY_PHYSICAL_NETWORK_INTERFACE
+echo "Setting lxc profile 'underlayprofile' eth1 (untrusted outside) parent to physical interface '$BCM_UNDERLAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE'."
+lxc profile device set underlayprofile eth1 parent $BCM_UNDERLAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE
+
+#lxc profile device set underlayprofile eth2 nictype physical
+echo "Setting lxc profile 'underlayprofile' eth2 (trusted inside) parent to physical interface '$BCM_UNDERLAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE'."
+lxc profile device set underlayprofile eth2 parent $BCM_UNDERLAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE
 
 # ensure the host_template is available.
 bash -c "../shared/create_dockervol.sh underlay"
@@ -55,24 +53,27 @@ bash -c "../shared/create_dockervol.sh underlay"
 
 # Apply the resulting profile and start the container.
 if [[ -z $(lxc list | grep underlay | grep RUNNING) ]]; then
-    # create a root device backed by the ZFS pool name passed in BC_ZFS_POOL_NAME.
-    #lxc profile device add underlayprofile root disk path=/ pool=$BC_ZFS_POOL_NAME
+    # create a root device backed by the ZFS pool name passed in bcm_data.
+    #lxc profile device add underlayprofile root disk path=/ pool=$bcm_data
     lxc profile apply underlay docker,underlayprofile
+
+    # configure dockerd
+    lxc file push ./daemon.json underlay/etc/docker/daemon.json
 
     lxc start underlay
 
+    # systemd binds to 53 be default, remove it and let's use docker-hosted dnsmasq container
+    lxc exec underlay -- systemctl stop systemd-resolved
+    lxc exec underlay -- systemctl disable systemd-resolved
+
+
     sleep 30
 
-    # update routes to prefer eth0 for outbound access.
-    lxc exec underlay -- ifmetric eth0 0
+    # Update routing table so it routes traffic out the outside interface
+    lxc exec underlay -- ifmetric eth3 25
 else
     echo "LXD host 'underlay' is already in a running state. Exiting."
     exit 1
 fi
-
-# # # underlay_INSIDE_IP is the IP that was assigned to the underlay macvlan interface.
-# # underlay_INSIDE_IP=$(lxc exec underlay -- ip address show dev eth1 | grep "inet " |  awk '{match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART,RLENGTH); print ip}')
-
-bash -c ./stacks/dnsmasq/up_lxd_dnsmasq.sh
 
 
