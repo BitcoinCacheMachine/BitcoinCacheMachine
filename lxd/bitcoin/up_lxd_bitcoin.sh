@@ -28,10 +28,10 @@ echo "Applying bitcoin lxd profile file to lxd profile 'bitcoinprofile'."
 cat ./bitcoin_lxd_profile.yml | lxc profile edit bitcoinprofile
 
 ## Create the manager1 host from the lxd image template.
-lxc init bctemplate bitcoin -p docker -p dockertemplate_profile -s $bcm_data
+lxc init bctemplate bitcoin -p docker -p docker_priv -s $bcm_data
 
-echo "Applying the lxd profiles 'bitcoinprofile' and 'docker' to the lxd host 'bitcoin'."
-lxc profile apply bitcoin docker,bitcoinprofile
+echo "Applying the lxd profiles 'bitcoinprofile' and 'default' to the lxd host 'bitcoin'."
+lxc profile apply bitcoin default,bitcoinprofile
 
 
 

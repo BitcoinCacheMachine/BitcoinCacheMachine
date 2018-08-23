@@ -8,11 +8,10 @@ config:
           - type: dhcp
             ipv4: true
             control: auto
-
-description:
 devices:
   eth0:
     nictype: bridged
     parent: lxdbr0
     type: nic
-name: docker.yml
+    
+name: default

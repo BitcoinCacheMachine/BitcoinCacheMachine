@@ -24,13 +24,6 @@ else
     echo "lxdbrUnderlay already exists."
 fi
 
-# create the underlay container.
-if [[ -z $(lxc list | grep underlay) ]]; then
-  lxc copy dockertemplate/dockerSnapshot underlay
-else
-  echo "LXC container 'underlay' already exists."
-fi
-
 # create the underlayprofile profile if it doesn't exist.
 if [[ -z $(lxc profile list | grep underlayprofile) ]]; then
     lxc profile create underlayprofile
@@ -38,6 +31,16 @@ fi
 
 echo "Applying ./underlay_lxd_profile.yml to lxd profile 'underlayprofile'."
 cat ./underlay_lxd_profile.yml | lxc profile edit underlayprofile
+
+# create the underlay container.
+if [[ -z $(lxc list | grep underlay) ]]; then
+  #lxc copy dockertemplate/dockerSnapshot underlay
+
+  lxc init ubuntu:18.04 -p default -p underlayprofile -s bcm_data underlay
+else
+  echo "LXC container 'underlay' already exists."
+fi
+
 
 #lxc profile device set underlayprofile eth1 nictype physical
 echo "Setting lxc profile 'underlayprofile' eth1 (untrusted outside) parent to physical interface '$BCM_UNDERLAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE'."
@@ -55,7 +58,7 @@ bash -c "../shared/create_dockervol.sh underlay"
 if [[ -z $(lxc list | grep underlay | grep RUNNING) ]]; then
     # create a root device backed by the ZFS pool name passed in bcm_data.
     #lxc profile device add underlayprofile root disk path=/ pool=$bcm_data
-    lxc profile apply underlay docker,underlayprofile
+    lxc profile apply underlay default,docker_unpriv,underlayprofile
     #lxc file push ./ufw.conf underlay/etc/default/ufw
     #lxc exec underlay -- chown root:root /etc/default/ufw
 

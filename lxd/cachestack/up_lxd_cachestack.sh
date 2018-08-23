@@ -94,7 +94,7 @@ fi
 # Apply the resulting profile and start the container.
 if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
     #lxc profile device add cachestackprofile root disk path=/ pool=$bcm_data
-    lxc profile apply cachestack docker,cachestackprofile
+    lxc profile apply cachestack default,cachestackprofile
 
     # push necessary files to the template including daemon.json
     lxc file push ./daemon.json cachestack/etc/docker/daemon.json

@@ -2,6 +2,10 @@
 
 set -e
 
+# set the working directory to the location where the script is located
+cd "$(dirname "$0")"
+
+
 # delete dockertemplate
 if [[ $(lxc list | grep dockertemplate) ]]; then
     echo "Deleting dockertemplate lxd host."
@@ -36,30 +40,5 @@ if [[ $BCM_ZFS_STORAGE_POOL_DELETE = "true" ]]; then
 
 fi
 
-
-
-
-
-# delete lxd profile docker
-if [[ $(lxc profile list | grep "docker ") ]] ; then
-  # make sure it doesn't have anything attached to it.
-  if [[ ! -z $(lxc profile list | grep docker | grep "| 0") ]]; then
-    echo "Deleting docker lxd profile."
-    lxc profile delete docker
-  else
-    echo "Could not delete lxd profile 'docker' due to attached resources. Check your BCM environment variables."
-  fi
-fi
-
-
-
-# delete lxd profile dockertemplate_profile
-if [[ $(lxc profile list | grep "dockertemplate_profile") ]] ; then
-  # make sure it doesn't have anything attached to it.
-  if [[ ! -z $(lxc profile list | grep docker | grep "| 0") ]]; then
-    echo "Deleting dockertemplate_profile lxd profile."
-    lxc profile delete dockertemplate_profile
-  else
-    echo "Could not delete lxd profile 'dockertemplate_profile' due to attached resources. Check your BCM environment variables."
-  fi
-fi
+# destroy the profiles
+bash -c ./down_lxd_profiles.sh

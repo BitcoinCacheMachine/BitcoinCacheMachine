@@ -31,14 +31,14 @@ if [[ -z $(lxc profile list | grep docker) ]]; then
 fi
 
 
-# create the dockertemplate_profile profile if it doesn't exist, which might happen when we're using an external cachestack
-if [[ -z $(lxc profile list | grep "dockertemplate_profile") ]]; then
-  lxc profile create dockertemplate_profile
-  cat ../../bcs/host_template/lxd_profile_docker_template.yml | lxc profile edit dockertemplate_profile
+# create the docker_priv profile if it doesn't exist, which might happen when we're using an external cachestack
+if [[ -z $(lxc profile list | grep "docker_priv") ]]; then
+  lxc profile create docker_priv
+  cat ../../bcs/host_template/lxd_profile_docker_template.yml | lxc profile edit docker_priv
 fi
 
 ## Create the manager1 host from the lxd image template.
-lxc init bctemplate manager-template -p docker -p dockertemplate_profile -s $bcm_data
+lxc init bctemplate manager-template -p docker -p docker_priv -s $bcm_data
 
 # push necessary files to the template including daemon.json
 lxc file push ./daemon.json manager-template/etc/docker/daemon.json
@@ -53,7 +53,7 @@ lxc profile create manager1
 cat ./lxd_profiles/manager1.yml | lxc profile edit manager1
 
 lxc copy manager-template/managerTemplate manager1
-lxc profile apply manager1 docker,manager1
+lxc profile apply manager1 default,manager1
 
 if [[ -z $(lxc storage list | grep "manager1-dockervol") ]]; then
   # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.

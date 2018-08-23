@@ -21,22 +21,7 @@ else
   echo "'bcm_data' already exists, skipping pool creation."
 fi
 
-# create the docker profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep docker) ]]; then
-  lxc profile create docker
-fi
-
-cat ./docker_lxd_profile.yml | lxc profile edit docker
-
-# create the dockertemplate_profile profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep "dockertemplate_profile") ]]; then
-  # create necessary templates
-  lxc profile create dockertemplate_profile
-else
-  echo "LXD profile 'dockertemplate_profile' already exists, skipping profile creation."
-fi
-
-cat ./lxd_profile_docker_template.yml | lxc profile edit dockertemplate_profile
+bash -c ./up_lxd_profiles.sh
 
 # cache the active LXD endpoint so we don't have to use the LXD API mulitple times.
 ACTIVE_LXD_ENDPOINT=$(lxc remote get-default)
@@ -48,8 +33,8 @@ lxc image copy ubuntu:18.04 $ACTIVE_LXD_ENDPOINT:
 if [ ! -z bcm_data ]; then
   # initialize the LXD container to the active lxd endpoint. 
   lxc init ubuntu:18.04 $ACTIVE_LXD_ENDPOINT:dockertemplate \
-    -p docker \
-    -p dockertemplate_profile \
+    -p default \
+    -p docker_priv \
     -s bcm_data
 
   lxc start $ACTIVE_LXD_ENDPOINT:dockertemplate
@@ -92,6 +77,6 @@ sleep 5
 # stop the template since we don't need it running anymore.
 lxc stop $ACTIVE_LXD_ENDPOINT:dockertemplate
 
-lxc profile remove $ACTIVE_LXD_ENDPOINT:dockertemplate dockertemplate_profile
+lxc profile remove $ACTIVE_LXD_ENDPOINT:dockertemplate docker_priv
 
 lxc snapshot $ACTIVE_LXD_ENDPOINT:dockertemplate dockerSnapshot

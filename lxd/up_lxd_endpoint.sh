@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 
 # quit if there are no BC environment variables
 if [[ -z $(env | grep BCM_) ]]; then
-  echo "BC variables not set. Please BCM environment variables."
+  echo "BCM variables not set. Please BCM environment variables."
   exit
 fi
 
@@ -20,20 +20,20 @@ if [[ $BCM_UNDERLAY_INSTALL = "true" ]]; then
   bash -c ./underlay/up_lxd_underlay.sh
 fi
 
-# if [[ $BCM_CACHESTACK_INSTALL = "true" ]]; then
-#     echo "Deploying 'cachestack' host(s)"
-#     bash -c ./cachestack/up_lxd_cachestack.sh
-# fi
+if [[ $BCM_CACHESTACK_INSTALL = "true" ]]; then
+    echo "Deploying 'cachestack' host(s)"
+    bash -c ./cachestack/up_lxd_cachestack.sh
+fi
 
-# if [[ $BCM_MANAGERS_INSTALL = "true" ]]; then
-#   echo "Deploying 'manager' host(s)"
-#   bash -c ./managers/up_lxd_managers.sh
-# fi
+if [[ $BCM_MANAGERS_INSTALL = "true" ]]; then
+  echo "Deploying 'manager' host(s)"
+  bash -c ./managers/up_lxd_managers.sh
+fi
 
-# if [[ $BCM_BITCOIN_INSTALL = "true" ]]; then
-#   echo "Deploying 'bitcoin' host"
-#   bash -c ./bitcoin/up_lxd_bitcoin.sh
-# fi
+if [[ $BCM_BITCOIN_INSTALL = "true" ]]; then
+  echo "Deploying 'bitcoin' host"
+  bash -c ./bitcoin/up_lxd_bitcoin.sh
+fi
 
 
 # if [[ $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT = "none" ]]; then

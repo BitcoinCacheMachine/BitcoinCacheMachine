@@ -1,18 +1,9 @@
 config:
   limits.cpu: "2"
   limits.memory: "512MB"    
-  linux.kernel_modules: nf_nat
   user.network-config: |
     version: 1
     config:      
-
-      # initial mgmt interface for bootstrapping.
-      - type: physical
-        name: eth0
-        subnets:
-          - type: dhcp
-            ipv4: true
-            control: auto
 
       # untrusted outside; gets IP via DHCP run by upstream gateway
       - type: physical
@@ -34,12 +25,6 @@ config:
 
 description:
 devices:
-
-  # Used for management and initial downloading of software
-  eth0:
-    nictype: bridged
-    parent: lxdbrUnderlay
-    type: nic
 
   # physical access to untrusted outside
   eth1:
