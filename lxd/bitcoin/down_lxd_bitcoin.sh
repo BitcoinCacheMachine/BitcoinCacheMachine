@@ -2,20 +2,25 @@
 
 set -eu
 
-if [[ $(lxc exec manager1 -- docker stack ls | grep "lncli-web") ]]; then
-    echo "Removing docker stack 'lncli-web' from the swarm."
-    lxc exec manager1 -- docker stack rm lncli-web
+if [[ $(lxc list | grep manager1) ]]; then
+    # if manager1 exists, then let's see if the stack is up
+    if [[ $(lxc exec manager1 -- docker stack ls | grep "lncli-web") ]]; then
+        echo "Removing docker stack 'lncli-web' from the swarm."
+        lxc exec manager1 -- docker stack rm lncli-web
+    fi
+
+    if [[ $(lxc exec manager1 -- docker stack ls | grep lnd) ]]; then
+        echo "Removing docker stack 'lnd' from the swarm."
+        lxc exec manager1 -- docker stack rm lnd
+    fi
+
+    if [[ $(lxc exec manager1 -- docker stack ls | grep lightningd) ]]; then
+        echo "Removing docker stack 'lightningd' from the swarm."
+        lxc exec manager1 -- docker stack rm lightningd
+    fi
 fi
 
-if [[ $(lxc exec manager1 -- docker stack ls | grep lnd) ]]; then
-    echo "Removing docker stack 'lnd' from the swarm."
-    lxc exec manager1 -- docker stack rm lnd
-fi
 
-if [[ $(lxc exec manager1 -- docker stack ls | grep lightningd) ]]; then
-    echo "Removing docker stack 'lightningd' from the swarm."
-    lxc exec manager1 -- docker stack rm lightningd
-fi
 
 if [[ $(lxc list | grep bitcoin) ]]; then
     if [[ $(lxc exec bitcoin -- docker info | grep "Swarm: active") ]]; then

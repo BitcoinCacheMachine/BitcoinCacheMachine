@@ -56,24 +56,23 @@ if [[ -z $(lxc list | grep underlay | grep RUNNING) ]]; then
     # create a root device backed by the ZFS pool name passed in bcm_data.
     #lxc profile device add underlayprofile root disk path=/ pool=$bcm_data
     lxc profile apply underlay docker,underlayprofile
-
-    # configure dockerd
-    lxc file push ./daemon.json underlay/etc/docker/daemon.json
+    #lxc file push ./ufw.conf underlay/etc/default/ufw
+    #lxc exec underlay -- chown root:root /etc/default/ufw
 
     lxc start underlay
-
-    # systemd binds to 53 be default, remove it and let's use docker-hosted dnsmasq container
-    lxc exec underlay -- systemctl stop systemd-resolved
-    lxc exec underlay -- systemctl disable systemd-resolved
-
 
     sleep 30
 
     # Update routing table so it routes traffic out the outside interface
-    lxc exec underlay -- ifmetric eth3 25
+    lxc exec underlay -- ifmetric eth1 50
 else
     echo "LXD host 'underlay' is already in a running state. Exiting."
     exit 1
 fi
 
+bash -c ./stacks/dnsmasq/up_lxd_dnsmasq.sh
 
+# allow outbound packets destinated on port 80 through to the outside untrusted gateway
+lxc exec underlay -- ufw allow in on eth2 to any port 80
+lxc exec underlay -- ufw allow in on eth2 to any port 443
+lxc exec underlay -- ufw enable

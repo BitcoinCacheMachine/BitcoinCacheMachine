@@ -10,7 +10,7 @@ fi
 
 
 # bctemplate
-if [[ $BC_LXD_IMAGE_BCTEMPLATE_DELETE = 'true' ]]; then
+if [[ $BCM_LXD_IMAGE_BCTEMPLATE_DELETE = "true" ]]; then
   if [[ $(lxc image list | grep bctemplate) ]]; then
     echo "Destrying lxd image 'bctemplate'."
     lxc image delete bctemplate
@@ -20,30 +20,27 @@ fi
 
 # delete lxd storage pool 
 if [[ $BCM_ZFS_STORAGE_POOL_DELETE = "true" ]]; then
-    # make sure it exists
-    if [[ $(lxc storage list | grep "bcm_data") ]]; then
-        # make sure it's unused
-        if [[ ! -z $(lxc storage list | grep "bcm_data" | grep "| 0") ]]; then
-            echo "Deleting lxd storage pool 'bcm_data'."
-            lxc storage delete bcm_data
-        else
-            echo "Keeping lxc storage pool bcm_data."
-        fi
+  # if specified, delete the template and lxd base image
+  if [[ $BCM_HOST_TEMPLATE_DELETE = "true" ]]; then
+    if [[ $(lxc image list | grep bbb592c417b6) ]]; then
+        echo "Destrying lxd image 'bbb592c417b6'."
+        lxc image delete bbb592c417b6
     fi
-fi
+  fi
+  
+  # make sure it exists
+  if [[ $(lxc storage list | grep "bcm_data") ]]; then
+    echo "Deleting lxd storage pool 'bcm_data'."
+    lxc storage delete "bcm_data"
+  fi
 
-
-# if specified, delete the template and lxd base image
-if [[ $BCM_HOST_TEMPLATE_DELETE = "true" ]]; then\
-    if [[ $(lxc image list | grep 38219778c2cf) ]]; then
-        echo "Destrying lxd image '38219778c2cf'."
-        lxc image delete 38219778c2cf
-    fi
 fi
 
 
 
-# delete lxd profile dockertemplate_profile
+
+
+# delete lxd profile docker
 if [[ $(lxc profile list | grep "docker ") ]] ; then
   # make sure it doesn't have anything attached to it.
   if [[ ! -z $(lxc profile list | grep docker | grep "| 0") ]]; then

@@ -12,50 +12,18 @@ lxc file push ./Dockerfile underlay/apps/dnsmasq/Dockerfile
 lxc file push ./dnsmasq.conf underlay/apps/dnsmasq/dnsmasq.conf
 lxc exec underlay -- docker build -t dnsmasq:latest /apps/dnsmasq
 
+# systemd binds to 53 be default, remove it and let's use docker-hosted dnsmasq container
+lxc exec underlay -- systemctl disable systemd-resolved
+
+sleep 10
 
 lxc exec underlay -- docker run --name dnsmasq --rm -d --cap-add=NET_ADMIN --net=host dnsmasq:latest dnsmasq -d --conf-file=/etc/dnsmasq.conf
 
+lxc stop underlay
+
+#configure dockerd
+lxc file push ./daemon.json underlay/etc/docker/daemon.json
+lxc start underlay
 
 
-
-
-
-# lxc exec cachestack -- mkdir -p /apps/rsyncd
-# lxc file push ./Dockerfile cachestack/apps/rsyncd/Dockerfile
-# lxc file push ./entrypoint.sh cachestack/apps/rsyncd/entrypoint.sh
-
-# # build the rsync image. We don't need to put it in a private registry I don't think.
-# lxc exec cachestack -- docker build -t "$BCS_INSTALL_RSYNCD_BUILD_IMAGE" /apps/rsyncd
-# lxc exec cachestack -- docker push "$BCS_INSTALL_RSYNCD_BUILD_IMAGE"
-
-
-# if [[ ! -f ~/.bcm/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key.pub ]]; then
-#     echo "Generating SSH keys for rsync authentication. Storing at ~/.bcm/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key.pub"
-#     mkdir -p ~/.bcm/endpoints/"$(lxc remote get-default)"/.ssh
-#     ssh-keygen -t rsa -b 2048 -f ~/.bcm/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key
-# fi
-
-# echo "Deploying rsyncd to 'cachestack'."
-# lxc exec cachestack -- mkdir -p /apps/rsyncd
-# lxc exec cachestack -- mkdir -p /apps/rsyncd/.ssh
-# lxc file push ~/.bcm/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key.pub cachestack/apps/rsyncd/authorized_keys
-# lxc file push ./rsyncd.conf cachestack/apps/rsyncd/rsyncd.conf
-# lxc file push ./rsyncd.yml cachestack/apps/rsyncd/rsyncd.yml
-# lxc exec cachestack -- env BCS_INSTALL_RSYNCD_BUILD_IMAGE=$BCS_INSTALL_RSYNCD_BUILD_IMAGE docker stack deploy -c /apps/rsyncd/rsyncd.yml rsyncd
-
-# wait-for-it -t 0 cachestack.lxd:2222
-# # sleep 15
-
-# if [[ $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED = "true" ]]; then
-#     lxc exec cachestack -- mkdir -p cachestack/apps/bitcoind/data
-
-#     # if the directory exists, then we're good to go.
-#     if [ -d "$BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR" ]; then
-    
-#         # TODO ugprade basic authentication to SSH keys
-#         echo "$BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR on $HOSTNAME will be pushed to cachestack rsyncd."
-#         SSH_KEY_PATH="~/.bcm/endpoints/lexx/.ssh/cachestack-rsync-key"
-
-#         rsync -av -e "ssh -i $SSH_KEY_PATH -p 2222 -l rsync -o StrictHostKeyChecking=no" $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED_SOURCEDIR/ cachestack.lxd:bitcoind_testnet_data
-#     fi
-# fi
+lxc exec underlay -- ifmetric eth1 25

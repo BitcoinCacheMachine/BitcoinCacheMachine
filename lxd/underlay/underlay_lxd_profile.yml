@@ -23,7 +23,6 @@ config:
             control: auto
 
       # inside underlay network -- data path, where we forward incoming DHCP and DNS requests
-      # to lxdbrUndLANsvcs and act as a gateway for underlay hosts.
       - type: physical
         name: eth2
         subnets:

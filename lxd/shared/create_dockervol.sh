@@ -9,7 +9,7 @@ fi
 
 LXC_HOSTNAME=$1
 
-# create the underlay-dockervol storage pool.
+# create the {host}-dockervol storage pool.
 if [[ -z $(lxc storage list | grep "$LXC_HOSTNAME-dockervol") ]]; then
     # Create an LXC storage volume of type 'dir' then mount it at /var/lib/docker in the container.
     lxc storage create $LXC_HOSTNAME-dockervol dir
