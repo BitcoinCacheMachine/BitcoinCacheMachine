@@ -41,7 +41,7 @@ devices:
   # for access to cachestack
   eth1:
     nictype: bridged
-    parent: lxdbrBCMBridge
+    parent: lxdbrBCMCSBrdg
     type: nic
 
   # for connection to managers

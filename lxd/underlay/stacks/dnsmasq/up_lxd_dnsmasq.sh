@@ -13,17 +13,11 @@ lxc file push ./dnsmasq.conf underlay/apps/dnsmasq/dnsmasq.conf
 lxc exec underlay -- docker build -t dnsmasq:latest /apps/dnsmasq
 
 # systemd binds to 53 be default, remove it and let's use docker-hosted dnsmasq container
+lxc exec underlay -- systemctl stop systemd-resolved
 lxc exec underlay -- systemctl disable systemd-resolved
 
 sleep 10
 
-lxc exec underlay -- docker run --name dnsmasq --rm -d --cap-add=NET_ADMIN --net=host dnsmasq:latest dnsmasq -d --conf-file=/etc/dnsmasq.conf
-
-lxc stop underlay
-
-#configure dockerd
-lxc file push ./daemon.json underlay/etc/docker/daemon.json
-lxc start underlay
-
+lxc exec underlay -- docker run --name dnsmasq --rm -d --cap-add=NET_ADMIN --net=host dnsmasq:latest dnsmasq -d
 
 lxc exec underlay -- ifmetric eth1 25

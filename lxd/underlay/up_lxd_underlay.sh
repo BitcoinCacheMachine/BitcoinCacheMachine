@@ -32,11 +32,15 @@ fi
 echo "Applying ./underlay_lxd_profile.yml to lxd profile 'underlayprofile'."
 cat ./underlay_lxd_profile.yml | lxc profile edit underlayprofile
 
-# create the underlay container.
+# create the underlay container if it doesn't exist
 if [[ -z $(lxc list | grep underlay) ]]; then
-  #lxc copy dockertemplate/dockerSnapshot underlay
-
-  lxc init ubuntu:18.04 -p default -p underlayprofile -s bcm_data underlay
+    #lxc init ubuntu:18.04 -p default -p underlayprofile -s bcm_data underlay
+    if [[ $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE = "none" ]] ; then
+        #lxc init bctemplate underlay -p default -p docker_priv -p underlayprofile -s bcm_data
+        lxc copy dockertemplate/bcmHostSnapshot underlay
+    else
+        lxc init $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE:bctemplate cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
+    fi
 else
   echo "LXC container 'underlay' already exists."
 fi
@@ -57,14 +61,22 @@ bash -c "../shared/create_dockervol.sh underlay"
 # Apply the resulting profile and start the container.
 if [[ -z $(lxc list | grep underlay | grep RUNNING) ]]; then
     # create a root device backed by the ZFS pool name passed in bcm_data.
-    #lxc profile device add underlayprofile root disk path=/ pool=$bcm_data
-    lxc profile apply underlay default,docker_unpriv,underlayprofile
+    
+    lxc profile apply underlay default,bcm_disk,docker_priv,underlayprofile
     #lxc file push ./ufw.conf underlay/etc/default/ufw
     #lxc exec underlay -- chown root:root /etc/default/ufw
+    lxc file push ./resolved.conf underlay/etc/systemd/resolved.conf
+
+    # lxc start underlay
+
+    # lxc exec underlay -- chmod 0644 /etc/systemd/resolved.conf
+    # lxc exec underlay -- chown root:root /etc/systemd/resolved.conf
+
+    # lxc stop underlay
 
     lxc start underlay
 
-    sleep 30
+    sleep 15
 
     # Update routing table so it routes traffic out the outside interface
     lxc exec underlay -- ifmetric eth1 50
@@ -76,6 +88,8 @@ fi
 bash -c ./stacks/dnsmasq/up_lxd_dnsmasq.sh
 
 # allow outbound packets destinated on port 80 through to the outside untrusted gateway
-lxc exec underlay -- ufw allow in on eth2 to any port 80
-lxc exec underlay -- ufw allow in on eth2 to any port 443
-lxc exec underlay -- ufw enable
+# lxc exec underlay -- ufw allow in on eth2 to any port 80
+# lxc exec underlay -- ufw allow in on eth2 to any port 443
+# lxc exec underlay -- ufw allow in on eth2 to any port 53
+# lxc exec underlay -- ufw allow in on eth2 to any port 67
+# lxc exec underlay -- ufw enable

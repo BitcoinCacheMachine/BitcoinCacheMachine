@@ -16,9 +16,6 @@ cd "$(dirname "$0")"
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-lxc list >>/dev/null
-
-
 # delete lxd container cachestack
 if [[ $(lxc list | grep cachestack) ]]; then
     echo "Deleting lxd container 'cachestack'."
@@ -40,10 +37,10 @@ if [[ $(lxc network list | grep lxdbrCacheStack) ]]; then
 fi
 
 
-# delete lxd network lxdBCSMgrnet 
-if [[ $(lxc network list | grep lxdBCSMgrnet) ]]; then
-    echo "Deleting lxd network 'lxdBCSMgrnet'."
-    lxc network delete lxdBCSMgrnet
+# delete lxd network lxdBCMCSMGRNET 
+if [[ $(lxc network list | grep lxdBCMCSMGRNET) ]]; then
+    echo "Deleting lxd network 'lxdBCMCSMGRNET'."
+    lxc network delete lxdBCMCSMGRNET
 fi
 
 # delete lxd network lxdBrNowhere 

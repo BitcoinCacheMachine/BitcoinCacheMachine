@@ -28,7 +28,7 @@ devices:
 
   # physical access to untrusted outside
   eth1:
-    nictype: physical
+    nictype: macvlan
     parent: eno1
     type: nic
 
@@ -37,10 +37,5 @@ devices:
     nictype: physical
     parent: eno1
     type: nic
-
-  root:
-    path: /
-    pool: bcm_data
-    type: disk
 
 name: underlay_lxd_profile.yml

@@ -1,4 +1,7 @@
 FROM ubuntu:bionic
 RUN apt update
 RUN apt install -y dnsmasq
-COPY dnsmasq.conf /etc/dnsmasq.conf
+ADD dnsmasq.conf /etc/dnsmasq.conf
+# RUN chmod 0644 /etc/dnsmasq.conf
+# RUN chown root:root /etc/dnsmasq.conf
+CMD ["dnsmasq"]

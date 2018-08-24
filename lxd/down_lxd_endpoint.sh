@@ -37,10 +37,10 @@ if [[ $BCM_HOST_TEMPLATE_DELETE = "true" ]]; then
   bash -c ./host_template/down_lxd_host_template.sh
 fi
 
-# delete lxd network lxdbrBCMBridge 
-if [[ $(lxc network list | grep lxdbrBCMBridge) ]]; then
-    echo "Deleting lxd network 'lxdbrBCMBridge'."
-    lxc network delete lxdbrBCMBridge
+# delete lxd network lxdbrBCMCSBrdg 
+if [[ $(lxc network list | grep lxdbrBCMCSBrdg) ]]; then
+    echo "Deleting lxd network 'lxdbrBCMCSBrdg'."
+    lxc network delete lxdbrBCMCSBrdg
 fi
 
 if [[ $(lxc image list | grep bbb592c417b6) ]]; then

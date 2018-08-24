@@ -5,13 +5,6 @@ config:
   user.network-config: |
     version: 1
     config:      
-      # mgmt interface and oubound NAT to HOST
-      - type: physical
-        name: eth0
-        subnets:
-          - type: dhcp
-            ipv4: true
-            control: auto
             
       # swarm managernet
       - type: physical
@@ -39,35 +32,19 @@ config:
             ipv4: true
             control: auto
 
-      # static IP given to cachestack for running DHCP/DNS/ROUTING - This would be Data plane
-      - type: physical
-        name: eth4
-        subnets:
-          - type: static
-            ipv4: true
-            address: 192.168.99.1
-            netmask: 255.255.255.0
-            control: auto
-
 description:
 devices:
-  
-  # Used for services requiring outbound internet
-  eth0:
-    nictype: bridged
-    parent: lxdbrCacheStack
-    type: nic
 
   # managernet
   eth1:
     nictype: bridged
-    parent: lxdBCSMgrnet
+    parent: lxdBCMCSMGRNET
     type: nic
 
   # bcmbridge
   eth2:
     nictype: bridged
-    parent: lxdbrBCMBridge
+    parent: lxdbrBCMCSBrdg
     type: nic
 
   # access to underlay network
@@ -76,14 +53,5 @@ devices:
     parent: eno1
     type: nic
 
-  # access to underlay network
-  eth4:
-    nictype: physical
-    parent: eno1
-    type: nic
 
-  root:
-    path: /
-    pool: bcm_data
-    type: disk
 name: lxd_profile_proxy_host

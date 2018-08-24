@@ -33,10 +33,10 @@ if [[ $(lxc network list | grep lxdbrUnderlay) ]]; then
 fi
 
 
-# delete lxd network lxdBCSMgrnet 
-if [[ $(lxc network list | grep lxdBCSMgrnet) ]]; then
-    echo "Deleting lxd network 'lxdBCSMgrnet'."
-    lxc network delete lxdBCSMgrnet
+# delete lxd network lxdBCMCSMGRNET 
+if [[ $(lxc network list | grep lxdBCMCSMGRNET) ]]; then
+    echo "Deleting lxd network 'lxdBCMCSMGRNET'."
+    lxc network delete lxdBCMCSMGRNET
 fi
 
 # delete lxd network lxdBrNowhere 

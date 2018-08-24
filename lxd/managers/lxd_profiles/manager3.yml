@@ -27,7 +27,7 @@ description:
 devices:
   eth0:
     nictype: bridged
-    parent: lxdbrBCMBridge
+    parent: lxdbrBCMCSBrdg
     type: nic
   eth1:
     nictype: bridged

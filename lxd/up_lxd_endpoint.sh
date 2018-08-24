@@ -16,8 +16,8 @@ fi
 bash -c ./shared/create_host_template.sh
 
 if [[ $BCM_UNDERLAY_INSTALL = "true" ]]; then
-  echo "Installing 'underlay' host."
-  bash -c ./underlay/up_lxd_underlay.sh
+    echo "Deploying 'underlay' host(s)"
+    bash -c ./underlay/up_lxd_underlay.sh
 fi
 
 if [[ $BCM_CACHESTACK_INSTALL = "true" ]]; then
@@ -36,13 +36,18 @@ if [[ $BCM_BITCOIN_INSTALL = "true" ]]; then
 fi
 
 
-# if [[ $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT = "none" ]]; then
+
+
+
+
+
+# if [[ $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE = "none" ]]; then
 #   # in this case, we deploy cachestack.
 #   echo "Deploying local cachestack for BCM instance."
 #   bash -c ./cachestack/up_lxd_cachestack.sh
 # else
-#   # in this assume the cachestack is defined in $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT
-#   echo "Assuming external LXD endpoint '$BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT' is hosting a cachestack."
-#   echo "Copying a prepared LXD system host image from $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT"
-#   lxc image copy $BCM_EXTERNAL_CACHESTACK_LXD_ENDPOINT:bctemplate $(lxc remote get-default): --auto-update --copy-aliases
+#   # in this assume the cachestack is defined in $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE
+#   echo "Assuming external LXD endpoint '$BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE' is hosting a cachestack."
+#   echo "Copying a prepared LXD system host image from $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE"
+#   lxc image copy $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE:bctemplate $(lxc remote get-default): --auto-update --copy-aliases
 # fi

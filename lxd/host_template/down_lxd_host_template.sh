@@ -21,6 +21,9 @@ if [[ $BCM_LXD_IMAGE_BCTEMPLATE_DELETE = "true" ]]; then
   fi
 fi
 
+# destroy the lxc profiles
+bash -c ./down_lxd_profiles.sh
+
 
 # delete lxd storage pool 
 if [[ $BCM_ZFS_STORAGE_POOL_DELETE = "true" ]]; then
@@ -37,8 +40,5 @@ if [[ $BCM_ZFS_STORAGE_POOL_DELETE = "true" ]]; then
     echo "Deleting lxd storage pool 'bcm_data'."
     lxc storage delete "bcm_data"
   fi
-
 fi
 
-# destroy the profiles
-bash -c ./down_lxd_profiles.sh

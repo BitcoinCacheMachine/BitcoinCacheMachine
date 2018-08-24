@@ -2,13 +2,24 @@
 
 
 # delete lxd profile docker
-if [[ $(lxc profile list | grep "default ") ]] ; then
+if [[ $(lxc profile list | grep "default") ]] ; then
   # make sure it doesn't have anything attached to it.
   if [[ ! -z $(lxc profile list | grep default | grep "| 0") ]]; then
-    echo "Deleting default lxd profile."
-    lxc profile delete default
+    echo "Restoring lxc profile default to default settings."
+    cat ./lxd_profiles/default.yml | lxc profile edit default
   else
     echo "Could not delete lxd profile 'default' due to attached resources. Check your BCM environment variables."
+  fi
+fi
+
+# delete lxd profile bcm_disk
+if [[ $(lxc profile list | grep "bcm_disk") ]] ; then
+  # make sure it doesn't have anything attached to it.
+  if [[ ! -z $(lxc profile list | grep bcm_disk | grep "| 0") ]]; then
+    echo "Deleting lxc profile bcm_disk to default settings."
+    lxc profile delete bcm_disk
+  else
+    echo "Could not delete lxc profile 'bcm_disk' due to attached resources. Check your BCM environment variables."
   fi
 fi
 
@@ -33,3 +44,4 @@ if [[ $(lxc profile list | grep "docker_unpriv") ]] ; then
     echo "Could not delete lxd profile 'docker_unpriv' due to attached resources. Check your BCM environment variables."
   fi
 fi
+

@@ -1,15 +1,7 @@
 #!/bin/bash
 
-# WARNING, this script ASSUMES that the LXD daemon is either 1) running on the same host
-# from which the script is being run (i.e., localhost). You can also provision Cache Stack
-# to a remote LXD daemon by setting your local LXC client to use the specified remote LXD service
-# You can use 'lxc remote add hostname hostname:8443 --accept-certificates to add a remote LXD'
-# endpoint to your client.
-
 # exit script if there's an error anywhere
 set -e
-
-echo "Starting multipass/lxd/bcs/up_lxd.sh"
 
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
@@ -17,9 +9,6 @@ cd "$(dirname "$0")"
 
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
-
-# ensure the host_template is available.
-bash -c ../create_host_template.sh
 
 # create the lxdbrCacheStack network if it doesn't exist.
 if [[ -z $(lxc network list | grep lxdbrCacheStack) ]]; then
@@ -29,29 +18,22 @@ else
     echo "lxdbrCacheStack already exists."
 fi
 
-# create the lxdbrBCMBridge network if it doesn't exist.
-if [[ -z $(lxc network list | grep lxdbrBCMBridge) ]]; then
-    # lxdbrBCMBridge connects cachestack services to BCM instances running in the same LXD daemon.
-    lxc network create lxdbrBCMBridge ipv4.nat=false ipv6.nat=false ipv6.address=none
+# create the lxdbrBCMCSBrdg network if it doesn't exist.
+if [[ -z $(lxc network list | grep lxdbrBCMCSBrdg) ]]; then
+    # lxdbrBCMCSBrdg connects cachestack services to BCM instances running in the same LXD daemon.
+    lxc network create lxdbrBCMCSBrdg ipv4.nat=false ipv6.nat=false ipv6.address=none
     #ipv4.address=10.254.254.1/24
 else
-    echo "lxdbrBCMBridge already exists."
+    echo "lxdbrBCMCSBrdg already exists."
 fi
 
-# create the lxdBCSMgrnet network if it doesn't exist.
-if [[ -z $(lxc network list | grep lxdBCSMgrnet) ]]; then
+# create the lxdBCMCSMGRNET network if it doesn't exist.
+if [[ -z $(lxc network list | grep lxdBCMCSMGRNET) ]]; then
     # a network for docker swarm manager communication 
     # will probably implement this using VXLAN later
-    lxc network create lxdBCSMgrnet ipv4.nat=false
+    lxc network create lxdBCMCSMGRNET ipv4.nat=false
 else
-    echo "lxdBCSMgrnet already exists."
-fi
-
-# create the cachestack container.
-if [[ -z $(lxc list | grep cachestack) ]]; then
-  lxc copy dockertemplate/dockerSnapshot cachestack
-else
-  echo "cachestack lxd container already exists."
+    echo "lxdBCMCSMGRNET already exists."
 fi
 
 # create the cachestackprofile profile if it doesn't exist.
@@ -62,8 +44,21 @@ fi
 echo "Applying ./cachestack_lxd_profile.yml to lxd profile 'cachestackprofile'."
 cat ./cachestack_lxd_profile.yml | lxc profile edit cachestackprofile
 
+# create the cachestack container.
+if [[ -z $(lxc list | grep cachestack) ]]; then
+    # if BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE is specified, we can init cachestack from the remote image
+    # if it's not specified, then we initiailze cachestack from bctemplate residing locally.
+    if [[ $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE = "none" ]] ; then
+        lxc init bctemplate cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
+    else
+        lxc init $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE:bctemplate cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
+    fi
+else
+  echo "cachestack lxd container already exists."
+fi
+
 # Cache Stack Standalone 
-if [[ $BCS_ATTACH_TO_UNDERLAY = "true" ]]; then
+if [[ $BCM_CACHESTACK_ATTACH_TO_UNDERLAY = "true" ]]; then
     # if we're in standalone mode, then we attach eth3 in the container via MACVLAN
     # to the user-provided physical network interface that provides access to the network underlay. 
     # cachestack will obtain a unique IP address on the underlay and register its name as 'cachestack' 
@@ -94,7 +89,7 @@ fi
 # Apply the resulting profile and start the container.
 if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
     #lxc profile device add cachestackprofile root disk path=/ pool=$bcm_data
-    lxc profile apply cachestack default,cachestackprofile
+    lxc profile apply cachestack default,bcm_disk,cachestackprofile
 
     # push necessary files to the template including daemon.json
     lxc file push ./daemon.json cachestack/etc/docker/daemon.json
