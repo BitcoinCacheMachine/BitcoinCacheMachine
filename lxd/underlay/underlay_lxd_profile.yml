@@ -23,6 +23,7 @@ config:
             netmask: 255.255.255.0
             control: auto
 
+
 description:
 devices:
 

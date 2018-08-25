@@ -8,7 +8,7 @@
 set -e
 
 # install LXD on the admin machine.
-sudo apt update && sudo apt install -y zfsutils-linux wait-for-it lxd rsync
+sudo apt-get update && sudo apt install -y zfsutils-linux wait-for-it lxd rsync
 
 # if ~/.bcm doesn't exist, create and populate it with default .env files.
 if [ ! -d ~/.bcm ]; then

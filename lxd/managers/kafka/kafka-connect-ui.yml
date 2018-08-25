@@ -5,8 +5,6 @@ services:
     image: landoop/kafka-connect-ui:latest
     ports:
       - "8002:8000"
-    depends_on:
-      - kafka-connect
     networks:
       - kafkaconnectnet
     environment:

@@ -1,3 +1,3 @@
 FROM ubuntu:bionic
-RUN apt update
-RUN apt install -y tor
+RUN apt-get update
+RUN apt-get install -y tor

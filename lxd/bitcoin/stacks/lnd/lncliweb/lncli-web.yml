@@ -33,8 +33,6 @@ services:
     networks:
       - webproxynet
       - onionnet
-    depends_on:
-      - lncli-web
     configs:
       - source: onionproxyconf
         target: /etc/nginx/nginx.conf
@@ -58,8 +56,6 @@ services:
     environment:
       LNCLIWEBONIONPROXY_PORTS: 80:80
       LNCLIWEBONIONPROXY_SERVICE_NAME: lncliwebonionproxy
-    depends_on:
-      - lncliwebonionproxy
     volumes:
       - onionservice-data:/var/lib/tor/hidden_service/
     networks:

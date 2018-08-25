@@ -6,9 +6,9 @@ set -e
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-# quit if there are no BC environment variables
-if [[ -z $(env | grep BC) ]]; then
-  echo "BC variables not set. Please source BCM environment variables."
+# quit if there are no BCM environment variables
+if [[ -z $(env | grep BCM) ]]; then
+  echo "BCM variables not set. Please source BCM environment variables."
   exit
 fi
 

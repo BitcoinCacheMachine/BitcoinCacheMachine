@@ -10,12 +10,19 @@ cd "$(dirname "$0")"
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-lxc list >>/dev/null
-
 # delete lxd container underlay
-if [[ $(lxc list | grep underlay) ]]; then
+if [[ $(lxc info underlay | grep "Status: Running") ]]; then
     echo "Deleting lxd container 'underlay'."
-    lxc delete --force underlay >/dev/null
+    lxc delete --force underlay
+fi
+
+
+if [[ $BCM_UNDERLAY_TEMPLATE_DELETE = "true" ]]; then
+    # delete lxd container underlay-template
+    if [[ $(lxc info underlay-template | grep "Name: underlay-template") ]]; then
+        echo "Deleting lxd container 'underlay-template'."
+        lxc delete --force underlay-template
+    fi
 fi
 
 

@@ -6,8 +6,8 @@ EXPOSE 9735 10009
 
 ENV GODEBUG netdns=cgo
 
-RUN apt update
-RUN apt install curl jq wait-for-it -y
+RUN apt-get update
+RUN apt-get install curl jq wait-for-it -y
 RUN go get -u github.com/golang/dep/cmd/dep
 
 RUN git clone https://github.com/lightningnetwork/lnd $GOPATH/src/github.com/lightningnetwork/lnd

@@ -52,6 +52,7 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 8332 8333 18332 18333 18443 18444
 
-RUN apt update && apt install -y curl tcptrack slurm net-tools iputils-ping
+RUN apt-get update 
+RUN apt-get install -y curl tcptrack slurm net-tools iputils-ping
 
 CMD ["bitcoind"]

@@ -14,7 +14,7 @@ fi
 
 sleep 5
 
-# install docker - this does an 'apt update'
+# install docker - this does an 'apt-get update'
 lxc file push ./get-docker.sh dockertemplate/root/get-docker.sh
 lxc exec dockertemplate -- apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
 lxc exec dockertemplate -- sh get-docker.sh >/dev/null
@@ -22,6 +22,7 @@ lxc exec dockertemplate -- sh get-docker.sh >/dev/null
 # TODO provide configuration item to route these requests over local TOR proxy
 echo "Installing required software on dockertemplate."
 lxc exec dockertemplate -- apt-get install wait-for-it tor jq curl ifmetric slurm tcptrack -y
+#lxd exec dockertemplate -- apt-get clean all
 lxc exec dockertemplate -- rm -rf /tmp/*
 
 # stop the current template dockerd instance since we're about to create a snapshot
@@ -35,6 +36,11 @@ lxc exec dockertemplate -- touch /.dockerenv
 
 lxc file push ./sysctl.conf dockertemplate/etc/sysctl.conf
 lxc exec dockertemplate -- chmod 0644 /etc/sysctl.conf
+
+lxc exec dockertemplate -- apt-get autoremove -y
+lxc exec dockertemplate -- apt-get clean
+lxc exec dockertemplate -- rm -rf /tmp/*
+
 
 # stop the template since we don't need it running anymore.
 lxc stop dockertemplate

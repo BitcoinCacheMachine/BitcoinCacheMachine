@@ -1,8 +1,7 @@
 version: '3.6'
 services:
-  dnsmaq:
-    image: bcm/dnsmasq:latest
-    command: dnsmasq -q -d --conf-file=/run/dnsmasq.conf --dhcp-broadcast
+  dnsmasq:
+    image: bcm-dnsmasq:latest
     ports:
       - target: 67
         published: 67
@@ -15,31 +14,42 @@ services:
         protocol: tcp
     networks: 
       hostnet: {}
-    environment:
-      - HTTP_PASS=${HTTP_PASS}
-      - HTTP_USER=user
-    deploy:
-      mode: replicated
-      replicas: 1
+      torproxynet:
     configs:
-      - source: dnsmasqconfig  #TODO check file permissions to least prviliege
-        target: /run/dnsmasq.conf
+      - source: dnsmasq_config  #TODO check file permissions to least prviliege
+        target: /etc/dnsmasq.conf
         uid: '33'
         gid: '33'
         mode: 0640
-      # - source: hostsconfig  #TODO check file permissions to least prviliege
-      #   target: /etc/dnsmasq_static_hosts.conf
-      #   uid: '33'
-      #   gid: '33'
-      #   mode: 0640
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  # for outbound DNS queries on port 9053/udp.
+  torproxy:
+    image: bcm-tor:latest
+    networks:
+      torproxynet:
+        aliases:
+          - torproxy
+    configs:
+      - source: tor_config
+        target: /etc/tor/torrc
+        uid: '0'
+        gid: '0'
+        mode: 0644
+    deploy:
+      mode: replicated
+      replicas: 1
 
 networks:
   hostnet:
-    external:
-      name: host
+    external: true
+    name: host
+  torproxynet:
 
 configs:
-  dnsmasqconfig:
+  dnsmasq_config:
     file: ./dnsmasq.conf
-  # hostsconfig:
-  #   file: ./dnsmasq_static_hosts.conf
+  tor_config:
+    file: ./torrc

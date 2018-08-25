@@ -14,8 +14,6 @@ services:
       kafkaconnectnet:
         aliases:
           - kafkaconnect
-    depends_on:
-      - schema-registry
     environment:
       CONNECT_BOOTSTRAP_SERVERS: broker1:9092,broker2:9092,broker3:9092
       CONNECT_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2182,zoo3:2183
