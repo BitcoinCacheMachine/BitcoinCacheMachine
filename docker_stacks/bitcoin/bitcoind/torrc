@@ -2,6 +2,14 @@ SOCKSPort 9050
 CookieAuthentication 1
 
 
+# see https://www.home-assistant.io/docs/ecosystem/tor/
+#HiddenServiceDir /var/lib/tor/homeassistant/
+#HiddenServicePort 80 127.0.0.1:8123
+#HiddenServiceAuthorizeClient stealth haremote1
+
+
+
+
 ## Configuration file for a typical Tor user
 ## Last updated 22 December 2017 for Tor 0.3.2.8-rc.
 ## (may or may not work for much older or much newer versions of Tor.)

@@ -1,0 +1,4 @@
+DNSPort 9053
+
+# Log err to info
+Log info file /var/log/tor/tor.log

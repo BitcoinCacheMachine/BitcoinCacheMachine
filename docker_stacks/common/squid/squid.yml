@@ -1,0 +1,24 @@
+version: '3.6'
+services:
+  squid:
+    image: bcm-squid:latest
+    ports:
+      - "3128:3128"
+    volumes:
+       - squid-data:/var/spool/squid3
+    configs:
+      - source: squid_config
+        target: /etc/squid/squid.conf
+        uid: '0'
+        gid: '0'
+        mode: 0644
+    deploy:
+      mode: replicated
+      replicas: 1
+
+volumes:
+  squid-data:
+
+configs:
+  squid_config:
+    file: squid.conf
