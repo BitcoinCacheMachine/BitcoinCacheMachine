@@ -5,7 +5,7 @@ echo "Sourcing all BCM default environment variables located in $BCM_LOCAL_GIT_R
 BCM_DEFAULTS_DIR="$BCM_LOCAL_GIT_REPO/resources/bcm/defaults"
 
 source $BCM_DEFAULTS_DIR/defaults.env
-source $BCM_DEFAULTS_DIR/underlay.env
+source $BCM_DEFAULTS_DIR/gateway.env
 source $BCM_DEFAULTS_DIR/cachestack.env
 source $BCM_DEFAULTS_DIR/managers.env
 source $BCM_DEFAULTS_DIR/bitcoin.env
@@ -21,4 +21,6 @@ else
     touch ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
 
     echo '#!/bin/bash' >> ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
+    BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
+    echo 'export BCM_LXD_SECRET="'$BCM_LXD_SECRET'"' >> ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
 fi

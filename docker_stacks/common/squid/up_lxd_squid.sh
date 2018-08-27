@@ -5,11 +5,11 @@
 cd "$(dirname "$0")"
 
 echo "Deploying squid to the active LXD endpoint."
-lxc exec underlay -- mkdir -p /apps/squid
+lxc exec gateway -- mkdir -p /apps/squid
 
 bash -c $BCM_LOCAL_GIT_REPO/docker_images/common/bcm-squid/build_lxd_bcm-squid.sh
 
-lxc file push squid.yml underlay/apps/squid/squid.yml
-lxc file push squid.conf underlay/apps/squid/squid.conf
+lxc file push squid.yml gateway/apps/squid/squid.yml
+lxc file push squid.conf gateway/apps/squid/squid.conf
 
-lxc exec underlay -- docker stack deploy -c /apps/squid/squid.yml squid
+lxc exec gateway -- docker stack deploy -c /apps/squid/squid.yml squid

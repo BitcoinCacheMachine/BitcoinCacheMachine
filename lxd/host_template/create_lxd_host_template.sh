@@ -3,12 +3,26 @@
 # first, make sure the profiles exist and/or are up to date.
 bash -c ./up_lxd_profiles.sh
 
+
+# create a zfs backend for exclusively holding the ubuntu 18.04 cloud image.
+if [[ -z $(lxc storage list | grep "bcm_ubuntu") ]]; then
+  echo "Creating a zfs backend hold the Ubuntu 18.04 cloud image."
+  lxc storage create "bcm_ubuntu" zfs size=1GB
+else
+  echo "LXC storage pool 'bcm_ubuntu' already exists, skipping pool creation."
+fi
+
+# Since we're creating a host template, we need a public base image to start our constructions with.
+# BCM uses ubuntu:18.04 as a base image. We download it and reference it as bcm-lxd-base
+# to avoid confusion with what is being referenced.
+lxc image copy ubuntu:18.04 "$(lxc remote get-default)": --alias bcm-lxd-base --auto-update
+
 # only execute if bcm_data is non-zero
 if [[ $(lxc storage list | grep "bcm_data") ]]; then
     # initialize the LXD container to the active lxd endpoint. 
     lxc init ubuntu:18.04 -p default -p docker_priv -s bcm_data dockertemplate
     lxc config set dockertemplate limits.cpu 4
-    lxc config set dockertemplate limits.memory 2GB
+    lxc config set dockertemplate limits.memory 4GB
     lxc start dockertemplate
 fi
 

@@ -13,7 +13,9 @@ config:
             ipv4: true
             control: auto
 
-      # inside underlay network -- data path, where we forward incoming DHCP and DNS requests
+      # eth physically attaches to the physical underlay network 
+      # this will be the data path where we accept DHCP and DNS
+      # request and forward traffic if instructed to do so.
       - type: physical
         name: eth2
         subnets:
@@ -22,7 +24,6 @@ config:
             address: 192.168.0.1
             netmask: 255.255.255.0
             control: auto
-
 
 description:
 devices:
@@ -39,4 +40,4 @@ devices:
     parent: eno1
     type: nic
 
-name: underlay_lxd_profile.yml
+name: gateway_lxd_profile.yml

@@ -27,9 +27,9 @@ if [[ $BCM_CACHESTACK_DELETE = "true" ]]; then
   bash -c ./cachestack/down_lxd_cachestack.sh
 fi
 
-if [[ $BCM_UNDERLAY_DELETE = "true" ]]; then
-  echo "Calling ./underlay/down_lxd_underlay.sh"
-  bash -c ./underlay/down_lxd_underlay.sh
+if [[ $BCM_GATEWAY_DELETE = "true" ]]; then
+  echo "Calling ./gateway/down_lxd_gateway.sh"
+  bash -c ./gateway/down_lxd_gateway.sh
 fi
 
 if [[ $BCM_HOST_TEMPLATE_DELETE = "true" ]]; then

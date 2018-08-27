@@ -23,6 +23,8 @@ fi
 
 bash -c ./up_lxd_profiles.sh
 
+bash -c ./download_bcm_lxd_cloud_image.sh
+
 # if either download the bctemplate from a remote LXD point, or create it yourself.
 if [[ $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE != "none" ]]; then
   echo "Attempting to download lxd image 'bctemplate' from remote LXD daemon $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE."

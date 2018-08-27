@@ -1,5 +1,5 @@
 #!/bin/bash
-# This scripts builds all images for 'underlay'
+# This scripts builds all images for 'gateway'
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"

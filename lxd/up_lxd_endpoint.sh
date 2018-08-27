@@ -8,16 +8,20 @@ cd "$(dirname "$0")"
 
 # quit if there are no BC environment variables
 if [[ -z $(env | grep BCM_) ]]; then
-  echo "BCM variables not set. Please BCM environment variables."
+  echo "BCM variables not set. Please source BCM environment variables by typing 'bcm'."
   exit
 fi
 
 # ensure the host_template is available.
 bash -c ./shared/create_host_template.sh
 
-if [[ $BCM_UNDERLAY_INSTALL = "true" ]]; then
-    echo "Deploying 'underlay' host(s)"
-    bash -c ./underlay/up_lxd_underlay.sh
+if [[ $BCM_GATEWAY_INSTALL = "true" ]]; then
+  echo "Creating an LXD host template for 'gateway'. It shall be called 'manager-template' and will be snapshotted."
+  bash -c ./gateway/create_lxd_gateway-template.sh
+
+  
+  echo "Deploying 'gateway' host(s)"
+  bash -c ./gateway/up_lxd_gateway.sh
 fi
 
 if [[ $BCM_CACHESTACK_INSTALL = "true" ]]; then

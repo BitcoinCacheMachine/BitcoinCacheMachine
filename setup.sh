@@ -16,12 +16,17 @@ cd "$(dirname "$0")"
 SCRIPT_DIR=$(pwd)
 
 # install LXD on the admin machine.
-sudo apt-get update && sudo apt install -y zfsutils-linux wait-for-it lxd rsync apg encfs
+sudo apt-get update && sudo apt install -y zfsutils-linux wait-for-it lxd rsync apg fuse libfuse-dev
+
+# TODO implemented encfs on ~/.bcm
+# TODO initialize ~/.bcm as git repo.
 
 # if ~/.bcm doesn't exist, create it
 if [ ! -d ~/.bcm ]; then
   echo "Creating Bitcoin Cache Machine config directory at ~/.bcm"
   mkdir -p ~/.bcm
+  git init ~/.bcm/
+  cd ~/.bcm
 fi
 
 # if ~/.bcm/endpoints doesn't exist, create it.
@@ -29,7 +34,6 @@ if [ ! -d ~/.bcm/endpoints ]; then
   echo "Creating BCM endpoints directory at ~/.bcm/endpoints"
   mkdir -p ~/.bcm/endpoints
 fi
-
 
 # if ~/.bcm/endpoints doesn't exist, create it.
 if [ ! -f ~/.bcm/endpoints/local.env ]; then
@@ -41,6 +45,7 @@ else
   echo "BCM endpoints config directory exists at ~/.bcm/endpoints"
 fi
 
+## RUNTIME operations here.
 # if ~/.bcm/runtime doesn't exist create it
 if [ ! -d ~/.bcm/runtime ]; then
   echo "Creating BCM runtime directory at ~/.bcm/runtime"
@@ -49,6 +54,8 @@ else
   echo "BCM runtime directory exists at ~/.bcm/runtime"
 fi
 
+git add *
+git commit -am "Added ~/.bcm/endpoints directory."
 
 echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
 
@@ -69,5 +76,5 @@ else
   echo "Run 'lxc remote get-default' to determine your current LXD endpoint. Run 'lxc remote set-default ENDPOINT' to change the LXD endpoint."
 
   echo "Setting BCM_LOCAL_GIT_REPO ENV VAR in current shell to '$SCRIPT_DIR'"
-  source env BCM_LOCAL_GIT_REPO=$SCRIPT_DIR
+  export BCM_LOCAL_GIT_REPO=$SCRIPT_DIR
 fi

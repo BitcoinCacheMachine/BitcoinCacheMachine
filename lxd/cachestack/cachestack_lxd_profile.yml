@@ -24,7 +24,7 @@ config:
             ipv4: true
             control: auto
 
-      # data path for services originating on the underlay.
+      # data path for services originating on the gateway.
       - type: physical
         name: eth3
         subnets:

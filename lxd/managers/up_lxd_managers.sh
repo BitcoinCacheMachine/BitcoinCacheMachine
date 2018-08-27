@@ -8,7 +8,7 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# for outbound NAT in case services on manager1 need to access a cachestack services on underlay
+# for outbound NAT in case services on manager1 need to access a cachestack
 echo "Creating lxdbrManager1."
 lxc network create lxdbrManager1
 

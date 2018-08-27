@@ -58,10 +58,10 @@ else
 fi
 
 # Cache Stack Standalone 
-if [[ $BCM_CACHESTACK_ATTACH_TO_UNDERLAY = "true" ]]; then
+if [[ $BCM_CACHESTACK_ATTACH_TO_GATEWAY = "true" ]]; then
     # if we're in standalone mode, then we attach eth3 in the container via MACVLAN
-    # to the user-provided physical network interface that provides access to the network underlay. 
-    # cachestack will obtain a unique IP address on the underlay and register its name as 'cachestack' 
+    # to the user-provided physical network interface that provides access to the network gateway. 
+    # cachestack will obtain a unique IP address on the gateway and register its name as 'cachestack' 
     # with the local DNS server, if any.
     lxc profile device set cachestackprofile eth3 nictype macvlan
     lxc profile device set cachestackprofile eth3 parent $BCS_TRUSTED_HOST_INTERFACE
