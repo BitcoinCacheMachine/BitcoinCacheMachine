@@ -2,7 +2,8 @@
 
 set -e
 
-echo "Installing BCM LXD profile templates."
+# call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
+bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
 # default is given to each LXD container and defines eth0, which is always for outbound NAT management plane
 

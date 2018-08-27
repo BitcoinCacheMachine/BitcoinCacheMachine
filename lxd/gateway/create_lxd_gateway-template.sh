@@ -10,45 +10,34 @@
 set -e
 
 # set the working directory to the location where the script is located
-# since all file references are relative to this script
 cd "$(dirname "$0")"
 
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-# create the lxdbrGateway network if it doesn't exist.
-if [[ -z $(lxc network list | grep lxdbrGateway) ]]; then
-    # a bridged network network for mgmt and outbound NAT by hosts.
-    lxc network create lxdbrGateway ipv4.nat=true
-else
-    echo "lxdbrGateway already exists."
-fi
-
-# create the gatewayprofile profile if it doesn't exist.
-if [[ -z $(lxc profile list | grep gatewayprofile) ]]; then
-    lxc profile create gatewayprofile
-fi
-
-echo "Applying gateway_lxd_profile.yml to lxd profile 'gatewayprofile'."
-cat gateway_lxd_profile.yml | lxc profile edit gatewayprofile
 
 ## Create the manager1 host from the lxd image template.
 lxc init bcm-template gateway-template -p docker_priv -p gatewayprofile -s bcm_data
 
-lxc profile apply gateway-template default,docker_priv
+sleep 5
+
+echo "Starting LXC container 'gateway-template' so we can make some updates to the file system."
+lxc start gateway-template
+
+sleep 15
 
 if [[ $BCM_GATEWAY_ENABLE_IP_FORWARDING = "true" ]]; then
-    lxc start gateway-template
-
-    sleep 10
+    echo "Configuring the lxc container image  'gateway-template' to support IP forwarding."
     # let's start gateway so we can update some file permissions.
     # ufw firewall policy rules
-    lxc file push ufw_before.rules gateway-template/etc/ufw/before.rules
-    lxc file push ufw_sysctl.conf gateway-template/etc/ufw/sysctl.conf
-    lxc file push ufw.conf gateway-template/etc/default/ufw
+    lxc exec gateway-template -- mkdir -p /etc/ufw
+    lxc file push ufw_before.rules "gateway-template"/etc/ufw/before.rules
+    lxc file push ufw_sysctl.conf "gateway-template"/etc/ufw/sysctl.conf
+    lxc exec gateway-template -- mkdir -p /etc/default
+    lxc file push ufw.conf "gateway-template"/etc/default/ufw
 
     # disable systemd-resolved so we can run a DNS server locally.
-    lxc file push resolved.conf gateway-template/etc/systemd/resolved.conf
+    lxc file push resolved.conf "gateway-template"/etc/systemd/resolved.conf
 
     lxc exec gateway-template -- chown root:root /etc/systemd/resolved.conf
     lxc exec gateway-template -- chmod 0644 /etc/systemd/resolved.conf
@@ -63,12 +52,16 @@ if [[ $BCM_GATEWAY_ENABLE_IP_FORWARDING = "true" ]]; then
     lxc exec gateway-template -- chmod 0644 /etc/default/ufw
 
     lxc exec gateway-template -- ufw enable
-    
-    lxc stop gateway-template
-
-    # I've seen where the snapshot doesn't always work right after the previous command.
-    sleep 2
+    sleep 5
 fi
 
-# so we can restore to a good known state.
-lxc snapshot gateway-template gatewaySnapshot
+echo "Stopping lxc container 'gateway-template' so we can take a proper snapshot."
+lxc stop gateway-template --force --timeout 5
+
+sleep 10
+
+if [[ $(lxc info gateway-template | grep "Status: Stopped") ]]; then
+    # so we can restore to a good known state.
+    echo "Creating a snapshot from lxc host 'gateway-template'."
+    lxc snapshot "gateway-template" gatewaySnapshot
+fi

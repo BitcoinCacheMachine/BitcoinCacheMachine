@@ -1,13 +1,7 @@
 #!/bin/bash
 
-# stop scrtip if error is encountered.
-set -e
-
-# set the working directory to the location where the script is located
-cd "$(dirname "$0")"
-
-# go ahead and refresh the environment variables.
-source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh
+# call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
+bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
 # quit if there are no BCM environment variables
 if [[ -z $(env | grep BCM_) ]]; then
@@ -21,6 +15,7 @@ fi
 if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]]; then
   # then we're going to arrive at 'bcm-template' by creating it ourselves'
   bash -c ./host_template/up_lxd_host_template.sh
+
 else
   # this is the logic that is taken when the administrator has specified a
   # custom LXD image server which is typical of home and offince network deployments
@@ -29,16 +24,6 @@ else
   else
     echo "Error! LXD remote $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE not found."
   fi
-fi
-
-
-# if instructed, serve the newly created snapshot to trusted LXD hosts.
-if [[ $BCM_LXD_DOCKER_TEMPLATE_IMAGE_SERVE = "true" ]]; then
-    # if the template doesn't exist, publish it so remote clients can reach it.
-    if [[ -z $(lxc image list | grep "bcm-template") ]]; then
-        echo "Publishing dockertemplate/bcmHostSnapshot snapshot as 'bcm-template' lxd image."
-        lxc publish dockertemplate/bcmHostSnapshot --alias bcm-template --public
-    fi
 fi
 
 

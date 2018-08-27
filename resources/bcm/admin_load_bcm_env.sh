@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Sourcing all BCM default environment variables located in $BCM_LOCAL_GIT_REPO/resources/defaults/"
+#echo "Sourcing all BCM default environment variables located in $BCM_LOCAL_GIT_REPO/resources/defaults/"
 
 BCM_DEFAULTS_DIR="$BCM_LOCAL_GIT_REPO/resources/bcm/defaults"
 
@@ -14,7 +14,7 @@ BCM_ACTIVE_LXD_ENDPOINT=$(lxc remote get-default)
 
 # if ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env exists, source it
 if [[ -e ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env ]]; then
-    echo "Sourcing ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env."
+    #echo "Sourcing ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env."
     source ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
 else
     echo "~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env does not exist! Stubbing one out for you bro."

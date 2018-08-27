@@ -14,7 +14,7 @@ if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
     lxc start dockertemplate
 fi
 
-sleep 5
+sleep 10
 
 # install docker - the script get-docker.sh does an apt-get update
 lxc file push get-docker.sh dockertemplate/root/get-docker.sh
@@ -22,7 +22,7 @@ lxc exec dockertemplate -- sh get-docker.sh >/dev/null
 
 # TODO provide configuration item to route these requests over local TOR proxy
 echo "Installing required software on dockertemplate."
-lxc exec dockertemplate -- apt-get install wait-for-it tor jq curl ifmetric slurm tcptrack -y
+lxc exec dockertemplate -- apt-get install wait-for-it jq curl ifmetric slurm tcptrack -y
 lxc exec dockertemplate -- apt-get autoclean
 lxc exec dockertemplate -- apt-get check
 lxc exec dockertemplate -- rm -rf /tmp/*
@@ -49,4 +49,19 @@ lxc stop dockertemplate
 
 echo "Creating a snapshot of the lxd host 'dockertemplate' called 'bcmHostSnapshot'."
 lxc snapshot dockertemplate bcmHostSnapshot
+
+# only do publish the 'bcm-template' if it doesn't exist already.
+if [[ -z $(lxc image list -c l | grep "bcm-template") ]]; then
+    # if instructed, serve the newly created snapshot to trusted LXD hosts.
+    if [[ $(lxc list | grep dockertemplate) ]]; then
+        if [[ $BCM_ADMIN_IMAGE_BCTEMPLATE_MAKE_PUBLIC = "yes" ]]; then
+            # if the template doesn't exist, publish it so remote clients can reach it.
+            echo "Publishing dockertemplate/bcmHostSnapshot as a public lxd image 'bcm-template' on lxd remote '$(lxc remote get-default)'."
+            lxc publish dockertemplate/bcmHostSnapshot --alias bcm-template --public
+        else
+            echo "Publishing dockertemplate/bcmHostSnapshot as non-public lxd image on lxd remote '$(lxc remote get-default)'."
+            lxc publish dockertemplate/bcmHostSnapshot --alias bcm-template
+        fi
+    fi
+fi
 

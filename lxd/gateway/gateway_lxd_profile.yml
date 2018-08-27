@@ -39,5 +39,3 @@ devices:
     nictype: physical
     parent: eno1
     type: nic
-
-name: gateway_lxd_profile.yml
