@@ -38,7 +38,7 @@ if [[ -z $(lxc profile list | grep "docker_priv") ]]; then
 fi
 
 ## Create the manager1 host from the lxd image template.
-lxc init bctemplate manager-template -p docker -p docker_priv -s $bcm_data
+lxc init bcm-template manager-template -p docker -p docker_priv -s $bcm_data
 
 # push necessary files to the template including daemon.json
 lxc file push ./daemon.json manager-template/etc/docker/daemon.json

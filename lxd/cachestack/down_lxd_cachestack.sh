@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # WARNING, this script ASSUMES that the LXD daemon is either 1) running on the same host
-# from which the script is being run (i.e., localhost). You can also provision Cache Stack
+# from which the script is being run (i.e., localhost). You can also provision `cachestack`
 # to a remote LXD daemon by setting your local LXC client to use the specified remote LXD service
 # You can use 'lxc remote add hostname hostname:8443 --accept-certificates to add a remote LXD'
 # endpoint to your client.

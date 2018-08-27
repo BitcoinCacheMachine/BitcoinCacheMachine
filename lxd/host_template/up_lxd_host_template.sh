@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Creating a LXD host template."
+echo "Creating a 'host_template' that BCM components can use."
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
@@ -11,6 +11,7 @@ cd "$(dirname "$0")"
 if [[ -z $(lxc network list | grep lxdbr0) ]]; then
   lxc network create lxdbr0
 fi
+
 
 # create the zfs cluster if it doesn't exist.
 # $ZFS_POOL_NAME should be set before being called to allow for separation
@@ -21,14 +22,9 @@ else
   echo "LXC storage pool 'bcm_data' already exists, skipping pool creation."
 fi
 
+# copy the ubuntu/18.04/i386 lxc image from the public "image:" server to our active LXD remote.
+lxc image copy images:ubuntu/18.04 $(lxc remote get-default): --alias bcm-bionic-base --auto-update
+
 bash -c ./up_lxd_profiles.sh
 
-bash -c ./download_bcm_lxd_cloud_image.sh
-
-# if either download the bctemplate from a remote LXD point, or create it yourself.
-if [[ $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE != "none" ]]; then
-  echo "Attempting to download lxd image 'bctemplate' from remote LXD daemon $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE."
-  lxc image copy $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE:bctemplate $(lxc remote get-default): --auto-update --copy-aliases
-else
-  bash -c ./create_lxd_host_template.sh
-fi
+bash -c ./create_lxd_host_template.sh

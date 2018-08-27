@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # WARNING, this script ASSUMES that the LXD daemon is either 1) running on the same host
-# from which the script is being run (i.e., localhost). You can also provision Cache Stack
+# from which the script is being run (i.e., localhost). You can also provision `cachestack`
 # to a remote LXD daemon by setting your local LXC client to use the specified remote LXD service
 # You can use 'lxc remote add hostname hostname:8443 --accept-certificates to add a remote LXD'
 # endpoint to your client.
@@ -29,25 +29,18 @@ if [[ -z $(lxc profile list | grep gatewayprofile) ]]; then
     lxc profile create gatewayprofile
 fi
 
-echo "Applying ./gateway_lxd_profile.yml to lxd profile 'gatewayprofile'."
-cat ./gateway_lxd_profile.yml | lxc profile edit gatewayprofile
+echo "Applying gateway_lxd_profile.yml to lxd profile 'gatewayprofile'."
+cat gateway_lxd_profile.yml | lxc profile edit gatewayprofile
 
-# create the gateway container if it doesn't exist
-if [[ -z $(lxc list | grep gateway-template) ]]; then
-    #lxc init ubuntu:18.04 -p default -p gatewayprofile -s bcm_data gateway
-    if [[ $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE = "none" ]] ; then
-        #lxc init bctemplate gateway -p default -p docker_priv -p gatewayprofile -s bcm_data
-        lxc copy dockertemplate/bcmHostSnapshot gateway-template
-    else
-        lxc init $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE:bctemplate gateway-template
-    fi
-else
-  echo "LXC container 'gateway-template' already exists."
-fi
+## Create the manager1 host from the lxd image template.
+lxc init bcm-template gateway-template -p docker_priv -p gatewayprofile -s bcm_data
 
 lxc profile apply gateway-template default,docker_priv
 
 if [[ $BCM_GATEWAY_ENABLE_IP_FORWARDING = "true" ]]; then
+    lxc start gateway-template
+
+    sleep 10
     # let's start gateway so we can update some file permissions.
     # ufw firewall policy rules
     lxc file push ufw_before.rules gateway-template/etc/ufw/before.rules
@@ -56,8 +49,6 @@ if [[ $BCM_GATEWAY_ENABLE_IP_FORWARDING = "true" ]]; then
 
     # disable systemd-resolved so we can run a DNS server locally.
     lxc file push resolved.conf gateway-template/etc/systemd/resolved.conf
-
-    lxc start gateway-template
 
     lxc exec gateway-template -- chown root:root /etc/systemd/resolved.conf
     lxc exec gateway-template -- chmod 0644 /etc/systemd/resolved.conf
@@ -72,10 +63,12 @@ if [[ $BCM_GATEWAY_ENABLE_IP_FORWARDING = "true" ]]; then
     lxc exec gateway-template -- chmod 0644 /etc/default/ufw
 
     lxc exec gateway-template -- ufw enable
+    
+    lxc stop gateway-template
 
+    # I've seen where the snapshot doesn't always work right after the previous command.
+    sleep 2
 fi
 
-lxc stop gateway-template
-
 # so we can restore to a good known state.
-lxc snapshot gateway-template gateway
+lxc snapshot gateway-template gatewaySnapshot

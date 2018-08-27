@@ -13,32 +13,32 @@ if [[ $(lxc list | grep dockertemplate) ]]; then
 fi
 
 
-# bctemplate
-if [[ $BCM_LXD_IMAGE_BCTEMPLATE_DELETE = "true" ]]; then
-  if [[ $(lxc image list | grep bctemplate) ]]; then
-    echo "Destrying lxd image 'bctemplate'."
-    lxc image delete bctemplate
+# destroy the lxc profiles
+bash -c ./delete_lxd_profiles.sh
+
+
+# bcm-template
+if [[ $BCM_LXD_DOCKER_TEMPLATE_IMAGE_DELETE = "true" ]]; then
+  if [[ $(lxc image list | grep bcm-template) ]]; then
+    echo "Destrying lxd image 'bcm-template'."
+    lxc image delete "bcm-template"
   fi
 fi
 
-# destroy the lxc profiles
-bash -c ./down_lxd_profiles.sh
-
-
-# delete lxd storage pool 
-if [[ $BCM_ZFS_STORAGE_POOL_DELETE = "true" ]]; then
-  # if specified, delete the template and lxd base image
-  if [[ $BCM_HOST_TEMPLATE_DELETE = "true" ]]; then
-    if [[ $(lxc image list | grep bbb592c417b6) ]]; then
-        echo "Destrying lxd image 'bbb592c417b6'."
-        lxc image delete bbb592c417b6
-    fi
+# if specified, delete the template and lxd base image
+if [[ $BCM_HOST_TEMPLATE_BCM_BIONIC_BASE_DELETE = "true" ]]; then
+  if [[ $(lxc image list | grep bcm-bionic-base) ]]; then
+      echo "Destrying lxd image 'bcm-bionic-base'."
+      lxc image delete "bcm-bionic-base"
   fi
-  
-  # make sure it exists
-  if [[ $(lxc storage list | grep "bcm_data") ]]; then
+fi
+
+if [[ $BCM_HOST_TEMPLATE_ZFS_BCM_DATA_DELETE = "true" ]]; then
+  # delete lxd storage pool 
+  if [[ $(lxc storage list | grep "bcm_data" | grep "| 0") ]]; then
     echo "Deleting lxd storage pool 'bcm_data'."
     lxc storage delete "bcm_data"
+  else
+    echo "LXC storage pool 'bcm_data' can't be deleted."
   fi
 fi
-

@@ -39,25 +39,26 @@ If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/)
 
 Documentation can be found in each directory starting at ./multipass. Readme files in each directory tell you what you need to know about deploying the various infrastructure components at that level. [README.md](./multipass/README.md) details the requirements for running BCM in a multipass-based VM and provides simple instructions for getting started. But before you begin, clone this repository to your machine--the machine that will execute BCM shell (BASH) scripts. In the documentation, this machine is referred to as the `admin machine` since it manages sensitive information (passwords, certificates, etc.) and is required for administrative installations or changes.
 
-Download the BCM git repo to the `admin machine` and cd into the root of the repo. All documentation in this repo assumes you have cloned the repo to `~/git/github/bcm` which is considered the BCM repo root directory (designated below as "$BCM_LOCAL_GIT_REPO").
+Clone the BCM reference implementation on to the `admin machine` and cd into the root of the repo. Open a terminal then run the following commands to get started:
 
 ```bash
 mkdir -p ~/git/github/bcm
 git clone https://github.com/BitcoinCacheMachine/BitcoinCacheMachine ~/git/github/bcm
 cd ~/git/github/bcm
+./setup.sh
 ```
 
-Next, run `./setup.sh` on the `admin machine`. This script creates the directory ~/.bcm, which is where you BCM scripts source BCM deployment options and to store runtime files. Click [here](./resources/README.md) for more information.
+`./setup.sh` prepares the `admin machine` for using BCM scripts. This script creates the directory ~/.bcm, which is where you BCM scripts source BCM deployment options and to store runtime files. Click [here](./resources/README.md) for more information.
 
 To continue, consider running [BCM in a multipass-based VM](./multipass). Click [here](./docs/installation/baremetal.md) if you want to run BCM on a computer running Linux (i.e., bare-metal).
 
 ## BCM Components
 
-Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware (PLANNED, see [LXD Clustering](https://lxd.readthedocs.io/en/latest/clustering/).
+Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware (PLANNED, see [LXD Clustering](https://lxd.readthedocs.io/en/latest/clustering/)).
 
 Each Bitcoin Cache Machine deployment includes one or more of the following components:
 
-* `gateway` - an LXD container that provides essential network services for BCM deployments. `underlay` runs [dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) which provides DHCP and DNS services for your physical network home or office network (i.e., from the perspective of BCM, this is the physical underlay network). BCM components, e.g., cachestack, managers, bitcoin, elastic, etc., SHOULD be deployed on `gateway` `trusted inside` network. During deployment, you can specify whether `gateway` allows outbound traffic (i.e., ip forwarding) from the `trusted inside` to `untrusted outside`. You can also deploy a squid proxy/cache for certain use cases. DNS and HTTP/HTTPS (with squid) requests received on the `trusted inside` interface are routed through TOR to protect your privacy. More details about `gateway` and its operation can be found at ./lxd/gateway/README.md.
+* `gateway` - an LXD container that provides essential network services for BCM deployments. `gateway` runs [dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) which provides DHCP and DNS services for your physical network home or office network (i.e., from the perspective of BCM, this is the physical underlay network). BCM components, e.g., cachestack, managers, bitcoin, elastic, etc., SHOULD be deployed on `gateway` `trusted inside` network. During deployment, you can specify whether `gateway` allows outbound traffic (i.e., ip forwarding) from the `trusted inside` to `untrusted outside`. You can also deploy a squid proxy/cache for certain use cases. DNS and HTTP/HTTPS (with squid) requests received on the `trusted inside` interface are routed through TOR to protect your privacy. More details about `gateway` and its operation can be found at ./lxd/gateway/README.md.
 
 * `cachestack` - a set of LXD components that primarily provide caching services for other BCM components. `cachestack` MAY be installed in either standalone mode  (essential for development), in which case it provides caching services to devices on your network, or 2) in combination with other BCM components. Certain BCM components are dependent on one or more caching services that are expected to be hosted on a `cachestack`. If there is no standalone `cachestack` on your LAN segment, BCM installs a local copy and uses it internally; that is, BCM is dependent on a `cachestack` existing. Each `cachestack` hosts a Docker registry mirror configured as a pull-through cache and a private docker registry to store images emitted after the docker image build process.  More information about the `cachestack` and its components can be found at ./lxd/cachestack/README.md.
 
@@ -67,14 +68,12 @@ Each Bitcoin Cache Machine deployment includes one or more of the following comp
 
 * `app_host` -- hosts designed for user applications. Each app_host can be named according to user requirements, examples include hosting an `elastic` database for visualizing data originating from a Kafka topic, or perhaps `streamhost` for stream processing to/from Kafka topics. Developers choosing BCM as an operating platform create custom code and organize it here. /lxd/app_host/README.md provides BASH scripts for provisioning each `app_host`. Users simply develop associated `$BCM_LOCAL_GIT_REPO/docker_stack` files `$BCM_LOCAL_GIT_REPO/docker_image` files to deploy a custom app.
 
-
-
 ## Project Status
 
-BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real bitcoin on it. Master branch is meant to be stable-ish. There are a lot of things that need to be done to it, especially in securing all the INTERFACES!!! I'm still working on core features; hardening and hardware-based cryptographic operations are next for integration.
+BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real bitcoin on it. Stable builds will be formally tagged, but we're not there yet. There are a lot of things that need to be done to it, especially in securing all the INTERFACES!!!
 
 ## How to contribute
 
 Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate.
 
-[Keybase Team for Bitcoin Cache Machine and Bitcoin Cache Stack](https://keybase.io/team/btccachemachine)
+[Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)

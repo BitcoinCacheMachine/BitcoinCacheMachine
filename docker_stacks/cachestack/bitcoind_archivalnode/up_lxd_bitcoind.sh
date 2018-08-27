@@ -2,7 +2,7 @@
 
 
 # TODO refactor to subdirectory
-echo "Deploying a bitcoind archival node to the Cache Stack."
+echo "Deploying a bitcoind archival node to the 'cachestack'."
 lxc exec cachestack -- mkdir -p /apps/bitcoind_archivalnode
 lxc file push ./stacks/bitcoind_archivalnode/bitcoind.yml cachestack/apps/bitcoind_archivalnode/bitcoind.yml
 lxc file push ./stacks/bitcoind_archivalnode/bitcoind-testnet.conf cachestack/apps/bitcoind_archivalnode/bitcoind-testnet.conf

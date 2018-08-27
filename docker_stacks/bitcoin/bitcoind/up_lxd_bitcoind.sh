@@ -22,14 +22,14 @@ fi
 lxc exec bitcoin -- docker volume create bitcoind_testnet_data
 
 if [[ $BCM_INSTALL_BITCOIN_BITCOIND_TESTNET_RSYNC_BOOTSTRAP = "true" ]]; then
-    echo "Bootstrapping bitcoind testnet data directory using rsync from files hosted on $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE."
+    echo "Bootstrapping bitcoind testnet data directory using rsync from files hosted on $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE."
     lxc exec bitcoin -- docker pull cachestack.lxd/rsyncd:latest
 
     # next, run the container with the rsync client on it and do a remote-to-local rsync pull
     # from the LXD host running the cachestack TO the local BCM instance.
-    RSYNC_IP_ADDRESS=$(lxc list $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE:cachestack --columns 4 | grep eth3 | awk '{match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART,RLENGTH); print ip}')
+    RSYNC_IP_ADDRESS=$(lxc list $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE:cachestack --columns 4 | grep eth3 | awk '{match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART,RLENGTH); print ip}')
     
-    lxc file push ~/.bcm/endpoints/"$BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE"/.ssh/cachestack-rsync-key bitcoin/apps/bitcoind/id_rsa_rsyncd_cachestack
+    lxc file push ~/.bcm/endpoints/"$BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE"/.ssh/cachestack-rsync-key bitcoin/apps/bitcoind/id_rsa_rsyncd_cachestack
 
     echo "Pulling via rsync from $RSYNC_IP_ADDRESS:bitcoind_testnet_data/ to docker volume bitcoind_testnet_data."
     lxc exec bitcoin -- docker run -it --rm -v /apps/bitcoind/id_rsa_rsyncd_cachestack:/root/.ssh/rsync_rsa_key -v bitcoind_testnet_data:/bitcoindata cachestack.lxd/rsyncd:latest rsync -av -e "ssh -i /root/.ssh/rsync_rsa_key -p 2222 -l rsync -o StrictHostKeyChecking=no" "$RSYNC_IP_ADDRESS":bitcoind_testnet_data/ /bitcoindata/

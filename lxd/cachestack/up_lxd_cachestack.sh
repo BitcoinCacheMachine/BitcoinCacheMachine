@@ -46,18 +46,18 @@ cat ./cachestack_lxd_profile.yml | lxc profile edit cachestackprofile
 
 # create the cachestack container.
 if [[ -z $(lxc list | grep cachestack) ]]; then
-    # if BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE is specified, we can init cachestack from the remote image
-    # if it's not specified, then we initiailze cachestack from bctemplate residing locally.
-    if [[ $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE = "none" ]] ; then
-        lxc init bctemplate cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
+    # if BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE is specified, we can init cachestack from the remote image
+    # if it's not specified, then we initiailze cachestack from bcm-template residing locally.
+    if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]] ; then
+        lxc init bcm-template cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
     else
-        lxc init $BCM_LXD_EXTERNAL_BCTEMPLATE_REMOTE:bctemplate cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
+        lxc init $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE:bcm-template cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
     fi
 else
   echo "cachestack lxd container already exists."
 fi
 
-# Cache Stack Standalone 
+# `cachestack` Standalone 
 if [[ $BCM_CACHESTACK_ATTACH_TO_GATEWAY = "true" ]]; then
     # if we're in standalone mode, then we attach eth3 in the container via MACVLAN
     # to the user-provided physical network interface that provides access to the network gateway. 
@@ -115,7 +115,7 @@ if [[ $(lxc exec cachestack -- docker info | grep "Swarm: inactive") ]]; then
     lxc exec cachestack -- docker swarm init --advertise-addr=10.254.253.11 >>/dev/null
 fi
 
-echo "Deploying Cache Stack services."
+echo "Deploying `cachestack` services."
 
 # Deploy the private registry if specified.
 if [[ $BCS_INSTALL_PRIVATEREGISTRY = 'true' ]]; then
@@ -137,7 +137,7 @@ fi
 # Deploy IPFS Cache if specified.
 if [[ $BCS_INSTALL_IPFSCACHE = 'true' ]]; then
     # TODO refactor to subdirectory
-    echo "Deploying IPFS cache to the Cache Stack."
+    echo "Deploying IPFS cache to the `cachestack`."
     lxc exec cachestack -- mkdir -p /apps/ipfs_cache
     lxc file push ./stacks/ipfs_cache/ipfs_cache.yml cachestack/apps/ipfs_cache/ipfs_cache.yml
     lxc exec cachestack -- docker stack deploy -c /apps/ipfs_cache/ipfs_cache.yml ipfscache

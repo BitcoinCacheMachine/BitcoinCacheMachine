@@ -11,17 +11,21 @@ cd "$(dirname "$0")"
 SCRIPT_DIR=$(pwd)
 
 # delete lxd container gateway
-if [[ $(lxc info gateway | grep "Name: gateway") ]]; then
-    echo "Deleting lxd container 'gateway'."
-    lxc delete --force gateway
+if [[ $(lxc list | grep gateway) ]]; then
+    if [[ $(lxc info gateway | grep "Name: gateway") ]]; then
+        echo "Deleting lxd container 'gateway'."
+        lxc delete --force gateway
+    fi
 fi
 
 
 if [[ $BCM_GATEWAY_TEMPLATE_DELETE = "true" ]]; then
-    # delete lxd container gateway-template
-    if [[ $(lxc info gateway-template | grep "Name: gateway-template") ]]; then
-        echo "Deleting lxd container 'gateway-template'."
-        lxc delete --force gateway-template
+    if [[ $(lxc list | grep "gateway-template") ]]; then
+        # delete lxd container gateway-template
+        if [[ $(lxc info gateway-template | grep "Name: gateway-template") ]]; then
+            echo "Deleting lxd container 'gateway-template'."
+            lxc delete --force gateway-template
+        fi
     fi
 fi
 

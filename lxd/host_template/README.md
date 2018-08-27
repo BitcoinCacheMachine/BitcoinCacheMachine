@@ -1,6 +1,6 @@
 # bcm_host_template
 
-This repo is shared by BCM Cache Stack and Bitcoin Cache Machine. `./up_lxc.sh` provisions a host template based on Ubuntu 18.04 and with the latest docker daemon.
+This repo is shared by BCM `cachestack` and Bitcoin Cache Machine. `./up_lxc.sh` provisions a host template based on Ubuntu 18.04 and with the latest docker daemon.
 
 ## Storage
 
