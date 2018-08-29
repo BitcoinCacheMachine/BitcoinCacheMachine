@@ -17,7 +17,6 @@ All BCM LXD scripts (any scripts with "_lxd_" in the name) ASSUME that BCM envir
 ### Start BCM
 export BCM_LOCAL_GIT_REPO="/home/user/git/github/BitcoinCacheMachine"
 alias bcm="source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh"
-lxc remote set-default local
 ### END BCM
 ```
 

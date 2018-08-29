@@ -1,5 +1,5 @@
-FROM bcm-base:latest
-RUN apt-get install -y dnsmasq tor
+FROM bcm-tor:latest
+RUN apt-get install -y dnsmasq
 RUN mkdir -p /tftp/pxeboot
 ADD dnsmasq.conf /etc/dnsmasq.conf
 ADD torrc /etc/tor/torrc

@@ -30,7 +30,7 @@ if [[ $(lxc list | grep bitcoin) ]]; then
 fi
 
 if [[ $(lxc list | grep bitcoin) ]]; then
-    echo "Destroying lxd container 'bitcoin'."
+    echo "Destroying lxc container 'bitcoin'."
     lxc delete --force bitcoin
 fi
 

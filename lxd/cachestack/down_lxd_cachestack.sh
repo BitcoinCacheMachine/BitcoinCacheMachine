@@ -16,36 +16,31 @@ cd "$(dirname "$0")"
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-# delete lxd container cachestack
+# delete lxc container cachestack
 if [[ $(lxc list | grep cachestack) ]]; then
-    echo "Deleting lxd container 'cachestack'."
     lxc delete --force cachestack >/dev/null
 fi
 
 
-# delete lxd container cachestack
+# delete lxc container cachestack
 if [[ $(lxc profile list | grep cachestackprofile) ]]; then
-    echo "Deleting lxd profile 'cachestackprofile'."
     lxc profile delete cachestackprofile >/dev/null
 fi
 
 
 # delete lxd network lxdbrCacheStack 
 if [[ $(lxc network list | grep lxdbrCacheStack) ]]; then
-    echo "Deleting lxd network 'lxdbrCacheStack'."
     lxc network delete lxdbrCacheStack
 fi
 
 
 # delete lxd network lxdBCMCSMGRNET 
 if [[ $(lxc network list | grep lxdBCMCSMGRNET) ]]; then
-    echo "Deleting lxd network 'lxdBCMCSMGRNET'."
     lxc network delete lxdBCMCSMGRNET
 fi
 
 # delete lxd network lxdBrNowhere 
 if [[ $(lxc network list | grep lxdBrNowhere) ]]; then
-    echo "Deleting lxd network 'lxdBrNowhere'."
     lxc network delete lxdBrNowhere
 fi
 

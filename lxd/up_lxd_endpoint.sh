@@ -27,7 +27,7 @@ else
 fi
 
 
-if [[ $BCM_GATEWAY_INSTALL = "true" ]]; then
+if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
   echo "Deploying 'gateway' LXD host and associated components."
   bash -c ./gateway/up_lxd_gateway.sh
 fi

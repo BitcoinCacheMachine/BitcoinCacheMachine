@@ -31,14 +31,14 @@ if [[ -z $(lxc profile list | grep docker) ]]; then
 fi
 
 
-# create the docker_priv profile if it doesn't exist, which might happen when we're using an external cachestack
-if [[ -z $(lxc profile list | grep "docker_priv") ]]; then
-  lxc profile create docker_priv
-  cat ../../bcs/host_template/lxd_profile_docker_template.yml | lxc profile edit docker_priv
+# create the docker_privileged profile if it doesn't exist, which might happen when we're using an external cachestack
+if [[ -z $(lxc profile list | grep "docker_privileged") ]]; then
+  lxc profile create docker_privileged
+  cat ../../bcs/host_template/lxd_profile_docker_template.yml | lxc profile edit docker_privileged
 fi
 
 ## Create the manager1 host from the lxd image template.
-lxc init bcm-template manager-template -p docker -p docker_priv -s $bcm_data
+lxc init bcm-template manager-template -p docker -p docker_privileged -s $bcm_data
 
 # push necessary files to the template including daemon.json
 lxc file push ./daemon.json manager-template/etc/docker/daemon.json

@@ -3,9 +3,9 @@
 # quit if error.
 set -e
 
-# delete lxd container manager1
+# delete lxc container manager1
 if [[ $(lxc list | grep manager1) ]]; then
-    echo "Destroying lxd container 'manager1'."
+    echo "Destroying lxc container 'manager1'."
     lxc delete --force manager1
 fi
 
@@ -40,6 +40,6 @@ fi
 
 # delete lxd profile manager-template 
 if [[ $(lxc list | grep "manager-template") ]]; then
-    echo "Destroying lxd container 'manager-template'."
+    echo "Destroying lxc container 'manager-template'."
     lxc delete --force manager-template
 fi

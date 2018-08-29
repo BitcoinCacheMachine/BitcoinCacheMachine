@@ -28,7 +28,7 @@ echo "Applying bitcoin lxd profile file to lxd profile 'bitcoinprofile'."
 cat ./bitcoin_lxd_profile.yml | lxc profile edit bitcoinprofile
 
 ## Create the manager1 host from the lxd image template.
-lxc init bcm-template bitcoin -p docker -p docker_priv -s $bcm_data
+lxc init bcm-template bitcoin -p docker -p docker_privileged -s $bcm_data
 
 echo "Applying the lxd profiles 'bitcoinprofile' and 'default' to the lxd host 'bitcoin'."
 lxc profile apply bitcoin default,bitcoinprofile
@@ -42,7 +42,7 @@ if [[ -z $(lxc storage list | grep "bitcoin-dockervol") ]]; then
     lxc storage create bitcoin-dockervol dir
     lxc config device add bitcoin dockerdisk disk source=$(lxc storage show bitcoin-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 else
-    echo "bitcoin-dockervol lxd storage pool already exists; attaching it to LXD container 'bitcoin'."
+    echo "bitcoin-dockervol lxd storage pool already exists; attaching it to lxc container 'bitcoin'."
     lxc config device add bitcoin dockerdisk disk source=$(lxc storage show bitcoin-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 fi
 

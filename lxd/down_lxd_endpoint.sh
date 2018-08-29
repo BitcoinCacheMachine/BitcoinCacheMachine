@@ -9,6 +9,17 @@ if [[ -z $(env | grep BCM) ]]; then
   exit
 fi
 
+
+
+echo "Calling ./gateway/down_lxd_gateway.sh"
+bash -c ./gateway/down_lxd_gateway.sh
+
+echo "Calling ./host_template/down_lxd_host_template.sh"
+bash -c ./host_template/down_lxd_host_template.sh
+
+
+
+
 # if [[ $BCM_BITCOIN_DELETE = "true" ]]; then
 #   echo "Calling ./bitcoin/down_lxd_bitcoin.sh"
 #   bash -c ./bitcoin/down_lxd_bitcoin.sh
@@ -29,24 +40,3 @@ fi
 # else
 #   echo "BCM environment variables are configured to SKIP deletion of LXD host 'cachestack'."
 # fi
-
-# if [[ $BCM_GATEWAY_DELETE = "true" ]]; then
-echo "Calling ./gateway/down_lxd_gateway.sh"
-bash -c ./gateway/down_lxd_gateway.sh
-# else
-#   echo "BCM environment variables are configured to SKIP deletion of LXD host 'gateway'."
-# fi
-
-# # if set, we run the host_template down scripts.
-# if [[ $BCM_ADMIN_HOST_TEMPLATE_DELETE = "true" ]]; then
-echo "Calling ./host_template/down_lxd_host_template.sh"
-bash -c ./host_template/down_lxd_host_template.sh
-# else
-#   echo "BCM environment variables are configured to SKIP deletion of the BCM host template."
-# fi
-
-# delete lxd network lxdbrBCMCSBrdg 
-if [[ $(lxc network list | grep lxdbrBCMCSBrdg) ]]; then
-    echo "Deleting lxd network 'lxdbrBCMCSBrdg'."
-    lxc network delete lxdbrBCMCSBrdg
-fi

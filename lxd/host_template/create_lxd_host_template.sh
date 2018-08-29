@@ -7,8 +7,8 @@ cd "$(dirname "$0")"
 
 # only execute if bcm_data is non-zero
 if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
-    # initialize the LXD container to the active lxd endpoint. 
-    lxc init bcm-bionic-base -p default -p docker_priv -s bcm_data dockertemplate
+    # initialize the lxc container to the active lxd endpoint. 
+    lxc init bcm-bionic-base -p default -p docker_privileged -s bcm_data dockertemplate
     lxc config set dockertemplate limits.cpu 4
     lxc config set dockertemplate limits.memory 4GB
     lxc start dockertemplate
@@ -54,7 +54,7 @@ lxc snapshot dockertemplate bcmHostSnapshot
 if [[ -z $(lxc image list -c l | grep "bcm-template") ]]; then
     # if instructed, serve the newly created snapshot to trusted LXD hosts.
     if [[ $(lxc list | grep dockertemplate) ]]; then
-        if [[ $BCM_ADMIN_IMAGE_BCTEMPLATE_MAKE_PUBLIC = "yes" ]]; then
+        if [[ $BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC = "yes" ]]; then
             # if the template doesn't exist, publish it so remote clients can reach it.
             echo "Publishing dockertemplate/bcmHostSnapshot as a public lxd image 'bcm-template' on lxd remote '$(lxc remote get-default)'."
             lxc publish dockertemplate/bcmHostSnapshot --alias bcm-template --public

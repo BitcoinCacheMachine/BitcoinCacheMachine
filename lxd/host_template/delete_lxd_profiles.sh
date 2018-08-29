@@ -13,14 +13,14 @@ if [[ $(lxc profile list | grep "default") ]] ; then
 fi
 
 
-# delete lxd profile docker_priv
-if [[ $(lxc profile list | grep "docker_priv") ]] ; then
+# delete lxd profile docker_privileged
+if [[ $(lxc profile list | grep "docker_privileged") ]] ; then
   # make sure it doesn't have anything attached to it.
   if [[ ! -z $(lxc profile list | grep docker | grep "| 0") ]]; then
-    echo "Deleting docker_priv lxd profile."
-    lxc profile delete docker_priv
+    echo "Deleting docker_privileged lxd profile."
+    lxc profile delete docker_privileged
   else
-    echo "Could not delete lxd profile 'docker_priv' due to attached resources. Check your BCM environment variables."
+    echo "Could not delete lxd profile 'docker_privileged' due to attached resources. Check your BCM environment variables."
   fi
 fi
 

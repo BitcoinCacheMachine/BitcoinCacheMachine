@@ -1,12 +1,8 @@
 #!/bin/bash
 
 sudo apt-get update
-
 sudo apt upgrade -y
-
-sudo snap install lxd
-sudo apt install zfsutils -y
-
+sudo apt-get install lxd zfsutils -y
 
 cat <<EOF | lxd init --preseed
 # Daemon settings

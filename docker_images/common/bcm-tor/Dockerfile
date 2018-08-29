@@ -1,3 +1,4 @@
 FROM bcm-base:latest
-RUN apt-get install -y tor && apt-get purge && apt-get autoremove && apt-get clean
-CMD [ "tor" ]
+RUN apt-get install -y tor
+#RUN apt-get autoremove -y
+#RUN apt-get clean

@@ -49,12 +49,12 @@ if [[ -z $(lxc list | grep cachestack) ]]; then
     # if BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE is specified, we can init cachestack from the remote image
     # if it's not specified, then we initiailze cachestack from bcm-template residing locally.
     if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]] ; then
-        lxc init bcm-template cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
+        lxc init bcm-template cachestack -p default -p docker_privileged -p cachestackprofile -s bcm_data
     else
-        lxc init $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE:bcm-template cachestack -p default -p docker_priv -p cachestackprofile -s bcm_data
+        lxc init $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE:bcm-template cachestack -p default -p docker_privileged -p cachestackprofile -s bcm_data
     fi
 else
-  echo "cachestack lxd container already exists."
+  echo "cachestack lxc container already exists."
 fi
 
 # `cachestack` Standalone 
@@ -82,7 +82,7 @@ if [[ -z $(lxc storage list | grep "cachestack-dockervol") ]]; then
     lxc storage create cachestack-dockervol dir
     lxc config device add cachestack dockerdisk disk source=$(lxc storage show cachestack-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 else
-    echo "cachestack-dockervol lxd storage pool already exists; attaching it to LXD container 'cachestack'."
+    echo "cachestack-dockervol lxd storage pool already exists; attaching it to lxc container 'cachestack'."
     lxc config device add cachestack dockerdisk disk source=$(lxc storage show cachestack-dockervol | grep source | awk 'NF>1{print $NF}') path=/var/lib/docker
 fi
 

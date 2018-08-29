@@ -69,7 +69,7 @@ else
   echo $BCM_BASHRC_FLAG >> ~/.bashrc
   echo 'export BCM_LOCAL_GIT_REPO="'$SCRIPT_DIR'"' >> ~/.bashrc
   echo 'alias bcm="source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh"' >> ~/.bashrc
-  echo 'lxc remote set-default local' >> ~/.bashrc
+  #echo 'lxc remote set-default local' >> ~/.bashrc
   echo '### END BCM' >> ~/.bashrc
 
   echo "Done. Execute 'bcm' to load BCM environment variables FOR THE CURRENT LXD endpoint."
