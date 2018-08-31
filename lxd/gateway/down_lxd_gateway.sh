@@ -16,7 +16,7 @@ SCRIPT_DIR=$(pwd)
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_GATEWAY_CONTAINER_DELETE bcm-gateway"
 
 # delete 'bcm-gateway-dockervol'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage_dockervol.sh $BCM_GATEWAY_STORAGE_DOCKERVOL_DELETE bcm-gateway-dockervol"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_GATEWAY_STORAGE_DOCKERVOL_DELETE bcm-gateway-dockervol"
 
 # delte container gateway-template
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_GATEWAY_CONTAINER_TEMPLATE_DELETE gateway-template"

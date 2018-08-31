@@ -5,12 +5,11 @@ set -e
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-
 # create and populate the required networks
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_network_bridge_nat.sh $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE lxdbr0"
+bash -c "$BCM_LXD_OPS/create_lxc_network_bridge_nat.sh $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE lxdbr0"
 
-# create and populate the required networks
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_storage_zfs.sh $BCM_HOSTTEMPLATE_STORAGE_ZFS_CREATE bcm_data 5GB"
+# create and populate the zfs storage backends
+bash -c "$BCM_LXD_OPS/create_lxc_storage_zfs.sh $BCM_STORAGE_BCM_DATA_CREATE bcm_data 10GB"
 
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
@@ -24,16 +23,13 @@ fi
 ####
 # PROFILES
 ####
-
 #default
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DEFAULT_CREATE default $BCM_LOCAL_GIT_REPO/lxd/host_template/lxd_profiles/default.yml"
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DEFAULT_CREATE default $BCM_LXD_HOST_PROFILES/default.yml"
 #bcm_disk
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh $BCM_HOSTTEMPLATE_STORAGE_BCMDISK_ZFS_CREATE bcm_disk $BCM_LOCAL_GIT_REPO/lxd/host_template/lxd_profiles/bcm_disk.yml"
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_BCMDISK_CREATE bcm_disk $BCM_LXD_HOST_PROFILES/bcm_disk.yml"
 #docker_unprivileged
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIEGED_CREATE docker_unprivileged $BCM_LOCAL_GIT_REPO/lxd/host_template/lxd_profiles/docker_unprivileged.yml"
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIEGED_CREATE docker_unprivileged $BCM_LXD_HOST_PROFILES/docker_unprivileged.yml"
 #docker_privileged
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_CREATE docker_privileged $BCM_LOCAL_GIT_REPO/lxd/host_template/lxd_profiles/docker_privileged.yml"
-
-
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_CREATE docker_privileged $BCM_LXD_HOST_PROFILES/docker_privileged.yml"
 
 bash -c ./create_lxd_host_template.sh

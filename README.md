@@ -52,7 +52,7 @@ cd ~/git/github/bcm
 
 To continue, consider running [BCM in a multipass-based VM](./multipass). Click [here](./wiki/installation/baremetal.md) if you want to run BCM on a computer running Linux (i.e., bare-metal).
 
-## Bitcoin Cache Machine Concept Overview
+## Bitcoin Cache Machine Component
 
 First, it is important that Bitcoin Cache Machine is designed to be composable. The components listed below may be deployed depending on the desired use case. Second is to remember that the components listed below are simply LXD
 

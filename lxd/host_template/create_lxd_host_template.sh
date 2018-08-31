@@ -22,7 +22,7 @@ lxc exec dockertemplate -- sh get-docker.sh >/dev/null
 
 # TODO provide configuration item to route these requests over local TOR proxy
 echo "Installing required software on dockertemplate."
-lxc exec dockertemplate -- apt-get install wait-for-it jq curl ifmetric slurm tcptrack -y
+lxc exec dockertemplate -- apt-get install wait-for-it jq nmap curl ifmetric slurm tcptrack -y
 lxc exec dockertemplate -- apt-get autoclean
 lxc exec dockertemplate -- apt-get check
 lxc exec dockertemplate -- rm -rf /tmp/*
@@ -47,6 +47,9 @@ lxc exec dockertemplate -- rm -rf /tmp/*
 # stop the template since we don't need it running anymore.
 lxc stop dockertemplate
 
+lxc profile remove dockertemplate default
+lxc profile remove dockertemplate docker_privileged
+
 echo "Creating a snapshot of the lxd host 'dockertemplate' called 'bcmHostSnapshot'."
 lxc snapshot dockertemplate bcmHostSnapshot
 
@@ -64,4 +67,3 @@ if [[ -z $(lxc image list -c l | grep "bcm-template") ]]; then
         fi
     fi
 fi
-

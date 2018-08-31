@@ -9,7 +9,8 @@ if [[ -z $(env | grep BCM) ]]; then
   exit
 fi
 
-
+echo "Calling ./gateway/down_lxd_cachestack.sh"
+bash -c ./cachestack/down_lxd_cachestack.sh
 
 echo "Calling ./gateway/down_lxd_gateway.sh"
 bash -c ./gateway/down_lxd_gateway.sh
@@ -34,9 +35,3 @@ bash -c ./host_template/down_lxd_host_template.sh
 #   echo "BCM environment variables are configured to SKIP deletion of LXD 'manager' hosts."
 # fi
 
-# if [[ $BCM_CACHESTACK_DELETE = "true" ]]; then
-#   echo "Calling ./cachestack/down_lxd_cachestack.sh"
-  # bash -c ./cachestack/down_lxd_cachestack.sh
-# else
-#   echo "BCM environment variables are configured to SKIP deletion of LXD host 'cachestack'."
-# fi

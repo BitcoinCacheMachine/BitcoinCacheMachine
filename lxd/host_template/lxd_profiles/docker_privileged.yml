@@ -2,4 +2,3 @@ config:
   linux.kernel_modules: overlay,nf_nat,ip_tables,ip6_tables,netlink_diag,br_netfilter,xt_conntrack,nf_conntrack,ip_vs,vxlan
   security.nesting: "true"
   security.privileged: "true"
-name: docker_priv

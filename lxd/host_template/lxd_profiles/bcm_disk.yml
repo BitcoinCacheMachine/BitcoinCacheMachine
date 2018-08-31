@@ -3,5 +3,3 @@ devices:
     path: /
     pool: bcm_data
     type: disk
-
-name: disk

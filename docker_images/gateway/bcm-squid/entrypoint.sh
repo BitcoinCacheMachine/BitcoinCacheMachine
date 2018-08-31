@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # start squid
-squid
+squid -N

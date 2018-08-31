@@ -14,97 +14,84 @@ if [[ -z $(lxc image list | grep "bcm-template") ]]; then
     exit 1
 fi
 
-
-# before we even continue, ensure the appropriate ports actually exist.
-if [[ -z $(lxc network list | grep $BCM_GATEWAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE) ]]; then
-    echo "Error. Physical interface '$BCM_GATEWAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE' doesn't exist on LXD host '$(lxc remote get-default)'. Please update BCM environment variable BCM_GATEWAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE."
-    exit
-fi
-
 # now check inside
 if [[ -z $(lxc network list | grep $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE) ]]; then
     echo "Error. Physical interface '$BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE' doesn't exist on LXD host $(lxc remote get-default). Please update BCM environment variable BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE."
     exit
 fi
 
-
 # create and populate the required networks
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_network_bridge_nat.sh $BCM_GATEWAY_NETWORKS_CREATE lxdbrGateway"
 
 
-# create an populate necessary profiles
+# create an bcm-gateway-profile
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE bcm-gateway-profile $BCM_LOCAL_GIT_REPO/lxd/gateway/gateway_lxd_profile.yml"
 
+# then update the profile with the user-specified interface
+echo "Setting lxc profile 'bcm-gateway-profile' eth1 to host interface '$BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE'."
+lxc profile device set bcm-gateway-profile eth1 parent $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE
+
 # create a gateway template if it doesn't exist.
-if [[ -z $(lxc list | grep "gateway-template") ]]; then
+if [[ -z $(lxc list | grep "bcm-gateway") ]]; then
     # let's generate a LXC template to base our lxc container on.
-    bash -c ./create_lxd_gateway-template.sh
+    lxc init bcm-template bcm-gateway -p bcm_disk -p docker_privileged -p bcm-gateway-profile
 fi
-
-
-if [[ $BCM_GATEWAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE = "default" ]] || [[ $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE = "default" ]]; then
-    echo "Please configure the BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE and BCM_GATEWAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE environment variables in your '~/.bcm/endpoints/$(lxc remote get-default).env'"
-    exit
-fi
-
-
-# create gateway from the snapshot
-lxc copy gateway-template/gatewaySnapshot bcm-gateway
 
 # create the docker backing for 'bcm-gateway'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_attach_lxc_storage_to_container.sh $BCM_GATEWAY_STORAGE_DOCKERVOL_CREATE bcm-gateway bcm-gateway-dockervol"
 
-#lxc profile device set bcm-gateway-profile eth1 nictype physical
-echo "Setting lxc profile 'bcm-gateway-profile' eth1 (untrusted outside) to macvlan on physical interface '$BCM_GATEWAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE'."
-lxc profile device set bcm-gateway-profile eth1 parent $BCM_GATEWAY_PHYSICAL_UNTRUSTED_OUTSIDE_INTERFACE
+lxc file push 10-lxc.yaml bcm-gateway/etc/netplan/10-lxc.yaml
 
-#lxc profile device set bcm-gateway-profile eth2 nictype physical
-echo "Setting lxc profile 'bcm-gateway-profile' eth2 (trusted inside) parent to capture the physical interface '$BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE'."
-lxc profile device set bcm-gateway-profile eth2 parent $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE
-
-# apply the profiles to bcm-gateway
-lxc profile apply bcm-gateway ''
-lxc profile apply bcm-gateway docker_privileged,bcm-gateway-profile
-
-#lxc file push dockerd.json bcm-gateway/etc/docker/daemon.json
+sleep 5
 
 lxc start bcm-gateway
 
-#sleep 15
+sleep 15
 
-# lxc exec bcm-gateway -- ifmetric eth1 25
+# lxc exec bcm-gateway -- apt-get install -y ufw
+# lxc file push ufw_before.rules bcm-gateway/etc/ufw/before.rules
+# lxc file push ufw_sysctl.conf bcm-gateway/etc/ufw/sysctl.conf
 
-# #lxc exec bcm-gateway -- docker swarm init --advertise-addr 127.0.0.1 --listen-addr 127.0.0.1:2377 --data-path-addr 192.168.0.1 >/dev/null
+# lxc exec bcm-gateway -- mkdir -p /etc/default
+# lxc file push ufw.conf bcm-gateway/etc/default/ufw
+
+# lxc exec bcm-gateway -- chown root:root /etc/ufw/before.rules
+# lxc exec bcm-gateway -- chmod 0640 /etc/ufw/before.rules
+# lxc exec bcm-gateway -- chown root:root /etc/ufw/sysctl.conf
+# lxc exec bcm-gateway -- chmod 0644 /etc/ufw/sysctl.conf
+
+# lxc exec bcm-gateway -- chown root:root /etc/default/ufw
+# lxc exec bcm-gateway -- chmod 0644 /etc/default/ufw
+# #lxc exec bcm-gateway -- ifmetric eth0 25
+
+bash -c "$BCM_LOCAL_GIT_REPO/docker_images/gateway/build_gateway.sh bcm-gateway"
+
+lxc file push resolved.conf bcm-gateway/etc/systemd/resolved.conf
+lxc exec bcm-gateway -- chown root:root /etc/systemd/resolved.conf
+lxc exec bcm-gateway -- chmod 0644 /etc/systemd/resolved.conf
+
+# lxc exec bcm-gateway -- ufw allow in on eth1 proto tcp to any port 9050 #OUTBOUND TOR
+# lxc exec bcm-gateway -- ufw allow in on eth1 proto tcp to any port 3128 #HTTP/HTTPS
+# lxc exec bcm-gateway -- ufw allow in on eth1 proto tcp to any port 53 #DNS
+# lxc exec bcm-gateway -- ufw allow in on eth1 proto udp to any port 53 #DNS
+# lxc exec bcm-gateway -- ufw allow in on eth1 proto udp to any port 67 #DHCP
+# lxc exec bcm-gateway -- ufw allow in on eth1 proto udp to any port 69 #TFTP
+# lxc exec bcm-gateway -- ufw enable
 
 
-# # build the necessary images
-# bash -c "$BCM_LOCAL_GIT_REPO/docker_images/gateway/build_gateway.sh bcm-gateway"
-
-# # #bash -c $BCM_LOCAL_GIT_REPO/docker_stacks/common/squid/up_lxd_squid.sh
+lxc stop bcm-gateway
+lxc snapshot bcm-gateway gatewaySnapshot
 
 
-# # #systemd binds to 53 be default, remove it and let's use docker-hosted dnsmasq container
-# # # lxc exec bcm-gateway -- systemctl stop systemd-resolved
-# # # lxc exec bcm-gateway -- systemctl disable systemd-resolved
+# #systemd binds to 53 be default, remove it and let's use docker-hosted dnsmasq container
+# # lxc exec bcm-gateway -- systemctl stop systemd-resolved
+# # lxc exec bcm-gateway -- systemctl disable systemd-resolved
 
-# lxc exec bcm-gateway -- docker run --name dnsmasq -d --restart always --net=host --cap-add=NET_ADMIN bcm-dnsmasq:latest
+# disable systemd-resolved so we can run a DNS server locally.
+lxc start bcm-gateway
+sleep 15
+lxc exec bcm-gateway -- docker run --name dnsmasq -d --restart always --net=host --cap-add=NET_ADMIN bcm-dnsmasq:latest
 
-# # if [[ $BCM_GATEWAY_ENABLE_IP_FORWARDING = "true" ]]; then
-# #     # let's start gateway so we can update some file permissions.
-# #     # ufw firewall policy rules
-# #     lxc exec bcm-gateway -- ufw allow in on eth2 proto tcp to any port 443
-# #     lxc exec bcm-gateway -- ufw allow in on eth2 proto tcp to any port 80
-# #     lxc exec bcm-gateway -- ufw allow in on eth2 proto tcp to any port 53
-# #     lxc exec bcm-gateway -- ufw allow in on eth2 proto udp to any port 53
-# #     lxc exec bcm-gateway -- ufw allow in on eth2 proto udp to any port 67
-# #     lxc exec bcm-gateway -- ufw allow in on eth2 proto udp to any port 67
-# #     lxc exec bcm-gateway -- ufw enable
-# # fi
+lxc exec bcm-gateway -- docker swarm init
 
-
-
-# lxc stop bcm-gateway
-
-# sleep 15
-
-# lxc start bcm-gateway
+bash -c "$BCM_LOCAL_GIT_REPO/docker_stacks/gateway/squid/up_lxd_squid.sh bcm-gateway"

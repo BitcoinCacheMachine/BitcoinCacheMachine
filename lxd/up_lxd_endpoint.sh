@@ -26,16 +26,15 @@ else
   fi
 fi
 
-
 if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
-  echo "Deploying 'gateway' LXD host and associated components."
+  echo "Deploying 'bcm-gateway'."
   bash -c ./gateway/up_lxd_gateway.sh
 fi
 
-# if [[ $BCM_CACHESTACK_INSTALL = "true" ]]; then
-#     echo "Deploying 'cachestack' host(s)"
-#     bash -c ./cachestack/up_lxd_cachestack.sh
-# fi
+if [[ $BCM_ADMIN_CACHESTACK_INSTALL = "true" ]]; then
+    echo "Deploying 'bcm-cachestack'."
+    bash -c ./cachestack/up_lxd_cachestack.sh
+fi
 
 # if [[ $BCM_MANAGERS_INSTALL = "true" ]]; then
 #   echo "Deploying 'manager' host(s)"

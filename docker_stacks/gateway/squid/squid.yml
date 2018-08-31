@@ -3,12 +3,14 @@ services:
   squid:
     image: bcm-squid:latest
     ports:
+      - "8080:8080"
       - "3128:3128"
     volumes:
-       - squid-data:/var/spool/squid3
+       - squid-cache:/var/spool/squid
+       - squid-log:/var/log/squid
     configs:
       - source: squid_config
-        target: /etc/squid/squid.conf
+        target: /etc/squid3/squid.conf
         uid: '0'
         gid: '0'
         mode: 0644
@@ -17,7 +19,8 @@ services:
       replicas: 1
 
 volumes:
-  squid-data:
+  squid-cache:
+  squid-log:
 
 configs:
   squid_config:

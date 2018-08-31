@@ -24,7 +24,7 @@ else
 fi
 
 
-echo "Applying bitcoin lxd profile file to lxd profile 'bitcoinprofile'."
+echo "Applying bitcoin lxd profile file to lxc profile 'bitcoinprofile'."
 cat ./bitcoin_lxd_profile.yml | lxc profile edit bitcoinprofile
 
 ## Create the manager1 host from the lxd image template.
