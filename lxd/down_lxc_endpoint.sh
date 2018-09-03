@@ -9,14 +9,14 @@ if [[ -z $(env | grep BCM) ]]; then
   exit
 fi
 
-echo "Calling ./gateway/down_lxd_cachestack.sh"
-bash -c ./cachestack/down_lxd_cachestack.sh
+echo "Calling ./gateway/down_lxc_cachestack.sh"
+bash -c "./cachestack/down_lxc_cachestack.sh template"
 
-echo "Calling ./gateway/down_lxd_gateway.sh"
-bash -c ./gateway/down_lxd_gateway.sh
+echo "Calling ./gateway/down_lxc_gateway.sh"
+bash -c "./gateway/down_lxc_gateway.sh template"
 
-echo "Calling ./host_template/down_lxd_host_template.sh"
-bash -c ./host_template/down_lxd_host_template.sh
+echo "Calling ./host_template/down_lxc_host_template.sh"
+bash -c "./host_template/down_lxc_host_template.sh"
 
 
 

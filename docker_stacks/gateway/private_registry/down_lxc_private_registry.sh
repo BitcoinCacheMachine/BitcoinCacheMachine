@@ -4,8 +4,8 @@
 
 if [[ $(lxc exec cachestack -- docker stack ls | grep privateregistry) ]]; then
     echo "Removing docker stack 'privateregistry' from the swarm on 'cachestack'."
-    lxc exec cachestack -- docker stack rm privateregistry
+    lxc exec bcm-cachestack -- docker stack rm privateregistry
     sleep 10
 fi
 
-lxc exec cachestack -- docker system prune -f
+lxc exec bcm-cachestack -- docker system prune -f

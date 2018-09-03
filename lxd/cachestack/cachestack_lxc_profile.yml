@@ -15,6 +15,6 @@ devices:
 
   # get's IP address attached network
   eth0:
-    nictype: macvlan
-    parent: eno1
+    nictype: bridged
+    parent: lxdGWLocalNet
     type: nic

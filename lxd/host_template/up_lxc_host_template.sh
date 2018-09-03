@@ -32,4 +32,4 @@ bash -c "$BCM_LXD_OPS/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNP
 #docker_privileged
 bash -c "$BCM_LXD_OPS/create_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_CREATE docker_privileged $BCM_LXD_HOST_PROFILES/docker_privileged.yml"
 
-bash -c ./create_lxd_host_template.sh
+bash -c ./create_lxc_host_template.sh

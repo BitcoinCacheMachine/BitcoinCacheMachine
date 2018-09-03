@@ -12,8 +12,8 @@
 *nat
 :POSTROUTING ACCEPT [0:0]
 
-# Forward traffic from eth2 (inside) through eth1 (outside).
--A POSTROUTING -s 192.168.0.0/24 -o eth1 -j MASQUERADE
+# Forward traffic from eth1 (inside) through eth0 (outside).
+-A POSTROUTING -s 192.168.5.0/24 -o eth0 -j MASQUERADE
 
 # don't delete the 'COMMIT' line or these nat table rules won't be processed
 COMMIT

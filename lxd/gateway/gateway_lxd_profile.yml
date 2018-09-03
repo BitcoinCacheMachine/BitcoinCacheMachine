@@ -8,14 +8,14 @@ config:
           - type: dhcp
             ipv4: true
             control: auto
-            
+        
 devices:
   eth0:
     nictype: bridged
     parent: lxdbrGateway
     type: nic
-  
+
   eth1:
-    nictype: physical
-    parent: ens1
+    nictype: bridged
+    parent: lxdGWLocalNet
     type: nic

@@ -22,6 +22,7 @@ lxc exec dockertemplate -- sh get-docker.sh >/dev/null
 
 # TODO provide configuration item to route these requests over local TOR proxy
 echo "Installing required software on dockertemplate."
+lxc exec dockertemplate -- apt-get install -y ca-certificates
 lxc exec dockertemplate -- apt-get install wait-for-it jq nmap curl ifmetric slurm tcptrack -y
 lxc exec dockertemplate -- apt-get autoclean
 lxc exec dockertemplate -- apt-get check

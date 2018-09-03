@@ -1,0 +1,5 @@
+{
+    "dns": [ "gateway.bcm.tld" ],
+    "registry-mirrors": ["http://bcmnet.tld:5000"],
+    "insecure-registries": [ "http://bcmnet.tld" ]
+}

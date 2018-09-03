@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
 bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
@@ -14,7 +16,7 @@ fi
 # it's best to centralize your image creation, but good for standalone deployments.
 if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]]; then
   # then we're going to arrive at 'bcm-template' by creating it ourselves'
-  bash -c ./host_template/up_lxd_host_template.sh
+  bash -c ./host_template/up_lxc_host_template.sh
 
 else
   # this is the logic that is taken when the administrator has specified a
@@ -26,15 +28,15 @@ else
   fi
 fi
 
-if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
-  echo "Deploying 'bcm-gateway'."
-  bash -c ./gateway/up_lxd_gateway.sh
-fi
+# if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
+#   echo "Deploying 'bcm-gateway'."
+#   bash -c ./gateway/up_lxc_gateway.sh
+# fi
 
-if [[ $BCM_ADMIN_CACHESTACK_INSTALL = "true" ]]; then
-    echo "Deploying 'bcm-cachestack'."
-    bash -c ./cachestack/up_lxd_cachestack.sh
-fi
+# if [[ $BCM_ADMIN_CACHESTACK_INSTALL = "true" ]]; then
+#     echo "Deploying 'bcm-cachestack'."
+#     bash -c ./cachestack/up_lxc_cachestack.sh
+# fi
 
 # if [[ $BCM_MANAGERS_INSTALL = "true" ]]; then
 #   echo "Deploying 'manager' host(s)"

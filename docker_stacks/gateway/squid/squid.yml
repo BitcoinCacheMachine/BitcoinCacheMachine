@@ -3,14 +3,18 @@ services:
   squid:
     image: bcm-squid:latest
     ports:
-      - "8080:8080"
-      - "3128:3128"
+      - target: 3128
+        published: 3128
+        protocol: tcp
+        mode: host
+    networks:
+      hostnet: {}
     volumes:
        - squid-cache:/var/spool/squid
        - squid-log:/var/log/squid
     configs:
       - source: squid_config
-        target: /etc/squid3/squid.conf
+        target: /etc/squid/squid.conf
         uid: '0'
         gid: '0'
         mode: 0644
@@ -25,3 +29,8 @@ volumes:
 configs:
   squid_config:
     file: squid.conf
+
+networks:
+  hostnet:
+    external: true
+    name: host
