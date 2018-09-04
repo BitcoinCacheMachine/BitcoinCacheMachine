@@ -28,20 +28,20 @@ else
   fi
 fi
 
-# if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
-#   echo "Deploying 'bcm-gateway'."
-#   bash -c ./gateway/up_lxc_gateway.sh
-# fi
+if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
+  echo "Deploying 'bcm-gateway'."
+  bash -c ./gateway/up_lxc_gateway.sh
+fi
 
-# if [[ $BCM_ADMIN_CACHESTACK_INSTALL = "true" ]]; then
-#     echo "Deploying 'bcm-cachestack'."
-#     bash -c ./cachestack/up_lxc_cachestack.sh
-# fi
+if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
+    echo "Creating lxc container 'bcm-bcmnettemplate' and associated snapshot 'bcmnet_template'."
+    bash -c ./bcmnet_template/up_lxc_bcmnet_template.sh
+fi
 
-# if [[ $BCM_MANAGERS_INSTALL = "true" ]]; then
-#   echo "Deploying 'manager' host(s)"
-#   bash -c ./managers/up_lxd_managers.sh
-# fi
+if [[ $BCM_ADMIN_RSYNC_INSTALL = "true" ]]; then
+  echo "Deploying lxc host 'rsync' and deploying the associated rsync stack."
+  bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/rsync/up_lxc_rsyncd.sh"
+fi
 
 # if [[ $BCM_BITCOIN_INSTALL = "true" ]]; then
 #   echo "Deploying 'bitcoin' host"

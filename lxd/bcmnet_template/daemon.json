@@ -1,0 +1,4 @@
+{
+    "registry-mirrors": ["https://gateway.bcmnet:5000/"],
+    "insecure-registries": [ "http://gateway.bcmnet" ]
+}

@@ -27,13 +27,13 @@ lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker swarm init --advertise-addr 1
 
 # let's slap a registry mirror pull through cache.
 if [[ $BCM_GATEWAY_STACKS_REGISTRYMIRROR_DEPLOY = "true" ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO/docker_stacks/gateway/registry_mirror/up_lxc_registrymirror.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
+    bash -c "./stacks/registry_mirror/up_lxc_registrymirror.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
     lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 192.168.4.1:5000
 fi
 
 # Deploy the private registry if specified.
 if [[ $BCM_GATEWAY_STACKS_PRIVATEREGISTRY_DEPLOY = "true" ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO/docker_stacks/gateway/private_registry/up_lxc_private_registry.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
+    bash -c "./stacks/private_registry/up_lxc_private_registry.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
     lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 192.168.4.1:80
 fi
 
@@ -47,6 +47,7 @@ sleep 15
 # ### ABSOLUTE FIRST STEP 1, Let's get DHCP and DNS working.
 # ## To accomplish this, we first need to build our dnsmasq docker image.
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker pull farscapian/bcm-dnsmasq:latest
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker pull farscapian/bcm-squid:latest
 
 # disable systemd-resolved so don't have a conflict on port 53 when dnsmasq binds.
 lxc file push resolved.conf $BCM_LXC_GATEWAY_CONTAINER_NAME/etc/systemd/resolved.conf
@@ -63,3 +64,11 @@ lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker run --name dnsmasq -d --resta
 lxc file push finished.daemon.json $BCM_LXC_GATEWAY_CONTAINER_NAME/etc/docker/daemon.json
 
 lxc restart $BCM_LXC_GATEWAY_CONTAINER_NAME
+
+sleep 15
+
+# Deploy squid
+if [[ $BCM_GATEWAY_STACKS_SQUID_DEPLOY = "true" ]]; then
+    bash -c "./stacks/squid/up_lxc_squid.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
+    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 192.168.4.1:3128
+fi
