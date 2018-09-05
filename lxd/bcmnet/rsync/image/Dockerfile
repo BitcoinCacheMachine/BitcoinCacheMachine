@@ -1,6 +1,9 @@
 FROM ubuntu:bionic
 
-RUN env HTTPS_PROXY=http://gateway.bcmnet:3128 HTTP_PROXY=http://gateway.bcmnet:3128 apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+ENV http_proxy=http://bcmnet:3128 \
+    https_proxy=http://bcmnet:3128
+
+RUN apt-get update -o Acquire::ForceIPv4=true && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     net-tools \
     openssh-server \
     rsync \

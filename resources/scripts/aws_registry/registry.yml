@@ -29,14 +29,38 @@ services:
       mode: replicated
       replicas: 1
 
+
+  nginx:
+    image: nginx:1.15.3
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    configs:
+      - source: nginxconf
+        target: /etc/nginx/nginx.conf
+        uid: '33'
+        gid: '33'
+        mode: 0640
+    secrets:
+      - source: fullchainpem
+        target: /certs/fullchain.pem
+      - source: privkeypem
+        target: /certs/privkey.pem
+    deploy:
+      mode: replicated
+      replicas: 1
+
+
 volumes:
   private-registry-data:
 
-secrets:
-  privreg_tls_cert:
-    file: privreg.cert
-  privreg_tls_key:
-    file: privreg.key
+# secrets:
+#   privreg_tls_cert:
+#     file: privreg.cert
+#   privreg_tls_key:
+#     file: privreg.key
 
 configs:
   regmirror_config:

@@ -19,8 +19,6 @@ lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=f
 # create the storage pool if it doesn't exist.
 if [[ -z $(lxc storage list | grep "$bcm_data") ]]; then
   lxc storage create "$bcm_data" zfs size=10GB
-else
-  echo "$bcm_data already exists, skipping pool creation."
 fi
 
 # create the docker profile if it doesn't exist. This may happen when we have an external cachestack 

@@ -10,7 +10,5 @@ if [[ $1 = "true" ]]; then
         else
             lxc network create $2 ipv4.nat=false ipv6.nat=false dns.mode=none
         fi
-    else
-        echo "LXC network '$2' already exists."
     fi
 fi

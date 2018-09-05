@@ -48,11 +48,9 @@ fi
 
 lxc file push 10-lxc.yaml $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/etc/netplan/10-lxc.yaml
 
-sleep 5
-
 lxc start $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME
 
-sleep 15
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME"
 
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- apt-get install -y ufw tor
 lxc file push torrc $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/etc/tor/torrc
@@ -60,7 +58,9 @@ lxc file push torrc $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/etc/tor/torrc
 
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on localhost proto udp to any port 9053 #incoming TOR DNS requests from local (probably docker) processes.
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 9050 #OUTBOUND TOR
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3128 # HTTPS PROXYs
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3128 # HTTP PROXYs
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3129 # HTTP redirect to HTTPS
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3130 # HTTPS
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 80 # 80 for Docker Private REgistry
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 5000 # 5000 for docker registry pull through cache.
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 53 #DNS

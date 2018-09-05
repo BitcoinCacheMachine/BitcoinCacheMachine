@@ -5,5 +5,5 @@
 cd "$(dirname "$0")"
 
 bash -c "$BCM_LOCAL_GIT_REPO/docker_images/common/bcm-base/build_lxd_bcm-base.sh"
-bash -c "$BCM_LOCAL_GIT_REPO/docker_images/gateway/bcm-dnsmasq/build_dockerhub.sh"
-bash -c "$BCM_LOCAL_GIT_REPO/docker_images/gateway/bcm-squid/build_dockerhub.sh"
+#bash -c "./dnsmasq/build_dockerhub.sh"
+#bash -c "$BCM_LOCAL_GIT_REPO/docker_images/gateway/bcm-squid/build_dockerhub.sh"

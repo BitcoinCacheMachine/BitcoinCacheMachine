@@ -24,7 +24,8 @@ lxc file push daemon.json $INSTANCE_NAME/etc/docker/daemon.json
 
 lxc start $INSTANCE_NAME
 
-sleep 10
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $INSTANCE_NAME"
+
 
 # lxc exec $INSTANCE_NAME -- systemctl enable docker
 # lxc exec $INSTANCE_NAME -- systemctl start docker
@@ -92,7 +93,7 @@ sleep 10
 
 #     lxc start cachestack
 
-#     sleep 30
+
 
 #     # update routes to prefer eth0 for outbound access.
 #     lxc exec cachestack -- ifmetric eth0 0

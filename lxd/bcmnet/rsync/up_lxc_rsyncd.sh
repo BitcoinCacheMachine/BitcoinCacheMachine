@@ -47,7 +47,6 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet_template/delete_instance.sh bcm-rsync-bu
 # lxc exec cachestack -- env BCS_INSTALL_RSYNCD_BUILD_IMAGE=$BCS_INSTALL_RSYNCD_BUILD_IMAGE docker stack deploy -c /apps/rsyncd/rsyncd.yml rsyncd
 
 # wait-for-it -t 0 cachestack.lxd:2222
-# # sleep 15
 
 # if [[ $BCS_INSTALL_BITCOIND_TESTNET_RSYNC_SEED = "true" ]]; then
 #     lxc exec cachestack -- mkdir -p cachestack/apps/bitcoind/data
