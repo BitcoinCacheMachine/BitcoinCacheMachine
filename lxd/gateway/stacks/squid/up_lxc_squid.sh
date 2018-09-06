@@ -4,7 +4,7 @@
 cd "$(dirname "$0")"
 
 # Let's generate some HTTPS certificates for the new registry mirror.
-bash -c "../../../shared/generate_certificate.sh $BCM_LXC_GATEWAY_CONTAINER_NAME squid bcmnet"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/generate_certificate.sh $BCM_LXC_GATEWAY_CONTAINER_NAME squid bcmnet"
 
 echo "Deploying squid to 'bcm-gateway'."
 lxc exec bcm-gateway -- mkdir -p /apps/squid

@@ -2,6 +2,10 @@
 
 set -e
 
+# set the working directory to the location where the script is located
+# since all file references are relative to this script
+cd "$(dirname "$0")"
+
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
 bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
@@ -11,11 +15,9 @@ if [[ -z $(env | grep BCM) ]]; then
   exit
 fi
 
-echo "Calling ./bcmnet/rsync/down_lxc_rsynd.sh"
-bash -c "./bcmnet/rsync/down_lxc_rsyncd.sh"
 
-echo "Calling ./bcmnet_template/down_lxc_bcmnet_template.sh"
-bash -c "./bcmnet_template/down_lxc_bcmnet_template.sh template"
+echo "Calling ./bcmnet/down_lxc_bcmnet.sh"
+bash -c "./bcmnet/down_lxc_bcmnet.sh template"
 
 echo "Calling ./gateway/down_lxc_gateway.sh"
 bash -c "./gateway/down_lxc_gateway.sh template"

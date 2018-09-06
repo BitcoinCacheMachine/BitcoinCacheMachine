@@ -2,6 +2,10 @@
 
 set -e
 
+# set the working directory to the location where the script is located
+# since all file references are relative to this script
+cd "$(dirname "$0")"
+
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
 bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
@@ -34,14 +38,10 @@ if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
 fi
 
 if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
-    echo "Creating lxc container 'bcm-bcmnettemplate' and associated snapshot 'bcmnet_template'."
-    bash -c ./bcmnet_template/up_lxc_bcmnet_template.sh
+    echo "Creating lxc container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' and associated snapshot 'bcmnet_template'."
+    bash -c ./bcmnet/up_lxc_bcmnet.sh
 fi
 
-if [[ $BCM_ADMIN_RSYNC_INSTALL = "true" ]]; then
-  echo "Deploying lxc host 'rsync' and deploying the associated rsync stack."
-  bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/rsync/up_lxc_rsyncd.sh"
-fi
 
 # if [[ $BCM_BITCOIN_INSTALL = "true" ]]; then
 #   echo "Deploying 'bitcoin' host"

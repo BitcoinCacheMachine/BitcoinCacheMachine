@@ -13,6 +13,11 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
+
+echo "Calling ./bcmnet_hosts/rsync/down_lxc_rsynd.sh"
+bash -c "./bcmnet_hosts/rsync/down_lxc_rsyncd.sh"
+
+
 # delete container 'bcm-gateway'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_BCMNETTEMPLATE_CONTAINER_DELETE $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME"
 

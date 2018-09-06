@@ -8,6 +8,12 @@ cd "$(dirname "$0")"
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
 bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
+# ensure the machine has snap
+if [[ ! $(snap list | grep multipass) ]]; then
+    # if it doesn't, let's install
+    sudo snap install multipass --beta --classic
+fi
+
 # if bcm-template lxc image exists, run the gateway template creation script.
 if [[ -z $(lxc info $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME | grep BCMGatewayTemplate) ]]; then
     echo "Required snapshot 'BCMGatewayTemplate' on lxc container 'BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME' does not exist. Exiting."
@@ -47,7 +53,7 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_GATEWAY_CON
 # ### ABSOLUTE FIRST STEP 1, Let's get DHCP and DNS working.
 # ## To accomplish this, we first need to build our dnsmasq docker image.
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker pull farscapian/bcm-dnsmasq:latest
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker pull farscapian/bcm-squid:latest
+#lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker pull farscapian/bcm-squid:latest
 
 # disable systemd-resolved so don't have a conflict on port 53 when dnsmasq binds.
 lxc file push resolved.conf $BCM_LXC_GATEWAY_CONTAINER_NAME/etc/systemd/resolved.conf

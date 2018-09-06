@@ -8,7 +8,7 @@ set -e
 cd "$(dirname "$0")"
 
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet_template/create_instance_from_snapshot.sh bcm-rsync-builder"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/create_instance_from_snapshot.sh bcm-rsync-builder"
 
 lxc exec bcm-rsync-builder -- mkdir -p /apps/rsyncd
 
@@ -23,12 +23,12 @@ lxc delete --force bcm-rsync-builder
 lxc storage delete bcm-rsync-builder-dockervol
 
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet_template/delete_instance.sh bcm-rsync-builder"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/delete_instance.sh bcm-rsync-builder"
 
 
 
 # # let's get a fresh LXC host that's on bcmnet
-# bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet_template/create_instance_from_snapshot.sh rsync"
+# bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/create_instance_from_snapshot.sh rsync"
 
 
 

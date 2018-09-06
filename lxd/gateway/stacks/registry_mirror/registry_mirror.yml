@@ -6,8 +6,8 @@ services:
       - "5000:5000"
     volumes:
       - registrymirrorimage-data:/data
-    environment:
-      REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET}
+    # environment:
+    #   REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET}
     configs:
       - source: regmirror_config
         target: /etc/docker/registry/config.yml

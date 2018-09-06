@@ -15,27 +15,32 @@ if [[ -z $(lxc image list | grep "bcm-template") ]]; then
     return
 fi
 
-# now check inside
-if [[ -z $(lxc network list | grep $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE) ]]; then
-    echo "Error. Physical interface '$BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE' doesn't exist on LXD host $(lxc remote get-default). Please update BCM environment variable BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE."
-    exit 1
-fi
-
 # create and populate the required networks
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_network_bridge_nat.sh $BCM_GATEWAY_NETWORKS_CREATE lxdbrGateway"
 
-lxc network create lxdGWLocalNet ipv4.nat=false ipv6.nat=false dns.mode=none ipv4.dhcp=false ipv6.dhcp=false
 
 # create an bcm-gateway-profile
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE bcm-gateway-profile $BCM_LOCAL_GIT_REPO/lxd/gateway/gateway_lxd_profile.yml"
 
+#bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/connect_container_to_underlay.sh"
+lxc network create lxdGWLocalNet ipv4.nat=false ipv6.nat=false dns.mode=none ipv4.dhcp=false ipv6.dhcp=false
+
 
 #### this is what we do when we are told to attach to physical network
 if [[ $BCM_GATEWAY_ATTACH_TO_UNDERLAY == "true" ]]; then
-    # then update the profile with the user-specified interface
-    echo "Setting lxc profile 'bcm-gateway-profile' eth1 to host interface '$BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE'."
-    lxc profile device set bcm-gateway-profile eth1 nictype physical
-    lxc profile device set bcm-gateway-profile eth1 parent $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE
+    
+    if [[ $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE != "default" ]]; then
+        # ensure the physical interface exists.
+        if [[ -z $(lxc network list | grep $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE) ]]; then
+            echo "Error. Physical interface '$BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE' doesn't exist on LXD host $(lxc remote get-default). Please update BCM environment variable BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE."
+            exit 1
+        fi
+
+        # then update the profile with the user-specified interface
+        echo "Setting lxc profile 'bcm-gateway-profile' eth1 to host interface '$BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE'."
+        lxc profile device set bcm-gateway-profile eth1 nictype physical
+        lxc profile device set bcm-gateway-profile eth1 parent $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE
+    fi    
 else
     echo "BCM directed to perform a standalone deployment. LXC container '$BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME' will not attach to a physical interface."
 fi

@@ -23,7 +23,7 @@ if [[ -z $(lxc image list | grep bcm-template) ]]; then
 
     # TODO provide configuration item to route these requests over local TOR proxy
     echo "Installing required software on dockertemplate."
-    lxc exec dockertemplate -- apt-get install wait-for-it jq nmap curl ifmetric slurm tcptrack dnsutils -y
+    lxc exec dockertemplate -- apt-get install wait-for-it jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump -y
 
     # stop the current template dockerd instance since we're about to create a snapshot
     # Enable the docker daemon to start by default.

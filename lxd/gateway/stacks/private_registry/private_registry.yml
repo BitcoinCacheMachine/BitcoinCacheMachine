@@ -14,17 +14,17 @@ services:
         uid: '33'
         gid: '33'
         mode: 0640
-    # secrets:
-    #   - source: privreg_tls_cert
-    #     target: /var/lib/registry/privreg.cert
-    #     uid: '0'
-    #     gid: '0'
-    #     mode: 0400
-    #   - source: privreg_tls_key
-    #     target: /var/lib/registry/privreg.key
-    #     uid: '0'
-    #     gid: '0'
-    #     mode: 0400
+    secrets:
+      - source: privreg_tls_cert
+        target: /var/lib/registry/privreg.cert
+        uid: '0'
+        gid: '0'
+        mode: 0400
+      - source: privreg_tls_key
+        target: /var/lib/registry/privreg.key
+        uid: '0'
+        gid: '0'
+        mode: 0400
     deploy:
       mode: replicated
       replicas: 1

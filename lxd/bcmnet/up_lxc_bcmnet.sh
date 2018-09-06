@@ -25,12 +25,10 @@ if [[ -z $(lxc image list | grep "bcm-template") ]]; then
     exit 1
 fi
 
-#bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/connect_container_to_underlay.sh"
-
 # create a bcmnet_template template if it doesn't exist.
 if [[ -z $(lxc list | grep "$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME") ]]; then
     # let's generate a LXC template to base our lxc container on.
-    lxc init bcm-template $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -p bcm_disk -p docker_privileged -n lxdGWLocalNet
+    lxc init bcm-template $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -p bcm_disk -p docker_privileged 
 fi
 
 lxc file push 10-lxc.yaml $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/netplan/10-lxc.yaml
@@ -40,10 +38,10 @@ lxc start $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
 
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME"
 
-#we're going to update the docker daemon to use the HTTP/HTTPs proxy on gateway.
-lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/systemd/system/docker.service.d
-lxc file push https-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/https-proxy.conf
-lxc file push http-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/http-proxy.conf
+# #we're going to update the docker daemon to use the HTTP/HTTPs proxy on gateway.
+# lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/systemd/system/docker.service.d
+# lxc file push https-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/https-proxy.conf
+# lxc file push http-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/http-proxy.conf
 
 # # configure default environment to also use the squid proxy on gateway.
 # lxc config set $BCM_LXC_BCMNETTEMPLATE_CONTAINER_NAME environment.HTTP_PROXY http://bcmnet:3128/
@@ -51,9 +49,13 @@ lxc file push http-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/et
 
 # let's put the registry_mirror certificate up there to trust.
 lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/docker/certs.d/bcmnet:5000
-lxc file push ~/.bcm/runtime/$(lxc remote get-default)/bcm-gateway/registry_mirror/registry_mirror.cert $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/docker/certs.d/bcmnet:5000/ca.crt
-lxc file push ~/.bcm/runtime/$(lxc remote get-default)/bcm-gateway/registry_mirror/registry_mirror.cert $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/usr/local/share/ca-certificates/bcmnet:5000.crt
-lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- chown root:root /etc/docker/certs.d/bcmnet:5000/ca.crt
+lxc file push ~/.bcm/runtime/$(lxc remote get-default)/bcm-gateway/registry_mirror/registry_mirror.cert.DER $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/docker/certs.d/bcmnet:5000/ca.crt
+
+# create a client certificate for dockerd to use.
+mkdir -p ~/.bcm/runtime/$(lxc remote get-default)/bcmnet_template
+##########################
+###########################3
+#
 
 # put the squid proxy certificate on the template.
 lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/squid/ssl_cert
@@ -72,4 +74,9 @@ lxc stop $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
 # create a snapshot from which all production managers will be based.
 lxc snapshot $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME "bcmnet_template"
 
-echo "Done creating bcm-bcmnettemplate LXC conatiner snapshot. Yow can now spin up as many LXC hosts as you want, all of which are configured to use 'bcm-gateway'."
+echo "Done creating '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' LXC conatiner snapshot. Deploying bcmnet hosts."
+
+if [[ $BCM_ADMIN_RSYNC_INSTALL = "true" ]]; then
+  echo "Deploying lxc host 'rsync' and deploying the associated rsync stack."
+  bash -c "./bcmnet_hosts/rsync/up_lxc_rsyncd.sh"
+fi

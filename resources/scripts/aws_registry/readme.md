@@ -1,4 +1,4 @@
-# readem
+# Creates a host on AWS and deploys a Private registry
 
 Create the  ~/.aws/credentials file
 

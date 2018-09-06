@@ -6,7 +6,6 @@ BCM_DEFAULTS_DIR="$BCM_LOCAL_GIT_REPO/resources/bcm/defaults"
 
 source $BCM_DEFAULTS_DIR/defaults.env
 source $BCM_DEFAULTS_DIR/gateway.env
-source $BCM_DEFAULTS_DIR/cachestack.env
 source $BCM_DEFAULTS_DIR/managers.env
 source $BCM_DEFAULTS_DIR/bitcoin.env
 
