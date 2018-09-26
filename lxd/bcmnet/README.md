@@ -1,4 +1,16 @@
 
+# BCMNET
+
+This folder hosts all applications that need to connect to the underlay network. In general, lxc hosts that have connectivity to the bcmnet network can access the following services hosted on lxc host `gateway` located at 192.168.4.1:
+
+* Docker Registry Mirror accessible via 'bcmnet:5000' via TLS 1.3 with certificate-based client-server authentication.
+* Docker Private Registry accessible via 'bcmnet:443' via TLS 1.3 with certificate-based client-server authentication.
+
+
+
+
+
+<!-- 
 # `cachestack` for Bitcoin Cache Machine
 
 The `cachestack` is a software-defined network that provides underlay networking and caching services for your LAN or routed network and is designed to work closely with [Bitcoin Cache Machine](https://github.com/farscapian/bitcoincachemachine). This helps keep traffic off your Internet connection, which is good for privacy and performance. Other services such as PXE boot for automated provisioning are possible. `cachestack` is meant to be deployed on a reliable always-on x86_x64 computer. `cachestack` is PLANNED to be deployable to three independent commodity x86_x64 for local high availability (this can be achieved with LXD clustering and VXLAN). Bitcoin `cachestack` is installed entirely via the LXD API.
@@ -46,4 +58,4 @@ If you can run modern Ubuntu 18.04, you can run BCS. `cachestack` is exclusively
 Please remember that BCS is for testing purposes only and is under heavy development. REPEAT!!!! BCS SHOULD BE CONSIDERED FOR TESTING PURPOSES ONLY!
 
 You can run BCS as a QEMU/KVM-based VM (see ./docs/installation/multipass.md) or on bare-metal (see ./docs/baremetal.md) running Ubuntu 18.04.  It doesn't really make any sense to run BCS "in the cloud" since its purpose is to provide underlay network services for home and small office settings.
-
+ -->

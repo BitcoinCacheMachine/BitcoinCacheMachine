@@ -4,8 +4,11 @@ storage:
     rootdirectory: /data
 http:
   addr: :5000
+  host: https://bcmnet:5000
   tls:
-    certificate: /var/lib/registry/mirror.cert
-    key: /var/lib/registry/mirror.key
+    certificate: /var/lib/registry/bcmnet:5000.cert
+    key: /var/lib/registry/bcmnet:5000.key
+    clientcas:
+      - /var/lib/registry/ca.crt
 proxy:
   remoteurl: https://registry-1.docker.io

@@ -15,6 +15,12 @@ cd "$(dirname "$0")"
 # file on the admin machine.
 SCRIPT_DIR=$(pwd)
 
+# ensure the machine has snap
+if [[ ! $(snap list | grep multipass) ]]; then
+    # if it doesn't, let's install
+    sudo snap install multipass --beta --classic
+fi
+
 # install LXD on the admin machine.
 sudo apt-get update && sudo apt install -y zfsutils-linux wait-for-it lxd rsync apg fuse libfuse-dev
 
@@ -56,6 +62,29 @@ fi
 
 git add *
 git commit -am "Added ~/.bcm/endpoints directory."
+
+
+# certificates - we store root certificates here
+if [ ! -d ~/.bcm/certs ]; then
+  echo "Creating BCM certs directory at ~/.bcm/certs"
+  mkdir -p ~/.bcm/certs
+
+  # TODO we will change the self-signed root certificate to use Trezor 
+  # generate the private key for the root certificate
+  # Docs: this is essentially the root-of-trust for your software-defined datacenter.
+  # I'll eventually source this key on a bitcoin hardware device using usb-based docker image.
+  openssl genrsa -out ~/.bcm/certs/rootca.key 4096
+
+  # We wil self-sign this certificate
+  # this is what we will install on all BCM LXC hosts as the root certificate to trust; any cert signed by rootca.key will be trusted
+  # and will be used as trust/authentication boundary, i.e., one self-signed Root CA per BIP32 path.
+  openssl req -x509 -subj "/C=US/ST=BCM/L=INTERNET/O=BCM/CN=BCM ROOT CA" -new -nodes -key ~/.bcm/certs/rootca.key -sha256 -days 365 -out ~/.bcm/certs/rootca.cert
+
+  git add *
+  git commit -am "Added ~/.bcm/certs/rootca.key and rootca.cert"
+else
+  echo "BCM certs directory exists at ~/.bcm/certs"
+fi
 
 echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
 

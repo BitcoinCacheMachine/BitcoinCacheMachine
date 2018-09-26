@@ -1,9 +1,9 @@
 version: '3.6'
 services:
   private-registry:
-    image: registry:2.6.2
+    image: registry:latest
     ports: 
-      - "80:5000"
+      - "443:5000"
     volumes:
       - private-registry-data:/data
     environment:
@@ -34,9 +34,9 @@ volumes:
 
 secrets:
   privreg_tls_cert:
-    file: privreg.cert
+    file: bcmnet.cert
   privreg_tls_key:
-    file: privreg.key
+    file: bcmnet.key
 
 configs:
   regmirror_config:

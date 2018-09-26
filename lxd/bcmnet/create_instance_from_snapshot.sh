@@ -10,23 +10,36 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-INSTANCE_NAME=$1 
+LXC_HOST_NAME=$1 
+STACK_NAME=$2
+CERT_CN=$3
 
-lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $INSTANCE_NAME
+lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HOST_NAME
 
-lxc network attach lxdGWLocalNet $INSTANCE_NAME eth0
+lxc network attach lxdGWLocalNet $LXC_HOST_NAME eth0
 
 # create the docker backing for 'bcm-gateway'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_attach_lxc_storage_to_container.sh true $INSTANCE_NAME $INSTANCE_NAME-dockervol"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_attach_lxc_storage_to_container.sh true $LXC_HOST_NAME $LXC_HOST_NAME-dockervol"
 
 # make sure we configure the docker daemon.
-lxc file push daemon.json $INSTANCE_NAME/etc/docker/daemon.json
+lxc file push daemon.json $LXC_HOST_NAME/etc/docker/daemon.json
 
-lxc start $INSTANCE_NAME
+# push the client certificates up to the container before starting it
+# https://docs.docker.com/engine/security/certificates/#creating-the-client-certificates
 
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $INSTANCE_NAME"
 
+lxc start $LXC_HOST_NAME
 
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $LXC_HOST_NAME"
+
+#lxc exec $LXC_HOST_NAME -- mkdir -p /etc/docker/certs.d/bcmnet
+
+lxc file push ~/.bcm/runtime/$(lxc remote get-default)/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.cert $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.cert
+lxc file push ~/.bcm/runtime/$(lxc remote get-default)/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.key $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.key
+lxc file push ~/.bcm/certs/rootca.cert $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/ca.crt
+
+lxc stop $LXC_HOST_NAME
+lxc start $LXC_HOST_NAME
 # lxc exec $INSTANCE_NAME -- systemctl enable docker
 # lxc exec $INSTANCE_NAME -- systemctl start docker
 # # convert the host to allow swarm services. We only need the docker

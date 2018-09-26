@@ -15,6 +15,8 @@ if [[ -z $(env | grep BCM) ]]; then
   exit
 fi
 
+echo "Calling ./app_hosts/down_lxc_apphosts.sh"
+bash -c "./app_hosts/down_lxc_apphosts.sh template"
 
 echo "Calling ./bcmnet/down_lxc_bcmnet.sh"
 bash -c "./bcmnet/down_lxc_bcmnet.sh template"

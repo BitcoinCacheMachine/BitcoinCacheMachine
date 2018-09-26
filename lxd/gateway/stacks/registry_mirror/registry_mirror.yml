@@ -6,8 +6,8 @@ services:
       - "5000:5000"
     volumes:
       - registrymirrorimage-data:/data
-    # environment:
-    #   REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET}
+    environment:
+      REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET}
     configs:
       - source: regmirror_config
         target: /etc/docker/registry/config.yml
@@ -16,12 +16,17 @@ services:
         mode: 0640
     secrets:
       - source: regmirror_tls_cert
-        target: /var/lib/registry/mirror.cert
+        target: /var/lib/registry/bcmnet:5000.cert
         uid: '0'
         gid: '0'
         mode: 0400
       - source: regmirror_tls_key
-        target: /var/lib/registry/mirror.key
+        target: /var/lib/registry/bcmnet:5000.key
+        uid: '0'
+        gid: '0'
+        mode: 0400
+      - source: regmirror_ca_crt
+        target: /var/lib/registry/ca.crt
         uid: '0'
         gid: '0'
         mode: 0400
@@ -31,9 +36,11 @@ services:
 
 secrets:
   regmirror_tls_cert:
-    file: regmirror.cert
+    file: "bcmnet:5000.cert"
   regmirror_tls_key:
-    file: regmirror.key
+    file: "bcmnet:5000.key"
+  regmirror_ca_crt:
+    file: "ca.crt"
 
 configs:
   regmirror_config:

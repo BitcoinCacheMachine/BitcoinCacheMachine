@@ -10,7 +10,7 @@ cd "$(dirname "$0")"
 # quit if there are no multipass environment variables loaded.
 if [[ -z $(env | grep "BCM_MULTIPASS_") ]]; then
   echo "MULTIPASS environment variables not set. Please source update and source ~/bcm/lxd_endpoints.sh"
-  quit
+  exit 1
 fi
 
 # Stopping multipass vm $MULTIPASS_VM_NAME

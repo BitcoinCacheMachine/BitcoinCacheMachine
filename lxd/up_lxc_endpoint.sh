@@ -43,10 +43,8 @@ if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
 fi
 
 
-# if [[ $BCM_BITCOIN_INSTALL = "true" ]]; then
-#   echo "Deploying 'bitcoin' host"
-#   bash -c ./bitcoin/up_lxd_bitcoin.sh
-# fi
+echo "Deploying app_hosts"
+bash -c ./app_hosts/up_lxc_apphosts.sh
 
 
 

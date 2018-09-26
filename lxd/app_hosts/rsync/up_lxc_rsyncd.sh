@@ -7,28 +7,32 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# let's get a fresh LXC host that's configured to push/pull to gateway registreis
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/create_instance_from_snapshot.sh bcm-rsync-builder"
+# let's create a client certificate for the instance and store it in /etc/docker/certs.d/$INSTANCE_NAME/
+# https://docs.docker.com/engine/security/certificates/#understanding-the-configuration
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/generate_and_sign_client_certificate.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME rsyncd rsyncd-registry-mirror-client"
 
-lxc exec bcm-rsync-builder -- mkdir -p /apps/rsyncd
+# let's get a fresh LXC host that's configured to push/pull to gateway registreis
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/create_instance_from_snapshot.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME rsyncd rsyncd-registry-mirror-client"
+
+lxc exec $BCM_BCMNETINST_RSYNC_BUILDER_NAME -- mkdir -p /apps/rsyncd
 
 lxc file push ./image/Dockerfile bcm-rsync-builder/apps/rsyncd/Dockerfile
-lxc file push ./image/entrypoint.sh bcm-rsync-builder/apps/rsyncd/entrypoint.sh
+lxc file push ./image/entrypoint.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME/apps/rsyncd/entrypoint.sh
 
 # build the rsync image. We don't need to put it in a private registry I don't think.
-lxc exec bcm-rsync-builder -- docker build -t bcm-rsync:latest /apps/rsyncd
-lxc exec bcm-rsync-builder -- docker push bcm-rsync:latest
+lxc exec $BCM_BCMNETINST_RSYNC_BUILDER_NAME -- docker build -t bcm-rsync:latest /apps/rsyncd
+lxc exec $BCM_BCMNETINST_RSYNC_BUILDER_NAME -- docker push bcm-rsync:latest
 
-lxc delete --force bcm-rsync-builder
-lxc storage delete bcm-rsync-builder-dockervol
+# lxc delete --force $BCM_BCMNETINST_RSYNC_BUILDER_NAME
+# lxc storage delete $BCM_BCMNETINST_RSYNC_BUILDER_NAME-dockervol
+
+
+
+
 
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/delete_instance.sh bcm-rsync-builder"
+#bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/delete_instance.sh bcm-rsync-builder"
 
-
-
-# # let's get a fresh LXC host that's on bcmnet
-# bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/create_instance_from_snapshot.sh rsync"
 
 
 

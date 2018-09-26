@@ -41,7 +41,6 @@ if [[ -z $(lxc image list | grep bcm-template) ]]; then
     lxc exec dockertemplate -- apt-get clean
     lxc exec dockertemplate -- rm -rf /tmp/*
 
-
     # stop the template since we don't need it running anymore.
     lxc stop dockertemplate
 

@@ -13,11 +13,10 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# delete container 'bcm-gateway'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_BCMNETTEMPLATE_CONTAINER_DELETE $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME"
+bash -c ./rsync/down_lxc_rsyncd.sh
 
-# delete networks
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh $BCM_BCMNETTEMPLATE_NETWORK_LXDBR0CACHESTACK_DELETE lxdbrCachestack"
+# delete container 'bcm-gateway'
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh rsync rsync_template"
 
 # delete 'BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_BCMNETTEMPLATE_STORAGE_DOCKERVOL_DELETE bcm-bcmnet-template-dockervol"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh rsync bcm-bcmnet-rsync-dockervol"
