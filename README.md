@@ -36,6 +36,8 @@ If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/)
 
 Documentation can be found in each directory and in the wiki. Readme files in each directory tell you what you need to know about deploying the various infrastructure components at that level. [README.md](./multipass/README.md) details the requirements for running BCM in a multipass-based VM and provides simple instructions for getting started. But before you begin, clone this repository to your machine--the machine that will execute BCM shell (BASH) scripts. In the documentation, this machine is referred to as the `admin machine` since it manages sensitive information (passwords, certificates, etc.) and is required for administrative installations or changes.
 
+# Getting Started
+
 Clone the BCM reference implementation on to the `admin machine` and cd into the root of the repository. Open a terminal then run the following commands to get started:
 
 ```bash
@@ -45,9 +47,11 @@ cd ~/git/github/bcm
 ./setup.sh
 ```
 
-`./setup.sh` prepares the `admin machine` for using BCM scripts. This script creates the directory ~/.bcm, which is where BCM scripts store and manage sensitive BCM deployment options and runtime files. Click [here](./setup_README.md) for more information.
+`./setup.sh` prepares the `admin machine` for using BCM scripts. It also installs LXD on the `admin machine` so you can deploy BCM scripts locally for testing. `./setup.sh` creates the directory ~/.bcm, which is where BCM scripts store and manage sensitive deployment options and runtime files. Click [here](./setup_README.md) for more information.
 
-To continue, consider running [BCM in a multipass-based VM](./multipass). Click [here](./wiki/installation/baremetal.md) if you want to run BCM on a computer running Linux (i.e., bare-metal).
+Decide where you want to run your BCM workload. You can deploy BCM to the `admin machine` for quick and conveient testing. You can consider running BCM in a [multipass-based VM](./multipass/) or in a [cloud provider via cloud-init](./cloud_providers/). `multipass` VMs use lower-level hardware-based virtualization which provide additional security guarantees. In the end, all you need to run BCM component is a LXD endpoint configured and controllable bn your `admin machine`. Use the `lxc remote list`, `lxc remote get-default` and related commands.
+
+Once you have a properly configured LXD endpoint, delve into the ./lxd/ directory. This is where BCM data center components reside. You'll spend a lot of time in this directory.
 
 ## Project Status
 
