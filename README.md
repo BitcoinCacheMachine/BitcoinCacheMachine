@@ -49,9 +49,9 @@ cd ~/git/github/bcm
 
 `./setup.sh` prepares the `admin machine` for using BCM scripts. It also installs LXD on the `admin machine` so you can deploy BCM scripts locally for testing. `./setup.sh` creates the directory ~/.bcm, which is where BCM scripts store and manage sensitive deployment options and runtime files. Click [here](./setup_README.md) for more information.
 
-Decide where you want to run your BCM workload. You can deploy BCM to the `admin machine` for quick and conveient testing. You can consider running BCM in a [multipass-based VM](./multipass/) or in a [cloud provider via cloud-init](./cloud_providers/). `multipass` VMs use lower-level hardware-based virtualization which provide additional security guarantees. In the end, all you need to run BCM component is a LXD endpoint configured and controllable bn your `admin machine`. Use the `lxc remote list`, `lxc remote get-default` and related commands.
+Decide where you want to run your BCM workload. You can deploy BCM to the `admin machine` for quick and convenient testing. You can consider running BCM in a [multipass-based VM](./multipass/) or in a [cloud provider via cloud-init](./cloud_providers/). `multipass` VMs use lower-level hardware-based virtualization which provide additional security guarantees. In the end, all you need to run BCM component is a LXD endpoint configured and controllable by your `admin machine`. Use the `lxc remote list`, `lxc remote get-default` and related commands.
 
-Once you have a properly configured LXD endpoint, delve into the [./lxd/](./lxd/) directory. This is where BCM data center components reside. You'll spend a lot of time in this directory.
+Once you have a properly configured LXD endpoint, delve into the [./lxd/](./lxd/) directory. This is where BCM data center components reside. You'll spend a lot of time in this directory. Scripts in this directory execute against the currently configured LXD remote. By running BASH scripts on the `admin machine`, you can deploy software-defined components to the target LXD endpoint.
 
 ## Project Status
 
