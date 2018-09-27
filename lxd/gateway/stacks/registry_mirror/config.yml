@@ -6,9 +6,7 @@ http:
   addr: :5000
   host: https://bcmnet:5000
   tls:
-    certificate: /var/lib/registry/bcmnet:5000.cert
-    key: /var/lib/registry/bcmnet:5000.key
-    clientcas:
-      - /var/lib/registry/ca.crt
+    certificate: /var/lib/registry/bcmnet.cert
+    key: /var/lib/registry/bcmnet.key
 proxy:
   remoteurl: https://registry-1.docker.io

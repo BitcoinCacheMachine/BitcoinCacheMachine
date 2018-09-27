@@ -1,8 +1,7 @@
 {
     "proxies": {
         "default": {
-            "httpsProxy": "http://bcmnet:3128",
-            "httpProxy": "http://bcmnet:3128"
+            "httpsProxy": "http://bcmnet:3128"
         }
     }
 }

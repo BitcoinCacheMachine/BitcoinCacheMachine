@@ -72,7 +72,7 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_BCMNETTEMPL
 # update docker client to support HTTP/HTTPS
 lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir /root/.docker
 
-#lxc file push docker_client.config.json $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/root/.docker/config.json
+lxc file push docker_client.config.json $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/root/.docker/config.json
 
 lxc stop $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
 

@@ -1,0 +1,4 @@
+
+You can curl from a builder lxc host using the following command:
+
+curl --cacert /etc/docker/certs.d/bcmnet:5000/ca.crt https://bcmnet:5000/v2/_catalog

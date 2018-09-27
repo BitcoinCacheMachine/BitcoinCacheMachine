@@ -1,7 +1,6 @@
 FROM ubuntu:bionic
 
-ENV http_proxy=http://bcmnet:3128 \
-    https_proxy=http://bcmnet:3128
+ENV https_proxy=https://bcmnet:3128
 
 RUN apt-get update -o Acquire::ForceIPv4=true && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     net-tools \

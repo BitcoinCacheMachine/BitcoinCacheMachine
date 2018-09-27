@@ -13,11 +13,22 @@ services:
         uid: '0'
         gid: '0'
         mode: 0644
-      - source: squid_ca_cert
-        target: /etc/squid/ssl_cert/myCA.pem
+    secrets:
+      - source: squid_tls_cert
+        target: /etc/squid/ssl_cert/squid.cert
         uid: '0'
         gid: '0'
-        mode: 0644
+        mode: 0400
+      - source: squid_tls_key
+        target: /etc/squid/ssl_cert/squid.key
+        uid: '0'
+        gid: '0'
+        mode: 0400
+      - source: squid_ca_cert
+        target: /etc/squid/ssl_cert/ca.crt
+        uid: '0'
+        gid: '0'
+        mode: 0400
     deploy:
       mode: replicated
       replicas: 1
@@ -29,9 +40,13 @@ volumes:
 configs:
   squid_config:
     file: squid.conf
-  squid_ca_cert:
-    file: ca.pem
-    
+
+secrets:
+  squid_tls_cert:
+    file: squid.cert
+  squid_tls_key:
+    file: squid.key
+
 networks:
   hostnet:
     external: true
