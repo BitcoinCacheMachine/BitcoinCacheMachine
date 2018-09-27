@@ -51,7 +51,7 @@ cd ~/git/github/bcm
 
 Decide where you want to run your BCM workload. You can deploy BCM to the `admin machine` for quick and conveient testing. You can consider running BCM in a [multipass-based VM](./multipass/) or in a [cloud provider via cloud-init](./cloud_providers/). `multipass` VMs use lower-level hardware-based virtualization which provide additional security guarantees. In the end, all you need to run BCM component is a LXD endpoint configured and controllable bn your `admin machine`. Use the `lxc remote list`, `lxc remote get-default` and related commands.
 
-Once you have a properly configured LXD endpoint, delve into the ./lxd/ directory. This is where BCM data center components reside. You'll spend a lot of time in this directory.
+Once you have a properly configured LXD endpoint, delve into the [./lxd/](./lxd/) directory. This is where BCM data center components reside. You'll spend a lot of time in this directory.
 
 ## Project Status
 
