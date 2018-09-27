@@ -16,12 +16,12 @@ services:
         mode: 0640
     secrets:
       - source: privreg_tls_cert
-        target: /var/lib/registry/bcmnet.cert
+        target: /var/lib/registry/privreg.cert
         uid: '0'
         gid: '0'
         mode: 0400
       - source: privreg_tls_key
-        target: /var/lib/registry/bcmnet.key
+        target: /var/lib/registry/privreg.key
         uid: '0'
         gid: '0'
         mode: 0400
@@ -34,9 +34,9 @@ volumes:
 
 secrets:
   privreg_tls_cert:
-    file: "bcmnet.cert"
+    file: bcmnet.cert
   privreg_tls_key:
-    file: "bcmnet.key"
+    file: bcmnet.key
 
 configs:
   regmirror_config:

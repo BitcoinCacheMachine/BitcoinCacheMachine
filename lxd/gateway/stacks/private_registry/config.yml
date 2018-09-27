@@ -4,7 +4,6 @@ storage:
     rootdirectory: /data
 http:
   addr: :5000
-  host: https://bcmnet:443
   tls:
-    certificate: /var/lib/registry/bcmnet.cert
-    key: /var/lib/registry/bcmnet.key
+    certificate: /var/lib/registry/privreg.cert
+    key: /var/lib/registry/privreg.key

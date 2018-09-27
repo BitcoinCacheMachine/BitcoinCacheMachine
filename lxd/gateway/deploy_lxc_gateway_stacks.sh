@@ -13,8 +13,8 @@ if [[ $BCM_GATEWAY_STACKS_PRIVATEREGISTRY_DEPLOY = "true" ]]; then
     lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 192.168.4.1:443
 fi
 
-# Deploy squid
-if [[ $BCM_GATEWAY_STACKS_SQUID_DEPLOY = "true" ]]; then
-    bash -c "./stacks/squid/up_lxc_squid.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
-    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 192.168.4.1:3128
-fi
+# # Deploy squid
+# if [[ $BCM_GATEWAY_STACKS_SQUID_DEPLOY = "true" ]]; then
+#     bash -c "./stacks/squid/up_lxc_squid.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
+#     lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 192.168.4.1:3128
+# fi
