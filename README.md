@@ -1,9 +1,10 @@
 
 # <img src="./resources/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> Bitcoin Cache Machine
 
-Bitcoin Cache Machine (BCM) is an event-driven, software-defined data center created for developers, individuals, and small businesses wanting to own and operate their own bitcoin-related payment infrastructure. It's a Personal Financial Operating System (PFOS) based entirely on the ONLY secure blockchain--Bitcoin (as determined by the fabulous open-source implementation we call Bitcoin Core)! It's a platform for your Bitcoin-based business.
+Bitcoin Cache Machine is open-source software that implements a self-hosted, privacy-centric, software-defined network. BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization. Its broad purpose is to software-define your home, office, or cloud networks with resilient privacy-preserving Bitcoin-related payment and operating IT infrastructure.
 
-**IMPORTANT! BCM is intended for testing purposes ONLY! It is very new and under heavy development by a single author and HAS NOT undergone a formal security evaluation and it is VERY likely to have vulnerabilities. USE AT YOUR OWN RISK!!!**
+> **IMPORTANT!**
+> BCM is intended for testing purposes ONLY! It is very new and under heavy development by a single author and HAS NOT undergone a formal security > evaluation and it is VERY likely to have vulnerabilities. USE AT YOUR OWN RISK!!!**
 
 BCM deploys in a fully automated way and runs on bare-metal Linux, in a VM, on-premise (preferred), or in the cloud (i.e., on someone elses computer!). It's consists entirely of open-source software. BCM is MIT licensed, so fork away and feel free to submit pull requests with your awesome ideas for improvement!
 
@@ -11,7 +12,7 @@ BCM deploys in a fully automated way and runs on bare-metal Linux, in a VM, on-p
 
 If you're involved with Bitcoin, you will undoubtedly understand the importance of [running your own fully-validating bitcoin node](https://medium.com/@lopp/securing-your-financial-sovereignty-3af6fe834603) and operating your own IT infrastructure. Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your software up-to-date? Is your wallet software configured to consult your trusted full node? Has TOR for these services been tested properly? Are you routing your DNS queries over TOR? Are you backing up user critical data in real time?
 
-There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined home and office automation network. It's a self-hosted software-defined data center for Bitcoin maximalists.
+There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined home and office automation network. It's a data center for sovereign individuals.
 
 Bitcoin Cache Machine dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest.
 
@@ -32,9 +33,13 @@ Below you will find some of the development goals for Bitcoin Cache Machine:
 
 `BCM SHOULD BE CONSIDERED FOR TESTING PURPOSES ONLY!!! IT HAS NOT UNDERGONE A FORMAL SECURITY EVALUATION!!!`
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. You can run BCM in a hardware-based VM, directly on bare-metal, or in "the cloud". Bitcoin Cache Machine components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can deploy BCM to any LXD-capable endpoint! LXD is widely available on various free and open-source linux platforms. BCM has been developed and primarily tested using Ubuntu 18.04.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have an always-on computer with a reliable Internet connection. You might consider putting this computer on a UPS (an el-cheapo suffices; BCM and its components all ASSUME that the computers are running on are commodity hardware!
 
-Documentation can be found in each directory and in the wiki. Readme files in each directory tell you what you need to know about deploying the various infrastructure components at that level. [README.md](./multipass/README.md) details the requirements for running BCM in a multipass-based VM and provides simple instructions for getting started. But before you begin, clone this repository to your machine--the machine that will execute BCM shell (BASH) scripts. In the documentation, this machine is referred to as the `admin machine` since it manages sensitive information (passwords, certificates, etc.) and is required for administrative installations or changes.
+ You can run BCM in a hardware-based VM, directly on bare-metal, or in "the cloud". Bitcoin Cache Machine components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can deploy BCM components to any LXD-capable endpoint! LXD is widely available on various free and open-source linux platforms. Stable BCM releases will usually follow the lastest Ubuntu LTS, which is 18.04 as of Oct 2018. This includes cloud images used by multipass, LXD base images (from the public "image:" server), and Docker base images from [http://dockerhub.com/](DockerHub).
+
+Documentation for BCM and its components can be found in this source repository. Readme files in each directory tell you what you need to know about deploying the various infrastructure components at that level. For example, [the multipass README.md](./multipass/README.md) details the requirements for running BCM in a multipass-based VM and provides and directs the reader on what steps might be taken next and in which directory those steps might be found. 
+
+But before you begin, clone this repository to your machine--the machine that will execute BCM shell (BASH) scripts. In the documentation, this machine is referred to as the `admin machine` since it manages sensitive information (passwords, certificates, etc.) and is required for administrative installations or changes.
 
 # Getting Started
 

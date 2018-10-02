@@ -9,7 +9,7 @@ set -e
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
 cd "$(dirname "$0")"
-
+LXD_REMOTE=$(lxc remote get-default)
 LXC_HOST_NAME=$1 
 STACK_NAME=$2
 CERT_CN=$3
@@ -32,10 +32,10 @@ lxc start $LXC_HOST_NAME
 
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $LXC_HOST_NAME"
 
-#lxc exec $LXC_HOST_NAME -- mkdir -p /etc/docker/certs.d/bcmnet
+lxc exec $LXC_HOST_NAME -- mkdir -p /etc/docker/certs.d/bcmnet
 
-lxc file push ~/.bcm/runtime/$(lxc remote get-default)/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.cert $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.cert
-lxc file push ~/.bcm/runtime/$(lxc remote get-default)/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.key $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.key
+lxc file push ~/.bcm/runtime/$LXD_REMOTE/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.cert $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.cert
+lxc file push ~/.bcm/runtime/$LXD_REMOTE/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.key $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.key
 lxc file push ~/.bcm/certs/rootca.cert $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/ca.crt
 
 lxc stop $LXC_HOST_NAME
