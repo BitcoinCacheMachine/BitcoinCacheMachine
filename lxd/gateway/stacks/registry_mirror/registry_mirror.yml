@@ -36,9 +36,9 @@ services:
 
 secrets:
   regmirror_tls_cert:
-    file: "bcmnet:5000.cert"
+    file: "server.cert"
   regmirror_tls_key:
-    file: "bcmnet:5000.key"
+    file: "server.key"
   regmirror_ca_crt:
     file: "ca.crt"
 

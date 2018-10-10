@@ -4,42 +4,43 @@
 # that's connected to either lxdGWLocalNet for standalone deployments
 # or uses macvlan to connect to physical network interface.
 
-set -e
+set -eu
 
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
 cd "$(dirname "$0")"
-LXD_REMOTE=$(lxc remote get-default)
-LXC_HOST_NAME=$1 
-STACK_NAME=$2
-CERT_CN=$3
+export LXC_REMOTE=$(lxc remote get-default)
+export LXC_HOST=$1
+export STACK_NAME=$2
+export CERT_CN=$3
+export DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$STACK_NAME
 
-lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HOST_NAME
+lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HOST
 
-lxc network attach lxdGWLocalNet $LXC_HOST_NAME eth0
+lxc network attach lxdGWLocalNet $LXC_HOST eth0
 
 # create the docker backing for 'bcm-gateway'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_attach_lxc_storage_to_container.sh true $LXC_HOST_NAME $LXC_HOST_NAME-dockervol"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_attach_lxc_storage_to_container.sh true $LXC_HOST $LXC_HOST-dockervol"
 
 # make sure we configure the docker daemon.
-lxc file push daemon.json $LXC_HOST_NAME/etc/docker/daemon.json
+lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json
 
 # push the client certificates up to the container before starting it
 # https://docs.docker.com/engine/security/certificates/#creating-the-client-certificates
 
 
-lxc start $LXC_HOST_NAME
+lxc start $LXC_HOST
 
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $LXC_HOST_NAME"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $LXC_HOST"
 
-lxc exec $LXC_HOST_NAME -- mkdir -p /etc/docker/certs.d/bcmnet
+lxc exec $LXC_HOST -- mkdir -p /etc/docker/certs.d/bcmnet:5000
 
-lxc file push ~/.bcm/runtime/$LXD_REMOTE/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.cert $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.cert
-lxc file push ~/.bcm/runtime/$LXD_REMOTE/$LXC_HOST_NAME/$STACK_NAME/$CERT_CN.key $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/client.key
-lxc file push ~/.bcm/certs/rootca.cert $LXC_HOST_NAME/etc/docker/certs.d/bcmnet:5000/ca.crt
+lxc file push $DIR/$CERT_CN.cert $LXC_HOST/etc/docker/certs.d/bcmnet:5000/client.cert
+lxc file push $DIR/$CERT_CN.key $LXC_HOST/etc/docker/certs.d/bcmnet:5000/client.key
+lxc file push ~/.bcm/certs/rootca.cert $LXC_HOST/etc/docker/certs.d/bcmnet:5000/ca.crt
 
-lxc stop $LXC_HOST_NAME
-lxc start $LXC_HOST_NAME
+lxc stop $LXC_HOST
+lxc start $LXC_HOST
 # lxc exec $INSTANCE_NAME -- systemctl enable docker
 # lxc exec $INSTANCE_NAME -- systemctl start docker
 # # convert the host to allow swarm services. We only need the docker

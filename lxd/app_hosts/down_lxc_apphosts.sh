@@ -18,5 +18,3 @@ bash -c ./rsync/down_lxc_rsyncd.sh
 # delete container 'bcm-gateway'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh rsync rsync_template"
 
-# delete 'BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh rsync bcm-bcmnet-rsync-dockervol"
