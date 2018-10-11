@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eu
 
 echo "Copying /data/bitcoin.conf to /root/.bitcoin/bitcoin.conf so the bitcoin-cli works without issue"

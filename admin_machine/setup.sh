@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script iniitalizes the management computer that is executing 
 # BCM-related LXD and multipass scripts against (local) or remote LXD
@@ -38,7 +38,7 @@ if [ ! -f ~/.bcm/endpoints/local.env ]; then
   echo "Creating ~/.bcm/endpoints/local.env"
   touch ~/.bcm/endpoints/local.env
 
-  echo "#!/bin/bash" >> ~/.bcm/endpoints/local.env
+  echo "#!/usr/bin/env bash" >> ~/.bcm/endpoints/local.env
 else
   echo "BCM endpoints config directory exists at ~/.bcm/endpoints"
 fi

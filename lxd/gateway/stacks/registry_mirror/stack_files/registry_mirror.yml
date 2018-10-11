@@ -16,12 +16,12 @@ services:
         mode: 0640
     secrets:
       - source: regmirror_tls_cert
-        target: /var/lib/registry/bcmnet:5000.cert
+        target: /var/lib/registry/regmirror:5000.cert
         uid: '0'
         gid: '0'
         mode: 0400
       - source: regmirror_tls_key
-        target: /var/lib/registry/bcmnet:5000.key
+        target: /var/lib/registry/regmirror:5000.key
         uid: '0'
         gid: '0'
         mode: 0400
@@ -36,9 +36,9 @@ services:
 
 secrets:
   regmirror_tls_cert:
-    file: registrymirror.cert
+    file: regmirror.cert
   regmirror_tls_key:
-    file: registrymirror.key
+    file: regmirror.key
   regmirror_ca_crt:
     file: ca.crt
 

@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   squid:
-    image: sameersbn/squid
+    image: farscapian/bcm-squid
     ports:
       - "3128:3128"
     volumes:

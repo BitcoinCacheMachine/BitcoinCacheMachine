@@ -1,4 +1,4 @@
-# #!/bin/bash
+# #!/usr/bin/env bash
 
 # # TODO create a way to dynamically determine if dependencies are running...
 

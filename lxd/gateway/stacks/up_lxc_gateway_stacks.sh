@@ -1,21 +1,13 @@
 #!/bin/bash
 
+# this script loops through the lines in ./stack_options.csv which guide the script
+# on which stacks to deploy.
+
 set -eu
 
 cd "$(dirname "$0")"
 
-
-cat stack_options.csv | while read line; do
-    IFS=, read -ra values <<< $line
-    STACK=${values[0]}
-    CERTCN=${values[1]} 
-    BCMDEPLOYMENTVAR=${values[2]}
-    TCPPORT=${values[3]}
-
-    echo "$STACK, $CERTCN, $BCMDEPLOYMENTVAR, $TCPPORT"
-
-    if [ eval $BCMDEPLOYMENTVAR = "true" ]; then
-        echo "Wating for 192.168.4.1:$TCPPORT"
-        lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 "192.168.4.1:$TCPPORT"
-    fi
-done
+# arguments are "stack_name", "cert_cn/dns_name", and "tcpport"
+bash -c ./registry_mirror/up_lxc_registrymirror.sh
+bash -c ./private_registry/up_lxc_privateregistry.sh
+bash -c ./squid/up_lxc_squid.sh

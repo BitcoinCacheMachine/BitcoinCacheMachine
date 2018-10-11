@@ -43,20 +43,20 @@ But before you begin, clone this repository to your machine--the machine that wi
 
 # Getting Started
 
-Clone the BCM reference implementation on to the `admin machine` and cd into the root of the repository. Open a terminal then run the following commands to get started:
+Clone the BCM reference implementation on to the `admin machine` and cd into the `admin_machine` directory at the root of the repository. Open a terminal then run the following commands to get started:
 
 ```bash
 mkdir -p ~/git/github/bcm
 git clone https://github.com/BitcoinCacheMachine/BitcoinCacheMachine ~/git/github/bcm
-cd ~/git/github/bcm
+cd ~/git/github/bcm/admin_machine
 ./setup.sh
 ```
 
-`./setup.sh` prepares the `admin machine` for using BCM scripts. It also installs LXD on the `admin machine` so you can deploy BCM scripts locally for testing. docker-ce is also installed so you can run containers locally on the `admin machine` which facilitates USB mounting for hardware wallets. `./setup.sh` creates the directory ~/.bcm, which is where BCM scripts store and manage sensitive deployment options and runtime files. Click [here](./setup_README.md) for more information.
+`./setup.sh` prepares the `admin machine` for using BCM scripts. It also installs LXD on the `admin machine` so you can deploy BCM scripts locally for testing. docker-ce is also installed on the `admin machine` so you can run doccker containers locally. This allows the BCM admin machine to function without having to install a bunch of new software on your machine. `admin_machine/setup.sh` creates the directory ~/.bcm, which is where BCM scripts store and manage sensitive deployment options and runtime files. Click [here](./setup_README.md) for more information.
 
 Decide where you want to run your BCM workload. You can deploy BCM to the `admin machine` for quick and convenient testing. You can consider running BCM in a [multipass-based VM](./multipass/) or in a [cloud provider via cloud-init](./cloud_providers/). `multipass` VMs use lower-level hardware-based virtualization which provide additional security guarantees. In the end, all you need to run BCM component is a LXD endpoint configured and controllable by your `admin machine`. Use the `lxc remote list`, `lxc remote get-default` and related commands.
 
-Once you have a properly configured LXD endpoint, delve into the [./lxd/](./lxd/) directory. This is where BCM data center components reside. You'll spend a lot of time in this directory. Scripts in this directory execute against the currently configured LXD remote. By running BASH scripts on the `admin machine`, you can deploy software-defined components to the target LXD endpoint.
+Once you have a properly configured LXD endpoint, delve into the [./lxd/](./lxd/) directory. This is where you can deploy BCM data center components. Scripts in this directory are executed against the `admin machine` active LXD remote (run `lxc remote get-default)`. By running BASH scripts on the `admin machine`, you can deploy software-defined components to the target LXD endpoint.
 
 ## Project Status
 
