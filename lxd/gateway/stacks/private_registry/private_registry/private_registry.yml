@@ -34,9 +34,9 @@ volumes:
 
 secrets:
   privreg_tls_cert:
-    file: bcmnet.cert
+    file: "privreg.cert"
   privreg_tls_key:
-    file: bcmnet.key
+    file: "privreg.key"
 
 configs:
   regmirror_config:

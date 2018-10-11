@@ -9,11 +9,11 @@ set -eu
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
 cd "$(dirname "$0")"
-export LXC_REMOTE=$(lxc remote get-default)
-export LXC_HOST=$1
-export STACK_NAME=$2
-export CERT_CN=$3
-export DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$STACK_NAME
+LXC_REMOTE=$(lxc remote get-default)
+LXC_HOST=$1
+STACK_NAME=$2
+CERT_CN=$3
+DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$STACK_NAME
 
 lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HOST
 

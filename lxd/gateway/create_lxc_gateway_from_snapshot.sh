@@ -6,7 +6,7 @@ set -eu
 cd "$(dirname "$0")"
 
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
-bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
+#bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
 # if bcm-template lxc image exists, run the gateway template creation script.
 if [[ -z $(lxc info $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME | grep BCMGatewayTemplate) ]]; then
@@ -56,4 +56,4 @@ lxc restart $BCM_LXC_GATEWAY_CONTAINER_NAME
 
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
 
-bash -c ./deploy_lxc_gateway_stacks.sh
+bash -c ./stacks/up_lxc_gateway_stacks.sh

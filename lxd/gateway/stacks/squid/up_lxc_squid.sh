@@ -1,18 +1,31 @@
 #!/bin/bash
 
-# set the working directory to the location where the script is located
+set -e
+
 cd "$(dirname "$0")"
 
-bash -c "$BCM_LOCAL_GIT_REPO/docker_images/gateway/bcm-squid/build_lxd_bcm-squid.sh $BCM_LXC_GATEWAY_CONTAINER_NAME $BCM_DOCKER_BUILD_DOMAIN_IMAGE_PREFIX"
+LXC_REMOTE=$(lxc remote get-default)
+LXC_HOST=$BCM_LXC_GATEWAY_CONTAINER_NAME
+LXC_STACK="squid"
+CERT_CN="squid"
+
+DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$LXC_STACK
 
 # Let's generate some HTTPS certificates for the new registry mirror.
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/generate_certificate.sh $BCM_LXC_GATEWAY_CONTAINER_NAME squid bcmnet"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/generate_and_sign_client_certificate.sh $BCM_LXC_GATEWAY_CONTAINER_NAME $LXC_STACK $CERT_CN"
 
-echo "Deploying squid to 'bcm-gateway'."
-lxc exec bcm-gateway -- mkdir -p /apps/squid
+if [[ -d $DIR ]]; then
+    echo "Deploying $LXC_STACK to LXC host $LXC_HOST on LXD endpoint $LXC_REMOTE."
 
-lxc file push squid.yml bcm-gateway/apps/squid/squid.yml
-lxc file push squid.conf bcm-gateway/apps/squid/squid.conf
-lxc file push ~/.bcm/runtime/$(lxc remote get-default)/bcm-gateway/squid/squid.cert bcm-gateway/apps/squid/squid_ca.cert
-lxc file push ~/.bcm/runtime/$(lxc remote get-default)/bcm-gateway/squid/squid.key bcm-gateway/apps/squid/ca.pem
-lxc exec bcm-gateway -- docker stack deploy -c /apps/squid/squid.yml squid
+    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- mkdir -p /apps/$LXC_STACK
+
+    lxc file push squid.yml $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/squid.yml
+    lxc file push squid.conf $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/squid.conf
+
+    lxc file push $DIR/$CERT_CN.cert $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/$CERT_CN.cert
+    lxc file push $DIR/$CERT_CN.key $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/$CERT_CN.pem
+    lxc file push ~/.bcm/certs/rootca.cert $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/ca.crt
+
+    lxc exec bcm-gateway -- docker pull sameersbn/squid
+    lxc exec bcm-gateway -- docker stack deploy -c /apps/squid/squid.yml squid
+fi

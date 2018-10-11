@@ -6,8 +6,9 @@ cd "$(dirname "$0")"
 
 LXC_REMOTE=$(lxc remote get-default)
 LXC_HOST=$BCM_LXC_GATEWAY_CONTAINER_NAME
-LXC_STACK="registry_mirror"
-CERT_CN="registrymirror"
+LXC_STACK=$1
+CERT_CN=$2
+TCP_PORT=$3
 
 DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$LXC_STACK
 
@@ -18,18 +19,14 @@ if [[ -d $DIR ]]; then
     echo "Deploying $LXC_STACK to LXC host $LXC_HOST on LXD endpoint $LXC_REMOTE."
 
     lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- mkdir -p /apps/$LXC_STACK
-    lxc file push config.yml $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/config.yml
-    lxc file push registry_mirror.yml $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/registry_mirror.yml
+
+    lxc file push ./$LXC_STACK/$LXC_STACK/ $LXC_HOST/apps/ -p -r
 
     lxc file push $DIR/$CERT_CN.cert $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/$CERT_CN.cert
     lxc file push ~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$LXC_STACK/$CERT_CN.key $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/$CERT_CN.key
     lxc file push ~/.bcm/certs/rootca.cert $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/ca.crt
 
-    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- chown root:root /apps/$LXC_STACK/$CERT_CN.cert
-    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- chown root:root /apps/$LXC_STACK/$CERT_CN.key
-    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- chown root:root /apps/$LXC_STACK/ca.crt
+    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker stack deploy -c /apps/$LXC_STACK/$LXC_STACK.yml $CERTCN
 
-    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker stack deploy -c /apps/$LXC_STACK/registry_mirror.yml regmirror
 
-    lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- wait-for-it -t 0 192.168.4.1:5000
 fi

@@ -15,14 +15,6 @@ cd "$(dirname "$0")"
 # file on the admin machine.
 SCRIPT_DIR=$(pwd)
 
-# ensure the machine has snap
-if [[ ! $(snap list | grep multipass) ]]; then
-    # if it doesn't, let's install
-    sudo snap install multipass --beta --classic
-fi
-
-# install LXD on the admin machine.
-sudo apt-get update && sudo apt install -y zfsutils-linux wait-for-it lxd rsync apg fuse libfuse-dev
 
 # TODO implemented encfs on ~/.bcm
 # TODO initialize ~/.bcm as git repo.

@@ -14,6 +14,9 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/generate_and_sign_client_certificate.sh 
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/create_instance_from_snapshot.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME rsyncd $BCM_BCMNETINST_RSYNC_BUILDER_NAME"
 
+#for debugging in curl
+lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- apt-get install strace -y
+
 lxc exec $BCM_BCMNETINST_RSYNC_BUILDER_NAME -- mkdir -p /apps/rsyncd
 
 lxc file push ./image/Dockerfile bcm-rsync-builder/apps/rsyncd/Dockerfile

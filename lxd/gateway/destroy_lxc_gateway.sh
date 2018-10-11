@@ -11,7 +11,6 @@ bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 # get the current directory where this script is so we can reference it later.
 SCRIPT_DIR=$(pwd)
 
-
 # delete container 'bcm-gateway'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_GATEWAY_CONTAINER_DELETE $BCM_LXC_GATEWAY_CONTAINER_NAME"
 
@@ -29,3 +28,5 @@ if [[ $1 == "template" ]]; then
     bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh $BCM_GATEWAY_NETWORKS_DELETE lxdbrGateway"
     bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh $BCM_GATEWAY_NETWORKS_DELETE lxdGWLocalNet"
 fi
+
+rm -rf ~/.bcm/runtime/$(lxc remote get-default)/$BCM_LXC_GATEWAY_CONTAINER_NAME

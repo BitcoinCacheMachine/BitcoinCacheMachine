@@ -30,7 +30,7 @@ configs:
   squid_config:
     file: squid.conf
   squid_ca_cert:
-    file: ca.pem
+    file: ca.crt
     
 networks:
   hostnet:

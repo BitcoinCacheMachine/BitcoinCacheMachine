@@ -7,7 +7,7 @@ set -e
 cd "$(dirname "$0")"
 
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
-bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
+#bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
 # quit if there are no BCM environment variables
 if [[ -z $(env | grep BCM_) ]]; then
@@ -21,7 +21,6 @@ fi
 if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]]; then
   # then we're going to arrive at 'bcm-template' by creating it ourselves'
   bash -c ./host_template/up_lxc_host_template.sh
-
 else
   # this is the logic that is taken when the administrator has specified a
   # custom LXD image server which is typical of home and offince network deployments

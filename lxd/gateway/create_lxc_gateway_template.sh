@@ -61,17 +61,17 @@ lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- apt-get install -y ufw tor
 lxc file push torrc $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/etc/tor/torrc
 
 
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on localhost proto udp to any port 9053 #incoming TOR DNS requests from local (probably docker) processes.
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 9050 #OUTBOUND TOR
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3128 # HTTP PROXYs
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3129 # HTTP redirect to HTTPS
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3130 # HTTPS
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 80 # 80 for Docker Private REgistry
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on localhost proto udp to any port 9053 # incoming DNS requests go over TOR
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 9050 # For TOR proxy (TODO)
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3128 # HTTPS squid proxy
+#lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3129 # HTTP redirect to HTTPS
+#lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 3130 # HTTPS
+#lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 80 # 80 for Docker Private REgistry
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 5000 # 5000 for docker registry pull through cache.
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto tcp to any port 53 #DNS
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto udp to any port 53 #DNS
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto udp to any port 67 #DHCP
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto udp to any port 69 #TFTP
+#lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw allow in on eth1 proto udp to any port 69 #TFTP
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw enable
 
 

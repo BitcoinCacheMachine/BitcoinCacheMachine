@@ -13,7 +13,7 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-bash -c ./rsync/down_lxc_rsyncd.sh
+bash -c ./rsync/destroy_lxc_rsyncd.sh
 
 # delete container 'bcm-gateway'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh rsync rsync_template"
