@@ -6,16 +6,15 @@
 
 set -eu
 
+# set the working directory to the location where the script is located
+# since all file references are relative to this script
 cd "$(dirname "$0")"
-
-# local variables
 LXC_REMOTE=$(lxc remote get-default)
 LXC_HOST=$1
-LXC_STACK=$2
+STACK_NAME=$2
 CERT_CN=$3
-DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$LXC_STACK
+DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$STACK_NAME
 
-# create a new container based on the bcmnet_template snapshot
 lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HOST
 
 lxc network attach lxdGWLocalNet $LXC_HOST eth0
@@ -36,20 +35,12 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $LXC_HOST"
 
 lxc exec $LXC_HOST -- mkdir -p /etc/docker/certs.d/bcmnet:5000
 
-
-lxc file push $DIR/$CERT_CN.cert $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/$CERT_CN.cert
-lxc file push ~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$LXC_STACK/$CERT_CN.key $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/$CERT_CN.key
-lxc file push ~/.bcm/certs/rootca.cert $BCM_LXC_GATEWAY_CONTAINER_NAME/apps/$LXC_STACK/ca.crt
-
-lxc file push $DIR/$CERT_CN.cert $LXC_HOST/etc/docker/certs.d/regmirror:5000/client.cert
-lxc file push $DIR/$CERT_CN.key $LXC_HOST/etc/docker/certs.d/regmirror:5000/client.key
-lxc file push ~/.bcm/certs/rootca.cert $LXC_HOST/etc/docker/certs.d/regmirror:5000/ca.crt
+lxc file push $DIR/$CERT_CN.cert $LXC_HOST/etc/docker/certs.d/bcmnet:5000/client.cert
+lxc file push $DIR/$CERT_CN.key $LXC_HOST/etc/docker/certs.d/bcmnet:5000/client.key
+lxc file push ~/.bcm/certs/rootca.cert $LXC_HOST/etc/docker/certs.d/bcmnet:5000/ca.crt
 
 lxc stop $LXC_HOST
 lxc start $LXC_HOST
-
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $LXC_HOST"
-
 # lxc exec $INSTANCE_NAME -- systemctl enable docker
 # lxc exec $INSTANCE_NAME -- systemctl start docker
 # # convert the host to allow swarm services. We only need the docker

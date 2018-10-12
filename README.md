@@ -1,5 +1,5 @@
 
-# Bitcoin Cache Machine
+# <img src="./resources/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> Bitcoin Cache Machine
 
 Bitcoin Cache Machine is open-source software that implements a self-hosted, privacy-centric, software-defined network. BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization. Its broad purpose is to software-define your home, office, or cloud networks with resilient privacy-preserving Bitcoin-related payment and operating IT infrastructure.
 
@@ -12,7 +12,7 @@ BCM deploys in a fully automated way and runs on bare-metal Linux, in a VM, on-p
 
 If you're involved with Bitcoin, you will undoubtedly understand the importance of [running your own fully-validating bitcoin node](https://medium.com/@lopp/securing-your-financial-sovereignty-3af6fe834603) and operating your own IT infrastructure. Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your software up-to-date? Is your wallet software configured to consult your trusted full node? Has TOR for these services been tested properly? Are you routing your DNS queries over TOR? Are you backing up user critical data in real time?
 
-There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined home and office automation network.
+There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined home and office automation network. It's a data center for sovereign individuals.
 
 Bitcoin Cache Machine dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest.
 
@@ -21,7 +21,7 @@ Bitcoin Cache Machine dramatically lowers the barriers to deploying and operatin
 Below you will find some of the development goals for Bitcoin Cache Machine:
 
 * Provide a self-contained, event-driven, software-defined network that deploys a fully operational Bitcoin and Lightning-related IT infrastructure.
-* Run entirely on commodity x86_x64 hardware for home and small office settings. Run on bare-metal for individual use or run multiple BCM instances on shared infrastructure using [multipass](https://github.com/CanonicalLtd/multipass).
+* Run entirely on commodity x86_x64 hardware for home and small office settings. Run on bare-metal or in a self-hosted or cloud-based VM.
 * Integrate exclusively free and open source software ([FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software))!
 * Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
@@ -66,4 +66,4 @@ BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real
 
 Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate.
 
-[Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)<img src="./resources/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> 
+[Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
