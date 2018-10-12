@@ -29,7 +29,7 @@ else
 fi
 
 # Removing lxc remote vm
-if [[ $(lxc remote get-default) = $BCM_MULTIPASS_VM_NAME ]]; then
+if [[ $(lxc remote list | grep $BCM_MULTIPASS_VM_NAME) ]]; then
     echo "Removing lxd remote $BCM_MULTIPASS_VM_NAME"
     lxc remote set-default local
     lxc remote remove $BCM_MULTIPASS_VM_NAME

@@ -1,0 +1,12 @@
+#cloud-config
+package_upgrade: true
+
+# install host dependencies
+packages:
+  - zfsutils-linux
+  - wait-for-it
+  - tor
+
+write_files:
+  - path: /etc/lxd/preseed.yml
+    content: |

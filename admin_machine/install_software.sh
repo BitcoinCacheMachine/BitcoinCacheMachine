@@ -16,7 +16,9 @@ if [[ ! $(snap list | grep multipass) ]]; then
 fi
 
 # next install LXD/LXC so we can test locally
-sudo apt install -f zfsutils-linux lxd 
+sudo apt install -f zfsutils-linux
+
+sudo snap install lxd --candidate
 
 # and install client tools; TODO move these to a docker container running on the admin machine
 sudo apt-get install -f wait-for-it rsync apg libfuse-dev fuse

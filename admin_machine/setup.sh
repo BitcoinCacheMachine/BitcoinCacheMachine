@@ -33,6 +33,12 @@ if [ ! -d ~/.bcm/endpoints ]; then
   mkdir -p ~/.bcm/endpoints
 fi
 
+# if ~/.bcm/clusters doesn't exist, create it
+if [ ! -d ~/.bcm/clusters ]; then
+  echo "Creating directroy ~/.bcm/clusters"
+  mkdir -p ~/.bcm/clusters
+fi
+
 # if ~/.bcm/endpoints doesn't exist, create it.
 if [ ! -f ~/.bcm/endpoints/local.env ]; then
   echo "Creating ~/.bcm/endpoints/local.env"
