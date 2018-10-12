@@ -13,6 +13,9 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
+# call dependent application destroy scripts
+bash -c "./app_hosts/destroy_lxc_apphosts.sh"
+
 # delete container 'bcm-gateway'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_BCMNETTEMPLATE_CONTAINER_DELETE $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME"
 

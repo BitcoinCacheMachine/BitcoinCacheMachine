@@ -43,7 +43,7 @@ fi
 
 
 echo "Deploying app_hosts"
-bash -c ./app_hosts/up_lxc_apphosts.sh
+bash -c ./bcmnet/app_hosts/up_lxc_apphosts.sh
 
 
 

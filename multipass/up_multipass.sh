@@ -7,13 +7,11 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# set the working directory to the location where the script is located
-# since all file references are relative to this script
-cd "$(dirname "$0")"
-
 # quit if there are no multipass environment variables
-if [[ -z $(env | grep BCM_MULTIPASS_) ]]; then
-  echo "BCM_MULTIPASS_ variables not set. Please source BCM environment variables."
+if [[ -z $(env | grep BCM_MULTIPASS_VM_NAME) ]]; then
+  echo "BCM_MULTIPASS_VM_NAME variable not set. Set BCM_MULTIPASS_VM_NAME to something like 'bcm-01'"
+  echo "  and a default .env file will be stubbed out for you."
+  echo "Note: you can also manually define a .env ~/.bcm/endpoints/"
   exit
 fi
 
@@ -21,16 +19,23 @@ mkdir -p ~/.bcm/runtime/$BCM_MULTIPASS_VM_NAME
 touch ~/.bcm/runtime/$BCM_MULTIPASS_VM_NAME/cloud-init.yml
 
 # if the user has not specified BCM_LXD_SECRET, generate a secure one
-if [ ! -f ~/.bcm/endpoints$BCM_MULTIPASS_VM_NAME.env ]; then
-  BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
+if [ ! -f ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env ]; then
+  echo "~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env doesn't exist. Stubbing one out with default options."
   touch ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
-  cat $BCM_LOCAL_GIT_REPO/resources/bcm/default_endpoints/bcm-01.env >> ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
-  echo "export BCM_LXD_SECRET="$BCM_LXD_SECRET > ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
-else
-  source ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
+  BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
+  cat $BCM_LOCAL_GIT_REPO/resources/bcm/default_endpoints/multipass_default.env >> ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
+  echo "export BCM_LXD_SECRET="'"'$BCM_LXD_SECRET'"' >> ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
+  echo "export BCM_MULTIPASS_PROVISION_LXD="'"'"true"'"' >> ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
+  echo "Please source the updated ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env file and run this script again."
+  echo " :  source ~/.bcm/endpoints/bcm-01.env"
+  exit 1
 fi
 
-# update the cloud-init template and save a local copy in ~/.bcm/runtime/...
+# create a cloud-init file
+if [ ! -f ~/.bcm/runtime/$BCM_MULTIPASS_VM_NAME/cloud-init.yml ]; then
+  echo "~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env doesn't exist. Stubbing one out with default options."
+fi
+
 sed 's/CHANGEME/'$BCM_LXD_SECRET'/g' ./multipass_cloud-init.yml  > ~/.bcm/runtime/$BCM_MULTIPASS_VM_NAME/cloud-init.yml
 
 ## launch the VM based on Ubuntu Bionic
@@ -49,13 +54,13 @@ multipass start $BCM_MULTIPASS_VM_NAME
 # Get the IP address that was given to the multipass VM and add it 
 # as a remote LXD endpoint and configure the local client to execute 
 # commands against it.
-MULTIPASS_VM_IP_ADDRESS=$(multipass list | grep "$BCM_MULTIPASS_VM_NAME" | awk '{ print $3 }')
+VM_IP_ADDRESS=$(multipass list | grep "$BCM_MULTIPASS_VM_NAME" | awk '{ print $3 }')
 
-echo "Waiting for the remote lxd daemon to become avaialable."
-wait-for-it -t 0 $MULTIPASS_VM_IP_ADDRESS:8443
+echo "Waiting for the remote lxd daemon to become avaialable on tcp port 8443."
+wait-for-it -t 0 $VM_IP_ADDRESS:8443
 
-echo "Adding a lxd remote for $BCM_MULTIPASS_VM_NAME at $MULTIPASS_VM_IP_ADDRESS:8443."
-lxc remote add $BCM_MULTIPASS_VM_NAME "$MULTIPASS_VM_IP_ADDRESS:8443" --accept-certificate --password="$BCM_LXD_SECRET"
+echo "Adding a lxd remote for $BCM_MULTIPASS_VM_NAME at $VM_IP_ADDRESS:8443."
+lxc remote add $BCM_MULTIPASS_VM_NAME "$VM_IP_ADDRESS:8443" --accept-certificate --password="$BCM_LXD_SECRET"
 lxc remote set-default "$BCM_MULTIPASS_VM_NAME"
 
 echo "Current lxd remote default is $BCM_MULTIPASS_VM_NAME."

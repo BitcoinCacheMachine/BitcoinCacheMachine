@@ -1,12 +1,13 @@
+
 # Multipass and Bitcoin Cache Machine
 
 `multipass` is software (available as a snap) that orchestrates the creation, management, and maintenance of virtual machines (VMs) and associated Ubuntu images to simplify development. Each VM created by BCM multipass scripts run a cloud-based Ubuntu 18.04 image. 
 
-To run multipass, you must have a computer capable of running QEMU/KVM-based VMs which is typical with a developer or server machine. In some cases, you might have to visit your BIOS to ensure that hardware-based virtualization features are enabled. Low-end laptops typical of the home market may not have the necessary hardware requirements to run BCM in a multipass VM. However, you can always still run BCM on [bare-metal](./lxd/README.md)!  
+To run multipass, you must have a computer capable of running QEMU/KVM-based VMs which is typical with a developer or server machine. In some cases, you might have to visit your BIOS to ensure that hardware-based virtualization features are enabled. Low-end laptops typical of the home market may not have the necessary hardware requirements to run BCM in a multipass VM. However, you can still run BCM on [bare-metal](./lxd/README.md)!  
 
-The files present in this folder are responsible for creating and destroying multipass-based cloud instances for BCM deployment. The scripts are executed against the multipass daemon on the same machine that's executing the script.
+The files in this folder are responsible for creating and destroying multipass-based cloud instances for BCM deployment. The scripts are executed against the multipass daemon on the same machine that's executing the script.
 
-Upon launch, multipass provides the VM with a unique ./multipass_cloud-init.yml file. This file instructs the cloud-init process in the VM to prepare the underlying OS for BCM components. Cloud-init installs the necessary dependencies including ([ZFS](https://en.wikipedia.org/wiki/ZFS) for a lxc container storage container back-end, `wait-for-it` which is helpful to determine when service comes online, and `tor` for (eventually) exposing SSH and and LXD remote API endpoints over authenticated TOR onion sites. By default the cloud-init process initializes the LXD daemon to accept incoming connections on its one (1) external interface. By the end of the multipass creation phase, you should have a remotely accessible LXD endpoint ready to receive BCM commands.
+Upon launch, multipass provides the VM with a unique `./multipass_cloud-init.yml` file. This file instructs the cloud-init process in the VM to prepare the underlying base OS. Cloud-init installs the necessary dependencies including ([ZFS](https://en.wikipedia.org/wiki/ZFS) for a lxc container storage container back-end, `wait-for-it` which is helpful to determine when service comes online, and `tor` for (eventually) exposing SSH and and LXD remote API endpoints over authenticated TOR onion sites. By default the cloud-init process initializes the LXD daemon to accept incoming connections on its one (1) external interface. By the end of the multipass creation phase, you should have a remotely accessible LXD endpoint ready to receive BCM commands.
 
 ## How to run BCM in a multipass VM
 

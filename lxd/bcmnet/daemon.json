@@ -1,4 +1,4 @@
 {
-    "registry-mirrors": ["https://registrymirror:5000"],
-    "insecure-registries": [ "registrymirror" ]
+    "registry-mirrors": ["https://regmirror:5000"],
+    "insecure-registries": [ "regmirror" ]
 }
