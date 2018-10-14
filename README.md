@@ -67,3 +67,14 @@ BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real
 Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate.
 
 [Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
+
+You can also donate to the development of BCM by sending Bitcoin (BTC) to the following PayNym:
+
+On-chain payments:
+
+* [Paynym Public Directory](https://paynym.is/+muddywaterfall4ed)
+* [BIP47 Payment Code](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon)
+
+Lightning Payments:
+
+* Coming soon! Once BCM is near-complete, we will start eating our own dog-food.

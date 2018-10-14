@@ -1,4 +1,0 @@
-
-# Initialize the LXD daemon using the provided preseed.
-runcmd:
-  - cat /etc/lxd/preseed.yml | lxd init --preseed

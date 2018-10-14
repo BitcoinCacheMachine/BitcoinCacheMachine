@@ -1,7 +1,0 @@
-      config:
-        core.https_address: :8443
-        core.trust_password: CHANGEME
-      cluster:
-        server_name: VMNAME
-        enabled: true
-        cluster_password: "cluster"

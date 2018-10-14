@@ -45,6 +45,14 @@ if [[ -d ~/.bcm/runtime/$BCM_MULTIPASS_VM_NAME ]]; then
   rm -rf ~/.bcm/runtime/$BCM_MULTIPASS_VM_NAME
 fi
 
+if [[ -d ~/.bcm/certs/$BCM_MULTIPASS_VM_NAME ]]; then
+  rm -rf ~/.bcm/certs/$BCM_MULTIPASS_VM_NAME
+fi
+
+if [[ -d /tmp/bcm ]]; then
+  rm -rf /tmp/bcm
+fi
+
 cd ~/.bcm
 git add *
 git commit -am "Removed ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env and ~/.bcm/runtime/$BCM_MULTIPASS_VM_NAME"
