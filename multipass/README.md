@@ -24,14 +24,6 @@ You can run BCM in a multipass VM by running the `./up_multipass.sh` script. Bef
 
 The example `./bcm01.env` file creates a new VM named *bcm-01* and provides it with *30G* of disk space, *4G* of memory, and *4* vCPUs. It also directs BCM scripts to provision BCM components to the new multipass VM via the LXD API.
 
-```bash
-#!/bin/bash
 
-export BCM_MULTIPASS_VM_NAME="bcm-01"
-export BCM_MULTIPASS_DISK_SIZE="30G"
-export BCM_MULTIPASS_MEM_SIZE="4G"
-export BCM_MULTIPASS_CPU_COUNT="4"
-export BCM_MULTIPASS_PROVISION_LXD="true"
-```
 
 If you want to create more than one multipass VM, create a file at `~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env` which specifies BCM multipass and BCM-proper deployment options for the endpoint.

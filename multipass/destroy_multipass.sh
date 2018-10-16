@@ -6,24 +6,31 @@ set -eu
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
+VM_NAME=$1
+
+if [[ -z $(multipass list | grep $VM_NAME) ]]; then
+  export BCM_MULTIPASS_VM_NAME=$VM_NAME
+
+  if [[ -f ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env ]]; then
+    source ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env
+  else
+    echo " ~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env does not exit."
+    exit
+  fi
+fi
 
 # quit if there are no multipass environment variables loaded.
-if [[ -z $(env | grep "BCM_MULTIPASS_") ]]; then
-  echo "MULTIPASS environment variables not set. Please source update and source ~/bcm/lxd_endpoints.sh"
+if [[ -z $(env | grep "BCM_MULTIPASS_VM_NAME") ]]; then
+  echo "BCM_MULTIPASS_VM_NAME variable not set."
   exit 1
 fi
 
 # Stopping multipass vm $MULTIPASS_VM_NAME
 if [[ $(multipass list | grep "$BCM_MULTIPASS_VM_NAME") ]]; then
-  if [[ $(multipass list | grep "$BCM_MULTIPASS_VM_NAME") != "No instances found." ]]; then
-    echo "Stopping multipass vm $BCM_MULTIPASS_VM_NAME"
-    sudo multipass stop $BCM_MULTIPASS_VM_NAME
-    sudo multipass delete $BCM_MULTIPASS_VM_NAME
-    sudo multipass purge
-  else
-    echo "No '$BCM_MULTIPASS_VM_NAME' multipass exists to stop, delete, and purge."
-    exit 0
-  fi
+  echo "Stopping multipass vm $BCM_MULTIPASS_VM_NAME"
+  sudo multipass stop $BCM_MULTIPASS_VM_NAME
+  sudo multipass delete $BCM_MULTIPASS_VM_NAME
+  sudo multipass purge
 else
   echo "$BCM_MULTIPASS_VM_NAME doesn't exist."
 fi

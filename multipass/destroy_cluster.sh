@@ -1,12 +1,9 @@
 #!/bin/bash
 
-#!/bin/bash
+set -eu
 
-# brings up LXD cluster of 3 multipass vms.
-
-export BCM_MULTIPASS_VM_NAME="bcm-02"
-bash -c ./destroy_multipass.sh
-
-export BCM_MULTIPASS_VM_NAME="bcm-01"
-bash -c ./destroy_multipass.sh
-
+for vm in "bcm-03" "bcm-02" "bcm-01" "bcm-00"
+do
+    export BCM_MULTIPASS_VM_NAME=$vm
+    bash -c "./destroy_multipass.sh $BCM_MULTIPASS_VM_NAME"
+done
