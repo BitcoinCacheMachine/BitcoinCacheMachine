@@ -11,7 +11,7 @@ if [[ -z $(lxc image list | grep bcm-template) ]]; then
     # only execute if bcm_data is non-zero
     if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
         # initialize the lxc container to the active lxd endpoint. 
-        lxc init bcm-bionic-base -p default -p docker_privileged -s bcm_data dockertemplate
+        lxc init bcm-bionic-base -p default -p docker_privileged -s "$BCM_ZFS_PREFIX-bcm_data" dockertemplate
         lxc start dockertemplate
     fi
 

@@ -16,10 +16,10 @@ lxc network create lxdbrManager1
 echo "Creating lxd network 'managernet' for swarm members."
 lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=false
 
-# create the storage pool if it doesn't exist.
-if [[ -z $(lxc storage list | grep "$bcm_data") ]]; then
-  lxc storage create "$bcm_data" zfs size=10GB
-fi
+# # create the storage pool if it doesn't exist.
+# if [[ -z $(lxc storage list | grep "$bcm_d1ata") ]]; then
+#   lxc storage create "$bcm_d1ata" zfs size=10GB
+# fi
 
 # create the docker profile if it doesn't exist. This may happen when we have an external cachestack 
 # and we didn't create the profile during the host_template creation.
@@ -36,7 +36,7 @@ if [[ -z $(lxc profile list | grep "docker_privileged") ]]; then
 fi
 
 ## Create the manager1 host from the lxd image template.
-lxc init bcm-template manager-template -p docker -p docker_privileged -s $bcm_data
+lxc init bcm-template manager-template -p docker -p docker_privileged -s "$BCM_ZFS_PREFIX-bcm_d1ata"
 
 # push necessary files to the template including daemon.json
 lxc file push ./daemon.json manager-template/etc/docker/daemon.json

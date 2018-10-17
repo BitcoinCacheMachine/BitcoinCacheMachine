@@ -8,9 +8,6 @@ cd "$(dirname "$0")"
 # create and populate the required networks
 bash -c "$BCM_LXD_OPS/create_lxc_network_bridge_nat.sh $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE lxdbr0"
 
-# create and populate the zfs storage backends
-bash -c "$BCM_LXD_OPS/create_lxc_storage_zfs.sh $BCM_STORAGE_BCM_DATA_CREATE bcm_data 10GB"
-
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
 if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then

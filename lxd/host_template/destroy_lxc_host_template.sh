@@ -48,4 +48,4 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_
 # storage
 ####
 # delete lxc storage zfs backend
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_STORAGE_BCM_DATA_DELETE bcm_data"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_STORAGE_BCM_DATA_DELETE $BCM_ZFS_PREFIX-bcm_data"

@@ -28,7 +28,7 @@ echo "Applying bitcoin lxd profile file to lxc profile 'bitcoinprofile'."
 cat ./bitcoin_lxd_profile.yml | lxc profile edit bitcoinprofile
 
 ## Create the manager1 host from the lxd image template.
-lxc init bcm-template bitcoin -p docker -p docker_privileged -s $bcm_data
+#lxc init bcm-template bitcoin -p docker -p docker_privileged -s $bcm_d1ata  ### changed bcm_d1ata to bcm_d1ata to mess up search;
 
 echo "Applying the lxd profiles 'bitcoinprofile' and 'default' to the lxd host 'bitcoin'."
 lxc profile apply bitcoin default,bitcoinprofile

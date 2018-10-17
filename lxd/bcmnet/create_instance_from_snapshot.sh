@@ -99,7 +99,7 @@ lxc start $LXC_HOST
 
 # # Apply the resulting profile and start the container.
 # if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
-#     #lxc profile device add cachestackprofile root disk path=/ pool=$bcm_data
+#     #lxc profile device add cachestackprofile root disk path=/ pool=$bcm_d1ata
 #     lxc profile apply cachestack default,cachestackprofile
 
 #     # push necessary files to the template including daemon.json

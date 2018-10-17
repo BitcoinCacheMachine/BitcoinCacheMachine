@@ -68,9 +68,7 @@ Users wanting to contribute to the project may submit pull requests for review. 
 
 You can also donate to the development of BCM by donating Bitcoin (BTC). For on-chain payments, use BIP47/PayNyms:
 
-* [Paynym Public Directory](https://paynym.is/+muddywaterfall4ed)
-* [BIP47 Payment Code](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon)
-
-Lightning Payments:
-
-* Coming soon! Once BCM is near-complete, we will start eating our own dog-food.
+* on-chain - [Paynym Public Directory](https://paynym.is/+muddywaterfall4ed)
+* on-chain - BIP47 Payment Code: `PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon`
+* off-chain - We will start accepting donations via Lightning network once Bitcoin Cache Machine reaches maturity!
+  

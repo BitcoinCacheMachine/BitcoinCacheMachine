@@ -9,12 +9,6 @@ cd "$(dirname "$0")"
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
 #bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
-# quit if there are no BCM environment variables
-if [[ -z $(env | grep BCM_) ]]; then
-  echo "BCM variables not set. Please source BCM environment variables by typing 'bcm'."
-  exit
-fi
-
 # If the admin hasn't specified an external LXD image server, then
 # we can only assume that we need to build a base image from scratch. 
 # it's best to centralize your image creation, but good for standalone deployments.

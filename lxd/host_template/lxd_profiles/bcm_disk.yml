@@ -1,5 +1,5 @@
 devices:
   root:
     path: /
-    pool: bcm_data
+    pool: $BCM_ZFS_PREFIX-bcm_data
     type: disk

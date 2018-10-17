@@ -50,8 +50,8 @@ devices:
     parent: managernet
     type: nic
 
-  root:
-    path: /
-    pool: bcm_data
-    type: disk
+  # root:
+  #   path: /
+  #   pool: bcm_1data
+  #   type: disk
 name: lxd_profile_proxy_host

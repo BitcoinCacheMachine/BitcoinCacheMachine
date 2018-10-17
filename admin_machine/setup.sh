@@ -28,6 +28,12 @@ if [ ! -d ~/.bcm ]; then
 fi
 
 # if ~/.bcm/endpoints doesn't exist, create it.
+if [ ! -d ~/.bcm/clusters ]; then
+  echo "Creating BCM clusters directory at ~/.bcm/clusters"
+  mkdir -p ~/.bcm/clusters
+fi
+
+# if ~/.bcm/endpoints doesn't exist, create it.
 if [ ! -d ~/.bcm/endpoints ]; then
   echo "Creating BCM endpoints directory at ~/.bcm/endpoints"
   mkdir -p ~/.bcm/endpoints
