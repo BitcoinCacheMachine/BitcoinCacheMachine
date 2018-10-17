@@ -1,4 +1,0 @@
-
-  # - lxd init --auto --trust-password=CHANGEME --network-address=$(ip address show dev ens3 | grep "inet " |  awk '{match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART,RLENGTH); print ip}')
-  # - lxc config set core.https_address "[$(ip address show dev ens3 | grep "inet " |  awk '{match($0,/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/); ip = substr($0,RSTART,RLENGTH); print ip}')]:8443"
-  # - echo "BCS_TRUSTED_HOST_INTERFACE=ens3" >> /etc/environment
