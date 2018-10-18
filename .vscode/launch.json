@@ -8,7 +8,7 @@
             "type": "bashdb",
             "request": "launch",
             "name": "Bash-Debug (simplest configuration)",
-            "program": "bash -c './multipass/up_lxd_cluster.sh C1 1'"
+            "program": "bash -c './multipass/up_multipass_cluster.sh C1 1'"
         }
     ]
 }

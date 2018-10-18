@@ -30,3 +30,5 @@ lxc remote add $BCM_MULTIPASS_VM_NAME "$BCM_MULTIPASS_VM_IP:8443" --accept-certi
 lxc remote set-default $BCM_MULTIPASS_VM_NAME
 
 echo "Current lxd remote default is $BCM_MULTIPASS_VM_NAME."
+
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"

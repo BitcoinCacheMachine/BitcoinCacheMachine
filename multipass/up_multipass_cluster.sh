@@ -5,8 +5,9 @@
 
 set -e
 
+# let's the arguments passed in on the terminal
+# member count is really the number of nodes BEYOND the first cluster member.
 MEMBER_COUNT=0
-
 while getopts c:m: option
 do
     case "${option}"
@@ -16,21 +17,20 @@ do
     esac
 done
 
-
-echo "BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME"
-echo "MEMBER_COUNT=$MEMBER_COUNT"
-
+# the master is always going to be '$BCM_CLUSTER_NAME-00'
 export BCM_MULTIPASS_VM_NAME="$BCM_CLUSTER_NAME-00"
-export BCM_LXD_CLUSTER_MASTER=$BCM_MULTIPASS_VM_NAME
-export CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
 
+# we use this later since BCM_MULTIPASS_VM_NAME changes for each VM
+export BCM_LXD_CLUSTER_MASTER=$BCM_MULTIPASS_VM_NAME
+
+# to shorten reference to the cluster ~/.bcm directory
+export CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
 
 # if ~/.bcm/clusters doesn't exist, create it.
 if [ ! -d ~/.bcm/clusters ]; then
   echo "Creating BCM clusters directory at ~/.bcm/clusters"
   mkdir -p ~/.bcm/clusters
 fi
-
 
 # if ~/.bcm/clusters doesn't exist, create it.
 export ENDPOINTS_DIR="$CLUSTER_DIR/endpoints"
@@ -45,6 +45,7 @@ if [ ! -d $NEWVM_DIR ]; then
   mkdir -p $NEWVM_DIR
 fi
 
+# stub and source the master .env file
 bash -c "./stub_env.sh master"
 source $NEWVM_DIR/.env
 
@@ -55,6 +56,7 @@ else
     echo "Multipass VM $BCM_MULTIPASS_VM_NAME already exists. Continuing with existing VM."
 fi
 
+# now provision the other nodes.
 if [[ $MEMBER_COUNT -ge 1 ]]; then
     # spin up some member nodes
     echo "Member Count: $MEMBER_COUNT"

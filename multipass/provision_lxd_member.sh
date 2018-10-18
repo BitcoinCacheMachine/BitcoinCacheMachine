@@ -32,3 +32,5 @@ multipass copy-files $NEW_VM_DIR/lxd/preseed.yml $BCM_MULTIPASS_VM_NAME:/home/mu
 
 # now initialize the LXD daemon on the VM.
 multipass exec $BCM_MULTIPASS_VM_NAME -- sh -c "cat /home/multipass/preseed.yml | sudo lxd init --preseed"
+
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"

@@ -48,8 +48,8 @@ multipass launch \
   bionic
 
 #restart the VM for updates to take effect
-#multipass stop $BCM_MULTIPASS_VM_NAME
-#multipass start $BCM_MULTIPASS_VM_NAME
+multipass stop $BCM_MULTIPASS_VM_NAME
+multipass start $BCM_MULTIPASS_VM_NAME
 
 export BCM_MULTIPASS_VM_IP=$(multipass list | grep "$BCM_MULTIPASS_VM_NAME" | awk '{ print $3 }')
 
@@ -65,5 +65,3 @@ if [[ $IS_MASTER = "true" ]]; then
 else
   bash -c ./provision_lxd_member.sh
 fi
-
-bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"

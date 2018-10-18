@@ -20,10 +20,10 @@ echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
 export CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
 export ENDPOINTS_DIR="$CLUSTER_DIR/endpoints"
 
-# echo "CLUSTER_DIR=$CLUSTER_DIR"
-# echo "ENDPOINTS_DIR=$ENDPOINTS_DIR"
+echo "CLUSTER_DIR=$CLUSTER_DIR"
+echo "ENDPOINTS_DIR=$ENDPOINTS_DIR"
 
-if [[ -z $(multipass list | grep "No instances found.") ]]; then
+if [[ $(multipass list | grep "$BCM_CLUSTER_NAME") ]]; then
   VM_DELETE_LIST=$(multipass list --format csv | cut -d ',' -f1 | grep -v '^Name' | grep "$BCM_CLUSTER_NAME")
 
   for vm in $VM_DELETE_LIST
