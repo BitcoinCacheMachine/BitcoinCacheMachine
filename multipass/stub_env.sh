@@ -3,7 +3,7 @@
 TYPE=$1
 
 # create the file
-ENV_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME
+ENV_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME
 mkdir -p $ENV_DIR
 
 ENV_FILE="$ENV_DIR/.env"
@@ -20,7 +20,4 @@ else
     echo "Incorrect usage. Please specify whether $BCM_MULTIPASS_VM_NAME is an LXD cluster master or member."
 fi
 
-cd ~/.bcm
-git add *
-git commit -am "Added $ENV_FILE"
-cd -
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"

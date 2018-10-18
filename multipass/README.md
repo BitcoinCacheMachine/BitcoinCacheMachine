@@ -1,29 +1,37 @@
 # Multipass and Bitcoin Cache Machine
 
-`multipass` is software (available as a snap) that orchestrates the creation, management, and maintenance of virtual machines (VMs) and associated Ubuntu images to simplify development. Each VM created by BCM multipass scripts run a cloud-based Ubuntu 18.04 image. 
+[`multipass`](https://github.com/CanonicalLtd/multipass) is software (available as a [snap](https://snapcraft.io/)) that orchestrates the creation, management, and maintenance of QEMU/KVM VMs. BCM scripts use the multipass command line tool to create VMs locally (usually run on the `admin machine` for testing). Each VM created by BCM multipass scripts runs a cloud-based Ubuntu 18.04 LTS image.
+
+The scripts in this directory help you get started testing BCM quickly. Running `bash -c "./up_lxd_cluster.sh CLUS1 3"` at the terminal will create a series of multipass VMs. Each VM will be named CLUS1-00, CLUS1-01, ...  The last parameter is the number of member nodes you want in your LXD cluster.  In the example, there will be 4 VMs total, one for the cluster master (assumed) and 3 additional member nodes. If you run `bash -c "./up_lxd_cluster.sh CLUS1"` (without the integer parameter), a single VM will be created. In all cases, `up_lxd_cluster.sh` provides you with one or more generic Ubuntu VMs configured as an LXD cluster. Each VM represents available CPU, memory, disk, and networking that you can use to deploy BCM components.
+
+# multipass Requirements
 
 To run multipass, you must have a computer capable of running QEMU/KVM-based VMs which is typical with a developer or server machine. In some cases, you might have to visit your BIOS to ensure that hardware-based virtualization features are enabled. Low-end laptops typical of the home market may not have the necessary hardware requirements to run BCM in a multipass VM. However, you can always still run BCM on [bare-metal](./lxd/README.md)!  
 
-The files present in this folder are responsible for creating and destroying multipass-based cloud instances for BCM deployment. The scripts are executed against the multipass daemon on the same machine that's executing the script.
+# Script descriptions
 
-Upon launch, multipass provides the VM with a unique ./multipass_cloud-init.yml file. This file instructs the cloud-init process in the VM to prepare the underlying OS for BCM components. Cloud-init installs the necessary dependencies including ([ZFS](https://en.wikipedia.org/wiki/ZFS) for a lxc container storage container back-end, `wait-for-it` which is helpful to determine when service comes online, and `tor` for (eventually) exposing SSH and and LXD remote API endpoints over authenticated TOR onion sites. By default the cloud-init process initializes the LXD daemon to accept incoming connections on its one (1) external interface. By the end of the multipass creation phase, you should have a remotely accessible LXD endpoint ready to receive BCM commands.
+Each section below reviews what each script does.
 
-## How to run BCM in a multipass VM
+## Creation Scripts
 
-You can run BCM in a multipass VM by running the `./up_multipass.sh` script. Before executing the script, you MUST source your BCM multipass environment variables. An example is shown in ./bcm01.env which is a great way to get started with BCM.
+### ./up_lxd_cluster.sh
 
-`up_multipass.sh` does the following things:
+This is the entrypoint into the ./multipass directory. 
 
-1. Makes sure your computer has `multipass` available. If not, it attempts to install multipass via SNAP.
-2. Creates and manages files in ~/.bcm/endpoints/ and ~/.bcm/runtime/
-3. Creates new BCM_LXD_SECRET for the multipass VM ans stores it in ~/.bcm/$BCM_MULTIPASS_VM_NAME as specified in your sourced environment.
-4. Creates a modified `./multipass_cloud-init.yml` file to initialize the new VM.
-5. Launches the new VM with a base OS of Ubuntu 18.04.
-6. Provisions BCM components via LXD as specified by the current environment variables.
-7. Performs a git commit to ~/.bcm for version control of sensitive information.
+### ./stub.env.sh
 
-The example `./bcm01.env` file creates a new VM named *bcm-01* and provides it with *30G* of disk space, *4G* of memory, and *4* vCPUs. It also directs BCM scripts to provision BCM components to the new multipass VM via the LXD API.
+### ./multipass_vm_up.sh
+
+This script actually creates the VM using the `multipass` client tool.  The `multipass launch` command passes a `cloud-init` file to the VM for provisioning directly after launch. The `cloud-init` file that is used to provision ALL multipass hosts is ./cloud_init.yml. The `cloud-init` filee installs all necessary Base OS dependencies such as ([ZFS](https://en.wikipedia.org/wiki/ZFS), `wait-for-it` which is helpful to determine when service comes online, and tor. It also removes the default LXD client and installs the latest candidate LXD snap package.
+
+This script continues by obtaining the runtime IP address of the multipass VM then passing control over to either `./provision_lxd_master.sh` or `./provision_lxd_member.sh`, depending on whether the IS_MASTER parameter.
+
+### provision_lxd_master.sh
+
+### provision_lxd_member.sh
 
 
 
-If you want to create more than one multipass VM, create a file at `~/.bcm/endpoints/$BCM_MULTIPASS_VM_NAME.env` which specifies BCM multipass and BCM-proper deployment options for the endpoint.
+## ./destroy_cluster.sh
+
+## ./destroy_multipass.sh

@@ -1,24 +1,41 @@
 #!/bin/bash
 
-set -eu
+set -e
 
-export BCM_CLUSTER_NAME=$1
-
-VM_DELETE_LIST=$(multipass list --format csv | cut -d ',' -f1 | grep -v '^Name' | grep "$BCM_CLUSTER_NAME")
-
-for vm in $VM_DELETE_LIST
+while getopts c: option
 do
-    echo "Working on VM: $vm"
-    export BCM_MULTIPASS_VM_NAME=$vm
-    bash -c "./destroy_multipass.sh $BCM_MULTIPASS_VM_NAME"
+    case "${option}"
+    in
+    c) export BCM_CLUSTER_NAME=${OPTARG};;
+    esac
 done
 
-if [[ -d ~/.bcm/clusters/$BCM_CLUSTER_NAME ]]; then
-  rm -rf ~/.bcm/clusters/$BCM_CLUSTER_NAME
+if [[ -z $BCM_CLUSTER_NAME ]]; then
+  echo "BCM_CLUSTER_NAME incorrectly passed.  Use '-c CLUS1' to pass cluster name."
+  exit
 fi
 
+echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
 
-cd ~/.bcm
-git add *
-git commit -am "Removed ~/.bcm/clusters/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME/"
-cd -
+export CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
+export ENDPOINTS_DIR="$CLUSTER_DIR/endpoints"
+
+# echo "CLUSTER_DIR=$CLUSTER_DIR"
+# echo "ENDPOINTS_DIR=$ENDPOINTS_DIR"
+
+if [[ -z $(multipass list | grep "No instances found.") ]]; then
+  VM_DELETE_LIST=$(multipass list --format csv | cut -d ',' -f1 | grep -v '^Name' | grep "$BCM_CLUSTER_NAME")
+
+  for vm in $VM_DELETE_LIST
+  do
+      echo "Working on VM: $vm"
+      export BCM_MULTIPASS_VM_NAME=$vm
+      bash -c "./destroy_multipass.sh $BCM_MULTIPASS_VM_NAME"
+  done
+fi
+
+if [ -d $CLUSTER_DIR ]; then
+  rm -Rf $CLUSTER_DIR
+fi
+
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"

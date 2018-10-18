@@ -27,42 +27,36 @@ if [ ! -d ~/.bcm ]; then
   cd ~/.bcm
 fi
 
-# if ~/.bcm/endpoints doesn't exist, create it.
+# if ~/.bcm/clusters doesn't exist, create it.
 if [ ! -d ~/.bcm/clusters ]; then
   echo "Creating BCM clusters directory at ~/.bcm/clusters"
   mkdir -p ~/.bcm/clusters
 fi
 
-# if ~/.bcm/endpoints doesn't exist, create it.
-if [ ! -d ~/.bcm/endpoints ]; then
-  echo "Creating BCM endpoints directory at ~/.bcm/endpoints"
-  mkdir -p ~/.bcm/endpoints
-fi
+# # if ~/.bcm/endpoints doesn't exist, create it.
+# if [ ! -d ~/.bcm/endpoints ]; then
+#   echo "Creating BCM endpoints directory at ~/.bcm/endpoints"
+#   mkdir -p ~/.bcm/endpoints
+# fi
 
-# if ~/.bcm/clusters doesn't exist, create it
-if [ ! -d ~/.bcm/clusters ]; then
-  echo "Creating directroy ~/.bcm/clusters"
-  mkdir -p ~/.bcm/clusters
-fi
+# # if ~/.bcm/endpoints doesn't exist, create it.
+# if [ ! -f ~/.bcm/endpoints/local.env ]; then
+#   echo "Creating ~/.bcm/endpoints/local.env"
+#   touch ~/.bcm/endpoints/local.env
 
-# if ~/.bcm/endpoints doesn't exist, create it.
-if [ ! -f ~/.bcm/endpoints/local.env ]; then
-  echo "Creating ~/.bcm/endpoints/local.env"
-  touch ~/.bcm/endpoints/local.env
+#   echo "#!/usr/bin/env bash" >> ~/.bcm/endpoints/local.env
+# else
+#   echo "BCM endpoints config directory exists at ~/.bcm/endpoints"
+# fi
 
-  echo "#!/usr/bin/env bash" >> ~/.bcm/endpoints/local.env
-else
-  echo "BCM endpoints config directory exists at ~/.bcm/endpoints"
-fi
-
-## RUNTIME operations here.
-# if ~/.bcm/runtime doesn't exist create it
-if [ ! -d ~/.bcm/runtime ]; then
-  echo "Creating BCM runtime directory at ~/.bcm/runtime"
-  mkdir -p ~/.bcm/runtime
-else
-  echo "BCM runtime directory exists at ~/.bcm/runtime"
-fi
+# ## RUNTIME operations here.
+# # if ~/.bcm/runtime doesn't exist create it
+# if [ ! -d ~/.bcm/runtime ]; then
+#   echo "Creating BCM runtime directory at ~/.bcm/runtime"
+#   mkdir -p ~/.bcm/runtime
+# else
+#   echo "BCM runtime directory exists at ~/.bcm/runtime"
+# fi
 
 git add *
 git commit -am "Added ~/.bcm/endpoints directory."

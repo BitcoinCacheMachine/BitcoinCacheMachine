@@ -11,15 +11,9 @@ source $BCM_DEFAULTS_DIR/bitcoin.env
 
 BCM_ACTIVE_LXD_ENDPOINT=$(lxc remote get-default)
 
-# if ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env exists, source it
-if [[ -e ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env ]]; then
-    #echo "Sourcing ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env."
-    source ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
-else
-    echo "~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env does not exist! Stubbing one out for you bro."
-    touch ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
+ENV_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME
 
-    echo '#!/bin/bash' >> ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
-    BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
-    echo 'export BCM_LXD_SECRET="'$BCM_LXD_SECRET'"' >> ~/.bcm/endpoints/$BCM_ACTIVE_LXD_ENDPOINT.env
+# if $ENV_DIR/.env exists, source it
+if [[ -e $ENV_DIR/.env ]]; then
+    source $ENV_DIR/.env
 fi

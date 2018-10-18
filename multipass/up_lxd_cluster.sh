@@ -1,18 +1,29 @@
 #!/bin/bash
 
-set -eu
-
 # brings up LXD cluster of at least 1 member. Increase the number
 # by providing $1 as a number 2 or above.
-MEMBER_COUNT=
+
+set -e
+
+MEMBER_COUNT=0
+
+while getopts c:m: option
+do
+    case "${option}"
+    in
+    c) export BCM_CLUSTER_NAME=${OPTARG};;
+    m) export MEMBER_COUNT=${OPTARG};;
+    esac
+done
 
 
-# todo make sure $1 is an integer >=1
-if [[ -z $1 ]]; then
-    MEMBER_COUNT=1
-else 
-    MEMBER_COUNT=$2
-fi
+echo "BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME"
+echo "MEMBER_COUNT=$MEMBER_COUNT"
+
+export BCM_MULTIPASS_VM_NAME="$BCM_CLUSTER_NAME-00"
+export BCM_LXD_CLUSTER_MASTER=$BCM_MULTIPASS_VM_NAME
+export CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
+
 
 # if ~/.bcm/clusters doesn't exist, create it.
 if [ ! -d ~/.bcm/clusters ]; then
@@ -20,21 +31,22 @@ if [ ! -d ~/.bcm/clusters ]; then
   mkdir -p ~/.bcm/clusters
 fi
 
-# let's get the cluster name passed in from the commandline
-export BCM_CLUSTER_NAME=$1
-export BCM_MULTIPASS_VM_NAME="$BCM_CLUSTER_NAME-00"
-export BCM_LXD_CLUSTER_MASTER=$BCM_MULTIPASS_VM_NAME
 
-if [[ ! -d ~/.bcm/clusters/$BCM_CLUSTER_NAME ]]; then
-    mkdir -p ~/.bcm/clusters/$BCM_CLUSTER_NAME 
+# if ~/.bcm/clusters doesn't exist, create it.
+export ENDPOINTS_DIR="$CLUSTER_DIR/endpoints"
+if [ ! -d $ENDPOINTS_DIR ]; then
+  echo "Creating directory $ENDPOINTS_DIR"
+  mkdir -p $ENDPOINTS_DIR
 fi
 
-if [[ ! -d ~/.bcm/clusters/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME ]]; then
-    mkdir -p ~/.bcm/clusters/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME
+export NEWVM_DIR="$ENDPOINTS_DIR/$BCM_MULTIPASS_VM_NAME"
+if [ ! -d $NEWVM_DIR ]; then
+  echo "Creating BCM clusters directory at $NEWVM_DIR"
+  mkdir -p $NEWVM_DIR
 fi
 
 bash -c "./stub_env.sh master"
-source ~/.bcm/clusters/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME/.env
+source $NEWVM_DIR/.env
 
 # create the master multipass VM if it doesn't exist yet.
 if [[ -z $(multipass list | grep $BCM_MULTIPASS_VM_NAME) ]]; then
@@ -48,9 +60,11 @@ if [[ $MEMBER_COUNT -ge 1 ]]; then
     echo "Member Count: $MEMBER_COUNT"
     for i in $(seq -f %02g 1 $MEMBER_COUNT)
     do
+        echo "$BCM_CLUSTER_NAME-$i"
         export BCM_MULTIPASS_VM_NAME="$BCM_CLUSTER_NAME-$i"
+        export NEWVM_DIR="$ENDPOINTS_DIR/$BCM_MULTIPASS_VM_NAME"
         bash -c "./stub_env.sh member $BCM_LXD_CLUSTER_MASTER"
-        source ~/.bcm/clusters/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME/.env
+        source $NEWVM_DIR/.env
         bash -c "./multipass_vm_up.sh false $BCM_LXD_CLUSTER_MASTER $BCM_MULTIPASS_VM_NAME"
     done
 fi
