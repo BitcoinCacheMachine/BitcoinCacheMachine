@@ -8,7 +8,7 @@ Each VM represents available CPU, memory, disk, and networking that you can use 
 
 # multipass Requirements
 
-To run multipass, you must have a computer capable of running QEMU/KVM-based VMs which is typical with a developer or server machine. In some cases, you might have to visit your BIOS to ensure that hardware-based virtualization features are enabled. Low-end laptops typical of the home market may not have the necessary hardware requirements to run BCM in a multipass VM. However, you can always run BCM on [bare-metal](./lxd/README.md)!
+To run multipass, you must have a computer capable of running QEMU/KVM-based VMs which is typical with a developer or server machine. In some cases, you might have to visit your BIOS to ensure that hardware-based virtualization features are enabled. Low-end laptops typical of the DEV market may not have the necessary hardware requirements to run BCM in a multipass VM. However, you can always run BCM on [bare-metal](./lxd/README.md)!
 
 To install `multipass` manually, run the following command. Also remember that `$BCM_LOCAL_GIT_REPO/admin_machine/setup.sh` installs `multipass` on the `admin machine` during provisioning as well.
 
@@ -28,24 +28,24 @@ Each section below briefly explains what each script does. The end goal of all t
 
 This is what you're going to run when in the ./multipass directory. It has 2 parameters: `-c` for the cluster name, and `-m` for the number of additional nodes beyond 1 you want provisioned.  Pertinent examples, 
 
-* `./up_multipass_cluster.sh -c HOME -m 2` -- This will provision a total of three multipass VMs each prepended with "HOME". The VMs will be "HOME-00", "HOME-01", and "HOME-02". This is the recommended command when testing on the `admin machine` since it provisions a cluster of machines (representing physical hosts) that allow a quorum to be reached. Of course, BCM works just as well when developing against a single-host cluster as well.
-* `./up_multipass_cluster.sh -c HOME` -- This will provision one multipass VM named "HOME-00". HOME-00 will still be configured to operate in a LXD cluster even though it hasn't reached a quorum.
+* `./up_multipass_cluster.sh -c DEV -m 2` -- This will provision a total of three multipass VMs each prepended with "DEV". The VMs will be "DEV-00", "DEV-01", and "DEV-02". This is the recommended command when testing on the `admin machine` since it provisions a cluster of machines (representing physical hosts) that allow a quorum to be reached. Of course, BCM works just as well when developing against a single-host cluster.
+* `./up_multipass_cluster.sh -c DEV` -- This will provision one multipass VM named "DEV-00". DEV-00 will still be configured to operate in a LXD cluster even though it hasn't reached a quorum.
 
 ### ./stub.env.sh
 
-This script creates the .env file needed for each LXD endpoint. . `./stub_env.sh` uses the `envsubst` command to substitute environment variables from the template files in the ./env/ directory. The resulting file gets stored in the `~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME`.
+This script creates the .env file needed for each LXD endpoint. `./stub_env.sh` uses the `envsubst` command to substitute environment variables from the template files in the ./env/ directory. The resulting file gets stored at `~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME/.env`. This file contains, the VM multipass VM name, the LXD secret (randomly generated), and the multipass CPU, memory, and disk space used during provisioning.
 
 ### ./multipass_vm_up.sh
 
-This script actually creates the VM using the `multipass` cli.  The `multipass launch` command passes a [cloud-init](https://cloud-init.io/) file to the VM for provisioning directly after launch. The static `./cloud_init.yml` is used to initially provision ALL multipass hosts (master and members). The `cloud-init` file installs all necessary base OS dependencies such as ([ZFS](https://en.wikipedia.org/wiki/ZFS) and `wait-for-it`, which is helpful to determine when service come online. (TODO `tor` is also installed for optionally exposing the LXD REST API over an authenticated onion service). The cloud-init definition also removes the default LXD client that comes with the Ubuntu base image and instead installs the latest candidate LXD via snap.
+This script actually creates the VM using the `multipass` cli.  The `multipass launch` command passes a [cloud-init](https://cloud-init.io/) file to the VM for provisioning directly after launch. The static `./cloud_init.yml` is used to initially provision ALL multipass hosts (master and members). The `cloud-init` file installs all necessary base OS dependencies like [ZFS](https://en.wikipedia.org/wiki/ZFS), which is used as the LXD container storage backend, and `wait-for-it`, which is helpful to determine when service come online. (TODO `tor` is also installed for optionally exposing the LXD REST API over an authenticated onion service). The cloud-init definition also removes the default LXD client that comes with the Ubuntu base image and instead installs the latest candidate LXD via snap.
 
 This script continues by obtaining the runtime IP address of the multipass VM then passing control over to either `./provision_lxd_master.sh` or `./provision_lxd_member.sh`, depending on whether the multipass VM is the first host in the cluster, i.e., the host ending in '-00'.
 
 ### provision_lxd_master.sh
 
-This script starts by creating an LXD preseed file, storing it in `~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME/lxd/`. The resulting file is copied up to the multipass VM then the `lxd init` command is issued, passing in the preseed file. After LXD is configured, the resulting lxd.cert file in the daemon is copied back to the `admin_machine` for further provisioning activities. The lxd.cert is stored in the same directory as the LXD preseed file. 
+This script starts by creating an LXD preseed file, storing it in `~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME/lxd/`. The resulting file is copied up to the multipass VM then the `lxd init` command is issued, passing in the preseed file. After the LXD daemon is configured in the multipass VM, the resulting lxd.cert file in the daemon is copied back to the `admin_machine` for subsequent provisioning activities. The lxd.cert is stored in the same directory as the LXD preseed file.
 
-`provision_lxd_master.sh` completes by adding an LXD remote to the `admin_machine` lxd client (via `lxd remote add`). Furthermore, the LXD client target is defaulted to first cluster member (i.e., "-00") via `lxd remote set-default`.
+`provision_lxd_master.sh` completes by adding an LXD remote to the `admin_machine` lxd client (via `lxc remote add`). Furthermore, the lxc remote is defaulted to first cluster member (i.e., "-00") via `lxd remote set-default`. This allows you to pass control to BCM provisioning scripts in the `$BCM_LOCAL_GIT_REPO/lxd/` directory.
 
 ### provision_lxd_member.sh
 
@@ -55,7 +55,11 @@ This script starts by creating an LXD preseed file, storing it in `~/.bcm/cluste
 
 ### ./destroy_cluster.sh
 
-This script iterates over the VMs that have the specified cluster name and deletes them. It also removes related files in `~/.bcm/clusters/$BCM_CLUSTER_NAME`.
+This script iterates over the VMs that have the specified cluster name and deletes them. It also removes related files and directories in `~/.bcm/clusters/$BCM_CLUSTER_NAME`. You can initiate this script with the following command.
+
+./destroy_cluster.sh -c DEV
+
+In the example above, "DEV" is the name of the cluster you want destroyed.
 
 ### ./destroy_multipass.sh
 

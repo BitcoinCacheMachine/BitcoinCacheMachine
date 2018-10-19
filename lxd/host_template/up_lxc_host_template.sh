@@ -2,6 +2,8 @@
 
 set -e
 
+echo "Starting 'up_lxc_host_template.sh'."
+
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 

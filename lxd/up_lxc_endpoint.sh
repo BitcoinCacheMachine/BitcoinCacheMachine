@@ -7,22 +7,27 @@ set -e
 cd "$(dirname "$0")"
 
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
-#bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
+bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
 # If the admin hasn't specified an external LXD image server, then
 # we can only assume that we need to build a base image from scratch. 
 # it's best to centralize your image creation, but good for standalone deployments.
-if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]]; then
-  # then we're going to arrive at 'bcm-template' by creating it ourselves'
-  bash -c ./host_template/up_lxc_host_template.sh
-else
-  # this is the logic that is taken when the administrator has specified a
-  # custom LXD image server which is typical of home and offince network deployments
-  if [[ $(lxc remote list | grep $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE) ]]; then
-    echo "Attempting to download the LXC image named 'bcm-template' from the LXD remote $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE to LXD remote $(lxc remote get-default):bcm-template"
+if [[ ! -z $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE ]]; then
+  if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]]; then
+    # then we're going to arrive at 'bcm-template' by creating it ourselves'
+    bash -c ./host_template/up_lxc_host_template.sh
   else
-    echo "Error! LXD remote $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE not found."
+    # this is the logic that is taken when the administrator has specified a
+    # custom LXD image server which is typical of home and offince network deployments
+    if [[ $(lxc remote list | grep $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE) ]]; then
+      echo "Attempting to download the LXC image named 'bcm-template' from the LXD remote $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE to LXD remote $(lxc remote get-default):bcm-template"
+    else
+      echo "Error! LXD remote $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE not found."
+    fi
   fi
+else
+  echo "BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE not set. Exiting. Consider running 'bcm' to load environment variables for the current LXD remote '$(lxc remote get-default)'"
+  exit
 fi
 
 if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then

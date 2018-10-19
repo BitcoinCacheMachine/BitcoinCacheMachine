@@ -9,11 +9,12 @@ source $BCM_DEFAULTS_DIR/gateway.env
 source $BCM_DEFAULTS_DIR/managers.env
 source $BCM_DEFAULTS_DIR/bitcoin.env
 
-BCM_ACTIVE_LXD_ENDPOINT=$(lxc remote get-default)
-
-ENV_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_CLUSTER_NAME/$BCM_MULTIPASS_VM_NAME
+# let's export the current cluster based on the current LXD remote endpoint.
+export BCM_CLUSTER_NAME=$(lxc remote get-default | cut -f1 -d"-")
+ENV_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME
 
 # if $ENV_DIR/.env exists, source it
 if [[ -e $ENV_DIR/.env ]]; then
+    echo "Sourcing $ENV_DIR/.env"
     source $ENV_DIR/.env
 fi

@@ -25,5 +25,9 @@ echo "LXD images:"
 lxc image list
 
 echo ""
+echo "LXD cluster:"
+lxc cluster list
+
+echo ""
 echo "LXD remotes:"
 lxc remote list

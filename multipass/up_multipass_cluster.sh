@@ -53,7 +53,8 @@ source $NEWVM_DIR/.env
 if [[ -z $(multipass list | grep $BCM_MULTIPASS_VM_NAME) ]]; then
     bash -c "./multipass_vm_up.sh true null $BCM_MULTIPASS_VM_NAME"
 else
-    echo "Multipass VM $BCM_MULTIPASS_VM_NAME already exists. Continuing with existing VM."
+    echo "Multipass VM $BCM_MULTIPASS_VM_NAME already exists. Exiting."
+    exit
 fi
 
 # now provision the other nodes.

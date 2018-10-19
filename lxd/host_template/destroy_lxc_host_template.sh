@@ -16,23 +16,17 @@ if [[ $(lxc list | grep dockertemplate) ]]; then
     lxc delete --force dockertemplate
 fi
 
-####
 # containers
-####
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE bcm-template"
 
-####
-# images
-####
+## images
 # delete image 'bcm-template'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE bcm-template"
 
 # delete image 'bcm-template'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh $BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE bcm-bionic-base"
 
-####
 # profiles
-####
 
 # delete profile 'docker-privileged'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_DELETE docker_privileged"
@@ -44,8 +38,7 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_BCM_DISK_DELETE bcm_disk"
 
 
-####
 # storage
-####
+
 # delete lxc storage zfs backend
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_STORAGE_BCM_DATA_DELETE $BCM_ZFS_PREFIX-bcm_data"

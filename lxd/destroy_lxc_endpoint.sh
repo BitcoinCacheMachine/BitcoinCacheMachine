@@ -16,7 +16,7 @@ if [[ -z $(env | grep BCM) ]]; then
 fi
 
 echo "Calling ./app_hosts/destroy_lxc_apphosts.sh"
-bash -c "./app_hosts/destroy_lxc_apphosts.sh template"
+bash -c "./bcmnet/app_hosts/destroy_lxc_apphosts.sh template"
 
 echo "Calling ./bcmnet/destroy_lxc_bcmnet.sh"
 bash -c "./bcmnet/destroy_lxc_bcmnet.sh template"
