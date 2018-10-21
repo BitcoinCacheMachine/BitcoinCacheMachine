@@ -67,8 +67,6 @@ else
   echo "BCM certs directory exists at ~/.bcm/certs"
 fi
 
-echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
-
 BCM_BASHRC_FLAG='### Start BCM'
 
 if grep -Fxq "$BCM_BASHRC_FLAG" ~/.bashrc
@@ -76,16 +74,17 @@ then
   # code if found
   echo "BCM flag discovered in ~/.bashrc. Please inspect your ~/.bashrc to clear any BCM-related content, if appropriate."
 else
+  echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
   echo $BCM_BASHRC_FLAG >> ~/.bashrc
   echo 'export BCM_LOCAL_GIT_REPO="'$SCRIPT_DIR'"' >> ~/.bashrc
   echo 'alias bcm="source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh"' >> ~/.bashrc
-  echo '### END BCM' >> ~/.bashrc
 
-  echo "Done. Execute 'bcm' to load BCM environment variables FOR THE CURRENT LXD endpoint."
-  echo "Run 'lxc remote get-default' to determine your current LXD endpoint. Run 'lxc remote set-default ENDPOINT' to change the LXD endpoint."
+  echo "    Run 'bcm' to load BCM environment variables FOR THE CURRENT LXD endpoint."
+  echo "    Run 'lxc remote get-default' to determine your current LXD endpoint. Run 'lxc remote set-default <endpoint>' to change the LXD endpoint."
+  echo ""
 
   echo "Setting BCM_LOCAL_GIT_REPO ENV VAR in current shell to '$SCRIPT_DIR'"
-  export BCM_LOCAL_GIT_REPO=$SCRIPT_DIR
+  export BCM_LOCAL_GIT_REPO=../$SCRIPT_DIR
 fi
 
 # git commit
