@@ -4,6 +4,13 @@ set -eu
 
 sudo apt-get update
 
+
+# check to see if docker is installed first; if not, we shall install it
+if [[ -z $(docker info) ]]; then
+
+
+fi
+
 # first let's install docker-ce
 # get-docker.sh is the one from https://get.docker.com/
 bash -c $BCM_LOCAL_GIT_REPO/lxd/host_template/get-docker.sh
@@ -21,4 +28,4 @@ if [[ ! $(snap list | grep multipass) ]]; then
 fi
 
 # and install client tools; TODO move these to a docker container running on the admin machine
-sudo apt-get install -f wait-for-it rsync apg libfuse-dev fuse
+sudo apt-get install -y wait-for-it rsync apg libfuse-dev fuse
