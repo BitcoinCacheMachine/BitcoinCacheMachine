@@ -4,8 +4,10 @@ set -e
 
 # let's install and configure docker-ce
 if [[ ! $(snap list | grep docker) ]]; then
-    sudo addgroup --system docker
-    sudo adduser $(whoami) docker
+    if [[ -z $(groups | grep lxd) ]]; then
+        sudo addgroup --system docker
+        sudo adduser $(whoami) docker
+    fi
     
     sudo snap install docker --stable
 
