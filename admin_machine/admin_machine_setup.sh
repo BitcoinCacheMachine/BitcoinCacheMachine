@@ -39,17 +39,12 @@ fi
 echo "Setting BCM_LOCAL_GIT_REPO environment variable in current shell to '$(dirname "$(pwd)")'"
 export BCM_LOCAL_GIT_REPO="$(dirname "$(pwd)")"
 
-
-# reset to current dir
-cd "$(dirname "$0")"
-
 # TODO implemented encfs on ~/.bcm
 # if ~/.bcm doesn't exist, create it
 if [ ! -d ~/.bcm ]; then
   echo "Creating Bitcoin Cache Machine config directory at ~/.bcm"
   mkdir -p ~/.bcm
   git init ~/.bcm/
-  cd ~/.bcm
 fi
 
 # if ~/.bcm/clusters doesn't exist, create it.

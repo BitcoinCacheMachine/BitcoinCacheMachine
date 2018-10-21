@@ -6,7 +6,7 @@
 * Creates the `~/.bcm/` directory - BCM scripts store LXD cluster, endpoint, and sensitive runtime files in this directory. `admin_machine_setup.sh` initializes ~/.bcm as a git repository for versioning. BCM scripts make regular commits to the ~/.bcm repo as files are added or deleted.
 * (TODO:  ~/.bcm will be mounted using a encrypted [FUSE mount](https://github.com/netheril96/securefs) that can be unlocked interactively with a user-provided password or hardware wallet device).
 * Generates the Root Certificate Authority cert at ~/.bcm/certs. Eventually, digital signatures associated with the public key will be relegated exclusively to hardware wallet operations.
-* Places the following lines in your `~/.bashrc` file so you can simply type `bcm` to load all relevant BCM environment variables for your active LXD endpoint. The `../lxd/` directory relies heavily on BCM environment variables to guide execution of BCM scripts. The `$BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh` script loads ALL BCM default environment variables, THEN loads the environment variables for the active LXD remote endpoint, if any.
+* Places the following lines in your `~/.bashrc` file so you can simply type `bcm` to load all relevant BCM environment variables for your active LXD endpoint. The [`../lxd/`](../lxd/) directory relies heavily on BCM environment variables to guide execution of BCM scripts. The `$BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh` script loads ALL BCM default environment variables, THEN loads the environment variables for the active LXD remote endpoint, if any.
 
 ```bash
 ### Start BCM
