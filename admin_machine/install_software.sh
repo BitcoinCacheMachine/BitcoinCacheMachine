@@ -4,11 +4,10 @@ set -eu
 
 # let's install and configure docker-ce
 if [[ ! $(snap list | grep docker) ]]; then
-    sudo snap install docker --stable
-
     sudo addgroup --system docker
     sudo adduser $(whoami) docker
-    newgrp docker
+    
+    sudo snap install docker --stable
 
     sudo snap disable docker
     sudo snap enable docker
