@@ -25,6 +25,9 @@ if [[ ! $(snap list | grep lxd) ]]; then
     sudo usermod -G lxd -a $(whoami)
 
     sudo snap install lxd --stable
+
+    # next let's install the software.
+    bash -c "./provision_lxd.sh"
 fi
 
 # Next make sure multipass is installed so we can run type-1 VMs
