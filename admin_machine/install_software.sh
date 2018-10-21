@@ -3,7 +3,7 @@
 set -eu
 
 # let's install and configure docker-ce
-if [[ ! $(snap list | grep lxd) ]]; then
+if [[ ! $(snap list | grep docker) ]]; then
     sudo snap install docker --stable
 
     sudo addgroup --system docker
