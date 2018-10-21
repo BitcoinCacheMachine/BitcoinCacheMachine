@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -e
 
 # let's install and configure docker-ce
 if [[ ! $(snap list | grep docker) ]]; then
