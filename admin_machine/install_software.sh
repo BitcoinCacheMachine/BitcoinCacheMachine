@@ -4,7 +4,7 @@ set -e
 
 # let's install and configure docker-ce
 if [[ ! $(snap list | grep docker) ]]; then
-    if [[ -z $(groups | grep lxd) ]]; then
+    if [[ -z $(groups | grep docker) ]]; then
         sudo addgroup --system docker
         sudo adduser $(whoami) docker
     fi
@@ -23,9 +23,11 @@ sudo apt-get install -y zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 if [[ ! $(snap list | grep lxd) ]]; then
     sudo apt remove --purge lxd lxd-client
     
-    sudo groupadd --system lxd
-    sudo usermod -G lxd -a $(whoami)
-
+    if [[ -z $(groups | grep lxd) ]]; then
+        sudo groupadd --system lxd
+        sudo usermod -G lxd -a $(whoami)
+    fi
+    
     sudo snap install lxd --stable
 
     # next let's install the software.
