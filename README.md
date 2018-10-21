@@ -41,7 +41,7 @@ Documentation for BCM and its components can be found in this repository. All do
 
 ## Getting Started
 
-The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `admin machine`. We will first ensure we have tor and git installed, then you configure your local git client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address.  Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
+The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `admin machine`. We will first ensure we have tor and git installed, then you configure your local git client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.) Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
 
 ```bash
 sudo apt-get update
