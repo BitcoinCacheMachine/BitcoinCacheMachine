@@ -43,7 +43,17 @@ But before you begin, clone this repository to your machine--the machine that wi
 
 # Getting Started
 
-Clone the BCM reference implementation on to the `admin machine` and cd into the `admin_machine` directory at the root of the repository. Open a terminal then run the following commands to get started:
+These instructions assume you're running Ubuntu Desktop 18.04. The instructions will be similar for other modern Linux distros.
+
+The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `admin machine`. We will configure our local git client to download the BCM repository from github over TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address.
+
+```bash
+sudo apt-get update
+sudo apt-get install -y tor git
+git config --global http.proxy socks5://localhost:9050
+```
+
+You can now clone the BCM repository to the `admin machine` over TOR:
 
 ```bash
 mkdir -p ~/git/github/bcm
@@ -52,11 +62,13 @@ cd ~/git/github/bcm/admin_machine
 ./setup.sh
 ```
 
-`./setup.sh` prepares the `admin machine` for using BCM scripts. It also installs LXD on the `admin machine` so you can deploy BCM scripts locally for testing. docker-ce is also installed on the `admin machine` so you can run doccker containers locally. This allows the BCM admin machine to function without having to install a bunch of new software on your machine. `admin_machine/setup.sh` creates the directory ~/.bcm, which is where BCM scripts store and manage sensitive deployment options and runtime files. Click [here](./setup_README.md) for more information.
+Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of ~/git/github/bcm). You may want to change your global git settings back to defaults so you won't download ALL git repos using TOR. Note that the BCM git repo specifically is configured to use TOR for git push/pull operations. Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
 
-Decide where you want to run your BCM workload. You can deploy BCM to the `admin machine` for quick and convenient testing. You can consider running BCM in a [multipass-based VM](./multipass/) or in a [cloud provider via cloud-init](./cloud_providers/). `multipass` VMs use lower-level hardware-based virtualization which provide additional security guarantees. In the end, all you need to run BCM component is a LXD endpoint configured and controllable by your `admin machine`. Use the `lxc remote list`, `lxc remote get-default` and related commands.
+```bash
+git config --unset http.proxy
+```
 
-Once you have a properly configured LXD endpoint, delve into the [./lxd/](./lxd/) directory. This is where you can deploy BCM data center components. Scripts in this directory are executed against the `admin machine` active LXD remote (run `lxc remote get-default)`. By running BASH scripts on the `admin machine`, you can deploy software-defined components to the target LXD endpoint.
+Visit the [./admin_machine/](./admin_machine/README.md) directory to continue.
 
 ## Project Status
 
@@ -69,6 +81,6 @@ Users wanting to contribute to the project may submit pull requests for review. 
 You can also donate to the development of BCM by donating Bitcoin (BTC). For on-chain payments, use BIP47/PayNyms:
 
 * on-chain - [Paynym Public Directory](https://paynym.is/+muddywaterfall4ed)
-* on-chain - BIP47 Payment Code: `PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon`
+* on-chain - [BIP47](https://github.com/bitcoin/bips/blob/master/bip-0047.mediawiki) Payment Code: `PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon`
 * off-chain - We will start accepting donations via Lightning network once Bitcoin Cache Machine reaches maturity!
   

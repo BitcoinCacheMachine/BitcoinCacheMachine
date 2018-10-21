@@ -5,9 +5,11 @@ mkdir -p /tmp/bcm
 sudo apt-get update
 
 # first let's install docker-ce
-curl -fsSL get.docker.com -o /tmp/bcm/get-docker.sh
-chmod +x /tmp/bcm/get-docker.sh
-bash -c /tmp/bcm/get-docker.sh
+# get-docker.sh is the one from https://get.docker.com/
+bash -c $BCM_LOCAL_GIT_REPO/lxd/host_template/get-docker.sh
+
+# delete our temp files
+rm -Rf /tmp/bcm
 
 # Next make sure multipass is installed so we can run type-1 VMs
 if [[ ! $(snap list | grep multipass) ]]; then

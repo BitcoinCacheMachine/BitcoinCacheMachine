@@ -33,34 +33,6 @@ if [ ! -d ~/.bcm/clusters ]; then
   mkdir -p ~/.bcm/clusters
 fi
 
-# # if ~/.bcm/endpoints doesn't exist, create it.
-# if [ ! -d ~/.bcm/endpoints ]; then
-#   echo "Creating BCM endpoints directory at ~/.bcm/endpoints"
-#   mkdir -p ~/.bcm/endpoints
-# fi
-
-# # if ~/.bcm/endpoints doesn't exist, create it.
-# if [ ! -f ~/.bcm/endpoints/local.env ]; then
-#   echo "Creating ~/.bcm/endpoints/local.env"
-#   touch ~/.bcm/endpoints/local.env
-
-#   echo "#!/usr/bin/env bash" >> ~/.bcm/endpoints/local.env
-# else
-#   echo "BCM endpoints config directory exists at ~/.bcm/endpoints"
-# fi
-
-# ## RUNTIME operations here.
-# # if ~/.bcm/runtime doesn't exist create it
-# if [ ! -d ~/.bcm/runtime ]; then
-#   echo "Creating BCM runtime directory at ~/.bcm/runtime"
-#   mkdir -p ~/.bcm/runtime
-# else
-#   echo "BCM runtime directory exists at ~/.bcm/runtime"
-# fi
-
-git add *
-git commit -am "Added ~/.bcm/endpoints directory."
-
 
 # certificates - we store root certificates here
 if [ ! -d ~/.bcm/certs ]; then
@@ -105,3 +77,6 @@ else
   echo "Setting BCM_LOCAL_GIT_REPO ENV VAR in current shell to '$SCRIPT_DIR'"
   export BCM_LOCAL_GIT_REPO=$SCRIPT_DIR
 fi
+
+# git commit
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
