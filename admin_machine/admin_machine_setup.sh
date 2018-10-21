@@ -26,11 +26,12 @@ if [[ -z $(git config --get --global user.email) ]]; then
   exit
 fi
 
-cd ..
-if [[ $(git config --get http.proxy) != "socks5://localhost:9050" ]]; then
-  git config http.proxy socks5://localhost:9050
+BCM_GITHUB_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
+BCM_LOCAL_REPO_HTTP_PROXY="socks5://localhost:9050"
+if [[ $(git config --get --global http.$BCM_GITHUB_URL.proxy) != $BCM_LOCAL_REPO_HTTP_PROXY ]]; then
+  echo "Setting git client to use local TOR proxy for URL '$BCM_GITHUB_URL'"
+  git config --global "http.$BCM_GITHUB_URL.proxy" $BCM_LOCAL_REPO_HTTP_PROXY
 fi
-cd "$(dirname "$0")"
 
 # get the current directory where this script is so we can reference it later, namely in .bashrc
 # file on the admin machine.
