@@ -2,30 +2,22 @@
 
 set -eu
 
-sudo apt-get update
-
-
-# check to see if docker is installed first; if not, we shall install it
-if [[ -z $(docker info) ]]; then
-
-
+# let's install docker
+if [[ ! $(snap list | grep lxd) ]]; then
+    sudo snap install docker --stable
 fi
 
-# first let's install docker-ce
-# get-docker.sh is the one from https://get.docker.com/
-bash -c $BCM_LOCAL_GIT_REPO/lxd/host_template/get-docker.sh
-
-# install ZFS locally so we can run lxd
-sudo apt-get install -f zfsutils-linux
+# install ZFS locally and client tools.
+sudo apt-get update
+sudo apt-get install -f zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 
 # install lxd via snap
-sudo snap install lxd --stable
+if [[ ! $(snap list | grep lxd) ]]; then
+    sudo snap install lxd --stable
+fi
 
 # Next make sure multipass is installed so we can run type-1 VMs
 if [[ ! $(snap list | grep multipass) ]]; then
     # if it doesn't, let's install
     sudo snap install multipass --beta --classic
 fi
-
-# and install client tools; TODO move these to a docker container running on the admin machine
-sudo apt-get install -y wait-for-it rsync apg libfuse-dev fuse
