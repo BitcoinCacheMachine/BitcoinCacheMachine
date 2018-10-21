@@ -69,8 +69,7 @@ if [ ! -d ~/.bcm/certs ]; then
   # and will be used as trust/authentication boundary, i.e., one self-signed Root CA per BIP32 path.
   openssl req -x509 -subj "/C=US/ST=BCM/L=INTERNET/O=BCM/CN=BCM ROOT CA" -new -nodes -key ~/.bcm/certs/rootca.key -sha256 -days 365 -out ~/.bcm/certs/rootca.cert
 
-  git add *
-  git commit -am "Added ~/.bcm/certs/rootca.key and rootca.cert"
+  bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
 else
   echo "BCM certs directory exists at ~/.bcm/certs"
 fi
