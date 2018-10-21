@@ -22,7 +22,12 @@ sudo apt-get install -y zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 # remove any legacy lxd software and install install lxd via snap
 if [[ -z $(snap list | grep lxd) ]]; then
     sudo apt-get remove --purge lxd lxd-client
-    sudo addgroup --system lxd
+    
+    # if the lxd groups doesn't exist, create it.
+    if [[ -z $(cat /etc/group | grep lxd) ]]; then
+        sudo addgroup --system lxd
+    fi
+
     sudo adduser $(whoami) lxd
     newgrp lxd
     sudo snap install lxd --stable
