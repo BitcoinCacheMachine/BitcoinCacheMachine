@@ -28,7 +28,11 @@ if [[ -z $(snap list | grep lxd) ]]; then
         sudo addgroup --system lxd
     fi
 
-    sudo adduser $(whoami) lxd
+    # if the lxd groups doesn't exist, create it.
+    if [[ -z $(groups $(whoami) | grep lxd ) ]]; then
+        sudo adduser $(whoami) lxd
+    fi
+
     newgrp lxd
     sudo snap install lxd --stable
     sudo snap disable lxd
