@@ -21,9 +21,9 @@ sudo apt-get install -y zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 
 # remove any legacy lxd software and install install lxd via snap
 if [[ -z $(snap list | grep lxd) ]]; then
-    sudo apt remove --purge lxd lxd-client
+    sudo apt-get remove --purge lxd lxd-client
     sudo snap install lxd --stable
-    adduser $(whoami) lxd
+    sudo adduser $(whoami) lxd
 
     # next let's install the software.
     bash -c "./provision_lxd.sh"
