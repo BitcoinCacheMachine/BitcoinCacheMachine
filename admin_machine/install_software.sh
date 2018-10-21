@@ -17,7 +17,7 @@ sudo snap install lxd --stable
 # Next make sure multipass is installed so we can run type-1 VMs
 if [[ ! $(snap list | grep multipass) ]]; then
     # if it doesn't, let's install
-    sudo snap install multipass --stable --classic
+    sudo snap install multipass --beta --classic
 fi
 
 # and install client tools; TODO move these to a docker container running on the admin machine
