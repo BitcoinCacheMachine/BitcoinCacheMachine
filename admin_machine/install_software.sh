@@ -31,12 +31,10 @@ if [[ -z $(snap list | grep lxd) ]]; then
     # if the lxd groups doesn't exist, create it.
     if [[ -z $(groups $(whoami) | grep lxd ) ]]; then
         sudo adduser $(whoami) lxd
+        newgrp lxd -
     fi
 
-    newgrp lxd
     sudo snap install lxd --stable
-    sudo snap disable lxd
-    sudo snap enable lxd
 
     # next let's configure the software.
     bash -c "./provision_lxd.sh"
