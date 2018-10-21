@@ -19,6 +19,8 @@ sudo apt-get install -y zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 
 # install lxd via snap
 if [[ ! $(snap list | grep lxd) ]]; then
+    sudo apt remove --purge lxd lxd-client
+    
     sudo groupadd --system lxd
     sudo usermod -G lxd -a $(whoami)
 

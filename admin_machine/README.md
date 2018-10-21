@@ -21,8 +21,6 @@ alias bcm="source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh"
   4. [mulitpass](https://github.com/CanonicalLtd/multipass) -- Multipass allows you to run QEMU/KVM-based virtual machines. Also useful for testing and development. Visit the [BCM multipass directory](../multipass/) for additional details.
 * Configures the installed software for BCM. `./provision.sh` (called by `admin_machine_setup.sh`). This script primes the LXD configuration on your local `admin machine` to accept BCM scripts. It configures your local LXD endpoint to operate in [clustering](https://lxd.readthedocs.io/en/latest/clustering/) mode.
 
-Once you have a properly configured LXD endpoint, delve into the [$BCM_LOCAL_GIT_REPO/lxd/](../lxd/) directory. This is where you can deploy BCM data center components to any cluster-mode LXD endpoint.
-
 ## Getting Started
 
 Run the following on your `admin machine`:
@@ -30,3 +28,5 @@ Run the following on your `admin machine`:
 ```bash
 bash -c ./admin_machine_setup.sh  --- params
 ```
+
+Once you have a properly configured LXD endpoint (`lxc info` and `docker info`), delve into the [$BCM_LOCAL_GIT_REPO/lxd/](../lxd/) directory. This is where you can deploy BCM data center components to any cluster-mode LXD endpoint.

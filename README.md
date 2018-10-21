@@ -58,7 +58,7 @@ git clone $BCM_GITHUB_REPO_URL ~/git/github/bcm
 cd ~/git/github/bcm/admin_machine
 ```
 
-Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of `~/git/github/bcm`). Note that subsequent BCM setup scripts configure your git client to specifically is use TOR for git push/pull operations.
+Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of `~/git/github/bcm`).
 
 Click the following link to continue with the tutorial: [./admin_machine/](./admin_machine/).
 
