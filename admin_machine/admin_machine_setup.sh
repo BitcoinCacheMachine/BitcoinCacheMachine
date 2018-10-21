@@ -86,11 +86,10 @@ else
   echo "    Run 'bcm' to load BCM environment variables FOR THE CURRENT LXD endpoint."
   echo "    Run 'lxc remote get-default' to determine your current LXD endpoint. Run 'lxc remote set-default <endpoint>' to change the LXD endpoint."
   echo ""
-fi
 
-# git commit
-bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+  # git commit
+  bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+fi
 
 # next let's install the software.
 bash -c "./install_software.sh"
-
