@@ -46,22 +46,19 @@ The first step to getting started with Bitcoin Cache Machine is to clone the git
 ```bash
 sudo apt-get update
 sudo apt-get install -y tor git
-git config --global http.proxy socks5://localhost:9050
+BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
+git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
 ```
 
 You can now clone the BCM repository to the `admin machine` over TOR:
 
 ```bash
 mkdir -p ~/git/github/bcm
-git clone https://github.com/BitcoinCacheMachine/BitcoinCacheMachine ~/git/github/bcm
+git clone $BCM_GITHUB_REPO_URL ~/git/github/bcm
 cd ~/git/github/bcm/admin_machine
 ```
 
-Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of `~/git/github/bcm`). You may want to change your global git settings back to defaults so you won't download ALL git repos using TOR (see command below). Note that subsequent BCM setup scripts configure your git client to specifically is use TOR for git push/pull operations.
-
-```bash
-git config --unset http.proxy
-```
+Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of `~/git/github/bcm`). Note that subsequent BCM setup scripts configure your git client to specifically is use TOR for git push/pull operations.
 
 Click the following link to continue with the tutorial: [./admin_machine/](./admin_machine/).
 
