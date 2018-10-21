@@ -43,9 +43,9 @@ But before you begin, clone this repository to your machine--the machine that wi
 
 # Getting Started
 
-These instructions assume you're running Ubuntu Desktop 18.04. The instructions will be similar for other modern Linux distros.
+These instructions assume you're running Ubuntu Desktop 18.04. The instructions will be similar for other modern Linux distros. We recommend you type the command below into the terminal rather than copy-paste. This helps improve your Linux [muscle memory](https://en.wikipedia.org/wiki/Muscle_memory) which is especially useful if you want to start developing on BCM.
 
-The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `admin machine`. We will configure our local git client to download the BCM repository from github over TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address.
+The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `admin machine`. We will first ensure we have tor and git installed, then you configure your local git client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address.
 
 ```bash
 sudo apt-get update
@@ -62,7 +62,7 @@ cd ~/git/github/bcm/admin_machine
 ./setup.sh
 ```
 
-Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of ~/git/github/bcm). You may want to change your global git settings back to defaults so you won't download ALL git repos using TOR. Note that the BCM git repo specifically is configured to use TOR for git push/pull operations. Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
+Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of `~/git/github/bcm`). You may want to change your global git settings back to defaults so you won't download ALL git repos using TOR (see command below). Note that the BCM git repo specifically is configured to use TOR for git push/pull operations. Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
 
 ```bash
 git config --unset http.proxy
@@ -78,9 +78,10 @@ BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real
 
 Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate. [Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
 
-You can also donate to the development of BCM by donating Bitcoin (BTC). For on-chain payments, use BIP47/PayNyms:
+You can also donate to the development of BCM by donating Bitcoin (BTC). For on-chain payments, use [BIP47](https://github.com/bitcoin/bips/blob/master/bip-0047.mediawiki):
 
-* on-chain - [Paynym Public Directory](https://paynym.is/+muddywaterfall4ed)
-* on-chain - [BIP47](https://github.com/bitcoin/bips/blob/master/bip-0047.mediawiki) Payment Code: `PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon`
-* off-chain - We will start accepting donations via Lightning network once Bitcoin Cache Machine reaches maturity!
-  
+* on-chain - [BCM Payment Code](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon) Why BIP47 Payment Codes? Because sending to the same address every transaction is BAD FOR PRIVACY!
+
+[<img src="./resources/bcm-payment-code.jpg" alt="BCM Payment Code" height="250" width="250">](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon)
+
+* off-chain - We will start accepting donations via Lightning network once Bitcoin Cache Machine becomes stable enough for us to confidently accept off-chain paymight via Lightning Network!
