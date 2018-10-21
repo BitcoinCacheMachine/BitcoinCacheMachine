@@ -7,11 +7,11 @@
 * (TODO:  ~/.bcm will be mounted using a encrypted [FUSE mount](https://github.com/netheril96/securefs) that can be unlocked interactively with a user-provided password or hardware wallet device).
 * Generates the Root Certificate Authority cert at ~/.bcm/certs. Eventually, digital signatures associated with the public key will be relegated exclusively to hardware wallet operations.
 
-Next, `./admin_machine_setup.sh` places the following lines in your `~/.bashrc` file so you can simply type `bcm` to load all relevant BCM environment variables for your active LXD endpoint. ('user' will be replaced with the user running ./admin_machine_setup.sh on the `admin machine`)
+Next, `./admin_machine_setup.sh` places the following lines in your `~/.bashrc` file so you can simply type `bcm` to load all relevant BCM environment variables for your active LXD endpoint. The `../lxd/` directory relies heavily on BCM environment variables to guide execution of BCM scripts.
 
 ```bash
 ### Start BCM
-export BCM_LOCAL_GIT_REPO="~/git/user/bcm"
+export BCM_LOCAL_GIT_REPO="~/git/$(whoami)/bcm"
 alias bcm="source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh"
 ### END BCM
 ```
