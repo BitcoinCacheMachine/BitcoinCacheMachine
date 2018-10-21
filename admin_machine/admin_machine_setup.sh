@@ -30,6 +30,9 @@ fi
 # file on the admin machine.
 echo "Setting BCM_LOCAL_GIT_REPO environment variable in current shell to '$(dirname "$(pwd)")'"
 export BCM_LOCAL_GIT_REPO="$(dirname "$(pwd)")"
+cd $BCM_LOCAL_GIT_REPO
+git config http.proxy socks5://localhost:9050
+cd -
 
 # reset to current dir
 cd "$(dirname "$0")"
