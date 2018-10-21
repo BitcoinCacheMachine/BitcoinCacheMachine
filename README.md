@@ -68,7 +68,7 @@ Feel free to change the directory in which you store the BCM repository on your 
 git config --unset http.proxy
 ```
 
-Visit the [./admin_machine/](./admin_machine/README.md) directory to continue.
+Visit the [./admin_machine/](./admin_machine/) directory to continue.
 
 ## Project Status
 

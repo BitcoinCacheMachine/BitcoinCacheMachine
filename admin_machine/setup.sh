@@ -15,10 +15,7 @@ cd "$(dirname "$0")"
 # file on the admin machine.
 SCRIPT_DIR=$(pwd)
 
-
 # TODO implemented encfs on ~/.bcm
-# TODO initialize ~/.bcm as git repo.
-
 # if ~/.bcm doesn't exist, create it
 if [ ! -d ~/.bcm ]; then
   echo "Creating Bitcoin Cache Machine config directory at ~/.bcm"
@@ -32,7 +29,6 @@ if [ ! -d ~/.bcm/clusters ]; then
   echo "Creating BCM clusters directory at ~/.bcm/clusters"
   mkdir -p ~/.bcm/clusters
 fi
-
 
 # certificates - we store root certificates here
 if [ ! -d ~/.bcm/certs ]; then
@@ -80,3 +76,6 @@ fi
 
 # git commit
 bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+
+# next let's install the software.
+bash -c "./install_software.sh"
