@@ -26,6 +26,7 @@ if [[ -z $(git config --get --global user.email) ]]; then
   exit
 fi
 
+# let's make sure the local git client is using TOR for git push/pull operations for the BCM github URL only.
 BCM_GITHUB_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 BCM_LOCAL_REPO_HTTP_PROXY="socks5://localhost:9050"
 if [[ $(git config --get --global http.$BCM_GITHUB_URL.proxy) != $BCM_LOCAL_REPO_HTTP_PROXY ]]; then
