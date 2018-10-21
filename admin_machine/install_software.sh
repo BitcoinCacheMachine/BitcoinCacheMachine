@@ -3,7 +3,7 @@
 set -e
 
 # let's install and configure docker-ce
-if [[ ! $(snap list | grep docker) ]]; then
+if [ -z $(snap list | grep docker) ]; then
     if [[ -z $(groups | grep docker) ]]; then
         sudo addgroup --system docker
         sudo adduser $(whoami) docker
@@ -20,7 +20,7 @@ sudo apt-get update
 sudo apt-get install -y zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 
 # remove any legacy lxd software and install install lxd via snap
-if [[ -z $(snap list | grep lxd) ]]; then
+if [ -z $(snap list | grep lxd) ]; then
     sudo apt-get remove --purge lxd lxd-client
     sudo addgroup --system lxd
     sudo adduser $(whoami) lxd
@@ -34,7 +34,7 @@ if [[ -z $(snap list | grep lxd) ]]; then
 fi
 
 # Next make sure multipass is installed so we can run type-1 VMs
-if [[ ! $(snap list | grep multipass) ]]; then
+if [ -z $(snap list | grep multipass) ]; then
     # if it doesn't, let's install
     sudo snap install multipass --beta --classic
 fi
