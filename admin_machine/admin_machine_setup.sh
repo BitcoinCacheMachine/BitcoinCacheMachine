@@ -11,6 +11,21 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
+# first a common problem with new installations is that git itsn't fully configured.
+# let's test for this condition and quit if necessary.
+if [[ -z $(git config --get --global user.name)]]; then
+  echo "You need to configure the git user.name configuration parameter so we can make commits. Run the following command:"
+  echo "    git config --global user.name bubba"
+  exit
+fi
+
+# same for email address
+if [[ -z $(git config --get --global user.email)]]; then
+  echo "You need to configure the git email parameter so we can make commits. Run the following command:"
+  echo "    git config --global user.email bubba@nowhere.com"
+  exit
+fi
+
 # get the current directory where this script is so we can reference it later, namely in .bashrc
 # file on the admin machine.
 SCRIPT_DIR=$(pwd)
