@@ -31,6 +31,9 @@ fi
 echo "Setting BCM_LOCAL_GIT_REPO environment variable in current shell to '$(dirname "$(pwd)")'"
 export BCM_LOCAL_GIT_REPO="$(dirname "$(pwd)")"
 
+# reset to current dir
+cd "$(dirname "$0")"
+
 # TODO implemented encfs on ~/.bcm
 # if ~/.bcm doesn't exist, create it
 if [ ! -d ~/.bcm ]; then
@@ -91,6 +94,3 @@ bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
 # next let's install the software.
 bash -c "./install_software.sh"
 
-
-# next let's install the software.
-bash -c "./install_software.sh"
