@@ -41,7 +41,7 @@ Documentation for BCM and its components can be found in this repository. All do
 
 ## Getting Started
 
-The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `admin machine`. We will first ensure we have tor and git installed, then you configure your local git client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.) Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
+The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `dev machine`. We will first ensure we have tor and git installed, then you configure your local git client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.) Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
 
 ```bash
 sudo apt-get update
@@ -50,17 +50,17 @@ BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
 ```
 
-You can now clone the BCM repository to the `admin machine` over TOR:
+You can now clone the BCM repository to the `dev machine` over TOR:
 
 ```bash
 mkdir -p ~/git/github/bcm
 git clone $BCM_GITHUB_REPO_URL ~/git/github/bcm
-cd ~/git/github/bcm/admin_machine
+cd ~/git/github/bcm/dev_machine
 ```
 
-Feel free to change the directory in which you store the BCM repository on your `admin_machine` (instead of `~/git/github/bcm`).
+Feel free to change the directory in which you store the BCM repository on your `dev_machine` (instead of `~/git/github/bcm`).
 
-Click the following link to continue with the tutorial: [./admin_machine/](./admin_machine/).
+Click the following link to continue with the tutorial: [./dev_machine/](./dev_machine/).
 
 ## How to contribute
 

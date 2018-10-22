@@ -1,5 +1,5 @@
 config:
-  core.https_address: $BCM_ADMIN_MACHINE_LXD_LISTEN_IP:8443
+  core.https_address: $BCM_dev_machine_LXD_LISTEN_IP:8443
   core.trust_password: $BCM_LXD_SECRET
 cluster:
   server_name: $BCM_LXD_CLUSTER_NAME

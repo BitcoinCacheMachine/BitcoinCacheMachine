@@ -5,16 +5,21 @@
 
 set -e
 
-export BCM_LXD_CLUSTER_NAME="ADMIN_MACHINE"
-export BCM_ADMIN_MACHINE_LXD_LISTEN_IP="127.0.0.1"
+export BCM_LXD_CLUSTER_NAME="dev_machine"
+export BCM_dev_machine_LXD_LISTEN_IP="127.0.0.1"
 export BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
 
 BCM_CLUSTER_ROOT=~/.bcm/clusters/$BCM_LXD_CLUSTER_NAME
-BCM_ENDPOINT_ROOT=$BCM_CLUSTER_ROOT/local
+BCM_CLUSTER_PROJECTS_ROOT_DIR=$BCM_CLUSTER_ROOT/lxd_projects
+BCM_ENDPOINT_ROOT=$BCM_CLUSTER_ROOT/endpoints/local
 BCM_ENDPOINT_LXD_ROOT=$BCM_ENDPOINT_ROOT/lxd
 
 if [[ ! -d $BCM_CLUSTER_ROOT ]]; then
     mkdir -p $BCM_CLUSTER_ROOT
+fi
+
+if [[ ! -d $BCM_CLUSTER_PROJECTS_ROOT_DIR ]]; then
+    mkdir -p $BCM_CLUSTER_PROJECTS_ROOT_DIR
 fi
 
 if [[ ! -d $BCM_ENDPOINT_ROOT ]]; then
@@ -28,9 +33,6 @@ fi
 if [[ ! -f $BCM_ENDPOINT_LXD_ROOT/preseed.yml ]]; then
     # substitute the variables in lxd_master_preseed.yml
     envsubst < ./am_lxd_preseed.yml > $BCM_ENDPOINT_LXD_ROOT/preseed.yml
-fi
-
-if [[ -f $BCM_ENDPOINT_LXD_ROOT/preseed.yml ]]; then
-    # initialize the LXD daemon with the preseed
+    sleep 5
     bash -c "cat $BCM_ENDPOINT_LXD_ROOT/preseed.yml | sudo lxd init --preseed"
 fi

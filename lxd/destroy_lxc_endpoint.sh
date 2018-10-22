@@ -27,8 +27,14 @@ bash -c "./gateway/destroy_lxc_gateway.sh template"
 echo "Calling ./host_template/destroy_lxc_host_template.sh"
 bash -c "./host_template/destroy_lxc_host_template.sh"
 
-rm -rf ~/.bcm/runtime/$(lxc remote get-default)/
+# ensure we have an LXD project defined for this deployment
+# you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)
+if [[ $(lxc project list | grep bcm) ]]; then
+  lxc project switch default
+  lxc project delete bcm
+fi
 
+rm -rf ~/.bcm/runtime/$(lxc remote get-default)/
 
 # if [[ $BCM_BITCOIN_DELETE = "true" ]]; then
 #   echo "Calling ./bitcoin/destroy_lxd_bitcoin.sh"

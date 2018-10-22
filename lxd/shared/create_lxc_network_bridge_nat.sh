@@ -10,7 +10,6 @@ if [[ $PROCEED = "true" ]]; then
         # TODO LOOP THROUGH CLUSTER MEMBERS.
         for endpoint in $(bash -c $BCM_LOCAL_GIT_REPO/lxd/shared/get_lxc_cluster_members.sh)
         do
-            echo "$endpoint"
             lxc network create --target $endpoint $LXD_NETWORK_NAME
         done
 

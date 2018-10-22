@@ -36,7 +36,7 @@ if [[ -z $(lxc profile list | grep "docker_privileged") ]]; then
 fi
 
 ## Create the manager1 host from the lxd image template.
-lxc init bcm-template manager-template -p docker -p docker_privileged -s "$BCM_ZFS_PREFIX-bcm_d1ata"
+lxc init bcm-template manager-template -p docker -p docker_privileged -s "bcm_d1ata"
 
 # push necessary files to the template including daemon.json
 lxc file push ./daemon.json manager-template/etc/docker/daemon.json

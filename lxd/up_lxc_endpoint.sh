@@ -9,6 +9,15 @@ cd "$(dirname "$0")"
 # call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
 bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
+# ensure we have an LXD project defined for this deployment
+# you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)
+if [[ -z $(lxc project list | grep bcm) ]]; then
+    lxc project create bcm
+    mkdir $BCM_CLUSTER_PROJECTS_ROOT_DIR/bcm
+    lxc project switch bcm
+    #-c features.images=false -c features.profiles=false
+fi
+
 # If the admin hasn't specified an external LXD image server, then
 # we can only assume that we need to build a base image from scratch. 
 # it's best to centralize your image creation, but good for standalone deployments.

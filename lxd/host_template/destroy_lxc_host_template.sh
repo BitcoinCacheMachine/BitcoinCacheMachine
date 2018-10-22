@@ -6,10 +6,6 @@ set -e
 cd "$(dirname "$0")"
 
 
-# delte container gateway-template
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_GATEWAY_CONTAINER_TEMPLATE_DELETE gateway-template"
-
-
 # delete dockertemplate
 if [[ $(lxc list | grep dockertemplate) ]]; then
     echo "Deleting dockertemplate lxd host."
@@ -41,4 +37,4 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_
 # storage
 
 # delete lxc storage zfs backend
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_STORAGE_BCM_DATA_DELETE $BCM_ZFS_PREFIX-bcm_data"
+bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_STORAGE_BCM_DATA_DELETE bcm_data"
