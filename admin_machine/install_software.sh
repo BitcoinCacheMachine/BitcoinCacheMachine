@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -eu
 
 # let's install and configure docker-ce
 if [[ -z $(snap list | grep docker) ]]; then
@@ -21,15 +21,14 @@ sudo apt-get install -y zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 
 # remove any legacy lxd software and install install lxd via snap
 if [[ -z $(snap list | grep lxd) ]]; then
-    sudo apt-get remove --purge lxd lxd-client
-    
+   
     # if the lxd groups doesn't exist, create it.
     if [[ -z $(cat /etc/group | grep lxd) ]]; then
         sudo addgroup --system lxd
     fi
 
-    # if the lxd groups doesn't exist, create it.
-    if [[ -z $(groups $(whoami) | grep lxd ) ]]; then
+    # add the current user to the lxd group if necessary
+    if [[ -z $(groups $(whoami) | grep lxd) ]]; then
         sudo adduser $(whoami) lxd
         newgrp lxd -
     fi
