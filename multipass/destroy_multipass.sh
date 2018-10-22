@@ -56,4 +56,4 @@ if [[ -d /tmp/bcm ]]; then
   rm -rf /tmp/bcm
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh 'Destroyed $BCM_MULTIPASS_VM_NAME and associated files.'"

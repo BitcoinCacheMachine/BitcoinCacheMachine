@@ -1,6 +1,8 @@
 
 # First some notes about `./admin_machine_setup.sh`
 
+The `admin machine` is NOT meant to participate in production workloads. It's meant primarily for or and administering production LXD clusters (like in your home or office).
+
 `./admin_machine_setup.sh` prepares the `admin machine` for using BCM scripts. Here's what `./admin_machine_setup.sh` does to the `admin machine`:
 
 * Creates the `~/.bcm/` directory - BCM scripts store LXD cluster, endpoint, and sensitive runtime files in this directory. `admin_machine_setup.sh` initializes ~/.bcm as a git repository for versioning. BCM scripts make regular commits to the ~/.bcm repo as files are added or deleted.

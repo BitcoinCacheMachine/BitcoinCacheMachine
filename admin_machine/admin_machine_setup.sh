@@ -69,7 +69,7 @@ if [ ! -d ~/.bcm/certs ]; then
   # and will be used as trust/authentication boundary, i.e., one self-signed Root CA per BIP32 path.
   openssl req -x509 -subj "/C=US/ST=BCM/L=INTERNET/O=BCM/CN=BCM ROOT CA" -new -nodes -key ~/.bcm/certs/rootca.key -sha256 -days 365 -out ~/.bcm/certs/rootca.cert
 
-  bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+  bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh 'Added ~/.bcm/certs and associated certificate and key files.'"
 else
   echo "BCM certs directory exists at ~/.bcm/certs"
 fi
@@ -89,9 +89,6 @@ else
   echo "    Run 'bcm' to load BCM environment variables FOR THE CURRENT LXD endpoint."
   echo "    Run 'lxc remote get-default' to determine your current LXD endpoint. Run 'lxc remote set-default <endpoint>' to change the LXD endpoint."
   echo ""
-
-  # git commit
-  bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
 fi
 
 # next let's install the software.

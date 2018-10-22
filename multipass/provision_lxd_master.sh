@@ -3,14 +3,15 @@
 set -eu
 
 VM_DIR=$ENDPOINTS_DIR/$BCM_MULTIPASS_VM_NAME
+LXD_DIR=$VM_DIR/lxd
 
-mkdir -p $VM_DIR/lxd
+mkdir -p $LXD_DIR
 
  # substitute the variables in lxd_master_preseed.yml
-envsubst < ./lxd_preseed/lxd_master_preseed.yml > $VM_DIR/lxd/preseed.yml
+envsubst < ./lxd_preseed/lxd_master_preseed.yml > $LXD_DIR/preseed.yml
 
 # upload the lxd preseed file to the multipass vm.
-multipass copy-files $VM_DIR/lxd/preseed.yml $BCM_MULTIPASS_VM_NAME:/home/multipass/preseed.yml
+multipass copy-files $LXD_DIR/preseed.yml $BCM_MULTIPASS_VM_NAME:/home/multipass/preseed.yml
 
 # now initialize the LXD daemon on the VM.
 multipass exec $BCM_MULTIPASS_VM_NAME -- sh -c "cat /home/multipass/preseed.yml | sudo lxd init --preseed"
@@ -18,8 +19,8 @@ multipass exec $BCM_MULTIPASS_VM_NAME -- sh -c "cat /home/multipass/preseed.yml 
 # since it's the master, let's grab the certificate so we can use it in subsequent lxd_pressed files.
 if [[ ! -f $VM_DIR/lxd/lxd.cert ]]; then
   # lets' get the resulting cluster certificate fingerprint and store it in the .env for the cluster master.
-  mkdir -p $VM_DIR/lxd
-  multipass exec $BCM_MULTIPASS_VM_NAME -- cat /var/snap/lxd/common/lxd/server.crt >> $VM_DIR/lxd/lxd.cert
+  mkdir -p $LXD_DIR
+  multipass exec $BCM_MULTIPASS_VM_NAME -- cat /var/snap/lxd/common/lxd/server.crt >> $LXD_DIR/lxd.cert
 fi
 
 echo "Waiting for the remote lxd daemon to become available."
@@ -31,4 +32,4 @@ lxc remote set-default $BCM_MULTIPASS_VM_NAME
 
 echo "Current lxd remote default is $BCM_MULTIPASS_VM_NAME."
 
-bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh 'Added master LXD preseed files at $LXD_DIR'"

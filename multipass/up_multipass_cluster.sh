@@ -17,6 +17,11 @@ do
     esac
 done
 
+if [[ -z $BCM_CLUSTER_NAME ]]; then
+    echo "Please provide a cluster name using the -c <CLUSTER_NAME> argument."
+    exit
+fi
+
 # the master is always going to be '$BCM_CLUSTER_NAME-00'
 export BCM_MULTIPASS_VM_NAME="$BCM_CLUSTER_NAME-00"
 

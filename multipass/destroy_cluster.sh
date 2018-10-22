@@ -38,4 +38,4 @@ if [ -d $CLUSTER_DIR ]; then
   rm -Rf $CLUSTER_DIR
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh 'Destroyed Cluster $BCM_CLUSTER_NAME and all associted files.'"

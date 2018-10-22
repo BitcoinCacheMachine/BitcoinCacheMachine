@@ -21,7 +21,8 @@ sudo apt-get install -y zfsutils-linux wait-for-it rsync apg libfuse-dev fuse
 
 # remove any legacy lxd software and install install lxd via snap
 if [[ -z $(snap list | grep lxd) ]]; then
-   
+    echo "LXD snap package not found. Installing."
+
     # if the lxd groups doesn't exist, create it.
     if [[ -z $(cat /etc/group | grep lxd) ]]; then
         sudo addgroup --system lxd
@@ -34,10 +35,10 @@ if [[ -z $(snap list | grep lxd) ]]; then
     fi
 
     sudo snap install lxd --stable
-
-    # next let's configure the software.
-    bash -c "./provision_lxd.sh"
 fi
+
+# next let's configure the software.
+bash -c "./provision_lxd.sh"
 
 # Next make sure multipass is installed so we can run type-1 VMs
 if [[ -z $(snap list | grep multipass) ]]; then

@@ -20,4 +20,4 @@ else
     echo "Incorrect usage. Please specify whether $BCM_MULTIPASS_VM_NAME is an LXD cluster master or member."
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh"
+bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh" 'Added files associated with stub_env.sh'
