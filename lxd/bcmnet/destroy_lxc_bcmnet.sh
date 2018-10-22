@@ -9,6 +9,10 @@
 # exit script if there's an error anywhere
 set -e
 
+# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
+source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
+
+
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
 cd "$(dirname "$0")"

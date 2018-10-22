@@ -6,8 +6,8 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
-#bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
+# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
+source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 # quit if there are no BCM environment variables
 if [[ -z $(env | grep BCM) ]]; then
@@ -15,14 +15,14 @@ if [[ -z $(env | grep BCM) ]]; then
   exit
 fi
 
-echo "Calling ./app_hosts/destroy_lxc_apphosts.sh"
-bash -c "./bcmnet/app_hosts/destroy_lxc_apphosts.sh template"
+# echo "Calling ./app_hosts/destroy_lxc_apphosts.sh"
+# bash -c "./bcmnet/app_hosts/destroy_lxc_apphosts.sh template"
 
-echo "Calling ./bcmnet/destroy_lxc_bcmnet.sh"
-bash -c "./bcmnet/destroy_lxc_bcmnet.sh template"
+# echo "Calling ./bcmnet/destroy_lxc_bcmnet.sh"
+# bash -c "./bcmnet/destroy_lxc_bcmnet.sh template"
 
-echo "Calling ./gateway/destroy_lxc_gateway.sh"
-bash -c "./gateway/destroy_lxc_gateway.sh template"
+# echo "Calling ./gateway/destroy_lxc_gateway.sh"
+# bash -c "./gateway/destroy_lxc_gateway.sh template"
 
 echo "Calling ./host_template/destroy_lxc_host_template.sh"
 bash -c "./host_template/destroy_lxc_host_template.sh"

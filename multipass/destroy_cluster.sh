@@ -18,7 +18,7 @@ fi
 echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
 
 export CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
-export ENDPOINTS_DIR="$CLUSTER_DIR/endpoints"
+export ENDPOINTS_DIR="$CLUSTER_DIR/lxd_endpoints"
 
 echo "CLUSTER_DIR=$CLUSTER_DIR"
 echo "ENDPOINTS_DIR=$ENDPOINTS_DIR"

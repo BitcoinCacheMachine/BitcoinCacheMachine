@@ -33,7 +33,7 @@ This is what you're going to run when in the ./multipass directory. It has 2 par
 
 ### ./stub.env.sh
 
-This script creates the .env file needed for each LXD endpoint. `./stub_env.sh` uses the `envsubst` command to substitute environment variables from the template files in the ./env/ directory. The resulting file gets stored at `~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME/.env`. This file contains, the VM multipass VM name, the LXD secret (randomly generated), and the multipass CPU, memory, and disk space used during provisioning.
+This script creates the .env file needed for each LXD endpoint. `./stub_env.sh` uses the `envsubst` command to substitute environment variables from the template files in the ./env/ directory. The resulting file gets stored at `~/.bcm/clusters/$BCM_CLUSTER_NAME/lxd_endpoints/$BCM_MULTIPASS_VM_NAME/.env`. This file contains, the VM multipass VM name, the LXD secret (randomly generated), and the multipass CPU, memory, and disk space used during provisioning.
 
 ### ./multipass_vm_up.sh
 
@@ -43,13 +43,13 @@ This script continues by obtaining the runtime IP address of the multipass VM th
 
 ### provision_lxd_master.sh
 
-This script starts by creating an LXD preseed file, storing it in `~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME/lxd/`. The resulting file is copied up to the multipass VM then the `lxd init` command is issued, passing in the preseed file. After the LXD daemon is configured in the multipass VM, the resulting lxd.cert file in the daemon is copied back to the `dev_machine` for subsequent provisioning activities. The lxd.cert is stored in the same directory as the LXD preseed file.
+This script starts by creating an LXD preseed file, storing it in `~/.bcm/clusters/$BCM_CLUSTER_NAME/lxd_endpoints/$BCM_MULTIPASS_VM_NAME/lxd/`. The resulting file is copied up to the multipass VM then the `lxd init` command is issued, passing in the preseed file. After the LXD daemon is configured in the multipass VM, the resulting lxd.cert file in the daemon is copied back to the `dev_machine` for subsequent provisioning activities. The lxd.cert is stored in the same directory as the LXD preseed file.
 
 `provision_lxd_master.sh` completes by adding an LXD remote to the `dev_machine` lxd client (via `lxc remote add`). Furthermore, the lxc remote is defaulted to first cluster member (i.e., "-00") via `lxd remote set-default`. This allows you to pass control to BCM provisioning scripts in the `$BCM_LOCAL_GIT_REPO/lxd/` directory.
 
 ### provision_lxd_member.sh
 
-`provision_lxd_member.sh` performs similar functions to `provision_lxd_master.sh` and is required because LXD preseed files for VMs joining an existing cluster is different from the first host in the cluster. All resulting preseed files are stored under `~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME/lxd/`.
+`provision_lxd_member.sh` performs similar functions to `provision_lxd_master.sh` and is required because LXD preseed files for VMs joining an existing cluster is different from the first host in the cluster. All resulting preseed files are stored under `~/.bcm/clusters/$BCM_CLUSTER_NAME/lxd_endpoints/$BCM_MULTIPASS_VM_NAME/lxd/`.
 
 ## Destruction Scripts
 

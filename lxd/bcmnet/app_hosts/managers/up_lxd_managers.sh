@@ -16,10 +16,7 @@ lxc network create lxdbrManager1
 echo "Creating lxd network 'managernet' for swarm members."
 lxc network create managernet ipv4.address=10.0.0.1/24 ipv4.nat=false ipv6.nat=false
 
-# # create the storage pool if it doesn't exist.
-# if [[ -z $(lxc storage list | grep "$bcm_d1ata") ]]; then
-#   lxc storage create "$bcm_d1ata" zfs size=10GB
-# fi
+
 
 # create the docker profile if it doesn't exist. This may happen when we have an external cachestack 
 # and we didn't create the profile during the host_template creation.

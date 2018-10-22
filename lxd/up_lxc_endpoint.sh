@@ -1,19 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -eu
 
 # set the working directory to the location where the script is located
-# since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
-bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
+# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
+source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
-# ensure we have an LXD project defined for this deployment
-# you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)
 if [[ -z $(lxc project list | grep bcm) ]]; then
     lxc project create bcm
-    mkdir $BCM_CLUSTER_PROJECTS_ROOT_DIR/bcm
+    mkdir -p $BCM_CLUSTER_PROJECTS_ROOT_DIR
     lxc project switch bcm
     #-c features.images=false -c features.profiles=false
 fi
@@ -39,19 +36,19 @@ else
   exit
 fi
 
-if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
-  echo "Deploying 'bcm-gateway'."
-  bash -c ./gateway/up_lxc_gateway.sh
-fi
+# if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
+#   echo "Deploying 'bcm-gateway'."
+#   bash -c ./gateway/up_lxc_gateway.sh
+# fi
 
-if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
-    echo "Creating lxc container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' and associated snapshot 'bcmnet_template'."
-    bash -c ./bcmnet/up_lxc_bcmnet.sh
-fi
+# if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
+#     echo "Creating lxc container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' and associated snapshot 'bcmnet_template'."
+#     bash -c ./bcmnet/up_lxc_bcmnet.sh
+# fi
 
 
-echo "Deploying app_hosts"
-bash -c ./app_hosts/up_lxc_apphosts.sh
+# echo "Deploying app_hosts"
+# bash -c ./app_hosts/up_lxc_apphosts.sh
 
 
 

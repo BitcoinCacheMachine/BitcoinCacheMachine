@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -e
+set -eu
+
+# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
+source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
@@ -11,7 +14,7 @@ if [[ -z $(lxc image list | grep bcm-template) ]]; then
     # only execute if bcm_data is non-zero
     if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
         # initialize the lxc container to the active lxd endpoint. 
-        lxc init bcm-bionic-base -p default -p docker_privileged -s "bcm_data" dockertemplate
+        lxc init bcm-bionic-base -p default -p docker_privileged -s bcm_data dockertemplate
         lxc start dockertemplate
     fi
 

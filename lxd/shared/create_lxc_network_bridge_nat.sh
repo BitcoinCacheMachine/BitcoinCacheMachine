@@ -13,10 +13,9 @@ if [[ $PROCEED = "true" ]]; then
             lxc network create --target $endpoint $LXD_NETWORK_NAME
         done
 
-        lxc network create $LXD_NETWORK_NAME ipv4.nat=true
+        # if the network doesn't exist, go ahead and create it.
+        if [[ -z $(lxc network list | grep $LXD_NETWORK_NAME) ]]; then
+            lxc network create $LXD_NETWORK_NAME ipv4.nat=true
+        fi
     fi
 fi
-
-
-# output="$(lxc cluster list |  grep ONLINE | cut -f1,2 -d'|')"
-# FOO_NO_WHITESPACE="$(echo -e "${output}" | tr -d '[:space:]')"

@@ -4,7 +4,11 @@
 # ready to run docker containers and has 1 interface exclusively connecting
 # to bcmnet.
 
-set -e
+set -eu
+
+# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
+source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
+
 
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
@@ -16,8 +20,6 @@ if [[ $(lxc list | grep $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME) ]]; the
     exit 1
 fi
 
-# call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
-bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
 
 # if bcm-template lxc image exists, run the rest of the script.
 if [[ -z $(lxc image list | grep "bcm-template") ]]; then

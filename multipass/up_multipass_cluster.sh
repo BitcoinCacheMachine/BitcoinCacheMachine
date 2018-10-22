@@ -38,7 +38,7 @@ if [ ! -d ~/.bcm/clusters ]; then
 fi
 
 # if ~/.bcm/clusters doesn't exist, create it.
-export ENDPOINTS_DIR="$CLUSTER_DIR/endpoints"
+export ENDPOINTS_DIR="$CLUSTER_DIR/lxd_endpoints"
 if [ ! -d $ENDPOINTS_DIR ]; then
   echo "Creating directory $ENDPOINTS_DIR"
   mkdir -p $ENDPOINTS_DIR
@@ -78,4 +78,4 @@ if [[ $MEMBER_COUNT -ge 1 ]]; then
 fi
 
 # run the 'bcm' command to load bcm the environment variables
-source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh
+source $BCM_LOCAL_GIT_REPO/resources/bcm/1admin_load_bcm_env.sh

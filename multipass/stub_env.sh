@@ -3,7 +3,7 @@
 TYPE=$1
 
 # create the file
-ENV_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME/endpoints/$BCM_MULTIPASS_VM_NAME
+ENV_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME/lxd_endpoints/$BCM_MULTIPASS_VM_NAME
 mkdir -p $ENV_DIR
 
 ENV_FILE="$ENV_DIR/.env"

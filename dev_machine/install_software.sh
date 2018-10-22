@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -e
 
 # let's install and configure docker-ce
 if [[ -z $(snap list | grep docker) ]]; then
@@ -36,9 +36,6 @@ if [[ -z $(snap list | grep lxd) ]]; then
 
     sudo snap install lxd --stable
 fi
-
-# next let's configure the software.
-bash -c "./provision_lxd.sh"
 
 # Next make sure multipass is installed so we can run type-1 VMs
 if [[ -z $(snap list | grep multipass) ]]; then

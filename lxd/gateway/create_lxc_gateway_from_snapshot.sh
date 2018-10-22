@@ -5,8 +5,8 @@ set -eu
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-# call bcm_script_before.sh to perform the things that every BCM script must do prior to proceeding
-#bash -c $BCM_LOCAL_GIT_REPO/resources/bcm/bcm_script_before.sh
+# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
+source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 # if bcm-template lxc image exists, run the gateway template creation script.
 if [[ -z $(lxc info $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME | grep BCMGatewayTemplate) ]]; then

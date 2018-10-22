@@ -84,12 +84,11 @@ else
   echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
   echo $BCM_BASHRC_FLAG >> ~/.bashrc
   echo 'export BCM_LOCAL_GIT_REPO="'$BCM_LOCAL_GIT_REPO'"' >> ~/.bashrc
-  echo 'alias bcm="source $BCM_LOCAL_GIT_REPO/resources/bcm/admin_load_bcm_env.sh"' >> ~/.bashrc
-
-  echo "    Run 'bcm' to load BCM environment variables FOR THE CURRENT LXD endpoint."
-  echo "    Run 'lxc remote get-default' to determine your current LXD endpoint. Run 'lxc remote set-default <endpoint>' to change the LXD endpoint."
-  echo ""
 fi
 
 # next let's install the software.
 bash -c "./install_software.sh"
+
+
+# next let's provision lxd.
+bash -c "./provision_lxd.sh"
