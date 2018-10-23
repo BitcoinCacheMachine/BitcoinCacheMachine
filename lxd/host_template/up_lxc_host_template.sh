@@ -19,7 +19,8 @@ if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
   echo "LXC image 'bcm-bionic-base' already exists. Skipping downloading of the image from the public image server."
 else
   echo "Copying the ubuntu/18.04 lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-bionic-base'"
-  lxc image copy images:ubuntu/18.04 "$(lxc remote get-default):" --alias "bcm-bionic-base" --auto-update --public
+  lxc image copy images:ubuntu/18.04 local:
+  # --alias bcm-bionic-base --auto-update
 fi
 
 ####

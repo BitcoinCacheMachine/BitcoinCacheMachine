@@ -1,5 +1,5 @@
 
-# <img src="./resources/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> Bitcoin Cache Machine
+# <img src="./resources/images/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> Bitcoin Cache Machine
 
 Bitcoin Cache Machine is open-source software that implements a self-hosted, privacy-centric, software-defined network. BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization. Its broad purpose is to software-define your home, office, or cloud networks with resilient privacy-preserving Bitcoin-related payment and operating IT infrastructure.
 
@@ -70,6 +70,6 @@ You can also donate to the development of BCM by donating Bitcoin (BTC). For on-
 
 * on-chain - [BCM Payment Code](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon) Why BIP47 Payment Codes? Because sending to the same address every transaction is BAD FOR PRIVACY!
 
-[<img src="./resources/bcm-payment-code.jpg" alt="BCM Payment Code" height="250" width="250">](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon)
+[<img src="./resources/images/bcm-payment-code.jpg" alt="BCM Payment Code" height="250" width="250">](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon)
 
 * off-chain - We will start accepting donations via Lightning network once Bitcoin Cache Machine becomes stable enough for us to confidently accept off-chain paymight via Lightning Network!
