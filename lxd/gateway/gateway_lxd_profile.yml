@@ -17,5 +17,5 @@ devices:
 
   eth1:
     nictype: bridged
-    parent: lxdGWLocalNet
+    parent: lxdbrBCMNET
     type: nic

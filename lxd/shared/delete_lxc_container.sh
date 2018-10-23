@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
+LXC_CONTAINER_NAME=$1
 
-# removes an LXC container passed as $2 on the condition of $1
-
-if [[ $1 = "true" ]]; then
-    if [[ $(lxc list | grep $2) ]]; then
-        # delete lxc container $2
-        if [[ $(lxc info $2 | grep "Name: $2") ]]; then
-            echo "Deleting lxc container '$2'."
-            lxc delete --force $2
-        fi
+if [[ $(lxc list | grep $LXC_CONTAINER_NAME) ]]; then
+    # delete lxc container $2
+    if [[ $(lxc info $LXC_CONTAINER_NAME | grep "Name: $LXC_CONTAINER_NAME") ]]; then
+        echo "Deleting lxc container '$LXC_CONTAINER_NAME'."
+        lxc delete --force $LXC_CONTAINER_NAME
     fi
 fi

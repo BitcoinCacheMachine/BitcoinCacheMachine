@@ -12,7 +12,7 @@ source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 #create and populate the required networks
 if [[ $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE = "true" ]]; then
-  bash -c "$BCM_LXD_OPS/create_lxc_network_bridge_nat.sh lxdbr0"
+  bash -c "$BCM_LXD_OPS/create_lxc_network_bridge_nat.sh lxdbr0 basicnat"
 fi
 
 # Let's createlx the ZFS storage pool for all operational images

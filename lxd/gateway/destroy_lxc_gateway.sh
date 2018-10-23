@@ -12,21 +12,35 @@ source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 SCRIPT_DIR=$(pwd)
 
 # delete container 'bcm-gateway'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_GATEWAY_CONTAINER_DELETE $BCM_LXC_GATEWAY_CONTAINER_NAME"
+if [[ $BCM_GATEWAY_CONTAINER_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
+fi
 
 # delete BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_GATEWAY_STORAGE_DOCKERVOL_DELETE $BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME"
+if [[ $BCM_GATEWAY_STORAGE_DOCKERVOL_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME"
+fi
+
 
 if [[ $1 == "template" ]]; then
     # delte container gateway-template
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_GATEWAY_CONTAINER_TEMPLATE_DELETE $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME"
+    if [[ $BCM_GATEWAY_CONTAINER_TEMPLATE_DELETE = "true" ]]; then
+        bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME"
+    fi
 
     # delete the profile bcm-gateway-profile
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_DELETE 'bcm-gateway-profile'"
+    if [[ $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_DELETE = "true" ]]; then
+        bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh bcm-gateway-profile"
+    fi
+    
+    # delete lxc networks
+    if [[ $BCM_GATEWAY_NETWORKS_DELETE = "true" ]]; then
+        bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh lxdbrGateway"
+    fi
 
-    # delete networks
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh $BCM_GATEWAY_NETWORKS_DELETE lxdbrGateway"
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh $BCM_GATEWAY_NETWORKS_DELETE lxdGWLocalNet"
+    if [[ $BCM_GATEWAY_NETWORKS_DELETE = "true" ]]; then
+        bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh lxdbrBCMNET"
+    fi
 fi
 
 rm -rf ~/.bcm/runtime/$(lxc remote get-default)/$BCM_LXC_GATEWAY_CONTAINER_NAME

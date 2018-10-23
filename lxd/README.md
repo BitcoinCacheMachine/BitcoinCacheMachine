@@ -1,6 +1,6 @@
 # IMPORTANT NOTE
 
-This section is still under construction.  Your attempts at running scripts here will likely fail at the moment. Once we get a stable product with a semi-complete feature set, we will merge changes into the master branch.
+This section is still under construction.  Your attempts at running scripts here will likely fail at the moment. Once we get a stable product with a semi-complete feature set, we will merge changes into the master branch. Feel free to inspect the codebase to see what we're working on!
 
 # Deploying Bitcoin Cache Machine components using the LXD API
 

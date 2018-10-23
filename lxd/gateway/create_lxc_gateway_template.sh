@@ -15,15 +15,22 @@ if [[ -z $(lxc image list | grep "bcm-template") ]]; then
     return
 fi
 
-# create and populate the required networks
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_network_bridge_nat.sh $BCM_GATEWAY_NETWORKS_CREATE lxdbrGateway"
+if [[ $BCM_GATEWAY_NETWORKS_CREATE = "true" ]]; then
+    # create and populate the required networks
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_network_bridge_nat.sh lxdbrGateway basicnat"
+fi
+
+# create the 'bcm-gateway-profile' lxc profile
+if [[ $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh bcm-gateway-profile $BCM_LOCAL_GIT_REPO/lxd/gateway/gateway_lxd_profile.yml"
+fi
 
 
-# create an bcm-gateway-profile
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE bcm-gateway-profile $BCM_LOCAL_GIT_REPO/lxd/gateway/gateway_lxd_profile.yml"
-
-#bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/connect_container_to_underlay.sh"
-lxc network create lxdGWLocalNet ipv4.nat=false ipv6.nat=false dns.mode=none ipv4.dhcp=false ipv6.dhcp=false
+#create and populate the required networks
+if [[ $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE = "true" ]]; then
+    #bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/connect_container_to_underlay.sh"
+    lxc network create lxdbrBCMNET 
+fi
 
 
 #### this is what we do when we are told to attach to physical network

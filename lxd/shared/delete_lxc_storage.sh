@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 
-## TODO check parameters.
+LXC_STORAGE_POOL_NAME=$1
 
-# Delete the dockervol if instructed
-if [[ $1 = "true" ]]; then
-    # delete lxd storage gateway 
-    if [[ $(lxc storage list | grep $2) ]]; then
-        echo "Deleting lxd storage pool '$2'."
-        lxc storage delete $2
-    fi
+# delete lxd storage gateway 
+if [[ $(lxc storage list | grep $LXC_STORAGE_POOL_NAME) ]]; then
+    echo "Deleting lxd storage pool '$LXC_STORAGE_POOL_NAME'."
+    lxc storage delete $LXC_STORAGE_POOL_NAME
 fi

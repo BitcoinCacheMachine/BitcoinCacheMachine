@@ -27,7 +27,7 @@ Below you will find some of the development goals for Bitcoin Cache Machine:
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
 * Embrace hardware wallets for cryptographic  operations (trust boundaries, e.g., distinct lines of business accounting) where possible (e.g., Trezor-generated SSH keys or PGP certificates for authentication and encryption).
 * Pre-configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.). Use of TOR is default ya'll! If you want to compromise your security, go ahead but you're using an anti-pattern and compromising your security!
-* Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications, etc..
+* Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications, etc...
 
 ## How to Run Bitcoin Cache Machine
 
@@ -37,7 +37,9 @@ If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/)
 
  You can run BCM in a hardware-based VM, directly on bare-metal, or in "the cloud". Bitcoin Cache Machine components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can deploy BCM components to any LXD-capable endpoint! LXD is widely available on various free and open-source linux platforms. Stable BCM releases will usually follow the lastest Ubuntu LTS, which is 18.04 as of Oct 2018. This includes cloud images used by multipass, LXD base images (from the public "image:" server), and Docker base images from [Docker Hub](http://dockerhub.com/).
 
-Documentation for BCM and its components can be found in this repository. All documentation was written against Ubuntu 18.04, but should be applicable to most Debian-based distros.  `README.md` files in each directory tells you what you need to know about deploying the various infrastructure components at that level. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used. It is recommended that the commands be manually typed into the terminal rather than using copy/paste. This helps improve your Linux [muscle memory](https://en.wikipedia.org/wiki/Muscle_memory) which is especially useful if you want to start developing on BCM.
+Documentation for BCM and its components can be found in this repository. All documentation was written against Ubuntu 18.04, but should be work with most Linux distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used. You start with deploying a basic BCM instance to your development machine (i.e., `dev machine`).
+
+ `README.md` files in each directory tells you what you need to know about deploying the various infrastructure components at that level.  It is recommended that the commands be manually typed into the terminal rather than using copy/paste. This helps improve your Linux [muscle memory](https://en.wikipedia.org/wiki/Muscle_memory) which is especially useful if you want to start developing on BCM.
 
 ## Getting Started
 
