@@ -8,7 +8,7 @@ The `dev machine` is NOT meant to participate in production workloads. It is typ
 * Creates the `~/.bcm/` directory - BCM scripts store LXD cluster, endpoint, and sensitive runtime files in this directory. `up_dev_machine.sh` initializes ~/.bcm as a git repository for versioning. BCM scripts make regular commits to the ~/.bcm repo as files are added or deleted.
 * (TODO:  ~/.bcm will be mounted using a encrypted [FUSE mount](https://github.com/netheril96/securefs) that can be unlocked interactively with a user-provided password or hardware wallet device).
 * Generates the Root Certificate Authority cert at ~/.bcm/certs. Eventually, digital signatures associated with the public key will be relegated exclusively to hardware wallet operations.
-* Places the following line in your `~/.bashrc` file so BCM shell scripts can invoke scripts by fully qualified path.  The [`../lxd/`](../lxd/) directory relies heavily on BCM environment variables to guide execution of BCM scripts. The `$BCM_LOCAL_GIT_REPO/resources/bcm/1admin_load_bcm_env.sh` script loads ALL BCM default environment variables, THEN loads the environment variables for the active LXD remote endpoint, if any.
+* Places the following line in your `~/.bashrc` file so BCM shell scripts can invoke dependent scripts by fully qualified path.
 
 ```bash
 ### Start BCM
@@ -46,8 +46,8 @@ lxc info
 lxc cluster list
 ```
 
-You can inspect the `~/.bcm/clusters/DEV_MACHINE/` directory to view the files that were created. There should be a `lxd_endpoints` and `lxd_projects` directories. The LXD preseed file that was used to initialize the LXD daemon on the `dev machine` can be found at `~/.bcm/clusters/DEV_MACHINE/lxd_endpoints/local/lxd_preseed.yml`. This file contains sensitive password information and is thus git committed to ~/.bcm/.  `local` here refers to the LXD remote endpoint for your dev machine (local) which can be discovered by running `lxc remote list`.
+You can inspect the `~/.bcm/clusters/DEV_MACHINE/` directory to view the files that were created. The `lxd_endpoints` and `lxd_projects` directories should exist. The LXD preseed file that was used to initialize the LXD daemon on the `dev machine` can be found at `~/.bcm/clusters/DEV_MACHINE/lxd_endpoints/local/lxd_preseed.yml`. This file contains sensitive password information and is thus git committed to ~/.bcm/.  `local` here refers to the LXD remote endpoint for your dev machine (local) which can be discovered by running `lxc remote list`.
 
-To continue this tutorial, jump over to the [$BCM_LOCAL_GIT_REPO/lxd/lxd/](../lxd/) directory to start deploying BCM infrastructure components to your local `dev machine`.
+To continue this tutorial, jump up and down to the [../lxd/](../lxd/) directory to start deploying BCM infrastructure components to your local `dev machine`. All the scripts in this directory are applied to your currently active LXC remote (`lxc remote get-default`).
 
 Once you have a properly configured LXD endpoint (`lxc info` and `docker info`), delve into the [$BCM_LOCAL_GIT_REPO/lxd/](../lxd/) directory. This is where you can deploy BCM data center components to any cluster-mode LXD endpoint.

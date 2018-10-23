@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # this script generates a client certificate that is signed by the 
 # BCM trusted root CA. The cert files are stored at ~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$LXC_STACK/*

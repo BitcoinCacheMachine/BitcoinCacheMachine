@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 
 # removes an LXC container passed as $2 on the condition of $1
 

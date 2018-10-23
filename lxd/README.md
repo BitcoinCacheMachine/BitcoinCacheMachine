@@ -1,7 +1,10 @@
+# IMPORTANT NOTE
+
+This section is still under construction.  Your attempts at running scripts here will likely fail at the moment. Once we get a stable product with a semi-complete feature set, we will merge changes into the master branch.
 
 # Deploying Bitcoin Cache Machine components using the LXD API
 
-This is where BCM data center components reside. The main entrypoint at this level is ./up_lxc_endpoint.sh. This script calls subscripts to provision the data center. BCM Environment variables guide ./up_lxc_endpoint.sh and child scripts in the installation and deployment process. All `up_lxc_*.sh` scripts are designed to be idempotent; running the scripts multiple times SHOULD NOT change the resulting data center deployment. 
+This is where BCM data center components reside. The main entrypoint at this level is `./up_lxc_project.sh`. This script calls subscripts to provision the data center. BCM Environment variables, which are refreshed (i.e., exported) every time any script executes, guide the logic the installation and deployment process. All `up_lxc_*.sh` scripts are designed to be idempotent; running the scripts multiple times SHOULD NOT change the resulting data center deployment. 
 
 ## Assumptions
 

@@ -1,10 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# if the user has instructed us to delete the dockervol backing.
-if [[ $1 = "true" ]]; then
-    # delete lxd storage gateway
-    if [[ $(lxc profile list | grep "$2") ]]; then
-        echo "Deleting lxd profile '$2'."
-        lxc profile delete "$2"
-    fi
+PROFILE_NAME=$1
+
+# delete lxd storage gateway
+if [[ $(lxc profile list | grep "$PROFILE_NAME") ]]; then
+    echo "Deleting lxd profile '$PROFILE_NAME'."
+    lxc profile delete "$PROFILE_NAME"
 fi

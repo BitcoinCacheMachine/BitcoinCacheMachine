@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -14,29 +14,37 @@ if [[ $(lxc list | grep dockertemplate) ]]; then
     lxc delete --force dockertemplate
 fi
 
-# containers
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE bcm-template"
+# remove image bcm-template
+if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh bcm-template"
+fi
 
-## images
-# delete image 'bcm-template'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE bcm-template"
-
-# delete image 'bcm-template'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh $BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE bcm-bionic-base"
-
-# profiles
+# remove image bcm-bionic-base
+if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_image.sh bcm-bionic-base"
+fi
 
 # delete profile 'docker-privileged'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_DELETE docker_privileged"
+if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh docker_privileged"
+fi
 
-# delete image 'bcm-template'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILEGED_DELETE docker_unprivileged"
+# delete profile 'docker-unprivileged'
+if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILEGED_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh docker_unprivileged"
+fi
 
-# delete the profile bcm_disk
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh $BCM_HOSTTEMPLATE_PROFILE_BCM_DISK_DELETE bcm_disk"
+# delete profile 'bcm_disk'
+if [[ $BCM_HOSTTEMPLATE_PROFILE_BCM_DISK_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh bcm_disk"
+fi
 
+# delete profile 'bcm_disk'
+if [[ $BCM_STORAGE_BCM_DATA_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh bcm_data"
+fi
 
-# storage
-
-# delete lxc storage zfs backend
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh $BCM_STORAGE_BCM_DATA_DELETE bcm_data"
+# delete profile 'bcm_disk'
+if [[ $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_DELETE = "true" ]]; then
+    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_network.sh lxdbr0"
+fi

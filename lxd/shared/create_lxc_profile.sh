@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-if [[ $1 = "true" ]]; then
+PROFILE_NAME=$1
+LXD_PROFILE_FILE=$2
 
-    # create the $2 profile if it doesn't exist.
-    if [[ -z $(lxc profile list | grep $2) ]]; then
-        lxc profile create $2
-    fi
-
-    echo "Applying $3 to lxc profile '$2'."
-    cat $3 | lxc profile edit $2
+# create the $2 profile if it doesn't exist.
+if [[ -z $(lxc profile list | grep $PROFILE_NAME) ]]; then
+    lxc profile create $PROFILE_NAME
 fi
+
+echo "Applying $LXD_PROFILE_FILE to lxc profile '$PROFILE_NAME'."
+cat $LXD_PROFILE_FILE | lxc profile edit $PROFILE_NAME

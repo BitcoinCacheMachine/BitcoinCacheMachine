@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ $1 = "true" ]]; then
     # create the lxdbrGateway network if it doesn't exist.

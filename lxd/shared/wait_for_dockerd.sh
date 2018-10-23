@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [[ $(lxc list | grep $1) ]]; then
     while true; do

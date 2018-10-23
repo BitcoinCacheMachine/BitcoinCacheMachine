@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #### this is what we do when we are told to attach an underlay or stay on virtual network
 if [[ $BCM_BCMNETTEMPLATE_MACVLAN_TO_UNDERLAY = "true" ]]; then

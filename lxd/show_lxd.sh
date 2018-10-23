@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 echo ""
 echo "LXD system containers:"
 lxc list

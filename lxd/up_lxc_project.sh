@@ -9,7 +9,7 @@ cd "$(dirname "$0")"
 source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 if [[ -z $(lxc project list | grep bcm) ]]; then
-    lxc project create bcm
+    lxc project create bcm -c features.images=false -c features.profiles=false
     mkdir -p $BCM_CLUSTER_PROJECTS_ROOT_DIR
     lxc project switch bcm
     #-c features.images=false -c features.profiles=false
@@ -36,10 +36,10 @@ else
   exit
 fi
 
-# if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
-#   echo "Deploying 'bcm-gateway'."
-#   bash -c ./gateway/up_lxc_gateway.sh
-# fi
+if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
+  echo "Deploying 'bcm-gateway'."
+  bash -c ./gateway/up_lxc_gateway.sh
+fi
 
 # if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
 #     echo "Creating lxc container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' and associated snapshot 'bcmnet_template'."
