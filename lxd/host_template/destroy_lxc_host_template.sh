@@ -30,7 +30,7 @@ if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_DELETE = "true" ]]; then
 fi
 
 # delete profile 'docker-unprivileged'
-if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILEGED_DELETE = "true" ]]; then
+if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIGED_DELETE = "true" ]]; then
     bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_profile.sh docker_unprivileged"
 fi
 

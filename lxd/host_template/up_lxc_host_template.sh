@@ -40,7 +40,7 @@ if [[ $BCM_HOSTTEMPLATE_PROFILE_BCMDISK_CREATE = "true" ]]; then
 fi
 
 # create the docker_unprivileged profile
-if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIEGED_CREATE = "true" ]]; then
+if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIGED_CREATE = "true" ]]; then
   bash -c "$BCM_LXD_OPS/create_lxc_profile.sh docker_unprivileged ./lxd_profiles/docker_unprivileged.yml"
 fi
 
