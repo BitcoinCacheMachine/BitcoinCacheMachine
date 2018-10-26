@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
@@ -7,7 +7,6 @@ cd "$(dirname "$0")"
 
 # call bcm_script_before.sh to ensure we have up-to-date ENV variables.
 source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
-
 
 # if bcm-template lxc image exists, run the gateway template creation script.
 if [[ -z $(lxc image list | grep "bcm-template") ]]; then
@@ -25,13 +24,11 @@ if [[ $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE = "true" ]]; then
     bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh bcm-gateway-profile $BCM_LOCAL_GIT_REPO/lxd/gateway/gateway_lxd_profile.yml"
 fi
 
-
 #create and populate the required networks
 if [[ $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE = "true" ]]; then
     #bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/connect_container_to_underlay.sh"
     lxc network create lxdbrBCMNET 
 fi
-
 
 #### this is what we do when we are told to attach to physical network
 if [[ $BCM_GATEWAY_ATTACH_TO_UNDERLAY == "true" ]]; then
@@ -83,7 +80,10 @@ lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- ufw enable
 
 
 lxc stop $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME
-lxc snapshot $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME BCMGatewayTemplate
+
+sleep 2
+
+lxc snapshot $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME bcm-gateway-snapshot
 
 
 

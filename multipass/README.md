@@ -1,6 +1,6 @@
 # Multipass and Bitcoin Cache Machine
 
-[`multipass`](https://github.com/CanonicalLtd/multipass) is software (available as a [snap](https://snapcraft.io/)) that orchestrates the creation, management, and maintenance of QEMU/KVM VMs. Multipass is installed on the `dev machine` when running provisioning scripts found in `$BCM_LOCAL_GIT_REPO/dev_machine/` BCM scripts use the `multipass` CLI to create one or more hardware-enforced VMs. Each VM created by BCM multipass scripts runs a cloud-based Ubuntu 18.04 LTS image.
+[`multipass`](https://github.com/CanonicalLtd/multipass) is software (available as a [snap](https://snapcraft.io/)) that orchestrates the creation, management, and maintenance of QEMU/KVM VMs. Multipass is installed on the `dev machine` when running provisioning scripts found in `$BCM_LOCAL_GIT_REPO/lxd_projects/` BCM scripts use the `multipass` CLI to create one or more hardware-enforced VMs. Each VM created by BCM multipass scripts runs a cloud-based Ubuntu 18.04 LTS image.
 
 The scripts in this directory help you get started testing BCM quickly. Running `./up_multipass_cluster.sh -c CLUS1 -m 3` at the terminal will create a series of multipass VMs. Each VM will be named CLUS1-00, CLUS1-01, ...  The last parameter is the number of member nodes you want in your LXD cluster.  In the example, there will be 4 VMs total, one for the cluster master (assumed) and 3 additional member nodes. If you run `./up_multipass_cluster.sh CLUS1` (without the integer parameter), a single VM will be created. In all cases, `up_multipass_cluster.sh` leaves you with one or more Ubuntu VMs that are up-to-date and have necessary dependencies. Furthermore, LXD in each VM is [preseeded](https://lxd.readthedocs.io/en/latest/clustering/#preseed) and configured to operate in a cohesive cluster. 
 
@@ -10,7 +10,7 @@ Each VM represents available CPU, memory, disk, and networking that you can use 
 
 To run multipass, you must have a computer capable of running QEMU/KVM-based VMs which is typical with a developer or server machine. In some cases, you might have to visit your BIOS to ensure that hardware-based virtualization features are enabled. Low-end laptops typical of the DEV market may not have the necessary hardware requirements to run BCM in a multipass VM. However, you can always run BCM on [bare-metal](./lxd/README.md)!
 
-To install `multipass` manually, run the following command. Also remember that `$BCM_LOCAL_GIT_REPO/dev_machine/setup.sh` installs `multipass` on the `dev machine` during provisioning as well.
+To install `multipass` manually, run the following command. Also remember that `$BCM_LOCAL_GIT_REPO/lxd_projects/setup.sh` installs `multipass` on the `dev machine` during provisioning as well.
 
 ```bash
 sudo snap install lxd --candidate

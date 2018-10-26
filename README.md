@@ -37,7 +37,7 @@ If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/)
 
  You can run BCM in a hardware-based VM, directly on bare-metal, or in "the cloud". Bitcoin Cache Machine components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can deploy BCM components to any LXD-capable endpoint! LXD is widely available on various free and open-source linux platforms. Stable BCM releases will usually follow the lastest Ubuntu LTS, which is 18.04 as of Oct 2018. This includes cloud images used by multipass, LXD base images (from the public "image:" server), and Docker base images from [Docker Hub](http://dockerhub.com/).
 
-Documentation for BCM and its components can be found in this repository. All documentation was written against Ubuntu 18.04, but should be work with most Linux distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used. You start with deploying a basic BCM instance to your development machine (i.e., `dev machine`).
+Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu 18.04 machines, but should work with most Linux distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used. You start with deploying a basic BCM instance to your development machine (i.e., `dev machine`).
 
  `README.md` files in each directory tells you what you need to know about deploying the various infrastructure components at that level.  It is recommended that the commands be manually typed into the terminal rather than using copy/paste. This helps improve your Linux [muscle memory](https://en.wikipedia.org/wiki/Muscle_memory) which is especially useful if you want to start developing on BCM.
 
@@ -62,16 +62,14 @@ cd ~/git/github/bcm/dev_machine
 
 Feel free to change the directory in which you store the BCM repository on your `dev_machine` (instead of `~/git/github/bcm`).
 
-Click the following link to continue with the tutorial: [./dev_machine/](./dev_machine/).
+Click the following link to continue with the tutorial: [./lxd_projects/](./lxd_projects/).
 
 ## How to contribute
 
 Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate. [Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
 
-You can also donate to the development of BCM by donating Bitcoin (BTC). For on-chain payments, use [BIP47](https://github.com/bitcoin/bips/blob/master/bip-0047.mediawiki):
+You can also donate to the development of BCM by donating Bitcoin (BTC).
 
-* on-chain - [BCM Payment Code](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon) Why BIP47 Payment Codes? Because sending to the same address every transaction is BAD FOR PRIVACY!
+* Public on-chain donations: 3KNX4GTmXETtnFWFXvFqXg9sDJCbLvD8Zf
 
-[<img src="./resources/images/bcm-payment-code.jpg" alt="BCM Payment Code" height="250" width="250">](bitcoin:PM8TJSpgDvY9aPVCHq1rQCYzvutYxf9GeK8ixhtZzeasXox3yDCskc8qkK2kgwK8rnN4AVVbUmPsMFGBdvuFfwo8JvuxNNW9quoHJhexD7dRutEi7Eon)
-
-* off-chain - We will start accepting donations via Lightning network once Bitcoin Cache Machine becomes stable enough for us to confidently accept off-chain paymight via Lightning Network!
+[<img src="./resources/images/onchain_public_donation_address.png" alt="BCM Donation Address" height="250" width="250">](bitcoin:3KNX4GTmXETtnFWFXvFqXg9sDJCbLvD8Zf)

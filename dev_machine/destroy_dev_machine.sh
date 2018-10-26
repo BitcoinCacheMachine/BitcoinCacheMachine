@@ -4,12 +4,21 @@
 
 rm -Rf ~/.bcm/clusters
 
-sudo snap remove lxd
+bash -c ./trezor/destroy_trezor.sh
 
-sudo snap remove docker
+SKIP_SOFTWARE_UNINSTALL=$1
 
-sudo snap remove multipass
+if [[ $SKIP_SOFTWARE_UNINSTALL = "true" ]]; then
+    sudo snap remove lxd
+
+    sudo snap remove docker
+
+    sudo snap remove multipass
+else
+    echo "Skipping software uninstall."
+fi
 
 if [[ ! -z $(zpool list | grep "bcm_data") ]]; then
     sudo zpool destroy bcm_data
 fi
+

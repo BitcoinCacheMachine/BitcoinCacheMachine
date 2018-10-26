@@ -21,6 +21,14 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
   exit
 fi
 
+# used in certificate generation and selection in dev_machine/trezor
+export BCM_CURRENT_PROJECT_NAME="bcm-dev"
+
+# we'll leave this value as-is.
+if [[ -z $BCM_PROJECT_CERTIFICATE_EMAIL ]]; then
+  export BCM_PROJECT_CERTIFICATE_EMAIL="bcm@devmachine.tld"
+fi
+
 # export some variables yo
 export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
 export BCM_MULTIPASS_VM_NAME=$(lxc remote get-default)

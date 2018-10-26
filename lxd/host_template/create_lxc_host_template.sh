@@ -57,7 +57,7 @@ if [[ -z $(lxc image list | grep bcm-template) ]]; then
     if [[ -z $(lxc image list -c l | grep "bcm-template") ]]; then
         # if instructed, serve the newly created snapshot to trusted LXD hosts.
         if [[ $(lxc list | grep dockertemplate) ]]; then
-            if [[ $BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC = "yes" ]]; then
+            if [[ $BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC = "true" ]]; then
                 # if the template doesn't exist, publish it so remote clients can reach it.
                 echo "Publishing dockertemplate/bcmHostSnapshot as a public lxd image 'bcm-template' on lxd remote '$(lxc remote get-default)'."
                 lxc publish dockertemplate/bcmHostSnapshot --alias bcm-template --public

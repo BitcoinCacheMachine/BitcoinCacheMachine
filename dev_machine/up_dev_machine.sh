@@ -34,8 +34,7 @@ if [[ $(git config --get --global http.$BCM_GITHUB_URL.proxy) != $BCM_LOCAL_REPO
   git config --global "http.$BCM_GITHUB_URL.proxy" $BCM_LOCAL_REPO_HTTP_PROXY
 fi
 
-# get the current directory where this script is so we can reference it later, namely in .bashrc
-# file on the admin machine.
+# get the current directory where this script is so we can reference it later
 echo "Setting BCM_LOCAL_GIT_REPO environment variable in current shell to '$(dirname "$(pwd)")'"
 export BCM_LOCAL_GIT_REPO="$(dirname "$(pwd)")"
 
@@ -51,6 +50,12 @@ fi
 if [ ! -d ~/.bcm/clusters ]; then
   echo "Creating BCM clusters directory at ~/.bcm/clusters"
   mkdir -p ~/.bcm/clusters
+fi
+
+# if ~/.bcm/lxd_projects doesn't exist, create it.
+if [ ! -d ~/.bcm/lxd_projects ]; then
+  echo "Creating lxd_projects directory at ~/.bcm/lxd_projects"
+  mkdir -p ~/.bcm/lxd_projects
 fi
 
 # certificates - we store root certificates here
@@ -89,6 +94,10 @@ fi
 # next let's install the software.
 bash -c "./install_software.sh"
 
+sleep 20
 
 # next let's provision lxd.
 bash -c "./provision_lxd.sh"
+
+# next let's get our Trezor working so we can perform secure cryptographic operations.
+bash -c "./trezor/up_trezor.sh"

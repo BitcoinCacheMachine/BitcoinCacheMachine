@@ -31,6 +31,6 @@ if [[ ! -d $DIR ]]; then
     
     cd ~/.bcm
     git add *
-    git commit -am "Added $LXC_HOST certificate and secret key files to the admin machine at $DIR/$CERT_CN.cert"
+    git commit -am "Added $LXC_HOST certificate and secret key files to $DIR/$CERT_CN.cert"
     cd -
 fi

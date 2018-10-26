@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# this script configures your local admin machine to install
+# this script configures your machine to install
 # TIGHTVNC and expose it over an onion service.
 
 mkdir -p /var/lib/tor/tightvnc/

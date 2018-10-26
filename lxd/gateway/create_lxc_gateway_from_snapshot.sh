@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -eu
+set -e
 
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
@@ -9,12 +9,12 @@ cd "$(dirname "$0")"
 source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 # if bcm-template lxc image exists, run the gateway template creation script.
-if [[ -z $(lxc info $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME | grep BCMGatewayTemplate) ]]; then
-    echo "Required snapshot 'BCMGatewayTemplate' on lxc container 'BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME' does not exist. Exiting."
+if [[ -z $(lxc info $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME | grep 'bcm-gateway-snapshot') ]]; then
+    echo "Required snapshot 'bcm-docker-snapshot' on lxc container 'BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME' does not exist. Exiting."
     exit 1
 fi
 
-lxc copy $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/BCMGatewayTemplate $BCM_LXC_GATEWAY_CONTAINER_NAME
+lxc copy "$BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/bcm-gateway-snapshot" $(lxc remote get-default):$BCM_LXC_GATEWAY_CONTAINER_NAME
 
 # create the docker backing for 'BCM_LXC_GATEWAY_CONTAINER_NAME'
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_attach_lxc_storage_to_container.sh $BCM_GATEWAY_STORAGE_DOCKERVOL_CREATE $BCM_LXC_GATEWAY_CONTAINER_NAME $BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME"
