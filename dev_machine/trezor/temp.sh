@@ -7,8 +7,7 @@ docker system prune -f
 
 sleep 2
 
-docker build -t bcmtrezor:latest ./dev_machine/trezor/
-
+docker build -t bcmtrezor:latest .
 
 source $BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh
 source $BCM_LOCAL_GIT_REPO/dev_machine/trezor/export_usb_path.sh
