@@ -45,11 +45,6 @@ COPY ./commit_sign_git_repo.sh /commit_sign_git_repo.sh
 RUN chmod +x /commit_sign_git_repo.sh
 
 # run this script to quickly configure and commit and sign a repo
-COPY ./git_push_over_tor.sh /git_push_over_tor.sh
-RUN chmod +x /git_push_over_tor.sh
-
-
-# run this script to quickly configure and commit and sign a repo
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
