@@ -12,9 +12,6 @@ echo "git config --global user.name set to '$(git config --global --get user.nam
 git config --global user.email "$BCM_PROJECT_CERTIFICATE_EMAIL"
 echo "git config --global user.email set to '$(git config --global --get user.email)'"
 
-#git config --global user.signingkey $BCM_GIT_SIGNING_KEY
-#echo "git config --global user.signingkey: $(git config --global --get user.signingkey)"
-
 echo "Staging all uncommitting changes to the repo at /gitrepo."
 git add *
 
@@ -28,7 +25,7 @@ if [[ $BCM_GIT_AUTO_PUSH = "true" ]]; then
     echo "git config --global http.proxy:  $(git config --global --get http.proxy)"
 
     wait-for-it -t 0 127.0.0.1:9050
-    
+
     git push
 echo
     echo "The git repo WILL not be pushed."
