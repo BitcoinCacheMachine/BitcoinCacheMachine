@@ -18,7 +18,7 @@ export FILE_PATH=~/git/github/bcm
 export BCM_CERT_DIR=$GNUPGHOME
 export BCM_GIT_COMMIT_MESSAGE='Added trezor integration to dev_machine.'
 export BCM_PROJECT_CERTIFICATE_EMAIL='derek@farscapian.com'
-export BCM_GIT_CLIENT_USERNAME='Derek Smith'
+export BCM_GIT_CLIENT_USERNAME='farscapian'
 
 echo "BCM_CERT_DIR: '$BCM_CERT_DIR'"
 echo "FILE_PATH: '$FILE_PATH'"
