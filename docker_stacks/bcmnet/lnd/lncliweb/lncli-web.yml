@@ -3,7 +3,7 @@ services:
   # Provides admin interface to lnd
   # listens on 8280
   lncli-web:
-    image: farscapian/lncliweb:latest
+    image: <FIXME>/lncliweb:latest
     networks:
       - lnd_lndrpcnet
       - webproxynet

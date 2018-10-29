@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Building and pushing farscapian/lightningd:0.6 to DockerHub."
+echo "Building and pushing <FIXME>/lightningd:0.6 to DockerHub."
 #this step prepares custom images
-docker build -t farscapian/lightningd:0.6 .
-docker push farscapian/lightningd:0.6
+docker build -t <FIXME>/lightningd:0.6 .
+docker push <FIXME>/lightningd:0.6

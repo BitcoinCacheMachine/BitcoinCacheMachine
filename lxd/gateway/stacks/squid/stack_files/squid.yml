@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   squid:
-    image: farscapian/bcm-squid
+    image: <FIXME>/bcm-squid
     ports:
       - "3128:3128"
     volumes:

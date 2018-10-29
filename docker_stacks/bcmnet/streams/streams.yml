@@ -3,7 +3,7 @@ version: '3.4'
 services:
 
   bitcoinstreams:
-    image: farscapian/bitcoinstreams:latest
+    image: <FIXME>/bitcoinstreams:latest
     networks:
       kafka_kafkanet:
     deploy:

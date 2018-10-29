@@ -1,6 +1,5 @@
 FROM debian:stretch-slim
 
-MAINTAINER "Derek Smith - keybase.io/farscapian"
 # Credit basically goes to nicolasdorier here, I just updated bitcoind to 16.1 
 # and added extra volume and WORKDIR and added TOR to install
 

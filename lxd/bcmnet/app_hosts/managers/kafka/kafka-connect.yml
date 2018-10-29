@@ -4,7 +4,7 @@ services:
   # REST commands come over 8083 to control the configuratino of kafka connect
   # Listens on TCP 514 (syslog)
   kafka-connect:
-    image: farscapian/kafkaconnect:latest
+    image: <FIXME>/kafkaconnect:latest
     ports:
       - "8083:8083"
       - "514:5514"

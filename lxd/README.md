@@ -20,3 +20,18 @@ The instructions in this directory make the following assumptions:
 
 
 Decide where you want to run your BCM workload. You can deploy BCM to the `dev machine` for quick and convenient testing. You can consider running BCM in a [multipass-based VM](./multipass/) or in a [cloud provider via cloud-init](./cloud_providers/). `multipass` VMs use lower-level hardware-based virtualization which provide additional security guarantees. In the end, all you need to run BCM component is a LXD endpoint configured and controllable by your `dev machine`. Use the `lxc remote list`, `lxc remote get-default` and related commands.
+
+
+
+## Privilege Levels
+
+Unfortuantely, BCM is currently built entirely on privileged LXC containers. This is because Docker swarm could not be made functional using unprivileged containers. There are several mitigating factors that reduce the overall risk involved with this limitation:
+
+* `dockerd` runs within each privileged LXC container, hus `dockerd`-level process isolation is in effect for running application-level containers.
+* The network-level attack surface of BCM is extremely small. By default BCM exposes ZERO services to the local network interfaces EXCEPT for the LXD endpoint (for the management plane). Any service exposed to the internet is exposed as an authenticated onion whenever possible. This provides cloud-like connectivity to your BCM instance in your home or office. You get end-to-end encryption and IP anonymity as well as Layer 4 authentication.
+
+### priviliged.yml
+
+
+### unprivileged.yml
+

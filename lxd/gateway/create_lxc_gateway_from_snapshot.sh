@@ -35,7 +35,7 @@ bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_GATEWAY_CON
 
 # ### ABSOLUTE FIRST STEP 1, Let's get DHCP and DNS working.
 # ## To accomplish this, we first need to build our dnsmasq docker image.
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker pull farscapian/bcm-dnsmasq:latest
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker pull <FIXME>/bcm-dnsmasq:latest
 
 
 # disable systemd-resolved so don't have a conflict on port 53 when dnsmasq binds.
@@ -47,7 +47,7 @@ lxc restart $BCM_LXC_GATEWAY_CONTAINER_NAME
 
 bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
 
-lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker run --name dnsmasq -d --restart always --net=host --cap-add=NET_ADMIN farscapian/bcm-dnsmasq:latest
+lxc exec $BCM_LXC_GATEWAY_CONTAINER_NAME -- docker run --name dnsmasq -d --restart always --net=host --cap-add=NET_ADMIN <FIXME>/bcm-dnsmasq:latest
 
 # now let's update gateway's dockerd daemon to use the mirror it itself is hosting.
 lxc file push finished.daemon.json $BCM_LXC_GATEWAY_CONTAINER_NAME/etc/docker/daemon.json

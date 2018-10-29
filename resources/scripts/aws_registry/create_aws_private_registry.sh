@@ -39,8 +39,8 @@ docker-machine ssh registry -- sudo add-apt-repository ppa:certbot/certbot
 docker-machine ssh registry -- sudo apt-get update
 docker-machine ssh registry -- sudo apt-get -y install certbot 
 
-docker-machine ssh registry -- mkdir -p /home/ubuntu/registry/farscapian
-docker-machine ssh registry -- sudo certbot certonly --webroot -w /home/ubuntu/registry/farscapian -d farscapian.com -d registry.farscapian.com
+docker-machine ssh registry -- mkdir -p /home/ubuntu/registry/<FIXME>
+docker-machine ssh registry -- sudo certbot certonly --webroot -w /home/ubuntu/registry/<FIXME> -d <FIXME>.com -d registry.<FIXME>.com
 
 env REGISTRY_HTTP_SECRET=$REGISTRY_HTTP_SECRET docker stack deploy -c registry.yml registry
 

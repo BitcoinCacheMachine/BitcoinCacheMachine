@@ -3,7 +3,7 @@ services:
 
   # Listens for gelf messages on TCP
   gelflistener:
-    image: farscapian/logstash:latest
+    image: <FIXME>/logstash:latest
     ports:
       - "12201:12201/tcp"
     networks:

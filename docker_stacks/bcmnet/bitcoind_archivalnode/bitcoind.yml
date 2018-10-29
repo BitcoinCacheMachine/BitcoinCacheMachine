@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   bitcoind:
-    image: farscapian/bitcoind:16.1
+    image: <FIXME>/bitcoind:16.1
     hostname: bitcoind
     ports:
       - "18333:18333"

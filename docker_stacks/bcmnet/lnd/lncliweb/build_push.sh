@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Building and pushing farscapian/lncliweb to DockerHub."
+echo "Building and pushing <FIXME>/lncliweb to DockerHub."
 #this step prepares custom images
-docker build -t farscapian/lncliweb:latest .
-docker push farscapian/lncliweb:latest
+docker build -t <FIXME>/lncliweb:latest .
+docker push <FIXME>/lncliweb:latest

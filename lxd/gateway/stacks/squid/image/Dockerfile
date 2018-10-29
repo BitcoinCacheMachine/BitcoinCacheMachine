@@ -1,4 +1,4 @@
-FROM farscapian/bcm-base:latest
+FROM <FIXME>/bcm-base:latest
 RUN apt-get -y install squid
 
 ADD entrypoint.sh /entrypoint.sh
