@@ -52,5 +52,5 @@ docker exec -it \
     -e BCM_GIT_COMMIT_MESSAGE="$BCM_GIT_COMMIT_MESSAGE" \
     bcm-trezor-gitter bash -c /bcm_scripts/commit_sign_git_repo.sh
 
-# docker kill bcm-trezor-gitter
-# docker system prune -f
+docker kill bcm-trezor-gitter
+docker system prune -f
