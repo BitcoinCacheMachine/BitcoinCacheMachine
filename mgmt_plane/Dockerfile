@@ -34,3 +34,5 @@ RUN chmod +x /bcm/git_pull.sh
 # run this script to quickly configure and commit and sign a repo
 ADD ./container_scripts/docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+RUN mkdir -p /root/.bcm

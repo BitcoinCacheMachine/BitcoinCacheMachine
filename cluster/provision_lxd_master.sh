@@ -10,6 +10,8 @@ mkdir -p $LXD_DIR
  # substitute the variables in lxd_master_preseed.yml
 envsubst < ./lxd_preseed/lxd_master_preseed.yml > $LXD_DIR/preseed.yml
 
+
+## todo try to implement this in the cloud-init.
 # upload the lxd preseed file to the multipass vm.
 multipass copy-files $LXD_DIR/preseed.yml $BCM_CLUSTER_ENDPOINT_NAME:/home/multipass/preseed.yml
 
@@ -32,4 +34,4 @@ lxc remote set-default $BCM_CLUSTER_ENDPOINT_NAME
 
 echo "Current lxd remote default is $BCM_CLUSTER_ENDPOINT_NAME."
 
-bash -c "commit_bcm.sh 'Added master LXD preseed files at $LXD_DIR'"
+bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh 'Added master LXD preseed files at $LXD_DIR'"

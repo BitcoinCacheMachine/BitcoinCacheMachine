@@ -39,11 +39,6 @@ function createMaster {
         mkdir -p $ENDPOINTS_DIR
     fi
 
-    if [ ! -d $ENDPOINTS_DIR/lxd_client ]; then
-        echo "Creating directory $ENDPOINTS_DIR/lxd_client"
-        mkdir -p $ENDPOINTS_DIR/lxd_client
-    fi
-
     export BCM_ENDPOINT_DIR="$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME"
     if [ ! -d $BCM_ENDPOINT_DIR ]; then
         echo "Creating BCM clusters directory at $BCM_ENDPOINT_DIR"

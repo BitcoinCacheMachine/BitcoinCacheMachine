@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -e
+set -eu
+cd "$(dirname "$0")"
+
 
 COMMIT_MESSAGE=""
 
@@ -14,11 +16,10 @@ if [[ $COMMIT_MESSAGE = "" ]]; then
     exit
 fi
 
+# get the latest commit
 cd $BCM_LOCAL_GIT_REPO
 export GIT_COMMIT_VERSION=$(git log --format="%H" -n 1)
 cd -
 
-cd ~/.bcm
-git add *
-git commit -am "BCM_LOCAL_GIT_REPO version: $GIT_COMMIT_VERSION. Message: $COMMIT_MESSAGE"
-cd -
+
+bcm git commit -g=/home/derek/git/github/bcm -m="Updated CLI." -i=test -o=/home/derek/.gnupg -e=ubuntu@domain.com

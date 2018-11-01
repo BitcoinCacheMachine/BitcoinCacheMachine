@@ -16,12 +16,14 @@ docker build -t bcm-trezor:latest $BCM_LOCAL_GIT_REPO/mgmt_plane/
 
 source ./export_usb_path.sh
 
-
 echo "BCM_CERT_DIR: $BCM_CERT_DIR"
 echo "BCM_CERT_NAME: $BCM_CERT_NAME"
 echo "BCM_CERT_USERNAME: $BCM_CERT_USERNAME"
 echo "BCM_CERT_HOSTNAME: $BCM_CERT_HOSTNAME"
 echo "BCM_TREZOR_USB_PATH: $BCM_TREZOR_USB_PATH"
+
+# TODO move this into the mgmtplan container rather than installing on host.
+bash -c "$BCM_LOCAL_GIT_REPO/cluster/providers/lxd/snap_lxd_install.sh"
 
 # run the container.
 docker run -it --name trezorgpg --rm -v $BCM_CERT_DIR:/root/.gnupg \
@@ -31,4 +33,4 @@ docker run -it --name trezorgpg --rm -v $BCM_CERT_DIR:/root/.gnupg \
     --device=$BCM_TREZOR_USB_PATH \
     bcm-trezor:latest bash -c 'trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"'
 
-echo "Your public key and public keyring material can be found at '$BCM_CERT_DIR'."
+echo "Your public key and public keyring material can be found at '$BCM_CERT_DIR/trezor'."

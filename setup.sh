@@ -39,13 +39,30 @@ fi
 echo "Setting BCM_LOCAL_GIT_REPO environment variable in current shell to '$(pwd)'"
 export BCM_LOCAL_GIT_REPO=$(pwd)
 
-# TODO implemented encfs on ~/.bcm
-# if ~/.bcm doesn't exist, create it
-if [ ! -d ~/.bcm ]; then
-  echo "Creating Bitcoin Cache Machine config directory at ~/.bcm"
-  mkdir -p ~/.bcm
-  git init ~/.bcm/
+
+BCM_BASHRC_FLAG='### Start BCM'
+
+if grep -Fxq "$BCM_BASHRC_FLAG" ~/.bashrc
+then
+  # code if found
+  echo "BCM flag discovered in ~/.bashrc. Please inspect your ~/.bashrc to clear any BCM-related content, if appropriate."
+else
+  echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
+  echo "$BCM_BASHRC_FLAG" >> ~/.bashrc
+  echo "export BCM_LOCAL_GIT_REPO=$BCM_LOCAL_GIT_REPO" >> ~/.bashrc
+  echo "export PATH="'$PATH:'"$BCM_LOCAL_GIT_REPO/cli" >> ~/.bashrc
 fi
+
+echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please open a new terminal session to refresh your envronment, then typ 'bcm' to continue."
+
+
+
+
+
+
+
+
+
 
 # # certificates - we store root certificates here
 # if [ ! -d ~/.bcm/certs ]; then
@@ -67,19 +84,3 @@ fi
 # else
 #   echo "BCM certs directory exists at ~/.bcm/certs"
 # fi
-
-BCM_BASHRC_FLAG='### Start BCM'
-
-if grep -Fxq "$BCM_BASHRC_FLAG" ~/.bashrc
-then
-  # code if found
-  echo "BCM flag discovered in ~/.bashrc. Please inspect your ~/.bashrc to clear any BCM-related content, if appropriate."
-else
-  echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
-  echo "$BCM_BASHRC_FLAG" >> ~/.bashrc
-  echo "export PATH="'$PATH:'"$BCM_LOCAL_GIT_REPO/cli" >> ~/.bashrc
-fi
-
-
-
-echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please open a new terminal session to refresh your envronment, then typ 'bcm' to continue."

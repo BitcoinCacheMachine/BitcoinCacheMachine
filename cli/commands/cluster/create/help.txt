@@ -27,7 +27,7 @@ Parameters:
                           
                           'aws/azure' NOT SUPPORTED. BCM is meant for home and small office.
   
-  -x=<BCM_CLUSTER_COUNT>  Cluster count. Number of equal-size multipass VMs you want deployed.
+  -l=<BCM_CLUSTER_COUNT>  Cluster count. Number of equal-size multipass VMs you want deployed.
 
   -x=<BCM_MGMT_TYPE>      Valid values are 'local', 'net', and 'tor'. 
                     

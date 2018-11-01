@@ -111,7 +111,16 @@ if [[ $BCM_DEBUG = "true" ]]; then
 fi
 
 if [[ $BCM_CLI_COMMAND = "init" ]]; then
-    CERT_DIR=~/.bcm/certs
+
+
+    # if ~/.bcm doesn't exist, create it
+    if [ ! -d ~/.bcm ]; then
+        echo "Creating Bitcoin Cache Machine git repo at ~/.bcm"
+        mkdir -p ~/.bcm
+        git init ~/.bcm/
+    fi
+    
+    CERT_DIR="$GNUPGHOME"
     if [[ ! -z $BCM_PROJECT_OVERRIDE_DIR ]]; then
         CERT_DIR=$BCM_PROJECT_OVERRIDE_DIR
     fi
@@ -136,7 +145,6 @@ if [[ $BCM_CLI_COMMAND = "init" ]]; then
     sleep 5
 
     bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/build.sh"
-
 
     CERT_NAME=$BCM_PROJECT_NAME
     BCM_CERT_USERNAME=$BCM_PROJECT_USERNAME
