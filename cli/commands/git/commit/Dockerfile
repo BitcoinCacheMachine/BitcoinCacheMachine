@@ -1,2 +1,2 @@
 FROM bcm-trezor:latest
-CMD [ "/entrypoint.sh" ]
+ENTRYPOINT [ "/entrypoint.sh" ]

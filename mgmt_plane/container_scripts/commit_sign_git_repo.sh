@@ -1,22 +1,32 @@
 #!/bin/bash
 
+set -eu
+
 # set our working directory to the /gitrepo is which where out git repository
 # should be mounted. This is what we're committing.
 cd /gitrepo
 
+export GNUPGHOME=/root/.gnupg/trezor
 
+echo "GNUPGHOME: '$GNUPGHOME'"
+echo "BCM_GIT_CLIENT_USERNAME: '$BCM_GIT_CLIENT_USERNAME'"
+echo "BCM_EMAIL_ADDRESS: '$BCM_EMAIL_ADDRESS'"
+echo "BCM_GIT_COMMIT_MESSAGE: '$BCM_GIT_COMMIT_MESSAGE'"
+echo "BCM_GPG_SIGNING_KEY_ID: '$BCM_GPG_SIGNING_KEY_ID'"
 
-git config --local commit.gpgsign 1
-git config --local gpg.program $(which gpg2)
-echo "git config --local commit.gpgsign:  $(git config --local --get commit.gpgsign)"
-echo "git config --local gpg.program: $(git config --local --get gpg.program)"
+git config --global commit.gpgsign 1
+git config --global gpg.program $(which gpg2)
+git config --global user.signingkey "$BCM_GPG_SIGNING_KEY_ID"
+echo "git config --global commit.gpgsign:  $(git config --global --get commit.gpgsign)"
+echo "git config --global gpg.program: $(git config --global --get gpg.program)"
+echo "git config --global user.signingkey: $(git config --global --get user.signingkey)"
 
-git config --local user.name $BCM_GIT_CLIENT_USERNAME
-echo "git config --local user.name set to '$(git config --local --get user.name)'"
+git config --global user.name "$BCM_GIT_CLIENT_USERNAME"
+echo "git config --global user.name set to '$(git config --global --get user.name)'"
 
 # email must be passed in since a certificate can have many emails (uids)
-git config --local user.email "$BCM_EMAIL_ADDRESS"
-echo "git config --local user.email set to '$(git config --local --get user.email)'"
+git config --global user.email "$BCM_EMAIL_ADDRESS"
+echo "git config --global user.email set to '$(git config --global --get user.email)'"
 
 #gpg --list-secret-keys --keyid-format LONG
 #git config --local user.signingkey 
@@ -25,5 +35,4 @@ echo "Staging all outstanding changes."
 git add *
 
 echo "Committing and signing. Get ready to check your Trezor."
-echo "BCM_GIT_COMMIT_MESSAGE: '$BCM_GIT_COMMIT_MESSAGE'"
-git commit -S -am "$BCM_GIT_COMMIT_MESSAGE" --gpg-sign
+git commit -S -am "$BCM_GIT_COMMIT_MESSAGE"

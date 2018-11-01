@@ -1,8 +1,7 @@
 #!/bin/bash
 
-set -eu
+set -e
 cd "$(dirname "$0")"
-
 
 COMMIT_MESSAGE=""
 
@@ -11,7 +10,7 @@ if [[ ! -z $1 ]]; then
 fi
 
 # quit if a commit message wasn't passed.
-if [[ $COMMIT_MESSAGE = "" ]]; then
+if [[ -z $COMMIT_MESSAGE ]]; then
     echo "Please provide a commit message."
     exit
 fi
