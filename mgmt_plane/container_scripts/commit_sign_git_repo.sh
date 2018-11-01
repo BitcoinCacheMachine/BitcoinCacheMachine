@@ -26,4 +26,4 @@ git add *
 
 echo "Committing and signing. Get ready to check your Trezor."
 echo "BCM_GIT_COMMIT_MESSAGE: '$BCM_GIT_COMMIT_MESSAGE'"
-git commit -S -am "test" --gpg-sign
+git commit -S -am "$BCM_GIT_COMMIT_MESSAGE" --gpg-sign
