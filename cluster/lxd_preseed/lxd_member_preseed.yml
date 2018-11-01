@@ -1,0 +1,10 @@
+config:
+  core.https_address: $BCM_ENDPOINT_VM_IP:8443
+  core.trust_password: $BCM_LXD_SECRET
+cluster:
+  server_name: $BCM_CLUSTER_ENDPOINT_NAME
+  enabled: true
+  cluster_password: $BCM_LXD_CLUSTER_MASTER_PASSWORD
+  cluster_address: $BCM_LXD_CLUSTER_MASTER_IP:8443
+  cluster_certificate: "$BCM_LXD_CLUSTER_CERTIFICATE
+"

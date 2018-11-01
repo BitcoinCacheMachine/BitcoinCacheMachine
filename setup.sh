@@ -11,6 +11,7 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
+
 # first a common problem with new installations is that git itsn't fully configured.
 # let's test for this condition and quit if necessary.
 if [[ -z $(git config --get --global user.name) ]]; then
@@ -35,7 +36,7 @@ if [[ $(git config --get --global http.$BCM_GITHUB_URL.proxy) != $BCM_LOCAL_REPO
 fi
 
 # get the current directory where this script is so we can reference it later
-echo "Setting BCM_LOCAL_GIT_REPO environment variable in current shell to '$(dirname "$(0)")'"
+echo "Setting BCM_LOCAL_GIT_REPO environment variable in current shell to '$(pwd)'"
 export BCM_LOCAL_GIT_REPO=$(pwd)
 
 # TODO implemented encfs on ~/.bcm
@@ -62,7 +63,7 @@ fi
 #   # and will be used as trust/authentication boundary, i.e., one self-signed Root CA per BIP32 path.
 #   openssl req -x509 -subj "/C=US/ST=BCM/L=INTERNET/O=BCM/CN=BCM ROOT CA" -new -nodes -key ~/.bcm/certs/rootca.key -sha256 -days 365 -out ~/.bcm/certs/rootca.cert
 
-#   bash -c "$BCM_LOCAL_GIT_REPO/resources/commit_bcm.sh 'Added ~/.bcm/certs and associated certificate and key files.'"
+#   bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh 'Added ~/.bcm/certs and associated certificate and key files.'"
 # else
 #   echo "BCM certs directory exists at ~/.bcm/certs"
 # fi
@@ -75,11 +76,10 @@ then
   echo "BCM flag discovered in ~/.bashrc. Please inspect your ~/.bashrc to clear any BCM-related content, if appropriate."
 else
   echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
-  echo $BCM_BASHRC_FLAG >> ~/.bashrc
-  echo 'export BCM_LOCAL_GIT_REPO="'$BCM_LOCAL_GIT_REPO'"' >> ~/.bashrc
-  echo "alias bcm="""$BCM_LOCAL_GIT_REPO"/bcm-cli/bcm.sh "$@"" >> ~/.bashrc
+  echo "$BCM_BASHRC_FLAG" >> ~/.bashrc
+  echo "export PATH="'$PATH:'"$BCM_LOCAL_GIT_REPO/cli" >> ~/.bashrc
 fi
 
-bash -c ./host_provisioning/software_install/docker-ce.sh
 
-echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please open a new terminal session to refresh your envronment, then typ 'bcm'."
+
+echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please open a new terminal session to refresh your envronment, then typ 'bcm' to continue."

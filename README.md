@@ -57,7 +57,8 @@ You can now clone the BCM repository to the `dev machine` over TOR:
 ```bash
 mkdir -p ~/git/github/bcm
 git clone $BCM_GITHUB_REPO_URL ~/git/github/bcm
-cd ~/git/github/bcm/dev_machine
+cd ~/git/github/bcm/
+./setup.sh
 ```
 
 Feel free to change the directory in which you store the BCM repository on your `dev_machine` (instead of `~/git/github/bcm`).

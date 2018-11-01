@@ -17,24 +17,11 @@ set -eu
 #     exit
 #   fi
 
-#   export BCM_MULTIPASS_VM_NAME=$(lxc remote get-default)
+#   export BCM_CLUSTER_ENDPOINT_NAME=$(lxc remote get-default)
 # fi
 
-
-# # make the hwwallet_certs directory if it doesn't exist.
-# export BCM_PROJECT_DIR=~/.bcm/projects/$BCM_CURRENT_PROJECT_NAME
-# if [[ ! -d $BCM_PROJECT_DIR ]]; then
-#     mkdir -p $BCM_PROJECT_DIR
-# fi
-
-
-# # export some variables yo
-# export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-
-# export BCM_CLUSTER_ROOT_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
-# export BCM_CLUSTER_PROJECTS_ROOT_DIR=$BCM_CLUSTER_ROOT_DIR/projects
-# export BCM_ENDPOINT_LXD_ROOT_DIR=$BCM_CLUSTER_ROOT_DIR/lxd_endpoints
-
-# if [[ ! -z $(snap list | grep lxd) ]]; then
-#   export BCM_ENDPOINT_ROOT_DIR=$BCM_ENDPOINT_LXD_ROOT_DIR/$(lxc remote get-default)
-# fi
+# make the hwwallet_certs directory if it doesn't exist.
+export BCM_PROJECT_DIR=~/.bcm/projects/$BCM_PROJECT_NAME
+if [[ ! -d $BCM_PROJECT_DIR ]]; then
+    mkdir -p $BCM_PROJECT_DIR
+fi

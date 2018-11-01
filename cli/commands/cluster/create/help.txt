@@ -1,0 +1,43 @@
+Description:
+  Create an LXD cluster so you can deploy your BCM projects to it.
+
+Usage:
+  bcm cluster create 
+
+Example:
+  Create an LXD cluster named 'dev'. Since '-t=lxd', LXD will be installed automatically using
+  snap. Since '-x=net', the LXD remote endpoint will be exposed on the local network when your 
+  
+      bcm cluster create -c=dev -t=local -x=net
+
+Parameters:
+  -c=<BCM_CLUSTER_NAME>    The name of the new cluster. ~/.bcm/clusters/<BCM_CLUSTER_NAME> will 
+                          be populated after successful cluster creation.
+                          --cluster-name=<BCM_CLUSTER_NAME>
+
+  -t=<BCM_PROVIDER>       The provider is the mechanism by which an LXD instance will be made
+                          available. Valid option as are 'multipass', 'aws', and 'baremetal'. 
+                          
+                          'baremetal' installs LXD locally using snap and is recommended for 
+                          testing and development. 
+                          
+                          'multipass' install multipass as a snap and creates one or more QEMU-based
+                          VMs on your local computer. Each VM will be cloud-init provisioned into a 
+                          cluster configuratino
+                          
+                          'aws/azure' NOT SUPPORTED. BCM is meant for home and small office.
+  
+  -x=<BCM_CLUSTER_COUNT>  Cluster count. Number of equal-size multipass VMs you want deployed.
+
+  -x=<BCM_MGMT_TYPE>      Valid values are 'local', 'net', and 'tor'. 
+                    
+                          'local' is only compatible with '-t=baremetal' and configures your local LXD c
+                          lient to use the local unix socket for communication with the LXD daemon.
+                          
+                          'net' exposes the LXD remote endpoint on a local network interface.
+                          will listen on the local network interface (use -TODO=<INTERFACE_TO_LISTEN_ON>)
+                          
+                          'tor' will expose the LXD remote API using an authenticated onion site. This 
+                          is recommended for geographically distant clusters and is default when using
+                          third party providers (e.g., AWS, AZURE).
+ 

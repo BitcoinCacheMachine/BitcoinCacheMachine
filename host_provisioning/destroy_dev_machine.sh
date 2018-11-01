@@ -5,7 +5,7 @@
 sudo rm -rf ~/.bcm/clusters
 sudo rm -rf ~/.bcm/projects
 
-bash -c "./trezor/destroy_trezor.sh -n $BCM_CURRENT_PROJECT_NAME"
+bash -c "./mgmt_plane/destroy_trezor.sh -n $BCM_CURRENT_PROJECT_NAME"
 
 SKIP_SOFTWARE_UNINSTALL=$1
 

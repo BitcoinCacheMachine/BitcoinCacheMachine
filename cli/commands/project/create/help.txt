@@ -1,0 +1,12 @@
+Description:
+  Create a BCM project if it doesn't already exist. A Trezor required so the ~/.bcm/projects/<projectname> 
+  directory can be populated with public key material. The private key operations are relegated exclusively
+  to the Trezor.
+
+Usage:
+  bcm project create <BCM_PROJECT_NAME> -u=<BCM_PROJECT_USERNAME> -c=<BCM_CLUSTER_NAME>
+
+Required Flags:
+      -u (--user-name)          The username to be used on the certificate data, e.g., testing/stagging/production.
+                                See BCM documentation for other considerations regaring naming conventions.
+      -c (--cluster-name)       The name of the intended cluster that the project is will be deployed to. Required.

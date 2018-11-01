@@ -49,10 +49,10 @@ lxc cluster list
 docker info
 ```
 
-You can inspect the `~/.bcm/clusters/lxd_projects/` directory to view the files that were created. The `lxd_endpoints` and `lxd_projects` directories should exist. The LXD preseed file that was used to initialize the LXD daemon on the `dev machine` can be found at `~/.bcm/clusters/lxd_projects/lxd_endpoints/local/lxd_preseed.yml`. This file contains sensitive password information and is thus git committed to ~/.bcm/.  `local` here refers to the LXD remote endpoint for your dev machine (local) which can be discovered by running `lxc remote list`.
+You can inspect the `~/.bcm/clusters/lxd_projects/` directory to view the files that were created. The `endpoints` and `lxd_projects` directories should exist. The LXD preseed file that was used to initialize the LXD daemon on the `dev machine` can be found at `~/.bcm/clusters/lxd_projects/endpoints/local/lxd_preseed.yml`. This file contains sensitive password information and is thus git committed to ~/.bcm/.  `local` here refers to the LXD remote endpoint for your dev machine (local) which can be discovered by running `lxc remote list`.
 
 To continue this tutorial, jump up and down to the [../lxd/](../lxd/) directory to start deploying BCM infrastructure components to your local `dev machine`. This is where you can deploy BCM data center components to any cluster-mode LXD endpoint. All the scripts in this directory are applied to your currently active LXC remote (`lxc remote get-default`).
 
 ## Next step: Trezor for Cryptographic Operations
 
-To continue, delve into the [./trezor/](./trezor/) directory. This section shows how easy it is to get a fully functional Trezor T operating on your `dev machine`.
+To continue, delve into the [./mgmt_plane/](./mgmt_plane/) directory. This section shows how easy it is to get a fully functional Trezor T operating on your `dev machine`.

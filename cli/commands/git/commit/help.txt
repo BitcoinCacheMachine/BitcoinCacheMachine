@@ -1,0 +1,26 @@
+Description:
+  Commit and GPG-sign a git repository using a Trezor for secure cryptographic operations..
+
+Usage:
+  bcm git commit -g=<BCM_GIT_REPO_DIR> -m='<BCM_GIT_COMMIT_MESSAGE>' \
+                 -i=<BCM_GIT_CLIENT_USERNAME> -o=<BCM_PROJECT_OVERRIDE_DIR> 
+
+Parameters:
+  -g=<BCM_GIT_REPO_DIR>           The required path of the git repo you want to commit and sign.
+                                  --git-repo-dir=<BCM_GIT_REPO_DIR>
+
+  -m=<BCM_GIT_COMMIT_MESSAGE>     The required message to be included in the commit.
+                                  --git-commit-message=<BCM_GIT_COMMIT_MESSAGE>
+
+  -i=<BCM_GIT_CLIENT_USERNAME>    The required username to use for the git client. This SHOULD 
+                                  match the username of the remote git repo used when pushing.
+                                  --git-client-username=<BCM_GIT_CLIENT_USERNAME>
+
+  -o=<BCM_PROJECT_OVERRIDE_DIR>   Optional. Used to override the default ('bcm project get-default') 
+                                  directory that contains public GPG material used for signing.
+                                  --project-override=<BCM_PROJECT_OVERRIDE_DIR>
+  
+  -e=<BCM_EMAIL_ADDRESS>          Required. Specify the email address used to sign the git commit. This
+                                  MUST be an email listed in the certificate being used to sign the commit.
+                                  For github repos, this is the email in your public GPG certificate.
+

@@ -10,7 +10,7 @@ source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 if [[ -z $(lxc project list | grep bcm) ]]; then
     lxc project create bcm -c features.images=false -c features.profiles=false
-    mkdir -p $BCM_CLUSTER_PROJECTS_ROOT_DIR
+    mkdir -p $BCM_BCM_CLUSTER_DIR
     lxc project switch bcm
     #-c features.images=false -c features.profiles=false
 fi
