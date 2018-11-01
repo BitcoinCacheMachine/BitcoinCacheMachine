@@ -70,6 +70,10 @@ case $i in
     BCM_MGMT_TYPE="${i#*=}"
     shift # past argument=value
     ;;
+    -v=*|--gpg-signing-key-id=*)
+    BCM_GPG_SIGNING_KEY_ID="${i#*=}"
+    shift # past argument=value
+    ;;    
     -l=*|--cluster-node-count=*)
     BCM_CLUSTER_NODE_COUNT="${i#*=}"
     shift # past argument=value
@@ -261,6 +265,11 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
             exit
         fi
 
+         if [[ -z $BCM_GPG_SIGNING_KEY_ID ]]; then
+            echo "Required parameter BCM_GPG_SIGNING_KEY_ID not specified."
+            exit
+        fi
+
         if [[ ! -z $BCM_PROJECT_OVERRIDE_DIR ]]; then
             if [[ -d $BCM_PROJECT_OVERRIDE_DIR ]]; then
                 export BCM_PUBLIC_CERT_DIR=$BCM_PROJECT_OVERRIDE_DIR
@@ -294,6 +303,7 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
         export BCM_GIT_COMMIT_MESSAGE=$BCM_GIT_COMMIT_MESSAGE
         export BCM_GIT_CLIENT_USERNAME=$BCM_GIT_CLIENT_USERNAME
         export BCM_TREZOR_USB_PATH=$BCM_TREZOR_USB_PATH
+        export BCM_GPG_SIGNING_KEY_ID=$BCM_GPG_SIGNING_KEY_ID
 
         echo "BCM_PROJECT_DIR: $BCM_PROJECT_DIR"
         echo "BCM_GIT_COMMIT_MESSAGE: $BCM_GIT_COMMIT_MESSAGE"
@@ -301,6 +311,7 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
         echo "BCM_GIT_CLIENT_USERNAME: $BCM_GIT_CLIENT_USERNAME"
         echo "BCM_EMAIL_ADDRESS: $BCM_EMAIL_ADDRESS"
         echo "BCM_TREZOR_USB_PATH: $BCM_TREZOR_USB_PATH"
+        echo "BCM_GPG_SIGNING_KEY_ID: $BCM_GPG_SIGNING_KEY_ID"
 
         bash -c ./commands/git/commit/commitsign.sh
     elif [[ $BCM_CLI_VERB = "push" ]]; then

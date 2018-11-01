@@ -13,8 +13,6 @@ RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 RUN pip3 install Cython hidapi
 RUN pip3 install trezor_agent
 
-# set the GNUPGHOME variable which is used by trezor-agent
-ENV GNUPGHOME=/root/.gnupg/trezor
 
 WORKDIR /gitrepo
 
@@ -36,3 +34,5 @@ ADD ./container_scripts/docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 RUN mkdir -p /root/.bcm
+
+ENV GNUPGHOME=/root/.gnupg/trezor

@@ -3,6 +3,8 @@
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
+bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/build.sh"
+
 docker build -t bcm-gpgagent:latest .
 
 # BCM_GIT_COMMIT_MESSAGE must be set.
@@ -20,6 +22,12 @@ fi
 # BCM_GIT_COMMIT_MESSAGE must be set.
 if [[ -z $BCM_EMAIL_ADDRESS ]]; then
     echo "BCM_EMAIL_ADDRESS is not set. Exiting"
+    exit
+fi
+
+# BCM_GPG_SIGNING_KEY_ID must be set.
+if [[ -z $BCM_GPG_SIGNING_KEY_ID ]]; then
+    echo "BCM_GPG_SIGNING_KEY_ID is not set. Exiting"
     exit
 fi
 
@@ -57,15 +65,15 @@ docker run -d --name=bcm-trezor-gitter \
     -v $BCM_PUBLIC_CERT_DIR:/root/.gnupg \
     -v $BCM_GIT_REPO_DIR:/gitrepo \
     --device="$BCM_TREZOR_USB_PATH" \
+    -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
+    -e BCM_EMAIL_ADDRESS="$BCM_EMAIL_ADDRESS" \
+    -e BCM_GIT_COMMIT_MESSAGE="$BCM_GIT_COMMIT_MESSAGE" \
+    -e BCM_GPG_SIGNING_KEY_ID="$BCM_GPG_SIGNING_KEY_ID" \
     bcm-gpgagent:latest
 
 sleep 2
 
-docker exec -it \
-    -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
-    -e BCM_EMAIL_ADDRESS="$BCM_EMAIL_ADDRESS" \
-    -e BCM_GIT_COMMIT_MESSAGE="$BCM_GIT_COMMIT_MESSAGE" \
-    bcm-trezor-gitter /bcm/commit_sign_git_repo.sh
+docker exec -it bcm-trezor-gitter /bcm/commit_sign_git_repo.sh
 
 docker kill bcm-trezor-gitter
 docker system prune -f
