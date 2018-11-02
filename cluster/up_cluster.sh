@@ -3,7 +3,7 @@
 # brings up LXD cluster of at least 1 member. Increase the number
 # by providing $1 as a number 2 or above.
 
-set -e
+set -eu
 
 cd "$(dirname "$0")"
 
@@ -11,26 +11,32 @@ BCM_CLUSTER_NODE_COUNT=$1
 BCM_CLUSTER_NAME=$2
 BCM_PROVIDER_NAME=$3
 BCM_MGMT_TYPE=$4
+BCM_LXD_CLUSTER_MASTER=
+
+echo "Running up_cluster.sh with the following parameters."
+echo "BCM_CLUSTER_NODE_COUNT: '$BCM_CLUSTER_NODE_COUNT'"
+echo "BCM_CLUSTER_NAME: '$BCM_CLUSTER_NAME'"
+echo "BCM_PROVIDER_NAME: '$BCM_PROVIDER_NAME'"
+echo "BCM_MGMT_TYPE: '$BCM_MGMT_TYPE'"
+echo "BCM_LXD_CLUSTER_MASTER: '$BCM_LXD_CLUSTER_MASTER'"
+
 
 if [[ !($BCM_MGMT_TYPE = "local" || $BCM_MGMT_TYPE = "net" || $BCM_MGMT_TYPE = "tor") ]]; then
     echo "Error. BCM_MGMT_TYPE should be either 'local', 'net', or 'tor'."
     exit
 fi
 
-echo "BCM_MGMT_TYPE: '$BCM_MGMT_TYPE'"
-
 
 # see if the directory exists already; if so we exit
-export BCM_BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
-if [[ -d $BCM_BCM_CLUSTER_DIR ]]; then
-    echo "ERROR: The BCM_BCM_CLUSTER_DIR directory already exists. Exiting."
+export BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
+if [[ -d $BCM_CLUSTER_DIR ]]; then
+    echo "ERROR: The BCM_CLUSTER_DIR directory already exists. Exiting."
     exit
 fi
 
 function createMaster {
     export BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-00"
     export BCM_LXD_CLUSTER_MASTER=$BCM_CLUSTER_ENDPOINT_NAME
-    export BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
 
     # if ~/.bcm/clusters doesn't exist, create it.
     export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
@@ -45,13 +51,19 @@ function createMaster {
         mkdir -p $BCM_ENDPOINT_DIR
     fi
 
+
+
     # stub and source the master .env file
-    bash -c "./stub_env.sh master $BCM_PROVIDER_NAME"
+    bash -c "./stub_env.sh $BCM_CLUSTER_ENDPOINT_NAME master $BCM_ENDPOINT_DIR"
     source $BCM_ENDPOINT_DIR/.env
 
     echo "BCM_CLUSTER_ENDPOINT_NAME: $BCM_CLUSTER_ENDPOINT_NAME"
     echo "BCM_PROVIDER_NAME: $BCM_PROVIDER_NAME"
-    bash -c "./up_cluster_endpoint.sh true null $BCM_CLUSTER_ENDPOINT_NAME $BCM_PROVIDER_NAME"
+
+    # substitute the variables in lxd_master_preseed.yml
+    envsubst < ./lxd_preseed/lxd_master_preseed.yml > $BCM_ENDPOINT_DIR/lxd_preseed.yml
+
+    bash -c "./up_cluster_endpoint.sh true $BCM_CLUSTER_ENDPOINT_NAME $BCM_PROVIDER_NAME $BCM_ENDPOINT_DIR"
 }
 
 function createMembers {
@@ -65,10 +77,10 @@ function createMembers {
             do
                 echo "$BCM_CLUSTER_NAME-$i"
                 export BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-$i"
-                export NEWVM_DIR="$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME"
-                bash -c "./stub_env.sh member $BCM_PROVIDER_NAME"
-                source $NEWVM_DIR/.env
-                bash -c "./up_cluster_endpoint.sh false $BCM_LXD_CLUSTER_MASTER"
+                export BCM_ENDPOINT_DIR=$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME
+                bash -c "./stub_env.sh $BCM_CLUSTER_ENDPOINT_NAME member $BCM_ENDPOINT_DIR"
+                source $BCM_ENDPOINT_DIR/.env
+                bash -c "./up_cluster_endpoint.sh false $BCM_CLUSTER_ENDPOINT_NAME $BCM_PROVIDER_NAME $BCM_ENDPOINT_DIR"
             done
         fi
     fi

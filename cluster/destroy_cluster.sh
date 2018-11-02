@@ -4,13 +4,14 @@ cd "$(dirname "$0")"
 
 set -eu
 
-if [[ -z $BCM_CLUSTER_NAME ]]; then
-  echo "BCM_CLUSTER_NAME incorrectly passed.  Use '-c CLUS1' to pass cluster name."
-  exit
-fi
+BCM_CLUSTER_NAME=$1
+
+echo "Running destroy_cluster.sh with the following parameters:"
+echo "BCM_CLUSTER_NAME: $BCM_CLUSTER_NAME"
+echo "BCM_CLUSTER_NAME: $BCM_CLUSTER_NAME"
+
 
 echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
-
 export BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
 
@@ -24,7 +25,7 @@ if [[ $(multipass list | grep "$BCM_CLUSTER_NAME") ]]; then
   do
       echo "Working on VM: $vm"
       export BCM_CLUSTER_ENDPOINT_NAME=$vm
-      bash -c "./destroy_cluster_endpoint.sh $BCM_CLUSTER_ENDPOINT_NAME"
+      bash -c "./destroy_cluster_endpoint.sh $BCM_CLUSTER_NAME $BCM_CLUSTER_ENDPOINT_NAME"
   done
 fi
 

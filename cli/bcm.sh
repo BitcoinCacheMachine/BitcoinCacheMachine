@@ -216,8 +216,6 @@ elif [[ $BCM_CLI_COMMAND = "cluster" ]]; then
             export BCM_CLUSTER_NODE_COUNT=3
         fi
 
-        
-        
         bash -c "$BCM_LOCAL_GIT_REPO/cluster/up_cluster.sh $BCM_CLUSTER_NODE_COUNT $BCM_CLUSTER_NAME $BCM_PROVIDER_NAME $BCM_MGMT_TYPE"
         
     elif [[ $BCM_CLI_VERB = "destroy" ]]; then
@@ -227,7 +225,7 @@ elif [[ $BCM_CLI_COMMAND = "cluster" ]]; then
         fi
 
         export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-        bash -c $BCM_LOCAL_GIT_REPO/cluster/destroy_cluster.sh
+        bash -c "$BCM_LOCAL_GIT_REPO/cluster/destroy_cluster.sh $BCM_CLUSTER_NAME $BCM_CLUSTER_ENDPOINT_NAME"
     elif [[ $BCM_CLI_VERB = "list" ]]; then
         
         if [[ $BCM_HELP_FLAG = 1 ]]; then

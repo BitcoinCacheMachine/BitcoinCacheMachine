@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -e
+set -eu
+
+BCM_CLUSTER_NAME=$1
+BCM_CLUSTER_ENDPOINT_NAME=$2
 
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
@@ -13,20 +16,20 @@ fi
 
 BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
 ENDPOINTS_DIR=$BCM_CLUSTER_DIR/endpoints
-VM_DIR=$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME
+BCM_ENDPOINT_DIR=$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME
 
-echo "BCM_CLUSTER_DIR=$BCM_CLUSTER_DIR"
-echo "ENDPOINTS_DIR=$ENDPOINTS_DIR"
-echo "VM_DIR=$VM_DIR"
+echo "BCM_CLUSTER_DIR: $BCM_CLUSTER_DIR"
+echo "ENDPOINTS_DIR: $ENDPOINTS_DIR"
+echo "BCM_ENDPOINT_DIR: $BCM_ENDPOINT_DIR"
 
-if [[ $(multipass list | grep "$VM_NAME") ]]; then
-  if [[ -f $VM_DIR/.env ]]; then
-    source $VM_DIR/.env
+if [[ $(multipass list | grep "$BCM_CLUSTER_ENDPOINT_NAME") ]]; then
+  if [[ -f $BCM_ENDPOINT_DIR/.env ]]; then
+    source $BCM_ENDPOINT_DIR/.env
   fi
 fi
 
 # quit if there are no multipass environment variables loaded.
-if [[ -z $(env | grep "BCM_CLUSTER_ENDPOINT_NAME") ]]; then
+if [[ -z $(env | grep "$BCM_CLUSTER_ENDPOINT_NAME") ]]; then
   echo "BCM_CLUSTER_ENDPOINT_NAME variable not set."
   exit 1
 fi
@@ -50,12 +53,8 @@ else
     echo "No lxc remote called $BCM_CLUSTER_ENDPOINT_NAME to delete."
 fi
 
-if [[ -d $VM_DIR ]]; then
-  rm -rf $VM_DIR
-fi
-
-if [[ -d /tmp/bcm ]]; then
-  rm -rf /tmp/bcm
+if [[ -d $BCM_ENDPOINT_DIR ]]; then
+  rm -rf $BCM_ENDPOINT_DIR
 fi
 
 bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh 'Destroyed $BCM_CLUSTER_ENDPOINT_NAME and associated files.'"

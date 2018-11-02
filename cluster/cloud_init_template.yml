@@ -1,0 +1,24 @@
+#cloud-config
+package_upgrade: true
+
+# install host dependencies
+packages:
+  - zfsutils-linux
+  - wait-for-it
+  - tor
+
+write_files:
+  - path: /lxd_preseed.yml
+    content: |
+$BCM_CLUSTER_MASTER_LXD_PRESEED
+
+
+snap:
+  commands:
+    00: apt-get remove lxd lxd-client -y
+    01: snap install lxd --stable
+    02: sleep 30
+
+# Initialize the LXD daemon using the provided preseed.
+runcmd:
+  - bash -c "cat /lxd_preseed.yml | sudo lxd init --preseed"

@@ -1,35 +1,38 @@
 #!/bin/bash
 
-# quit script if anything goes awry
 set -eu
-
-# set the working directory to the location where the script is located
-# since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# quit if there are no multipass environment variables
-if [[ -z $(env | grep BCM_CLUSTER_ENDPOINT_NAME) ]]; then
-  echo "BCM_CLUSTER_ENDPOINT_NAME variables not set."
-  exit
-fi
-
 IS_MASTER=$1
-BCM_MULTIPASS_CLUSTER_MASTER=$2
-BCM_CLUSTER_ENDPOINT_NAME=$3
-BCM_PROVIDER_NAME=$4
+BCM_CLUSTER_ENDPOINT_NAME=$2
+BCM_PROVIDER_NAME=$3
+BCM_CLUSTER_ENDPOINT_DIR=$4
 BCM_ENDPOINT_VM_IP=
 
+echo "up_cluster_endpoint.sh"
+echo "IS_MASTER: $IS_MASTER"
+echo "BCM_CLUSTER_ENDPOINT_NAME: $BCM_CLUSTER_ENDPOINT_NAME"
+echo "BCM_CLUSTER_ENDPOINT_DIR: $BCM_CLUSTER_ENDPOINT_DIR"
+echo "BCM_PROVIDER_NAME: $BCM_PROVIDER_NAME"
+echo "BCM_ENDPOINT_VM_IP: $BCM_ENDPOINT_VM_IP"
+
 # if there's no .env file for the specified VM, we'll generate a new one.
-if [ -f $ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME/.env ]; then
-  source $ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME/.env
+if [ -f $BCM_CLUSTER_ENDPOINT_DIR/.env ]; then
+  source $BCM_CLUSTER_ENDPOINT_DIR/.env
 else
-  echo "Error. No $ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME/.env file to source."
+  echo "Error. No $BCM_CLUSTER_ENDPOINT_DIR/.env file to source."
   exit
 fi
 
 if [[ -z $BCM_PROVIDER_NAME ]]; then
   echo "BCM_PROVIDER_NAME not set. Exiting."
   exit
+fi
+
+# let's prepare the lxd preseed and cloud-init file
+if [[ -f $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml ]]; then
+  export BCM_CLUSTER_MASTER_LXD_PRESEED=$(cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | awk '{print "      " $0}')
+  envsubst < ./cloud_init_template.yml > $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml
 fi
 
 if [[ $BCM_PROVIDER_NAME = 'lxd' ]]; then
@@ -42,32 +45,14 @@ elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     --mem $BCM_ENDPOINT_MEM_SIZE \
     --cpus $BCM_ENDPOINT_CPU_COUNT \
     --name $BCM_CLUSTER_ENDPOINT_NAME \
-    --cloud-init ./cloud_init.yml \
+    --cloud-init $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml \
     bionic
 
-  #restart the VM for updates to take effect
-  multipass stop $BCM_CLUSTER_ENDPOINT_NAME
-  multipass start $BCM_CLUSTER_ENDPOINT_NAME
-
-
-  export BCM_ENDPOINT_VM_IP=$(multipass list | grep "$BCM_CLUSTER_ENDPOINT_NAME" | awk '{ print $3 }')
+  BCM_ENDPOINT_VM_IP=$(multipass list | grep "$BCM_CLUSTER_ENDPOINT_NAME" | awk '{ print $3 }')
+  bash -c "./add_endpoint_lxd_remote.sh $BCM_CLUSTER_ENDPOINT_NAME $BCM_ENDPOINT_VM_IP $BCM_LXD_SECRET"
 
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
   echo "todo; baremetal in up_cluster_endpoint.sh"
 elif [[ $BCM_PROVIDER_NAME = "aws" ]]; then
   echo "todo; aws in up_cluster_endpoint.sh"
-fi
-
-
-# make sure we get a good IP.
-if [[ -z $BCM_ENDPOINT_VM_IP ]]; then
-    echo "Could not determine the IP address for $BCM_CLUSTER_ENDPOINT_NAME."
-    exit
-fi
-
-# now we need to create the appropriate cloud-init file now that we have the IP address.
-if [[ $IS_MASTER = "true" ]]; then
-  bash -c ./provision_lxd_master.sh
-else
-  bash -c ./provision_lxd_member.sh
 fi
