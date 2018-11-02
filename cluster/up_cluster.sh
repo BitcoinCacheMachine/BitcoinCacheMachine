@@ -7,7 +7,7 @@ set -e
 
 cd "$(dirname "$0")"
 
-MEMBER_COUNT=$1
+BCM_CLUSTER_NODE_COUNT=$1
 BCM_CLUSTER_NAME=$2
 BCM_PROVIDER_NAME=$3
 BCM_MGMT_TYPE=$4
@@ -57,11 +57,11 @@ function createMaster {
 function createMembers {
 
     # now provision the other nodes.
-    if [[ ! -z $MEMBER_COUNT ]]; then
-        if [[ $MEMBER_COUNT -ge 1 ]]; then
+    if [[ ! -z $BCM_CLUSTER_NODE_COUNT ]]; then
+        if [[ $BCM_CLUSTER_NODE_COUNT -ge 2 ]]; then
             # spin up some member nodes
-            echo "Member Count: $MEMBER_COUNT"
-            for i in $(seq -f %02g 1 $MEMBER_COUNT)
+            echo "Member Count: $BCM_CLUSTER_NODE_COUNT"
+            for i in $(seq -f %02g 1 $BCM_CLUSTER_NODE_COUNT)
             do
                 echo "$BCM_CLUSTER_NAME-$i"
                 export BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-$i"
@@ -91,8 +91,9 @@ elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     # now we invoke the script that provisions the cluster.
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
     export BCM_PROVIDER_NAME=$BCM_PROVIDER_NAME
+    
     createMaster
-
+    createMembers
 elif [[ $BCM_PROVIDER = "aws" ]]; then
     echo "Creating a remote LXD cluster running on someone else's computers (AWS)."
 fi

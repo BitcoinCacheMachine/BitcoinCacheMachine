@@ -210,8 +210,15 @@ elif [[ $BCM_CLI_COMMAND = "cluster" ]]; then
             echo "BCM_MGMT_TYPE not set. Exiting"
             exit
         fi
+
+        if [[ -z $BCM_CLUSTER_NODE_COUNT ]]; then
+            echo "BCM_CLUSTER_NODE_COUNT not set. Setting it to 3."
+            export BCM_CLUSTER_NODE_COUNT=3
+        fi
+
         
-        bash -c "$BCM_LOCAL_GIT_REPO/cluster/up_cluster.sh 3 $BCM_CLUSTER_NAME $BCM_PROVIDER_NAME $BCM_MGMT_TYPE"
+        
+        bash -c "$BCM_LOCAL_GIT_REPO/cluster/up_cluster.sh $BCM_CLUSTER_NODE_COUNT $BCM_CLUSTER_NAME $BCM_PROVIDER_NAME $BCM_MGMT_TYPE"
         
     elif [[ $BCM_CLI_VERB = "destroy" ]]; then
         if [[ -z $BCM_CLUSTER_NAME ]]; then
