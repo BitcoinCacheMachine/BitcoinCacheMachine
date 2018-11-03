@@ -32,4 +32,4 @@ echo "Staging all outstanding changes."
 git add *
 
 echo "Committing and signing. Get ready to check your Trezor."
-git commit -S -am "$BCM_GIT_COMMIT_MESSAGE"
+git commit -S -m "$BCM_GIT_COMMIT_MESSAGE"

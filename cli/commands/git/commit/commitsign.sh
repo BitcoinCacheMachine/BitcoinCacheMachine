@@ -71,9 +71,8 @@ docker run -d --name=bcm-trezor-gitter \
     -e BCM_GPG_SIGNING_KEY_ID="$BCM_GPG_SIGNING_KEY_ID" \
     bcm-gpgagent:latest
 
-sleep 5
 
-# docker exec -it bcm-trezor-gitter /bcm/commit_sign_git_repo.sh
+docker exec -t bcm-trezor-gitter /bcm/commit_sign_git_repo.sh
 
 # docker kill bcm-trezor-gitter
 # docker system prune -f
