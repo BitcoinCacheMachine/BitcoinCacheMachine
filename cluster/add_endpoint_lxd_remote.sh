@@ -2,9 +2,31 @@
 
 set -eu
 
-BCM_CLUSTER_ENDPOINT_NAME=$1
-BCM_ENDPOINT_VM_IP=$2
-BCM_LXD_SECRET=$3
+BCM_CLUSTER_ENDPOINT_NAME=
+BCM_ENDPOINT_VM_IP=
+BCM_LXD_SECRET=
+
+for i in "$@"
+do
+case $i in
+    --endpoint=*)
+    BCM_CLUSTER_ENDPOINT_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    --endpoint-ip=*)
+    BCM_ENDPOINT_VM_IP="${i#*=}"
+    shift # past argument=value
+    ;;
+    --endpoint-lxd-secret=*)
+    BCM_LXD_SECRET="${i#*=}"
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
+
 
 echo "Waiting for the remote lxd daemon to become available."
 wait-for-it -t 0 $BCM_ENDPOINT_VM_IP:8443

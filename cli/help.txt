@@ -1,22 +1,26 @@
 Description:
   Command line client for Bitcoin Cache Machine. All of BCM's features can 
-  be driven through the various commands below. If you just pulled BCM to your 
-  local machine and want to get started consider the following steps:
+  be driven through the various commands below. If you just pulled BCM to 
+  your local machine and want to get started consider the following steps:
   
   1) Creating a new cluster with 'bcm cluster create'
   2) Define one or more BCM projects with 'bcm project create'
-  3) Deploy a BCM project to an active cluster with 'bcm project deploy -c=<BCM_CLUSTER_NAME>'
+  3) Deploy a BCM project to an active cluster with 
+     'bcm project deploy -c=<BCM_CLUSTER_NAME>'
 
 Usage:
   bcm [command]
 
 Available Commands:
-  init          Initialize your management plane.
-  cluster       Create, destroy, and manage BCM clusters (i.e., LXD cluster).
-  project       Manage BCM projects.
-  git           Perform typical git operations with a hardware wallet backend.
-  file          Create and verify file signatures, encrypt and decrypt files (Trezor-backed)
-  ssh           Perform SSH (new key identities and interactive login) operations with Trezor backend.
+  init       Initialize your management plane.
+  cluster    Create, destroy, and manage BCM clusters (i.e., LXD cluster).
+  project    Manage BCM projects.
+  git        Perform typical git operations with with your Trezor.
+  file       Create and verify file signatures, encrypt and decrypt files 
+             with your Trezor.
+  ssh        Perform SSH (new key identities and interactive login) operations 
+             with your Trezor.
+  pass       Create and manage GPG-encrypted passwords protected by your Trezor.
 
 Help
   Use "bcm [command]" to get help for that command.

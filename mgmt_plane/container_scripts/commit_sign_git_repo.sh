@@ -28,9 +28,6 @@ echo "git config --global user.name set to '$(git config --global --get user.nam
 git config --global user.email "$BCM_EMAIL_ADDRESS"
 echo "git config --global user.email set to '$(git config --global --get user.email)'"
 
-#gpg --list-secret-keys --keyid-format LONG
-#git config --local user.signingkey 
-
 echo "Staging all outstanding changes."
 git add *
 

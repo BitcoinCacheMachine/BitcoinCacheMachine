@@ -25,7 +25,7 @@ if [[ $(multipass list | grep "$BCM_CLUSTER_NAME") ]]; then
   do
       echo "Working on VM: $vm"
       export BCM_CLUSTER_ENDPOINT_NAME=$vm
-      bash -c "./destroy_cluster_endpoint.sh $BCM_CLUSTER_NAME $BCM_CLUSTER_ENDPOINT_NAME"
+      bash -c "./destroy_cluster_endpoint.sh --cluster-name=$BCM_CLUSTER_NAME --endpoint-name=$BCM_CLUSTER_ENDPOINT_NAME"
   done
 fi
 

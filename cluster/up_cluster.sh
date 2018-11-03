@@ -7,18 +7,46 @@ set -eu
 
 cd "$(dirname "$0")"
 
-BCM_CLUSTER_NODE_COUNT=$1
-BCM_CLUSTER_NAME=$2
-BCM_PROVIDER_NAME=$3
-BCM_MGMT_TYPE=$4
-BCM_LXD_CLUSTER_MASTER=
+BCM_CLUSTER_NODE_COUNT=
+BCM_CLUSTER_NAME=
+BCM_PROVIDER_NAME=
+BCM_MGMT_TYPE=
+BCM_CLUSTER_MASTER_NAME=
 
+for i in "$@"
+do
+case $i in
+    --cluster-name=*)
+    BCM_CLUSTER_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    --node-count=*)
+    BCM_CLUSTER_NODE_COUNT="${i#*=}"
+    shift # past argument=value
+    ;;
+    --provider=*)
+    BCM_PROVIDER_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    --mgmt-type=*)
+    BCM_MGMT_TYPE="${i#*=}"
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
+
+
+
+
+echo "____________________________"
 echo "Running up_cluster.sh with the following parameters."
 echo "BCM_CLUSTER_NODE_COUNT: '$BCM_CLUSTER_NODE_COUNT'"
 echo "BCM_CLUSTER_NAME: '$BCM_CLUSTER_NAME'"
 echo "BCM_PROVIDER_NAME: '$BCM_PROVIDER_NAME'"
 echo "BCM_MGMT_TYPE: '$BCM_MGMT_TYPE'"
-echo "BCM_LXD_CLUSTER_MASTER: '$BCM_LXD_CLUSTER_MASTER'"
 
 
 if [[ !($BCM_MGMT_TYPE = "local" || $BCM_MGMT_TYPE = "net" || $BCM_MGMT_TYPE = "tor") ]]; then
@@ -40,7 +68,6 @@ if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
 
     # first let's make sure the lxd snap is installed.
     bash -c $BCM_LOCAL_GIT_REPO/cluster/providers/lxd/snap_lxd_install.sh
-    export BCM_PROVIDER_NAME=$BCM_PROVIDER_NAME
 elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
 
@@ -55,8 +82,8 @@ fi
 
 
 ##### Let's start by creating the master.
-export BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-00"
-export BCM_LXD_CLUSTER_MASTER=$BCM_CLUSTER_ENDPOINT_NAME
+BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-00"
+BCM_CLUSTER_MASTER_NAME=$BCM_CLUSTER_ENDPOINT_NAME
 
 # if ~/.bcm/clusters doesn't exist, create it.
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
@@ -71,18 +98,20 @@ if [ ! -d $BCM_ENDPOINT_DIR ]; then
     mkdir -p $BCM_ENDPOINT_DIR >> /dev/null
 fi
 
-# stub and source the master .env file
-bash -c "./stub_env.sh $BCM_CLUSTER_ENDPOINT_NAME master $BCM_ENDPOINT_DIR"
+./stub_env.sh --endpoint-name="$BCM_CLUSTER_MASTER_NAME" --master --endpoint-dir="$BCM_ENDPOINT_DIR" --provider="$BCM_PROVIDER_NAME"
+
 source $BCM_ENDPOINT_DIR/.env
 
-echo "BCM_CLUSTER_ENDPOINT_NAME: $BCM_CLUSTER_ENDPOINT_NAME"
-echo "BCM_PROVIDER_NAME: $BCM_PROVIDER_NAME"
-
 # substitute the variables in lxd_master_preseed.yml
+export BCM_IP_ADDRESS_ENV_TEXT='$BCM_IP_ADDRESS_ENV_TEXT'
 envsubst < ./lxd_preseed/lxd_master_preseed.yml > $BCM_ENDPOINT_DIR/lxd_preseed.yml
 BCM_CLUSTER_MASTER_ENDPOINT_DIR=$BCM_ENDPOINT_DIR
-bash -c "./up_cluster_endpoint.sh true $BCM_CLUSTER_ENDPOINT_NAME $BCM_PROVIDER_NAME $BCM_ENDPOINT_DIR"
-export BCM_CLUSTER_MASTER_ENDPOINT_IP=`bash -c "./get_endpoint_ip.sh $BCM_PROVIDER_NAME $BCM_CLUSTER_ENDPOINT_NAME"`
+
+# create the endpoint using the underlying provider
+./up_cluster_endpoint.sh --master --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME" --provider="$BCM_PROVIDER_NAME" --endpoint-dir="$BCM_CLUSTER_MASTER_ENDPOINT_DIR"
+
+# get the IP address of the new endpoint
+export BCM_CLUSTER_MASTER_ENDPOINT_IP=`bash -c "./get_endpoint_ip.sh --provider=$BCM_PROVIDER_NAME --endpoint-name=$BCM_CLUSTER_ENDPOINT_NAME"`
 
 # since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
 CERT_FILE=$BCM_ENDPOINT_DIR/lxd.cert
@@ -119,11 +148,20 @@ if [[ $BCM_CLUSTER_NODE_COUNT -ge 2 ]]; then
     do
         echo "$BCM_CLUSTER_NAME-$i"
         export BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-$i"
-        export BCM_ENDPOINT_DIR=$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME
-        bash -c "./stub_env.sh $BCM_CLUSTER_ENDPOINT_NAME member $BCM_ENDPOINT_DIR $BCM_PROVIDER_NAME"
-        source $BCM_ENDPOINT_DIR/.env
-        BCM_ENDPOINT_VM_IP=`bash -c "./get_endpoint_ip.sh $BCM_PROVIDER_NAME $BCM_CLUSTER_ENDPOINT_NAME"`
-        envsubst < ./lxd_preseed/lxd_member_preseed.yml > $BCM_ENDPOINT_DIR/lxd_preseed.yml
-        bash -c "./up_cluster_endpoint.sh false $BCM_CLUSTER_ENDPOINT_NAME $BCM_PROVIDER_NAME $BCM_ENDPOINT_DIR"
+        export BCM_CLUSTER_ENDPOINT_DIR=$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME
+        bash -c "./stub_env.sh --endpoint-name=$BCM_CLUSTER_ENDPOINT_NAME --endpoint-type=member --endpoint-dir=$BCM_CLUSTER_ENDPOINT_DIR --provider=$BCM_PROVIDER_NAME"
+        
+        ENV_FILE=$BCM_CLUSTER_ENDPOINT_DIR/.env
+        if [[ -f $ENV_FILE ]]; then
+            source $ENV_FILE
+            BCM_ENDPOINT_VM_IP=`bash -c "./get_endpoint_ip.sh --provider=$BCM_PROVIDER_NAME --endpoint-name=$BCM_CLUSTER_ENDPOINT_NAME"`
+            
+            PRESEED_FILE=./lxd_preseed/lxd_member_preseed.yml
+            if [[ -f $PRESEED_FILE ]]; then
+                envsubst < ./lxd_preseed/lxd_member_preseed.yml > $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml
+                # create the endpoint using the underlying provider
+                ./up_cluster_endpoint.sh --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME" --provider="$BCM_PROVIDER_NAME" --endpoint-dir="$BCM_CLUSTER_ENDPOINT_DIR"
+            fi
+        fi
     done
 fi

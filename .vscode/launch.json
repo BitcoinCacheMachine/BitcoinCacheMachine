@@ -7,8 +7,10 @@
         {
             "type": "bashdb",
             "request": "launch",
-            "name": "Bash-Debug (simplest configuration)",
-            "program": "bash -c './multipass/up_multipass_cluster.sh C1 1'"
+            "name": "Bash-Debug (hardcoded script name)",
+            "cwd": "${workspaceFolder}",
+            "program": "$BCM_LOCAL_GIT_REPO/cli/bcm",
+            "args": [  "cluster", "create", "-c=dev", "-t=multipass", "-x=net" ]
         }
     ]
 }

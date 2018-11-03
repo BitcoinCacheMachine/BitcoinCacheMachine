@@ -8,16 +8,37 @@ packages:
   - tor
 
 write_files:
-  - path: /lxd_preseed.yml
+  - path: /entrypoint.sh
+    owner: root:root
+    permissions: '0500'
+    content: |
+      #!/bin/bash
+
+      set -eu
+      cd "$(dirname "$0")"
+
+      echo "Removing existing lxd and lxd-client using apt."
+      apt-get remove lxd lxd-client -y
+      
+      echo "Installing LXD via snap."
+      snap install lxd --stable
+
+      export BCM_IP_ADDRESS_ENV_TEXT=$(ip addr show $BCM_LISTEN_INTERFACE | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+
+      # Substitute the IP address in the cloud-init-pressed
+      echo "Creating /etc/bcm/lxd_preseed.yml. Updating it with BCM_IP_ADDRESS_ENV_TEXT=$BCM_IP_ADDRESS_ENV_TEXT"
+      envsubst < /etc/bcm/lxd_preseed_cloud-init.yml > /etc/bcm/lxd_preseed.yml
+
+      # finally, init the LXD daemon.
+      echo "Inititiating LXD init with the preseed file /etc/bcm/lxd_preseed.yml."
+      bash -c "cat /etc/bcm/lxd_preseed.yml | sudo lxd init --preseed"
+
+  - path: /etc/bcm/lxd_preseed_cloud-init.yml
+    owner: root:root
+    permissions: '0400'  
     content: |
 $BCM_CLUSTER_MASTER_LXD_PRESEED
 
-snap:
-  commands:
-    00: apt-get remove lxd lxd-client -y
-    01: snap install lxd --stable
-    02: sleep 15
-
-# Initialize the LXD daemon using the provided preseed.
+# Run the initialization script.
 runcmd:
-  - bash -c "cat /lxd_preseed.yml | sudo lxd init --preseed"
+  - bash -c /entrypoint.sh

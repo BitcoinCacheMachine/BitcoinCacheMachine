@@ -1,0 +1,6 @@
+Description:
+  Use Trezor back-end to manage a password store. All commands for 'bcm pass'
+  are passed to the 'pass' utility.
+
+Usage:
+  bcm pass [command]
