@@ -1,8 +1,25 @@
+config:
+  core.https_address: ::8443
+  core.trust_password: $BCM_LXD_SECRET
+storage_pools:
+- config:
+    size: 10GB
+  description: "ZFS storage backend for BCM system containers."
+  name: bcm_zfs
+  driver: zfs
+profiles:
+- config: {}
+  description: "Default BCM profile. Has ZFS backend only; no networking."
+  devices:
+    root:
+      path: /
+      pool: bcm_zfs
+      type: disk
+  name: bcm_default
 cluster:
   enabled: true
   server_name: $BCM_CLUSTER_ENDPOINT_NAME
-  server_address: $BCM_ENDPOINT_VM_IP:8443
-  cluster_address: $BCM_LXD_CLUSTER_MASTER_IP:8443
+  cluster_address: $BCM_CLUSTER_MASTER_ENDPOINT_IP:8443
   cluster_certificate: "$BCM_LXD_CLUSTER_CERTIFICATE
 "
   cluster_password: $BCM_LXD_CLUSTER_MASTER_PASSWORD

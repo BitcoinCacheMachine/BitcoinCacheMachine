@@ -12,12 +12,11 @@ write_files:
     content: |
 $BCM_CLUSTER_MASTER_LXD_PRESEED
 
-
 snap:
   commands:
     00: apt-get remove lxd lxd-client -y
     01: snap install lxd --stable
-    02: sleep 30
+    02: sleep 15
 
 # Initialize the LXD daemon using the provided preseed.
 runcmd:

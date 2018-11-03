@@ -48,7 +48,7 @@ elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     --cloud-init $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml \
     bionic
 
-  BCM_ENDPOINT_VM_IP=$(multipass list | grep "$BCM_CLUSTER_ENDPOINT_NAME" | awk '{ print $3 }')
+  BCM_ENDPOINT_VM_IP=`bash -c "./get_endpoint_ip.sh $BCM_PROVIDER_NAME $BCM_CLUSTER_ENDPOINT_NAME"`
   bash -c "./add_endpoint_lxd_remote.sh $BCM_CLUSTER_ENDPOINT_NAME $BCM_ENDPOINT_VM_IP $BCM_LXD_SECRET"
 
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then

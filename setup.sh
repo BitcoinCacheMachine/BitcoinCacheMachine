@@ -42,15 +42,15 @@ export BCM_LOCAL_GIT_REPO=$(pwd)
 
 BCM_BASHRC_FLAG='### Start BCM'
 
-if grep -Fxq "$BCM_BASHRC_FLAG" ~/.bashrc
+if grep -Fxq "$BCM_BASHRC_FLAG" ~/.profile
 then
   # code if found
-  echo "BCM flag discovered in ~/.bashrc. Please inspect your ~/.bashrc to clear any BCM-related content, if appropriate."
+  echo "BCM flag discovered in ~/.profile. Please inspect your ~/.profile to clear any BCM-related content, if appropriate."
 else
-  echo "Writing commands to ~/.bashrc to support running BCM from the admin machine."
-  echo "$BCM_BASHRC_FLAG" >> ~/.bashrc
-  echo "export BCM_LOCAL_GIT_REPO=$BCM_LOCAL_GIT_REPO" >> ~/.bashrc
-  echo "export PATH="'$PATH:'"$BCM_LOCAL_GIT_REPO/cli" >> ~/.bashrc
+  echo "Writing commands to ~/.profile to support running BCM from the admin machine."
+  echo "$BCM_BASHRC_FLAG" >> ~/.profile
+  echo "export BCM_LOCAL_GIT_REPO=$BCM_LOCAL_GIT_REPO" >> ~/.profile
+  echo "export PATH="'$PATH:'"$BCM_LOCAL_GIT_REPO/cli" >> ~/.profile
 fi
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please open a new terminal session to refresh your envronment, then typ 'bcm' to continue."

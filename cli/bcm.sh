@@ -17,9 +17,10 @@ BCM_PROJECT_USERNAME=
 BCM_CLUSTER_NAME=
 BCM_PROJECT_DIR=
 BCM_PROJECT_OVERRIDE_DIR=
-BCM_PROVIDER=
+BCM_GIT_REPO_DIR=
 BCM_MGMT_TYPE=
 BCM_PROVIDER_NAME=
+BCM_CLUSTER_NODE_COUNT=
 export BCM_FORCE_FLAG=0
 export BCM_DEBUG=false
 
@@ -213,8 +214,9 @@ elif [[ $BCM_CLI_COMMAND = "cluster" ]]; then
 
         if [[ -z $BCM_CLUSTER_NODE_COUNT ]]; then
             echo "BCM_CLUSTER_NODE_COUNT not set. Setting it to 3."
-            export BCM_CLUSTER_NODE_COUNT=3
+            export BCM_CLUSTER_NODE_COUNT=1
         fi
+        
 
         bash -c "$BCM_LOCAL_GIT_REPO/cluster/up_cluster.sh $BCM_CLUSTER_NODE_COUNT $BCM_CLUSTER_NAME $BCM_PROVIDER_NAME $BCM_MGMT_TYPE"
         
@@ -322,7 +324,7 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
     elif [[ $BCM_CLI_VERB = "push" ]]; then
         # required parameters to push are the git repository we're going to commit
         #
-        source ./shared/get_git_repo_dir.sh
+        echo "git push TODO"
     else
         cat ./commands/git/help.txt
     fi

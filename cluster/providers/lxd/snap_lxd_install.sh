@@ -23,4 +23,8 @@ if [[ -z $(snap list | grep lxd) ]]; then
     fi
 
     sudo snap install lxd --stable
+
+    # usually good to wait before exiting; other tools may try to use the tool
+    # before its initiailzed.
+    sleep 10
 fi

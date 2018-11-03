@@ -24,9 +24,9 @@ touch $ENV_FILE
 export BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
 
 if [ $BCM_CLUSTER_ENDPOINT_TYPE = "master" ]; then
-    envsubst < ./providers/$BCM_PROVIDER_NAME/env/master_defaults.env > $ENV_FILE
+    envsubst < ./env/master_defaults.env > $ENV_FILE
 elif [ $BCM_CLUSTER_ENDPOINT_TYPE = "member" ]; then
-    envsubst < ./providers/$BCM_PROVIDER_NAME/env/member_defaults.env > $ENV_FILE
+    envsubst < ./env/member_defaults.env > $ENV_FILE
 else
     echo "Incorrect usage. Please specify whether $BCM_CLUSTER_ENDPOINT_NAME is an LXD cluster master or member."
 fi
