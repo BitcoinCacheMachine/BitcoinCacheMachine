@@ -23,14 +23,14 @@ write_files:
       echo "Installing LXD via snap."
       snap install lxd --stable
 
-      export BCM_IP_ADDRESS_ENV_TEXT=$(ip addr show $BCM_LISTEN_INTERFACE | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+      export BCM_LXD_CORE_HTTPS_ADDRESS="$(ip addr show $BCM_LISTEN_INTERFACE | grep "inet\b" | awk '{print $2}' | cut -d/ -f1):8443"
 
       # Substitute the IP address in the cloud-init-pressed
-      echo "Creating /etc/bcm/lxd_preseed.yml. Updating it with BCM_IP_ADDRESS_ENV_TEXT=$BCM_IP_ADDRESS_ENV_TEXT"
+      echo "Creating /etc/bcm/lxd_preseed.yml. Updating it with BCM_LXD_CORE_HTTPS_ADDRESS: '$BCM_LXD_CORE_HTTPS_ADDRESS'"
       envsubst < /etc/bcm/lxd_preseed_cloud-init.yml > /etc/bcm/lxd_preseed.yml
 
       # finally, init the LXD daemon.
-      echo "Inititiating LXD init with the preseed file /etc/bcm/lxd_preseed.yml."
+      echo "Initializing LXD with the preseed file /etc/bcm/lxd_preseed.yml."
       bash -c "cat /etc/bcm/lxd_preseed.yml | sudo lxd init --preseed"
 
   - path: /etc/bcm/lxd_preseed_cloud-init.yml

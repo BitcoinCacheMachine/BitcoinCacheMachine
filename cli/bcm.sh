@@ -16,7 +16,7 @@ BCM_PROJECT_NAME=
 BCM_PROJECT_USERNAME=
 BCM_CLUSTER_NAME=
 BCM_PROJECT_DIR=
-BCM_PROJECT_OVERRIDE_DIR=
+BCM_CERT_DIR_OVERRIDE=
 BCM_GIT_REPO_DIR=
 BCM_MGMT_TYPE=
 BCM_PROVIDER_NAME=
@@ -60,8 +60,8 @@ case $i in
     BCM_EMAIL_ADDRESS="${i#*=}"
     shift # past argument=value
     ;;
-    -o=*|--project-override=*)
-    BCM_PROJECT_OVERRIDE_DIR="${i#*=}"
+    -o=*|--cert-dir-override=*)
+    BCM_CERT_DIR_OVERRIDE="${i#*=}"
     shift # past argument=value
     ;;
     -t=*|--type=*)
@@ -116,9 +116,12 @@ if [[ $BCM_DEBUG = "true" ]]; then
     echo "BCM_CLI_VERB: $BCM_CLI_VERB"
 fi
 
-if [[ $BCM_CLI_COMMAND = "init" ]]; then
-
-
+if [[ $BCM_CLI_COMMAND = "init" ]]; then 
+    if [[ $BCM_HELP_FLAG = 1 || -z $BCM_CLUSTER_NAME ]]; then
+        cat ./commands/init-help.txt
+        exit
+    fi
+    
     # if ~/.bcm doesn't exist, create it
     if [ ! -d ~/.bcm ]; then
         echo "Creating Bitcoin Cache Machine git repo at ~/.bcm"
@@ -126,21 +129,16 @@ if [[ $BCM_CLI_COMMAND = "init" ]]; then
         git init ~/.bcm/
     fi
     
-    CERT_DIR="$GNUPGHOME"
-    if [[ ! -z $BCM_PROJECT_OVERRIDE_DIR ]]; then
-        CERT_DIR=$BCM_PROJECT_OVERRIDE_DIR
+    # if ~/.bcmcerts doesn't exist, create it
+    if [ ! -d ~/.bcmcerts ]; then
+        echo "Creating Bitcoin Cache Machine certs repo at ~/.bcmcerts"
+        mkdir -p ~/.bcmcerts
+        git init ~/.bcmcerts/
     fi
 
-    if [[ ! -d $CERT_DIR/trezor ]]; then
-        mkdir -p $CERT_DIR
-    else
-        echo "$CERT_DIR/trezor already exists. Exiting."
-        exit
-    fi
-    
-    if [[ $BCM_HELP_FLAG = 1 || -z $BCM_CLUSTER_NAME ]]; then
-        cat ./commands/init-help.txt
-        exit
+    CERT_DIR=~/.bcmcerts
+    if [[ ! -z $BCM_CERT_DIR_OVERRIDE ]]; then
+        CERT_DIR=$BCM_CERT_DIR_OVERRIDE
     fi
 
     # install docker so we can get started.
@@ -223,7 +221,7 @@ elif [[ $BCM_CLI_COMMAND = "cluster" ]]; then
         fi
 
         export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-        bash -c "$BCM_LOCAL_GIT_REPO/cluster/destroy_cluster.sh $BCM_CLUSTER_NAME $BCM_CLUSTER_ENDPOINT_NAME"
+        bash -c "$BCM_LOCAL_GIT_REPO/cluster/destroy_cluster.sh --cluster-name=$BCM_CLUSTER_NAME"
     elif [[ $BCM_CLI_VERB = "list" ]]; then
         
         if [[ $BCM_HELP_FLAG = 1 ]]; then
@@ -247,15 +245,20 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
         fi
 
         if [[ -z $BCM_GIT_REPO_DIR ]]; then
-            echo "Required parameter BCM_GIT_REPO_DIR not specified."
+            BCM_GIT_REPO_DIR=~/.bcm
+        fi
+
+        if [[ ! -d $BCM_GIT_REPO_DIR ]]; then
+            echo "Directory $BCM_GIT_REPO_DIR doesn't exist."
+        fi
+
+        if [[ -z $BCM_CERT_DIR ]]; then
+            BCM_CERT_DIR=~/.bcmcerts
+        fi
+
+        if [[ ! -d $BCM_GIT_REPO_DIR ]]; then
+            echo "BCM_GIT_REPO_DIR doesn't exist."
             exit
-        else
-            if [[ -d "$BCM_GIT_REPO_DIR" ]]; then
-                export BCM_GIT_REPO_DIR=$BCM_GIT_REPO_DIR
-            else
-                echo "BCM_GIT_REPO_DIR does not appear to exist."
-                exit
-            fi
         fi
 
         if [[ -z $BCM_GIT_COMMIT_MESSAGE ]]; then
@@ -265,7 +268,7 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
 
         if [[ -z $BCM_GIT_CLIENT_USERNAME ]]; then
             echo "Required parameter BCM_GIT_CLIENT_USERNAME not specified."
-            exit
+            
         fi
 
          if [[ -z $BCM_GPG_SIGNING_KEY_ID ]]; then
@@ -273,42 +276,21 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
             exit
         fi
 
-        if [[ ! -z $BCM_PROJECT_OVERRIDE_DIR ]]; then
-            if [[ -d $BCM_PROJECT_OVERRIDE_DIR ]]; then
-                export BCM_PUBLIC_CERT_DIR=$BCM_PROJECT_OVERRIDE_DIR
-            fi
-        else
-            ACTIVE_BCM_PROJECT_DIR=$(bcm project get-default -d)
-            if [[ ! -d $ACTIVE_BCM_PROJECT_DIR ]]; then
-                echo "The public key material directory could not be determined. Please set BCM_PROJECT_OVERRIDE_DIR."
-                cat ./commands/git/commit/help.txt
-                exit
-            else
-                # we'll set the BCM_PROJECT_DIR to the active DIR
-                export BCM_PUBLIC_CERT_DIR=$ACTIVE_BCM_PROJECT_DIR
+        BCM_CERT_DIR=~/.bcmcerts
+        if [[ ! -z $BCM_CERT_DIR_OVERRIDE ]]; then
+            if [[ -d $BCM_CERT_DIR_OVERRIDE ]]; then
+                BCM_CERT_DIR=$BCM_CERT_DIR_OVERRIDE
             fi
         fi
 
         if [[ -z $BCM_EMAIL_ADDRESS ]]; then
             echo "Required parameter BCM_EMAIL_ADDRESS not specified."
             exit
-        else
-            EMAIL_REGEX="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
-
-            if [[ $BCM_EMAIL_ADDRESS =~ $EMAIL_REGEX ]] ; then
-                export BCM_EMAIL_ADDRESS=$BCM_EMAIL_ADDRESS
-            else
-                echo "BCM_EMAIL_ADDRESS is not a valid email address."
-            fi
         fi
         
         checkTrezor
-        export BCM_GIT_COMMIT_MESSAGE=$BCM_GIT_COMMIT_MESSAGE
-        export BCM_GIT_CLIENT_USERNAME=$BCM_GIT_CLIENT_USERNAME
-        export BCM_TREZOR_USB_PATH=$BCM_TREZOR_USB_PATH
-        export BCM_GPG_SIGNING_KEY_ID=$BCM_GPG_SIGNING_KEY_ID
 
-        echo "BCM_PROJECT_DIR: $BCM_PROJECT_DIR"
+        echo "BCM_CERT_DIR: $BCM_CERT_DIR"
         echo "BCM_GIT_COMMIT_MESSAGE: $BCM_GIT_COMMIT_MESSAGE"
         echo "BCM_GIT_REPO_DIR: $BCM_GIT_REPO_DIR"
         echo "BCM_GIT_CLIENT_USERNAME: $BCM_GIT_CLIENT_USERNAME"
@@ -316,7 +298,15 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
         echo "BCM_TREZOR_USB_PATH: $BCM_TREZOR_USB_PATH"
         echo "BCM_GPG_SIGNING_KEY_ID: $BCM_GPG_SIGNING_KEY_ID"
 
-        bash -c ./commands/git/commit/commitsign.sh
+        ./commands/git/commit/commitsign.sh \
+            --cert-dir=$BCM_CERT_DIR \
+            --git-repo-dir=$BCM_GIT_REPO_DIR \
+            --commit-message="$BCM_GIT_COMMIT_MESSAGE" \
+            --email-address="$BCM_EMAIL_ADDRESS" \
+            --gpg-signing-key-id="$BCM_GPG_SIGNING_KEY_ID" \
+            --trezor-usb-path="$BCM_TREZOR_USB_PATH" \
+            --git-username="$BCM_GIT_CLIENT_USERNAME"
+
     elif [[ $BCM_CLI_VERB = "push" ]]; then
         # required parameters to push are the git repository we're going to commit
         #

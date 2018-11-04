@@ -69,17 +69,22 @@ if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     sudo multipass stop $BCM_CLUSTER_ENDPOINT_NAME
     sudo multipass delete $BCM_CLUSTER_ENDPOINT_NAME
     sudo multipass purge
+    deleteLXDRemote
   else
     echo "$BCM_CLUSTER_ENDPOINT_NAME doesn't exist."
   fi
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
-  echo "TODO baremetal destroy."
-fi
+  echo "Removing LXD from your system."
+  deleteLXDRemote
+  sudo snap remove lxd
 
-deleteLXDRemote
+  if [[ ! -z $(zpool list | grep "bcm_zfs") ]]; then
+    sudo zpool destroy bcm_zfs
+  fi
+fi
 
 if [[ -d $BCM_ENDPOINT_DIR ]]; then
   rm -rf $BCM_ENDPOINT_DIR
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh 'Destroyed $BCM_CLUSTER_ENDPOINT_NAME and associated files.'"
+bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Destroyed $BCM_CLUSTER_ENDPOINT_NAME and associated files.'"

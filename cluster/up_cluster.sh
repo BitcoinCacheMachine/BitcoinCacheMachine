@@ -41,13 +41,13 @@ done
 
 
 
-echo "____________________________"
-echo "Running up_cluster.sh with the following parameters."
-echo "BCM_CLUSTER_NODE_COUNT: '$BCM_CLUSTER_NODE_COUNT'"
-echo "BCM_CLUSTER_NAME: '$BCM_CLUSTER_NAME'"
-echo "BCM_PROVIDER_NAME: '$BCM_PROVIDER_NAME'"
-echo "BCM_MGMT_TYPE: '$BCM_MGMT_TYPE'"
-
+if [[ $BCM_DEBUG = 1 ]]; then
+    echo "Running up_cluster.sh with the following parameters."
+    echo "BCM_CLUSTER_NODE_COUNT: '$BCM_CLUSTER_NODE_COUNT'"
+    echo "BCM_CLUSTER_NAME: '$BCM_CLUSTER_NAME'"
+    echo "BCM_PROVIDER_NAME: '$BCM_PROVIDER_NAME'"
+    echo "BCM_MGMT_TYPE: '$BCM_MGMT_TYPE'"
+fi
 
 if [[ !($BCM_MGMT_TYPE = "local" || $BCM_MGMT_TYPE = "net" || $BCM_MGMT_TYPE = "tor") ]]; then
     echo "Error. BCM_MGMT_TYPE should be either 'local', 'net', or 'tor'."
@@ -82,7 +82,11 @@ fi
 
 
 ##### Let's start by creating the master.
-BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-00"
+if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
+    BCM_CLUSTER_ENDPOINT_NAME=`hostname`
+else
+    BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-00"
+fi
 BCM_CLUSTER_MASTER_NAME=$BCM_CLUSTER_ENDPOINT_NAME
 
 # if ~/.bcm/clusters doesn't exist, create it.
@@ -103,12 +107,16 @@ fi
 source $BCM_ENDPOINT_DIR/.env
 
 # substitute the variables in lxd_master_preseed.yml
-export BCM_IP_ADDRESS_ENV_TEXT='$BCM_IP_ADDRESS_ENV_TEXT'
+export BCM_LXD_CORE_HTTPS_ADDRESS='$BCM_LXD_CORE_HTTPS_ADDRESS'
+if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
+    BCM_LXD_CORE_HTTPS_ADDRESS="127.0.10.1:8443"
+fi
+
 envsubst < ./lxd_preseed/lxd_master_preseed.yml > $BCM_ENDPOINT_DIR/lxd_preseed.yml
 BCM_CLUSTER_MASTER_ENDPOINT_DIR=$BCM_ENDPOINT_DIR
 
 # create the endpoint using the underlying provider
-./up_cluster_endpoint.sh --master --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME" --provider="$BCM_PROVIDER_NAME" --endpoint-dir="$BCM_CLUSTER_MASTER_ENDPOINT_DIR"
+./up_cluster_endpoint.sh --master --cluster-name=$BCM_CLUSTER_NAME --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME" --provider="$BCM_PROVIDER_NAME" --endpoint-dir="$BCM_CLUSTER_MASTER_ENDPOINT_DIR"
 
 # get the IP address of the new endpoint
 export BCM_CLUSTER_MASTER_ENDPOINT_IP=`bash -c "./get_endpoint_ip.sh --provider=$BCM_PROVIDER_NAME --endpoint-name=$BCM_CLUSTER_ENDPOINT_NAME"`
@@ -117,7 +125,7 @@ export BCM_CLUSTER_MASTER_ENDPOINT_IP=`bash -c "./get_endpoint_ip.sh --provider=
 CERT_FILE=$BCM_ENDPOINT_DIR/lxd.cert
 if [[ -d $BCM_ENDPOINT_DIR ]]; then
     # makre sure we're on the correct LXC remote
-    if [[ $(lxc remote get-default) = $BCM_CLUSTER_ENDPOINT_NAME ]]; then
+    if [[ $(lxc remote get-default) = $BCM_CLUSTER_NAME ]]; then
         # get the cluster master certificate using LXC.
         touch $CERT_FILE
         lxc info | awk '/    -----BEGIN CERTIFICATE-----/{p=1}p' | sed '1,/    -----END CERTIFICATE-----/!d' | sed "s/^[ \t]*//" >> $CERT_FILE
@@ -160,8 +168,10 @@ if [[ $BCM_CLUSTER_NODE_COUNT -ge 2 ]]; then
             if [[ -f $PRESEED_FILE ]]; then
                 envsubst < ./lxd_preseed/lxd_member_preseed.yml > $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml
                 # create the endpoint using the underlying provider
-                ./up_cluster_endpoint.sh --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME" --provider="$BCM_PROVIDER_NAME" --endpoint-dir="$BCM_CLUSTER_ENDPOINT_DIR"
+                ./up_cluster_endpoint.sh --cluster-name=$BCM_CLUSTER_NAME --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME" --provider="$BCM_PROVIDER_NAME" --endpoint-dir="$BCM_CLUSTER_ENDPOINT_DIR"
             fi
         fi
     done
 fi
+
+bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Created cluster $BCM_CLUSTER_NAME and all associated files.'"

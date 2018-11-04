@@ -34,3 +34,18 @@ docker run -it --name trezorgpg --rm -v $BCM_CERT_DIR:/root/.gnupg \
     bcm-trezor:latest bash -c 'trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"'
 
 echo "Your public key and public keyring material can be found at '$BCM_CERT_DIR/trezor'."
+
+export GNUPGHOME=$BCM_CERT_DIR/trezor
+
+LINE=$(sudo GNUPGHOME="$GNUPGHOME" su -p root -c 'gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/'')
+echo $LINE
+LINE="${LINE#*/}"
+echo $LINE
+LINE="$(echo $LINE | grep -o '^\S*')"
+LINE="$(echo $LINE | xargs)"
+touch $BCM_CERT_DIR/.env
+echo '#!/bin/bash' >> "$BCM_CERT_DIR/.env"
+echo "export BCM_DEFAULT_KEY_ID="'"'$LINE'"' >> "$BCM_CERT_DIR/.env"
+echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"' >> "$BCM_CERT_DIR/.env"
+echo "export BCM_CERT_USERNAME="'"'$BCM_CERT_USERNAME'"' >> "$BCM_CERT_DIR/.env"
+echo "export BCM_CERT_HOSTNAME="'"'$BCM_CERT_HOSTNAME'"' >> "$BCM_CERT_DIR/.env"

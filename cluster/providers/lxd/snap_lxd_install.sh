@@ -2,10 +2,10 @@
 
 # install ZFS locally and client tools.
 
-if [[ -z $(apt list | grep zfsutils) ]]; then
-    sudo apt-get update
-    sudo apt-get install -y zfsutils-linux wait-for-it apg
-fi
+
+# sudo apt-get update
+# sudo apt-get install -y zfsutils-linux wait-for-it apg
+# sudo apt-get remove lxd lxd-client
 
 # remove any legacy lxd software and install install lxd via snap
 if [[ -z $(snap list | grep lxd) ]]; then

@@ -16,6 +16,10 @@ case $i in
     IS_MASTER=1
     shift # past argument=value
     ;;
+    --cluster-name=*)
+    BCM_CLUSTER_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
     --endpoint-name=*)
     BCM_CLUSTER_ENDPOINT_NAME="${i#*=}"
     shift # past argument=value
@@ -63,15 +67,17 @@ elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
   BCM_LISTEN_INTERFACE=eno1
 fi
 
-# let's prepare the lxd preseed and cloud-init file
-if [[ -f $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml ]]; then
-  export BCM_CLUSTER_MASTER_LXD_PRESEED=$(cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | awk '{print "      " $0}')
-  export BCM_LISTEN_INTERFACE=$BCM_LISTEN_INTERFACE
-  envsubst < ./cloud_init_template.yml > $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml
+# prepare the cloud-init file
+if [[ $BCM_PROVIDER_NAME != "baremetal" ]]; then
+  if [[ -f $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml ]]; then
+    export BCM_CLUSTER_MASTER_LXD_PRESEED=$(cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | awk '{print "      " $0}')
+    export BCM_LISTEN_INTERFACE=$BCM_LISTEN_INTERFACE
+    envsubst < ./cloud_init_template.yml > $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml
+  fi
 fi
 
-if [[ $BCM_PROVIDER_NAME = 'lxd' ]]; then
-  echo "todo; lxd in up_cluster_endpoint.sh"
+if [[ $BCM_PROVIDER_NAME = 'baremetal' ]]; then
+  bash -c "cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | sudo lxd init --preseed"
 elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
   ## launch the VM based on Ubuntu Bionic with a static cloud-init.
   # we'll create lxd preseed files AFTER boot so we know the IP address.
@@ -91,5 +97,5 @@ fi
 # if it's the cluster master add the LXC remote so we can manage it.
 if [[ $IS_MASTER = 1 ]]; then
   BCM_ENDPOINT_VM_IP=`./get_endpoint_ip.sh --provider=$BCM_PROVIDER_NAME --endpoint-name=$BCM_CLUSTER_ENDPOINT_NAME`
-  ./add_endpoint_lxd_remote.sh --endpoint=$BCM_CLUSTER_ENDPOINT_NAME --endpoint-ip=$BCM_ENDPOINT_VM_IP --endpoint-lxd-secret=$BCM_LXD_SECRET
+  ./add_endpoint_lxd_remote.sh --cluster-name=$BCM_CLUSTER_NAME --endpoint=$BCM_CLUSTER_ENDPOINT_NAME --endpoint-ip=$BCM_ENDPOINT_VM_IP --endpoint-lxd-secret=$BCM_LXD_SECRET
 fi
