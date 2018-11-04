@@ -1,0 +1,10 @@
+Description:
+  Use BCM trezor integration to encrypt a file using PGP.
+
+Usage:
+  bcm file encrypt <BCM_TREZOR_FILE_PATH> -u=<BCM_PROJECT_USERNAME>
+
+Required Flags:
+      -u (--user-name)          The username to be used on the certificate data, e.g., testing/stagging/production.
+                                See BCM documentation for other considerations regaring naming conventions.
+      -c (--cluster-name)       The name of the intended cluster that the project is will be deployed to. Required.

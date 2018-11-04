@@ -1,0 +1,21 @@
+config:
+  core.https_address: "$BCM_LXD_CORE_HTTPS_ADDRESS"
+  core.trust_password: $BCM_LXD_SECRET
+storage_pools:
+- config:
+    size: 1GB
+  description: "ZFS storage backend for BCM system containers."
+  name: bcm_zfs
+  driver: zfs
+profiles:
+- config: {}
+  description: "Default BCM profile. Has ZFS backend only; no networking."
+  devices:
+    root:
+      path: /
+      pool: bcm_zfs
+      type: disk
+  name: bcm_default
+cluster:
+  server_name: $BCM_CLUSTER_ENDPOINT_NAME
+  enabled: true

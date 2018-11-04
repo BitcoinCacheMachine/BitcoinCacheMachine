@@ -1,0 +1,5 @@
+devices:
+  root:
+    path: /
+    pool: bcm_data
+    type: disk

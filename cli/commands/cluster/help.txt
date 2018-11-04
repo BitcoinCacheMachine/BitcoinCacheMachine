@@ -1,0 +1,22 @@
+Description:
+  Manage BCM clusters. BCM components are deployed to one or more clusters. You can 
+  have one or more physical machines or virtual machines be a member of the cluster. 
+  These machine collectively represent CPU, memory, and disk space that is available to 
+  software-defined BCM components. Each member of any particular cluster SHOULD be
+  connected via high-speed LAN and have direct IP reachability. Deploy and remotely 
+  management multiple clusters.
+
+Usage:
+  bcm cluster [command]
+
+Available Commands:
+  create        Creates a new cluster definition and attempts to bring
+                all machines into basic operation.
+  destroy       Destroys all LXD instances within a cluster. All data is 
+                destroyed.
+  list          List your cluster definitions.
+  stop          Performs a graceful shutdown of one or more instances in a cluster.
+  verify        Ping cluster members over the configured management port.
+  cull          Destroy nonresponsive machines using the underlying provider.
+
+Use "bcm cluster [command]" to get help for that command.

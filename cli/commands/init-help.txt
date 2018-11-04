@@ -1,0 +1,17 @@
+Description:
+  bcm init  Initialize your computer to become a management plane for your BCM deployments.
+            This tool creates ~/.bcm, installs docker, and creates a docker image that contains
+            all the software you need to manage your clusters and the projects deployed on them.
+
+            When that's complete, it's time to create your starting GPG certificates using the
+            new docker image. You will be asked to plug in your hardware wallet during this process.
+Usage:
+  bcm init -n=test -u=ubuntu -c=domain.com
+
+Options:
+  -o=<BCM_CERT_DIR>       Directory where public key material will be stored. The default 
+                          directory is ~/.bcm/certs.
+  -n=<BCM_CERT_NAME>      Required. The name that will appear in the PGP certificate.
+  -u=<BCM_CERT_USERNAME>  Required. The username that will appear in the GPG certificate.
+  -c=<BCM_CERT_HOSTNAME>  Required. The domain name that will appear in the GPG certificate.
+

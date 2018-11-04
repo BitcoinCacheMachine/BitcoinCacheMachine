@@ -1,0 +1,43 @@
+
+# Daemon settings
+config:
+  core.https_address: '[::]:8443'
+  core.trust_password: CHANGEME
+  images.auto_update_interval: 6
+
+cluster: null
+
+# Storage pools
+storage_pools:
+- name: bcm_data
+  driver: zfs
+  config:
+    source: my-zfs-pool/my-zfs-dataset
+
+# Network devices
+networks:
+- name: lxdbr0
+  type: bridge
+  config:
+    ipv4.address: auto
+    ipv6.address: none
+
+# Profiles
+profiles:
+- name: default
+  devices:
+    root:
+      path: /
+      pool: bcm_data
+      type: disk
+
+# - name: test-profile
+#   description: "Test profile"
+#   config:
+#     limits.memory: 2GB
+#   devices:
+#     test0:
+#       name: test0
+#       nictype: bridged
+#       parent: lxd-my-bridge
+#       type: nic

@@ -1,7 +1,0 @@
-ExitPolicy reject *:* # no exits allowed
-ControlPort 9051
-CookieAuthentication 1
-CookieAuthFileGroupReadable 1
-
-HiddenServiceDir /var/lib/tor/lightningd-service_v2/
-HiddenServicePort 1234 127.0.0.1:9735

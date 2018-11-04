@@ -1,87 +1,76 @@
 
-# <img src="./resources/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> Bitcoin Cache Machine
+# <img src="./resources/images/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> Bitcoin Cache Machine
 
-Bitcoin Cache Machine (BCM) is an event-driven, software-defined data center created for developers, individuals, and small businesses wanting to own and operate their own bitcoin-related payment infrastructure. It's a Personal Financial Operating System (PFOS) based entirely on the ONLY secure blockchain--Bitcoin (as determined by the fabulous open-source implementation we call Bitcoin Core)! It's a platform for your Bitcoin-based business.
+Bitcoin Cache Machine is open-source software that implements a self-hosted, privacy-centric, software-defined [data-center](https://en.wikipedia.org/wiki/Software-defined_data_center). BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization. Its broad purpose is to software-define your home, office, or cloud networks with resilient privacy-preserving Bitcoin-related payment and operating IT infrastructure.
 
-**IMPORTANT! BCM is intended for evaluation purposes ONLY! It is very new and under heavy development by a single author and HAS NOT undergone a formal security evaluation! Only Bitcoin TESTNET is supported at this time. USE AT YOUR OWN RISK!!!**
+## Project Status
 
-BCM deploys in a fully automated way and runs on bare-metal Linux, in a VM, on-premise (preferred), or in the cloud (i.e., on someone elses computer!). It's consists entirely of open-source software. BCM is MIT licensed, so fork away and feel free to submit pull requests with your awesome ideas for improvement!
+> **IMPORTANT!**
+> BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real bitcoin on it. Stable builds will be formally tagged once a stable proof-of-concept has been created.
 
 ## Why Bitcoin Cache Machine Exists
 
 If you're involved with Bitcoin, you will undoubtedly understand the importance of [running your own fully-validating bitcoin node](https://medium.com/@lopp/securing-your-financial-sovereignty-3af6fe834603) and operating your own IT infrastructure. Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your software up-to-date? Is your wallet software configured to consult your trusted full node? Has TOR for these services been tested properly? Are you routing your DNS queries over TOR? Are you backing up user critical data in real time?
 
-There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a privacy-centric software-defined home and office automation network. It's a self-hosted software-defined data center for Bitcoin maximalists.
+There are tons of other areas where your privacy can be compromised if you're not careful. BCM is meant to handle these concerns by creating a software-defined data center home and office designed to protect your overall privacy.
 
-Bitcoin Cache Machine dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest. You can improve overall performance and enable more rapid development by installing a standalone `cachestack` component on your network! `cachestack` is especially useful when developing new line of business applications on top of Bitcoin Cache Machine!
+Bitcoin Cache Machine dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest.
 
 ## Goals of Bitcoin Cache Machine
 
-Below you will find some of the development goals for BCM.
+Below you will find some of the development goals for Bitcoin Cache Machine:
 
-* Provide a self-contained, event-driven, software-defined IT infrastructure for potential Bitcoin and Lightning-related applications.
+* Provide a self-contained, event-driven, software-defined network that deploys a fully operational Bitcoin and Lightning-related IT infrastructure.
 * Run entirely on commodity x86_x64 hardware for home and small office settings. Run on bare-metal or in a self-hosted or cloud-based VM.
 * Integrate exclusively free and open source software ([FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software))!
-* Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc..
-* Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of each BCM deployment.
-* Embrace hardware wallets for cryptographic operations where possible (e.g., Trezor-generated SSH keys or PGP certificates for authentication and encryption).
-* Pre-configure all software to protect user's privacy (e.g., TOR for communication, disk encryption, minimal attack surface, etc.).
-* Embrace decentralization and sovereignty of the individual (i.e., [Anarchy](https://en.wikipedia.org/wiki/Anarchy)).
-* Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components.
-
-The trusted root of each BCM deployment from a [global consensus perspective](https://fieldnotes.resistant.tech/dags-and-decentralization/) is Bitcoin, the only censorship-resistant blockchain.
+* Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
+* Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
+* Embrace hardware wallets for cryptographic  operations (trust boundaries, e.g., distinct lines of business accounting) where possible (e.g., Trezor-generated SSH keys or PGP certificates for authentication and encryption).
+* Pre-configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.). Use of TOR is default ya'll! If you want to compromise your security, go ahead but you're using an anti-pattern and compromising your security!
+* Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications, etc...
 
 ## How to Run Bitcoin Cache Machine
 
 `BCM SHOULD BE CONSIDERED FOR TESTING PURPOSES ONLY!!! IT HAS NOT UNDERGONE A FORMAL SECURITY EVALUATION!!!`
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. You can run BCM in a hardware-based VM, directly on bare-metal, or in "the cloud". Bitcoin Cache Machine is deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can deploy BCM to any LXD-capable endpoint! LXD is widely available on various free and open-source linux platforms. BCM has been developed and primarily tested using Ubuntu 18.04.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have an always-on computer with a reliable Internet connection. You might consider putting this computer on a UPS (an el-cheapo suffices; BCM and its components all ASSUME that the computers are running on are commodity hardware!
 
-Documentation can be found in each directory starting at ./multipass. Readme files in each directory tell you what you need to know about deploying the various infrastructure components at that level. [README.md](./multipass/README.md) details the requirements for running BCM in a multipass-based VM and provides simple instructions for getting started. But before you begin, clone this repository to your machine--the machine that will execute BCM shell (BASH) scripts. In the documentation, this machine is referred to as the `admin machine` since it manages sensitive information (passwords, certificates, etc.) and is required for administrative installations or changes.
+ You can run BCM in a hardware-based VM, directly on bare-metal, or in "the cloud". Bitcoin Cache Machine components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can deploy BCM components to any LXD-capable endpoint! LXD is widely available on various free and open-source linux platforms. Stable BCM releases will usually follow the lastest Ubuntu LTS, which is 18.04 as of Oct 2018. This includes cloud images used by multipass, LXD base images (from the public "image:" server), and Docker base images from [Docker Hub](http://dockerhub.com/).
 
-Download the BCM git repo to the `admin machine` and cd into the root of the repo. All documentation in this repo assumes you have cloned the repo to `~/git/github/bcm` which is considered the BCM repo root directory.
+Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu 18.04 machines, but should work with most Linux distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used. You start with deploying a basic BCM instance to your development machine (i.e., `dev machine`).
+
+ `README.md` files in each directory tells you what you need to know about deploying the various infrastructure components at that level.  It is recommended that the commands be manually typed into the terminal rather than using copy/paste. This helps improve your Linux [muscle memory](https://en.wikipedia.org/wiki/Muscle_memory) which is especially useful if you want to start developing on BCM.
+
+## Getting Started
+
+The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your `dev machine`. You start start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) on your machine then you configure your local `git` client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.) Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
+
+```bash
+sudo apt-get update
+sudo apt-get install -y tor git
+BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
+git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
+```
+
+You can now clone the BCM repository to the `dev machine` over TOR:
 
 ```bash
 mkdir -p ~/git/github/bcm
-git clone https://github.com/BitcoinCacheMachine/BitcoinCacheMachine ~/git/github/bcm
-cd ~/git/github/bcm
+git clone $BCM_GITHUB_REPO_URL ~/git/github/bcm
+cd ~/git/github/bcm/
+./setup.sh
 ```
 
-To continue, consider running [BCM in a multipass-based VM](./multipass). Click [here](./docs/installation/baremetal.md) if you want to run BCM on a computer running Linux (i.e., bare-metal).
+Feel free to change the directory in which you store the BCM repository on your `dev_machine` (instead of `~/git/github/bcm`).
 
-## BCM Components
-
-Bitcoin Cache Machine is where your bitcoin-related workloads reside. BCM instances are meant to be horizontally scalable by adding commodity hardware (PLANNED, see [LXD Clustering](https://lxd.readthedocs.io/en/latest/clustering/).
-
-Each Bitcoin Cache Machine deployment includes one or more of the following components:
-
-* `cachestack` - a set of LXD components (networks, storage pool, profiles, etc.) and LXD containers that provide caching and underlay network services for dependent BCM components. You can install `cachestack` in standalone mode to provide network and caching services hosts on your LAN or corporate network. If there is no standalone `cachestack` on your LAN segment, Bitcoin Cache Machine installs a local copy and uses it internally; that is, BCM is dependent on a `cachestack`.
-
-1) [required] serves LXD images to clients (when in standalone mode),
-2) [required] hosts one or more Docker Registry mirrors configured as [a pull-through cache](https://docs.docker.com/registry/recipes/mirror/),
-3) [required] hosts a [private registry](https://docs.docker.com/registry/deploying/) for Docker images built during the BCM deployment process,
-4) [required] provides HTTP/HTTPS proxy/cache based on [Squid](http://www.squid-cache.org/),
-5) [optional] IPFS node for 1) serving cached data to IPFS nodes on the LAN and 2) and pinning static content to /ipfs,
-6) [optional] TOR SOCKS5 proxy for BCM components making outbound client-server requests on the Internet,
-6) [optional] RSYNCD server to serve bulk data to LAN clients, such as pre-indexed Bitcoin blockchain data (useful for development),
-5) [optional] Bitcoin border node / archival node serving and downloading block over TOR. This can be useful during development; you can have an archival node serve blocks to more trusted full nodes. More information about the Cache Stack and its components can be found in ./docs/architecture/cache_stack.md. Future versions of cachestack will include DHCP with hostname autoregistration and a DNS cache configured to use TOR.
-
-* `manager1` [required], `manager2` [optional], `manager3` [optional] -- There are manager LXD hosts to to facilitate the Docker Swarm manager role for the rest of the swarm. The docker daemon on each manager host is configured to use `cachestack` as the Docker registry mirror. A Kafka messaging stack is deployed to each manager node for distributed messaging and is the system-of-record for user data. Manager LXC containers MAY be deployed to independent x86_x64 hardware for local high-availability using LXD clustering.  (PLANNED) `manager1` is deployed with an administrative web interface exposed over a TOR hidden service. Administrative interfaces (e.g., wallet for lnd, Grafana dashboards, etc.) are exposed behind this TOR site.
-
-* `bitcoin` [required] -- the `bitcoin` lxd host is built for bitcoin-related services: A Bitcoin Core version 16.1 running as a fully-validating node provides the root of trust for global consensus operations [required]. One or more Lightning daemons may be deployed to the `bitcoin` lxd host as well. Users may choose which additional components to deploy depending the expected use case. Whenever possible, daemon P2P services are configured to use TOR. In addition, individual RPC interfaces (e.g., lnd GRPC interface) may be exposed at unique TOR onion sites. This allows mobile apps to securely connect and control their Lightning infrastructure. Like manager LXD containers, `bitcoin` uses `cachestack` to pull docker images. The docker daemon on `bitcoin` is configured to log via GELF to a logstash-based GELF listener on `manager1`; logs are stored in Kafka.
-
-* [NOT IMPLEMENTED] `elastic` -- you can deploy an elastic database and associated dashboards (grafana, kinbana). Other databases (e.g., graph database for lightning) will be made available as BCM is developed. All databases are fed with data from the Kafka messaging stack on the manager hosts.
-
-* `app-hosts` -- hosts designed for user-specific code. Examples include hosting an Elastic database for visualizing data originating from a Kafka topic, stream processing to/from Kafka topics, or application-level event-based workflows. Developers choosing BCM as an operating platform create custom code and organize it here.
-
-As mentioned, `cachestack` can be deployed in standalone mode, which is recommended when doing development on Bitcoin Cache Machine. In these cases, `cachestack` requires access to the underlay network to provide caching services to clients on your LAN (e.g., Bitcoin Cache Machine core components).
-
-## Project Status
-
-BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real bitcoin on it. Master branch is meant to be stable-ish. There are a lot of things that need to be done to it, especially in securing all the INTERFACES!!! I'm still working on core features; hardening and hardware-based cryptographic operations are next for integration.
+Click the following link to continue with the tutorial: [./lxd/](./lxd/).
 
 ## How to contribute
 
-Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate.
+Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate. [Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
 
-[Keybase Team for Bitcoin Cache Machine and Bitcoin Cache Stack](https://keybase.io/team/btccachemachine)
+You can also donate to the development of BCM by donating Bitcoin (BTC).
+
+* Public on-chain donations: 3KNX4GTmXETtnFWFXvFqXg9sDJCbLvD8Zf
+
+[<img src="./resources/images/onchain_public_donation_address.png" alt="BCM Donation Address" height="250" width="250">](bitcoin:3KNX4GTmXETtnFWFXvFqXg9sDJCbLvD8Zf)

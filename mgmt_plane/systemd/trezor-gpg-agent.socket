@@ -1,0 +1,11 @@
+[Unit]
+Description=trezor-gpg-agent socket
+
+[Socket]
+ListenStream=%t/gnupg/S.gpg-agent
+FileDescriptorName=std
+SocketMode=0600
+DirectoryMode=0700
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,21 @@
+config:  
+  user.network-config: |
+    version: 1
+    config:
+      - type: physical
+        name: eth0
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto
+        
+devices:
+  eth0:
+    nictype: bridged
+    parent: lxdbrGateway
+    type: nic
+
+  eth1:
+    nictype: bridged
+    parent: lxdbrBCMNET
+    type: nic
