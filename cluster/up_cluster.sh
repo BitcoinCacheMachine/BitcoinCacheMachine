@@ -174,4 +174,4 @@ if [[ $BCM_CLUSTER_NODE_COUNT -ge 2 ]]; then
     done
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Created cluster $BCM_CLUSTER_NAME and all associated files.'"
+bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Created cluster '$BCM_CLUSTER_NAME' and associated endpoints.'"

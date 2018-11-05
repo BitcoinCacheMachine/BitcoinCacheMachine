@@ -1,0 +1,13 @@
+Description:
+  Perform GPG operations on files with a Trezor backend.
+
+Usage:
+  bcm file [command]
+
+Available Commands:
+  encrypt           GPG encrypt a file using Trezor-emitted public GPG material.
+  decrypt           GPG decrypt a previously encrypted file. Requires Trezor.
+  createsignature   Create a GPG-backed signature over a file. Requires Trezor.
+  verifysignature   Verify a previously generated file signature.
+
+  Use "bcm file [command]" to get help for that command.

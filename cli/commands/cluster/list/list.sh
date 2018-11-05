@@ -3,7 +3,7 @@
 set -eu
 
 
-CLUSTERS_DIR=~/.bcm/clusters
+CLUSTERS_DIR="$HOME/.bcm/clusters"
 if [[ ! -d $CLUSTERS_DIR ]]; then
     mkdir -p $CLUSTERS_DIR
 fi

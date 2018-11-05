@@ -12,6 +12,4 @@ if [[ -z $(snap list | grep docker) ]]; then
 
     sudo snap disable docker
     sudo snap enable docker
-else
-    echo "'docker-ce' is already installed on your system. Sweet."
 fi

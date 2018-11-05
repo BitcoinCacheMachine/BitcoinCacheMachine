@@ -9,9 +9,8 @@ Usage:
   bcm init -n=test -u=ubuntu -c=domain.com
 
 Options:
-  -o=<BCM_CERT_DIR>       Directory where public key material will be stored. The default 
-                          directory is ~/.bcm/certs.
   -n=<BCM_CERT_NAME>      Required. The name that will appear in the PGP certificate.
   -u=<BCM_CERT_USERNAME>  Required. The username that will appear in the GPG certificate.
   -c=<BCM_CERT_HOSTNAME>  Required. The domain name that will appear in the GPG certificate.
-
+  -o=<BCM_CERT_DIR>       Optional. Directory where public key material will be stored. The default 
+                          directory is ~/.bcm/certs. You should back this directory up!

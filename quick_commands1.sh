@@ -4,6 +4,8 @@
 
 export BCM_DEBUG=1
 
+bcm init -n=staging -u=bob -c=host1
+
 # create a multipass cluster with mgmt on localnet
 bcm cluster create -c=dev -t=multipass -x=net -l=3
 bcm cluster destroy -c=dev
@@ -20,3 +22,8 @@ bcm init -n=test -u=ubuntu -c=domain.com
 bcm cluster create -c=home -t=multipass -l=3 -x=net
 
 
+## File operations
+
+
+
+bcm file encrypt --file-path="$HOME/.bcm/test/test.txt" --cert-dir="$HOME/.bcmcerts"

@@ -3,55 +3,20 @@
 set -eu
 cd "$(dirname "$0")"
 
-BCM_PUBLIC_CERT_DIR=
-BCM_GIT_COMMIT_MESSAGE=
-BCM_GIT_REPO_DIR=
-BCM_EMAIL_ADDRESS=
-BCM_GPG_SIGNING_KEY_ID=
 
-for i in "$@"
-do
-case $i in
-    --cert-dir=*)
-    BCM_PUBLIC_CERT_DIR="${i#*=}"
-    shift # past argument=value
-    ;;
-    --git-repo-dir=*)
-    BCM_GIT_REPO_DIR="${i#*=}"
-    shift # past argument=value
-    ;;
-    --commit-message=*)
-    BCM_GIT_COMMIT_MESSAGE="${i#*=}"
-    shift # past argument=value
-    ;;
-    --git-username=*)
-    BCM_GIT_CLIENT_USERNAME="${i#*=}"
-    shift # past argument=value
-    ;;
-    --email-address=*)
-    BCM_EMAIL_ADDRESS="${i#*=}"
-    shift # past argument=value
-    ;;
-    --gpg-signing-key-id=*)
-    BCM_GPG_SIGNING_KEY_ID="${i#*=}"
-    shift # past argument=value
-    ;;
-    --trezor-usb-path=*)
-    BCM_TREZOR_USB_PATH="${i#*=}"
-    shift # past argument=value
-    ;;
-    *)
-          # unknown option
-    ;;
-esac
-done
+# if BCM_PROJECT_DIR is empty, we'll check to see if someone over-rode
+# the trezor directory. If so, we'll send that in instead.
+if [[ $BCM_HELP_FLAG = 1 ]]; then
+    cat ./commands/git/commit/help.txt
+    exit
+fi
 
-echo "BCM_PUBLIC_CERT_DIR: $BCM_PUBLIC_CERT_DIR"
+echo "BCM_CERT_DIR: $BCM_CERT_DIR"
+echo "BCM_GIT_COMMIT_MESSAGE: $BCM_GIT_COMMIT_MESSAGE"
 echo "BCM_GIT_REPO_DIR: $BCM_GIT_REPO_DIR"
-echo "BCM_TREZOR_USB_PATH: $BCM_TREZOR_USB_PATH"
 echo "BCM_GIT_CLIENT_USERNAME: $BCM_GIT_CLIENT_USERNAME"
 echo "BCM_EMAIL_ADDRESS: $BCM_EMAIL_ADDRESS"
-echo "BCM_GIT_COMMIT_MESSAGE: $BCM_GIT_COMMIT_MESSAGE"
+echo "BCM_GPG_SIGNING_KEY_ID: $BCM_GPG_SIGNING_KEY_ID"
 
 # we need to stop any existing containers if there is any.
 if [[ $(docker ps | grep "bcm-trezor-gitter") ]]; then
@@ -65,16 +30,19 @@ if [[ $(docker ps -a | grep "bcm-trezor-gitter") ]]; then
     sleep 3
 fi
 
-if [[ ! -d $BCM_PUBLIC_CERT_DIR ]]; then
-    echo "'$BCM_PUBLIC_CERT_DIR' does not exist. Exiting."
-    exit
+bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/build.sh"
+if [[ ! -z $(docker image list | grep "bcm-gpgagent:latest") ]]; then
+    docker build -t bcm-gpgagent:latest .
+else
+    # make sure the container is up-to-date, but don't display
+    docker build -t bcm-gpgagent:latest . >> /dev/null
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/build.sh"
-docker build -t bcm-gpgagent:latest .
+# get the locatio of the trezor
+export BCM_TREZOR_USB_PATH=$(bcm info | grep "TREZOR_USB_PATH" | awk 'NF>1{print $NF}')
 
 docker run -d --name=bcm-trezor-gitter \
-    -v $BCM_PUBLIC_CERT_DIR:/root/.gnupg \
+    -v $BCM_CERT_DIR:/root/.gnupg \
     -v $BCM_GIT_REPO_DIR:/gitrepo \
     --device="$BCM_TREZOR_USB_PATH" \
     bcm-gpgagent:latest
@@ -88,5 +56,5 @@ docker exec -t \
     -e BCM_GPG_SIGNING_KEY_ID="$BCM_GPG_SIGNING_KEY_ID" \
      bcm-trezor-gitter /bcm/commit_sign_git_repo.sh
 
-docker kill bcm-trezor-gitter
-docker system prune -f
+docker stop bcm-trezor-gitter
+docker rm bcm-trezor-gitter

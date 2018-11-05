@@ -29,6 +29,8 @@ if [[ ! -d ~/.bcm/clusters/$BCM_CLUSTER_NAME ]]; then
   exit
 fi
 
+
+
 if [[ $BCM_DEBUG = 1 ]]; then
   echo "Running destroy_cluster.sh with the following parameters:"
   echo "BCM_CLUSTER_NAME: $BCM_CLUSTER_NAME"
@@ -44,7 +46,7 @@ if [[ $BCM_DEBUG = 1 ]]; then
   echo "ENDPOINTS_DIR: $ENDPOINTS_DIR"
 fi
 
-for endpoint in `bcm cluster list -c=$BCM_CLUSTER_NAME --endpoints`; do
+for endpoint in `bcm cluster list --cluster-name=$BCM_CLUSTER_NAME --endpoints`; do
   bash -c "./destroy_cluster_endpoint.sh --cluster-name=$BCM_CLUSTER_NAME --endpoint-name=$endpoint"
 done
 
@@ -53,7 +55,7 @@ if [[ $(lxc remote list | grep $BCM_CLUSTER_NAME) ]]; then
   lxc remote remove $BCM_CLUSTER_NAME
 fi
 
-if [ -d $BCM_CLUSTER_DIR ]; then
+if [[ -d $BCM_CLUSTER_DIR ]]; then
   rm -rf $BCM_CLUSTER_DIR
 fi
 

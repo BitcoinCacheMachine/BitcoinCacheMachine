@@ -1,8 +1,12 @@
 #!/bin/bash
 
 set -eu
-
-# set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-docker build -t bcm-trezor:latest .
+if [[ -z $(docker image list | grep "bcm-trezor") ]]; then
+    docker build -t bcm-trezor:latest .
+else
+    # make sure the container is up-to-date, but don't display
+    echo "Updating docker image bcm-trezor:latest ..."
+    docker build -t bcm-trezor:latest . >> /dev/null
+fi

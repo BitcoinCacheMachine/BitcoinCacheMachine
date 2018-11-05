@@ -5,6 +5,7 @@ cd "$(dirname "$0")"
 
 BCM_CLUSTER_NAME=
 BCM_CLUSTER_ENDPOINT_NAME=
+BCM_REMOVE_SOFTWARE=0
 
 for i in "$@"
 do
@@ -15,6 +16,10 @@ case $i in
     ;;
     --endpoint-name=*)
     BCM_CLUSTER_ENDPOINT_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    --remove-software)
+    BCM_REMOVE_SOFTWARE=1
     shift # past argument=value
     ;;
     *)
@@ -76,15 +81,21 @@ if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
   echo "Removing LXD from your system."
   deleteLXDRemote
-  sudo snap remove lxd
 
-  if [[ ! -z $(zpool list | grep "bcm_zfs") ]]; then
-    sudo zpool destroy bcm_zfs
+  lxc profile delete bcm_default
+  lxc storage delete bcm_zfs
+
+  if [[ $BCM_REMOVE_SOFTWARE = 1 ]]; then
+    sudo snap remove lxd
+    
+    sleep 3
+
+    if [[ ! -z $(zpool list | grep "bcm_zfs") ]]; then
+      sudo zpool destroy bcm_zfs
+    fi
   fi
 fi
 
 if [[ -d $BCM_ENDPOINT_DIR ]]; then
   rm -rf $BCM_ENDPOINT_DIR
 fi
-
-bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Destroyed $BCM_CLUSTER_ENDPOINT_NAME and associated files.'"

@@ -55,7 +55,7 @@ if [[ ! -z $BCM_PROJECT_NAME ]]; then
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
     export BCM_TREZOR_USB_PATH=$BCM_TREZOR_USB_PATH
     
-    $BCM_LOCAL_GIT_REPO/mgmt_plane/gpg-init.sh
+    bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/gpg-init.sh --cert-dir='$BCM_PROJECT_DIR' --cert-name='$BCM_PROJECT_NAME' --cert-username='$BCM_PROJECT_USERNAME' --cert-hostname='$BCM_CLUSTER_NAME'"
 
     # let's just do a quick spot check to ensure the directory exists.
     if [[ -d $BCM_PROJECT_DIR/trezor ]]; then
