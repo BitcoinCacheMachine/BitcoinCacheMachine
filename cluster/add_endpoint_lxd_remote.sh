@@ -40,14 +40,13 @@ if [[ -z $BCM_CLUSTER_ENDPOINT_NAME ]]; then
     exit
 fi
 
-
 if [[ -z $BCM_LXD_SECRET ]]; then
     echo "BCM_LXD_SECRET not set. Exiting"
     exit
 fi
 
 # first let's make sure we have 
-bash -c $BCM_LOCAL_GIT_REPO/cluster/providers/lxd/snap_lxd_install.sh
+bash -c $BCM_LOCAL_GIT_REPO_DIR/cluster/providers/lxd/snap_lxd_install.sh
 
 if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
     # to do, update this to multiple baremetals...

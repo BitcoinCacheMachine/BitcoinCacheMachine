@@ -52,4 +52,4 @@ else
     echo "Incorrect usage. Please specify whether $BCM_CLUSTER_ENDPOINT_NAME is an LXD cluster master or member."
 fi
 
-#bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Added files associated with stub_env.sh'"
+#bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/commit_bcm.sh --git-commit-message='Added files associated with stub_env.sh'"

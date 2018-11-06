@@ -35,7 +35,7 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
   exit
 fi
 
-BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
+BCM_CLUSTER_DIR=$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME
 ENDPOINTS_DIR=$BCM_CLUSTER_DIR/endpoints
 BCM_ENDPOINT_DIR=$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME
 
@@ -46,7 +46,7 @@ echo "BCM_ENDPOINT_DIR: $BCM_ENDPOINT_DIR"
 
 function deleteLXDRemote {
   # Removing lxc remote vm
-  if [[ $(lxc remote list | grep "$BCM_CLUSTER_ENDPOINT_NAME") ]]; then
+  if [[ ! -z $(lxc remote list | grep "$BCM_CLUSTER_ENDPOINT_NAME") ]]; then
       echo "Removing lxd remote $BCM_CLUSTER_ENDPOINT_NAME"
       lxc remote set-default local
       lxc remote remove $BCM_CLUSTER_ENDPOINT_NAME
@@ -79,19 +79,26 @@ if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     echo "$BCM_CLUSTER_ENDPOINT_NAME doesn't exist."
   fi
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
+
   echo "Removing LXD from your system."
   deleteLXDRemote
 
-  lxc profile delete bcm_default
-  lxc storage delete bcm_zfs
+  if [[ $(lxc profile list | grep "bcm_default") ]]; then
+    lxc profile delete bcm_default
+  fi
+
+  if [[ $(lxc storage list | grep "bcm_zfs") ]]; then
+    lxc storage delete bcm_zfs
+  fi
 
   if [[ $BCM_REMOVE_SOFTWARE = 1 ]]; then
+    sudo snap stop lxd
     sudo snap remove lxd
     
     sleep 3
 
     if [[ ! -z $(zpool list | grep "bcm_zfs") ]]; then
-      sudo zpool destroy bcm_zfs
+      sudo zpool destroy "bcm_zfs"
     fi
   fi
 fi

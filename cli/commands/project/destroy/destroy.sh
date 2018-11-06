@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR=~/.bcm/projects/$BCM_PROJECT_NAME
+DIR=$BCM_RUNTIME_DIR/projects/$BCM_PROJECT_NAME
 
 if [[ ! -d $DIR ]]; then
     echo "BCM project directory $DIR does not exist. Nothing deleted."
@@ -10,8 +10,8 @@ fi
 function deleteBCMProject {
     if [[ -d $DIR ]]; then
         sudo rm -rf $DIR
-        rm ~/.bcm/projects/bcm.client.sh
-        echo "Deleted contents of $DIR. Note ~/.bcm is a git repository and manages versions and history of all files."
+        rm "$BCM_RUNTIME_DIR/projects/bcm.client.sh"
+        echo "Deleted contents of $DIR. Note $BCM_RUNTIME_DIR is a git repository and manages versions and history of all files."
     fi
 }
 

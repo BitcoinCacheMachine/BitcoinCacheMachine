@@ -14,7 +14,7 @@ RUN mkdir /var/run/sshd
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
-# Prevent the creation of ~/.cache/motd.legal-displayed
+# Prevent the creation of $HOME/.cache/motd.legal-displayed
 RUN sed 's@session\s*optional\s*pam_motd.so.*@#&@g' -i /etc/pam.d/sshd
 
 RUN echo 'AuthorizedKeysFile /etc/ssh/%u/authorized_keys' >> /etc/ssh/sshd_config

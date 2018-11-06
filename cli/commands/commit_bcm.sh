@@ -6,8 +6,8 @@ cd "$(dirname "$0")"
 BCM_GIT_COMMIT_MESSAGE=
 BCM_GIT_CLIENT_USERNAME=
 BCM_EMAIL_ADDRESS=
-BCM_GIT_REPO_DIR=~/.bcm
-BCM_CERTS_DIR=~/.bcmcerts
+BCM_GIT_REPO_DIR=$BCM_RUNTIME_DIR
+BCM_CERTS_DIR=$BCM_RUNTIME_DIR/certs
 
 for i in "$@"
 do
@@ -53,11 +53,11 @@ if [[ -z $BCM_GIT_COMMIT_MESSAGE ]]; then
 fi
 
 # get the latest commit
-cd $BCM_LOCAL_GIT_REPO
+cd $BCM_LOCAL_GIT_REPO_DIR
 export GIT_COMMIT_VERSION=$(git log --format="%H" -n 1)
 cd -
 
-BCM_CERT_ENV=~/.bcmcerts/.env
+BCM_CERT_ENV=$BCM_RUNTIME_DIR/certs/.env
 if [[ ! -f $BCM_CERT_ENV ]]; then
     echo "No $BCM_CERT_ENV file found so source."
     exit
@@ -73,6 +73,6 @@ bcm git commit \
     --cert-dir="$BCM_CERTS_DIR" \
     --git-repo-dir="$BCM_GIT_REPO_DIR" \
     --git-commit-message="$BCM_GIT_COMMIT_MESSAGE" \
-    --git-client-username="$BCM_CERT_USERNAME" \
-    --email-address="$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME" \
+    --git-username="$BCM_CERT_USERNAME" \
+    --email-address="$BCM_CERT_USERNAME@$BCM_CERT_FQDN" \
     --gpg-signing-key-id="$BCM_DEFAULT_KEY_ID"

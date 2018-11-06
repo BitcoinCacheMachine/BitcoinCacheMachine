@@ -5,12 +5,17 @@ cd "$(dirname "$0")"
 set -eu
 
 BCM_CLUSTER_NAME=
+BCM_DEBUG=0
 
 for i in "$@"
 do
 case $i in
     --cluster-name=*)
     BCM_CLUSTER_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    --debug)
+    BCM_DEBUG=1
     shift # past argument=value
     ;;
     *)
@@ -24,12 +29,10 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
   exit
 fi
 
-if [[ ! -d ~/.bcm/clusters/$BCM_CLUSTER_NAME ]]; then
-  echo "~/.bcm/clusters/$BCM_CLUSTER_NAME does not exist. Nothing to destroy."
+if [[ ! -d $BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME ]]; then
+  echo "$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME does not exist. Nothing to destroy."
   exit
 fi
-
-
 
 if [[ $BCM_DEBUG = 1 ]]; then
   echo "Running destroy_cluster.sh with the following parameters:"
@@ -38,7 +41,7 @@ if [[ $BCM_DEBUG = 1 ]]; then
 fi
 
 echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
-export BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
+export BCM_CLUSTER_DIR=$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
 
 if [[ $BCM_DEBUG = 1 ]]; then
@@ -59,4 +62,4 @@ if [[ -d $BCM_CLUSTER_DIR ]]; then
   rm -rf $BCM_CLUSTER_DIR
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Destroyed cluster $BCM_CLUSTER_NAME and all associated files.'"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/commit_bcm.sh --git-commit-message='Destroyed cluster $BCM_CLUSTER_NAME and all associated files.'"

@@ -6,9 +6,6 @@ set -e
 # since all file references are relative to this script
 cd "$(dirname "$0")"
 
-# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
-source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
-
 # quit if there are no BCM environment variables
 if [[ -z $(env | grep BCM) ]]; then
   echo "BCM variables not set. Please source BCM environment variables."
@@ -34,7 +31,7 @@ if [[ $(lxc project list | grep bcm) ]]; then
   lxc project delete bcm
 fi
 
-rm -rf ~/.bcm/runtime/$(lxc remote get-default)/
+rm -rf $BCM_RUNTIME_DIR/runtime/$(lxc remote get-default)/
 
 # if [[ $BCM_BITCOIN_DELETE = "true" ]]; then
 #   echo "Calling ./bitcoin/destroy_lxd_bitcoin.sh"

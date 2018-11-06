@@ -4,10 +4,10 @@ set -eu
 cd "$(dirname "$0")"
 
 echo "init "$@""
-BCM_CERT_DIR=$HOME/.bcmcerts
+BCM_CERT_DIR=$BCM_RUNTIME_DIR/certs
 BCM_CERT_NAME=
 BCM_CERT_USERNAME=
-BCM_CERT_HOSTNAME=
+BCM_CERT_FQDN=
 BCM_CERT_DIR_OVERRIDE=
 
 if [[ "$@" = "init" ]]; then
@@ -29,8 +29,8 @@ case $i in
     BCM_CERT_USERNAME="${i#*=}"
     shift # past argument=value
     ;;
-    -c=*|--cert-hostname=*)
-    BCM_CERT_HOSTNAME="${i#*=}"
+    -c=*|--cert-fqdn=*)
+    BCM_CERT_FQDN="${i#*=}"
     shift # past argument=value
     ;;
     -o=*|--cert-dir-override=*)
@@ -55,20 +55,20 @@ if [[ -z $BCM_CERT_NAME  ]]; then
 fi
 
 
-# if ~/.bcm doesn't exist, create it
-if [ ! -d ~/.bcm ]; then
-    echo "Creating Bitcoin Cache Machine git repo at ~/.bcm"
-    mkdir -p ~/.bcm
-    git init ~/.bcm/
-    echo "Created ~/.bcm/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > ~/.bcm/debug.log
+# if $BCM_RUNTIME_DIR doesn't exist, create it
+if [ ! -d $BCM_RUNTIME_DIR ]; then
+    echo "Creating Bitcoin Cache Machine git repo at $BCM_RUNTIME_DIR"
+    mkdir -p $BCM_RUNTIME_DIR
+    git init $BCM_RUNTIME_DIR/
+    echo "Created $BCM_RUNTIME_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > $BCM_RUNTIME_DIR/debug.log
 fi
 
-# if ~/.bcmcerts doesn't exist, create it
-if [ ! -d ~/.bcmcerts ]; then
-    echo "Creating Bitcoin Cache Machine certs repo at ~/.bcmcerts"
-    mkdir -p ~/.bcmcerts
-    git init ~/.bcmcerts/
-    echo "Created ~/.bcmcerts/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > ~/.bcm/debug.log
+# if $BCM_RUNTIME_DIR/certs doesn't exist, create it
+if [ ! -d $BCM_RUNTIME_DIR/certs ]; then
+    echo "Creating Bitcoin Cache Machine certs repo at $BCM_RUNTIME_DIR/certs"
+    mkdir -p $BCM_RUNTIME_DIR/certs
+    git init $BCM_RUNTIME_DIR/certs/
+    echo "Created $BCM_RUNTIME_DIR/certs/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > $BCM_RUNTIME_DIR/debug.log
 fi
 
 
@@ -76,10 +76,10 @@ if [[ ! -z $BCM_CERT_DIR_OVERRIDE ]]; then
     BCM_CERT_DIR=$BCM_CERT_DIR_OVERRIDE
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/build.sh"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/build.sh"
 
-bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/gpg-init.sh \
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/gpg-init.sh \
     --cert-dir='$BCM_CERT_DIR' \
     --cert-name='$BCM_CERT_NAME' \
     --cert-username='$BCM_CERT_USERNAME' \
-    --cert-hostname='$BCM_CERT_HOSTNAME'"
+    --cert-hostname='$BCM_CERT_FQDN'"

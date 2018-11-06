@@ -2,18 +2,21 @@
 
 set -eu
 
-if [[ ! -d ~/.bcm/projects ]]; then
-    mkdir -p ~/.bcm/projects
+BCM_PROJECTS_DIR="$BCM_RUNTIME_DIR/projects"
+if [[ ! -d $BCM_PROJECTS_DIR ]]; then
+    echo "$BCM_PROJECTS_DIR does not exist. You may need to re-run 'bcm init'."
+    exit
 fi
 
-if [[ $(ls -l ~/.bcm/projects | grep -c ^d) = "0" ]]; then
+echo "BCM_PROJECTS_DIR: $BCM_PROJECTS_DIR"
+if [[ $(ls -l $BCM_PROJECTS_DIR | grep -c ^d) = "0" ]]; then
+    # this means the directory is empty and we're going to return nothing
     exit
 else
-    cd ~/.bcm/projects/
+    cd $BCM_PROJECTS_DIR
+    echo "in $BCM_PROJECTS_DIR"
     for project in `ls -d */ | sed 's/.$//'`; do
-        if [[ ! -z $project ]]; then
-            echo "$project"
-        fi
+        echo "$project"
     done
     cd - >> /dev/null
 fi

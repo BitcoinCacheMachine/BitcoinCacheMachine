@@ -5,9 +5,6 @@ set -eu
 # set the working directory to the location where the script is located
 cd "$(dirname "$0")"
 
-# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
-source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
-
 # if bcm-template lxc image exists, run the gateway template creation script.
 if [[ -z $(lxc image list | grep "bcm-template") ]]; then
     echo "Required LXC image 'bcm-template' does not exist! Ensure your current LXD remote $(lxc remote get-default) creates or downloads a remote 'bcm-template'."
@@ -16,17 +13,17 @@ fi
 
 if [[ $BCM_GATEWAY_NETWORKS_CREATE = "true" ]]; then
     # create and populate the required networks
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_network_bridge_nat.sh lxdbrGateway basicnat"
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/create_lxc_network_bridge_nat.sh lxdbrGateway basicnat"
 fi
 
 # create the 'bcm-gateway-profile' lxc profile
 if [[ $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE = "true" ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_lxc_profile.sh bcm-gateway-profile $BCM_LOCAL_GIT_REPO/lxd/gateway/gateway_lxd_profile.yml"
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/create_lxc_profile.sh bcm-gateway-profile $BCM_LOCAL_GIT_REPO_DIR/lxd/gateway/gateway_lxd_profile.yml"
 fi
 
 #create and populate the required networks
 if [[ $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE = "true" ]]; then
-    #bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/connect_container_to_underlay.sh"
+    #bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/connect_container_to_underlay.sh"
     lxc network create lxdbrBCMNET 
 fi
 
@@ -59,7 +56,7 @@ lxc file push 10-lxc.yaml $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/etc/netplan/1
 
 lxc start $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME
 
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/wait_for_dockerd.sh $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME"
 
 lxc exec $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -- apt-get install -y ufw tor
 lxc file push torrc $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/etc/tor/torrc

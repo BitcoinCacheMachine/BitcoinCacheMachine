@@ -27,6 +27,6 @@ Parameters:
   -v=<BCM_GPG_SIGNING_KEY_ID>     The ID of the certificate you want to sign with. This cert will be in <BCM_GIT_REPO_DIR>
 
   --default                       If this flag is specified, the following values will be used:
-                                  BCM_GIT_REPO_DIR:  ~/.bcm
-                                  BCM_GIT_CLIENT_USERNAME: sourced from ~/.bcmcerts/.env
-                                  BCM_EMAIL_ADDRESS: sourced from ~/.bcmcerts/.env
+                                  BCM_GIT_REPO_DIR:  $BCM_RUNTIME_DIR
+                                  BCM_GIT_CLIENT_USERNAME: sourced from $BCM_RUNTIME_DIR/certs/.env
+                                  BCM_EMAIL_ADDRESS: sourced from $BCM_RUNTIME_DIR/certs/.env

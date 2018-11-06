@@ -11,8 +11,8 @@ if [[ $BCM_DEBUG = "true" ]]; then
 fi
 
 if bcm project list | grep -q -x $BCM_NEW_PROJECT_NAME ; then
-    echo "#!/bin/bash" > ~/.bcm/projects/bcm.client.sh
-    echo "export BCM_PROJECT_NAME=$BCM_NEW_PROJECT_NAME" >> ~/.bcm/projects/bcm.client.sh
+    echo "#!/bin/bash" > $BCM_RUNTIME_DIR/projects/bcm.client.sh
+    echo "export BCM_PROJECT_NAME=$BCM_NEW_PROJECT_NAME" >> $BCM_RUNTIME_DIR/projects/bcm.client.sh
 else
     echo "Project '$BCM_NEW_PROJECT_NAME' doesn't exist. You can create the project by running 'bcm project create $BCM_NEW_PROJECT_NAME'."
 fi

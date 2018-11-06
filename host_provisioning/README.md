@@ -5,16 +5,16 @@ The `dev machine` is NOT meant to participate in production workloads. It is typ
 
 `./up_dev_machine.sh` prepares the `dev machine` for using BCM scripts. It is meant to be executed on a freshly installed Ubuntu 18.04 (Server or Desktop should work) Here's what `./up_dev_machine.sh` does to the `dev machine`:
 
-* Creates the `~/.bcm/` directory - BCM scripts store LXD cluster, endpoint, and sensitive runtime files in this directory. `up_dev_machine.sh` initializes ~/.bcm as a git repository for versioning. BCM scripts make regular commits to the ~/.bcm repo as files are added or deleted.
-* (TODO:  ~/.bcm will be mounted using a encrypted [FUSE mount](https://github.com/netheril96/securefs) that can be unlocked interactively with a user-provided password or hardware wallet device).
-* Generates the Root Certificate Authority cert at ~/.bcm/certs. Eventually, digital signatures associated with the public key will be relegated exclusively to hardware wallet operations.
-* Places the following line in your `~/.bashrc` file so BCM shell scripts can invoke dependent scripts by fully qualified path.
+* Creates the `$BCM_RUNTIME_DIR/` directory - BCM scripts store LXD cluster, endpoint, and sensitive runtime files in this directory. `up_dev_machine.sh` initializes $BCM_RUNTIME_DIR as a git repository for versioning. BCM scripts make regular commits to the $BCM_RUNTIME_DIR repo as files are added or deleted.
+* (TODO:  $BCM_RUNTIME_DIR will be mounted using a encrypted [FUSE mount](https://github.com/netheril96/securefs) that can be unlocked interactively with a user-provided password or hardware wallet device).
+* Generates the Root Certificate Authority cert at $BCM_RUNTIME_DIR/certs. Eventually, digital signatures associated with the public key will be relegated exclusively to hardware wallet operations.
+* Places the following line in your `$HOME/.bashrc` file so BCM shell scripts can invoke dependent scripts by fully qualified path.
 
 ```bash
 ### Start BCM
-export BCM_LOCAL_GIT_REPO="~/git/<USER>/bcm"
+export BCM_LOCAL_GIT_REPO_DIR="$HOME/git/<USER>/bcm"
 ```
-* Similar to above, `./up_dev_machine.sh` exports the BCM_LOCAL_GIT_REPO variable so the current shell knows where to locate BCM scripts.
+* Similar to above, `./up_dev_machine.sh` exports the BCM_LOCAL_GIT_REPO_DIR variable so the current shell knows where to locate BCM scripts.
 * Passes control to `./install_software.sh` which installs the following software on the `dev machine`:
   1. [docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu/) -- Docker is installed on the `dev machine` so docker containers be run locally (future work). Note that BCM infrastructure components are spawned in separate dockerd instances than the one listed here (those nested within LXC system containers).
   2. [ZFS](https://en.wikipedia.org/wiki/ZFS) - Used for LXC system container storage backend. dockerd instances inside each LXC system container are redirected to distinct directory-based storage pools. Future BCM versions will work to software-define the dockerd storage backend using [CEPH](https://en.wikipedia.org/wiki/Ceph_(software)) where appropriate.
@@ -49,7 +49,7 @@ lxc cluster list
 docker info
 ```
 
-You can inspect the `~/.bcm/clusters/lxd_projects/` directory to view the files that were created. The `endpoints` and `lxd_projects` directories should exist. The LXD preseed file that was used to initialize the LXD daemon on the `dev machine` can be found at `~/.bcm/clusters/lxd_projects/endpoints/local/lxd_preseed.yml`. This file contains sensitive password information and is thus git committed to ~/.bcm/.  `local` here refers to the LXD remote endpoint for your dev machine (local) which can be discovered by running `lxc remote list`.
+You can inspect the `$BCM_RUNTIME_DIR/clusters/lxd_projects/` directory to view the files that were created. The `endpoints` and `lxd_projects` directories should exist. The LXD preseed file that was used to initialize the LXD daemon on the `dev machine` can be found at `$BCM_RUNTIME_DIR/clusters/lxd_projects/endpoints/local/lxd_preseed.yml`. This file contains sensitive password information and is thus git committed to $BCM_RUNTIME_DIR/.  `local` here refers to the LXD remote endpoint for your dev machine (local) which can be discovered by running `lxc remote list`.
 
 To continue this tutorial, jump up and down to the [../lxd/](../lxd/) directory to start deploying BCM infrastructure components to your local `dev machine`. This is where you can deploy BCM data center components to any cluster-mode LXD endpoint. All the scripts in this directory are applied to your currently active LXC remote (`lxc remote get-default`).
 

@@ -6,9 +6,6 @@
 
 set -eu
 
-# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
-source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
-
 # set the working directory to the location where the script is located
 # since all file references are relative to this script
 cd "$(dirname "$0")"
@@ -16,14 +13,14 @@ LXC_REMOTE=$(lxc remote get-default)
 LXC_HOST=$1
 STACK_NAME=$2
 CERT_CN=$3
-DIR=~/.bcm/runtime/$LXC_REMOTE/$LXC_HOST/$STACK_NAME
+DIR=$BCM_RUNTIME_DIR/runtime/$LXC_REMOTE/$LXC_HOST/$STACK_NAME
 
 lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HOST
 
 lxc network attach lxdbrBCMNET $LXC_HOST eth0
 
 # create the docker backing for 'bcm-gateway'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/create_attach_lxc_storage_to_container.sh true $LXC_HOST $LXC_HOST-dockervol"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/create_attach_lxc_storage_to_container.sh true $LXC_HOST $LXC_HOST-dockervol"
 
 # make sure we configure the docker daemon.
 lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json
@@ -34,13 +31,13 @@ lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json
 
 lxc start $LXC_HOST
 
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/wait_for_dockerd.sh $LXC_HOST"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/wait_for_dockerd.sh $LXC_HOST"
 
 lxc exec $LXC_HOST -- mkdir -p /etc/docker/certs.d/bcmnet:5000
 
 lxc file push $DIR/$CERT_CN.cert $LXC_HOST/etc/docker/certs.d/bcmnet:5000/client.cert
 lxc file push $DIR/$CERT_CN.key $LXC_HOST/etc/docker/certs.d/bcmnet:5000/client.key
-lxc file push ~/.bcm/certs/rootca.cert $LXC_HOST/etc/docker/certs.d/bcmnet:5000/ca.crt
+lxc file push $BCM_RUNTIME_DIR/certs/rootca.cert $LXC_HOST/etc/docker/certs.d/bcmnet:5000/ca.crt
 
 lxc stop $LXC_HOST
 lxc start $LXC_HOST
@@ -65,7 +62,7 @@ lxc start $LXC_HOST
 # if [[ $BCM_BCMNETTEMPLATE_RSYNCD_INSTALL = 'true' ]]; then
 #     bash -c ./stacks/rsyncd/up_lxd_rsyncd.sh
 # fi
-    #bash -c "$BCM_LOCAL_GIT_REPO/docker_stacks/cachestack/squid/up_lxd_squid.sh bcm-gateway"
+    #bash -c "$BCM_LOCAL_GIT_REPO_DIR/docker_stacks/cachestack/squid/up_lxd_squid.sh bcm-gateway"
 
 # # Deploy IPFS Cache if specified.
 # if [[ $BCM_BCMNETTEMPLATE_IPFSCACHE_INSTALL = 'true' ]]; then

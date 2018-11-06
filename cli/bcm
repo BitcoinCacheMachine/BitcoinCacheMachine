@@ -1,7 +1,8 @@
 #!/bin/bash
 
 set -eu 
-
 cd "$(dirname "$0")"
+
+export BCM_LOCAL_GIT_REPO_DIR=$BCM_LOCAL_GIT_REPO_DIR
 
 ./bcm.sh "$@"

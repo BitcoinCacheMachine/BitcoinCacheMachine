@@ -3,7 +3,7 @@
 set -eu
 
 
-CLUSTERS_DIR="$HOME/.bcm/clusters"
+CLUSTERS_DIR="$BCM_RUNTIME_DIR/clusters"
 if [[ ! -d $CLUSTERS_DIR ]]; then
     mkdir -p $CLUSTERS_DIR
 fi
@@ -17,7 +17,7 @@ else
             if [[ $BCM_SHOW_ENDPOINTS_FLAG = 1 ]]; then
                 if [[ ! -z $BCM_CLUSTER_NAME ]]; then
                     if [[ $BCM_CLUSTER_NAME = "$cluster" ]]; then
-                        ENDPOINTS_DIR=~/.bcm/clusters/$cluster/endpoints
+                        ENDPOINTS_DIR=$BCM_RUNTIME_DIR/clusters/$cluster/endpoints
                         if [[ $(ls -l $ENDPOINTS_DIR | grep -c ^d) = "0" ]]; then
                             exit
                         else

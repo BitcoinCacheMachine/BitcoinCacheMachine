@@ -3,7 +3,6 @@
 set -eu
 cd "$(dirname "$0")"
 
-
 # if BCM_PROJECT_DIR is empty, we'll check to see if someone over-rode
 # the trezor directory. If so, we'll send that in instead.
 if [[ $BCM_HELP_FLAG = 1 ]]; then
@@ -30,7 +29,7 @@ if [[ $(docker ps -a | grep "bcm-trezor-gitter") ]]; then
     sleep 3
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/build.sh"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/build.sh"
 if [[ ! -z $(docker image list | grep "bcm-gpgagent:latest") ]]; then
     docker build -t bcm-gpgagent:latest .
 else

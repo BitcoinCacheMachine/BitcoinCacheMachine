@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 
 set -eu
+cd "$(dirname "$0")"
 
 echo "Starting 'up_lxc_host_template.sh'."
 
-# set the working directory to the location where the script is located
-cd "$(dirname "$0")"
-
-# call bcm_script_before.sh to ensure we have up-to-date ENV variables.
-source "$BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh"
 
 #create and populate the required networks
-if [[ $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE = "true" ]]; then
-  bash -c "$BCM_LXD_OPS/create_lxc_network_bridge_nat.sh lxdbr0 basicnat"
+if [[ $(lxc network list | grep bcmbr0) ]]; then
+  bash -c "$BCM_LXD_OPS/create_lxc_network_bridge_nat.sh bcmbr0 basicnat"
 fi
 
 # Let's createlx the ZFS storage pool for all operational images
-if [[ -z $(lxc storage list | grep "bcm_data") ]]; then
-  lxc storage create bcm_data zfs size=10GB
+if [[ -z $(lxc storage list | grep "bcm_zfs") ]]; then
+  lxc storage create bcm_zfs zfs size=10GB
 fi
 
 # download the main ubuntu image if it doesn't exist.
@@ -30,23 +26,16 @@ else
 fi
 
 # create the default profile
-if [[ $BCM_HOSTTEMPLATE_PROFILE_DEFAULT_CREATE = "true" ]]; then
-  bash -c "$BCM_LXD_OPS/create_lxc_profile.sh default ./lxd_profiles/default.yml"
-fi
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh default ./lxd_profiles/default.yml"
 
 # create the bcm_disk profile
-if [[ $BCM_HOSTTEMPLATE_PROFILE_BCMDISK_CREATE = "true" ]]; then
-  bash -c "$BCM_LXD_OPS/create_lxc_profile.sh bcm_disk ./lxd_profiles/bcm_disk.yml"
-fi
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh bcm_disk ./lxd_profiles/bcm_disk.yml"
 
 # create the docker_unprivileged profile
-if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIGED_CREATE = "true" ]]; then
-  bash -c "$BCM_LXD_OPS/create_lxc_profile.sh docker_unprivileged ./lxd_profiles/docker_unprivileged.yml"
-fi
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh docker_unprivileged ./lxd_profiles/docker_unprivileged.yml"
 
 # create the docker_privileged profile
-if [[ $BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_CREATE = "true" ]]; then
-  bash -c "$BCM_LXD_OPS/create_lxc_profile.sh docker_privileged ./lxd_profiles/docker_privileged.yml"
-fi
+bash -c "$BCM_LXD_OPS/create_lxc_profile.sh docker_privileged ./lxd_profiles/docker_privileged.yml"
+
 
 bash -c ./create_lxc_host_template.sh

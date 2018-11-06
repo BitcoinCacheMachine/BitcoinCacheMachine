@@ -4,7 +4,6 @@
 # by providing $1 as a number 2 or above.
 
 set -eu
-
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_NODE_COUNT=
@@ -12,6 +11,7 @@ BCM_CLUSTER_NAME=
 BCM_PROVIDER_NAME=
 BCM_MGMT_TYPE=
 BCM_CLUSTER_MASTER_NAME=
+BCM_SHOW_HELP=0
 
 for i in "$@"
 do
@@ -38,9 +38,6 @@ case $i in
 esac
 done
 
-
-
-
 if [[ $BCM_DEBUG = 1 ]]; then
     echo "Running up_cluster.sh with the following parameters."
     echo "BCM_CLUSTER_NODE_COUNT: '$BCM_CLUSTER_NODE_COUNT'"
@@ -49,14 +46,9 @@ if [[ $BCM_DEBUG = 1 ]]; then
     echo "BCM_MGMT_TYPE: '$BCM_MGMT_TYPE'"
 fi
 
-if [[ !($BCM_MGMT_TYPE = "local" || $BCM_MGMT_TYPE = "net" || $BCM_MGMT_TYPE = "tor") ]]; then
-    echo "Error. BCM_MGMT_TYPE should be either 'local', 'net', or 'tor'."
-    exit
-fi
-
 
 # see if the directory exists already; if so we exit
-export BCM_CLUSTER_DIR=~/.bcm/clusters/$BCM_CLUSTER_NAME
+export BCM_CLUSTER_DIR=$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME
 if [[ -d $BCM_CLUSTER_DIR ]]; then
     echo "ERROR: The BCM_CLUSTER_DIR directory already exists. Exiting."
     exit
@@ -67,12 +59,12 @@ if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
     echo "Performing a local LXD installation (bare-metal). Note this provides no fault tolerance."
 
     # first let's make sure the lxd snap is installed.
-    bash -c $BCM_LOCAL_GIT_REPO/cluster/providers/lxd/snap_lxd_install.sh
+    bash -c $BCM_LOCAL_GIT_REPO_DIR/cluster/providers/lxd/snap_lxd_install.sh
 elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
 
     # install multipass so we can get started.
-    bash -c $BCM_LOCAL_GIT_REPO/cluster/providers/multipass/snap_multipass_install.sh
+    bash -c $BCM_LOCAL_GIT_REPO_DIR/cluster/providers/multipass/snap_multipass_install.sh
     
 elif [[ $BCM_PROVIDER_NAME = "aws" ]]; then
     echo "Creating a remote LXD cluster running on someone else's computers (AWS)."
@@ -89,7 +81,7 @@ else
 fi
 BCM_CLUSTER_MASTER_NAME=$BCM_CLUSTER_ENDPOINT_NAME
 
-# if ~/.bcm/clusters doesn't exist, create it.
+# if $BCM_RUNTIME_DIR/clusters doesn't exist, create it.
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
 if [ ! -d $ENDPOINTS_DIR ]; then
     echo "Creating directory $ENDPOINTS_DIR"
@@ -174,4 +166,4 @@ if [[ $BCM_CLUSTER_NODE_COUNT -ge 2 ]]; then
     done
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Created cluster '$BCM_CLUSTER_NAME' and associated endpoints.'"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/commit_bcm.sh --git-commit-message='Created cluster '$BCM_CLUSTER_NAME' and associated endpoints.'"

@@ -36,4 +36,4 @@ multipass copy-files $BCM_ENDPOINT_DIR/lxd/preseed.yml $BCM_CLUSTER_ENDPOINT_NAM
 # now initialize the LXD daemon on the VM.
 multipass exec $BCM_CLUSTER_ENDPOINT_NAME -- sh -c "cat /home/multipass/preseed.yml | sudo lxd init --preseed"
 
-bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Added files associated with provision_lxd_member.sh'"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/commit_bcm.sh --git-commit-message='Added files associated with provision_lxd_member.sh'"
