@@ -2,21 +2,22 @@
 
 set -eu
 
-BCM_PROJECTS_DIR="$BCM_RUNTIME_DIR/projects"
 if [[ ! -d $BCM_PROJECTS_DIR ]]; then
     echo "$BCM_PROJECTS_DIR does not exist. You may need to re-run 'bcm init'."
     exit
 fi
 
-echo "BCM_PROJECTS_DIR: $BCM_PROJECTS_DIR"
-if [[ $(ls -l $BCM_PROJECTS_DIR | grep -c ^d) = "0" ]]; then
-    # this means the directory is empty and we're going to return nothing
-    exit
+if [[ $BCM_DEPLOYMENTS_FLAG = 1 ]]; then
+    # Let's display the deployed endpoints.
+    cd $BCM_DEPLOYMENTS_DIR >>/dev/null
+    for deployment in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
+        echo "$deployment"
+    done
+    cd - >>/dev/null
 else
-    cd $BCM_PROJECTS_DIR
-    echo "in $BCM_PROJECTS_DIR"
-    for project in `ls -d */ | sed 's/.$//'`; do
+    cd $BCM_PROJECTS_DIR >>/dev/null
+    for project in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
         echo "$project"
     done
-    cd - >> /dev/null
+    cd - >>/dev/null
 fi

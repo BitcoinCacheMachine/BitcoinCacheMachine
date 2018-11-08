@@ -2,9 +2,13 @@ Description:
   Deploy and existing BCM project definition to an existing cluster.
 
 Usage:
-  bcm project deploy --project-name=<BCM_PROJECT_NAME> --cluster-name=<BCM_CLUSTER_NAME>
+  bcm project deploy --project-name=<BCM_PROJECT_NAME> 
+                      --cluster-name=<BCM_CLUSTER_NAME> \
+                      --user-name=<BCM_PROJECT_USERNAME> \
+
 
 Required Flags:
-    --project-name=<BCM_PROJECT_NAME>    The BCM project name you want deployed.         
-    --cluster-name=<BCM_CLUSTER_NAME>    The BCM cluster you want to run your BCM project on.
- 
+    --project-name=<BCM_PROJECT_NAME>     The BCM project name you want deployed.         
+    --cluster-name=<BCM_CLUSTER_NAME>     The BCM cluster you want to run your BCM project on.
+    --user-name=<BCM_PROJECT_USERNAME>    The username that appears on the runtime certificates for the
+                                          project deployment.

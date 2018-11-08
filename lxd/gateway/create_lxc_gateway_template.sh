@@ -49,7 +49,7 @@ fi
 # create a gateway template if it doesn't exist.
 if [[ -z $(lxc list | grep "$BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME") ]]; then
     # grab the bcm-template lxc image that's been prepared for us.
-    lxc init bcm-template $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -p bcm_disk -p docker_privileged -p bcm-gateway-profile
+    lxc init bcm-template $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME -p bcm_default -p docker_privileged -p bcm-gateway-profile
 fi
 
 lxc file push 10-lxc.yaml $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME/etc/netplan/10-lxc.yaml

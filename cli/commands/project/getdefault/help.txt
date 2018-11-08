@@ -1,8 +1,0 @@
-Description:
-  Get the active BCM project. This returns the BCM_PROJECT_NAME value set in $BCM_RUNTIME_DIR/projects/bcm.client.sh
-
-Usage:
-  bcm project get-default -d
-
-Options:
-  -d        If specified, the BCM project directory of the active project will be returned.      

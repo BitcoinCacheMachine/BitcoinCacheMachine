@@ -1,8 +1,25 @@
 #!/bin/bash
 
-set -eu 
+set -e
 cd "$(dirname "$0")"
 
-export BCM_LOCAL_GIT_REPO_DIR=$BCM_LOCAL_GIT_REPO_DIR
+# make the following environment variables available to child shells
+export BCM_CERTS_DIR=$BCM_RUNTIME_DIR/certs
+export BCM_PROJECTS_DIR=$BCM_RUNTIME_DIR/projects
+export BCM_CLUSTERS_DIR=$BCM_RUNTIME_DIR/clusters
+export BCM_PASSWORDS_DIR=$BCM_RUNTIME_DIR/passwords
+export BCM_DEPLOYMENTS_DIR=$BCM_RUNTIME_DIR/deployments
 
-./bcm.sh "$@"
+if [[ -z $BCM_DEBUG ]]; then
+    export BCM_DEBUG=0
+fi
+
+if [[ $BCM_DEBUG = 1 ]]; then
+    export BCM_DEBUG=$BCM_DEBUG
+    echo "BCM_CERTS_DIR: $BCM_CERTS_DIR"
+    echo "BCM_PROJECTS_DIR: $BCM_PROJECTS_DIR"
+    echo "BCM_CLUSTERS_DIR: $BCM_CLUSTERS_DIR"
+    echo "BCM_PASSWORDS_DIR: $BCM_PASSWORDS_DIR"
+fi
+
+./commands/cli_entrypoint.sh "$@"

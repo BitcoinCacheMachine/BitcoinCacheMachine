@@ -54,18 +54,6 @@ else
   echo "$BCM_BASHRC_END_FLAG" >> $HOME/.profile
 fi
 
-if grep -Fxq "$BCM_BASHRC_START_FLAG" $HOME/.bashrc
-then
-  # code if found
-  echo "BCM flag discovered in $HOME/.bashrc. Please inspect your $HOME/.bashrc to clear any BCM-related content, if appropriate."
-else
-  echo "Writing commands to $HOME/.bashrc to support running BCM from the admin machine."
-  echo "$BCM_BASHRC_START_FLAG" >> $HOME/.bashrc
-
-  echo "$BCM_BASHRC_END_FLAG" >> $HOME/.bashrc
-fi
-
-
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please open a new terminal session to refresh your envronment, then typ 'bcm' to continue."
 
 
@@ -90,7 +78,6 @@ echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please 
 #   # and will be used as trust/authentication boundary, i.e., one self-signed Root CA per BIP32 path.
 #   openssl req -x509 -subj "/C=US/ST=BCM/L=INTERNET/O=BCM/CN=BCM ROOT CA" -new -nodes -key $BCM_RUNTIME_DIR/certs/rootca.key -sha256 -days 365 -out $BCM_RUNTIME_DIR/certs/rootca.cert
 
-#   bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/commit_bcm.sh --git-commit-message='Added $BCM_RUNTIME_DIR/certs and associated certificate and key files.'"
-# else
+else
 #   echo "BCM certs directory exists at $BCM_RUNTIME_DIR/certs"
 # fi

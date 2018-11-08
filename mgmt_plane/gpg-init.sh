@@ -75,9 +75,3 @@ echo "export BCM_DEFAULT_KEY_ID="'"'$LINE'"' >> "$BCM_CERT_DIR/.env"
 echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"' >> "$BCM_CERT_DIR/.env"
 echo "export BCM_CERT_USERNAME="'"'$BCM_CERT_USERNAME'"' >> "$BCM_CERT_DIR/.env"
 echo "export BCM_CERT_FQDN="'"'$BCM_CERT_FQDN'"' >> "$BCM_CERT_DIR/.env"
-
-source $BCM_CERT_DIR/.env
-
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/commit_bcm.sh \
-    --git-commit-message='Performed GPG init process.' \
-    --cert-dir='$GNUPGHOME'"

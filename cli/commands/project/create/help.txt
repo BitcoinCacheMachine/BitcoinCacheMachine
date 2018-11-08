@@ -1,11 +1,10 @@
 Description:
-  Create a new BCM Project, which is a definition of the Bitcoin software stack.
+  Create a new BCM Project definition. This describes the Bitcoin software stack you want to deploy.
 
 Usage:
-  bcm project create --project-name=<BCM_PROJECT_NAME> \
-                    -u=<BCM_PROJECT_USERNAME> -c=<BCM_CLUSTER_NAME>
+  bcm project create --project-name=<BCM_PROJECT_NAME>
 
 Required Flags:
-      -u (--user-name)          The username to be used on the certificate data, e.g., testing/stagging/production.
-                                See BCM documentation for other considerations regaring naming conventions.
-      -c (--cluster-name)       The name of the intended cluster that the project is will be deployed to. Required.
+      --project-name=<BCM_PROJECT_NAME>   The name of the project definition you want to create.
+
+ 

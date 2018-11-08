@@ -166,4 +166,12 @@ if [[ $BCM_CLUSTER_NODE_COUNT -ge 2 ]]; then
     done
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/commit_bcm.sh --git-commit-message='Created cluster '$BCM_CLUSTER_NAME' and associated endpoints.'"
+
+source $BCM_CERTS_DIR/.env
+bcm git commit \
+    --cert-dir="$BCM_CERTS_DIR" \
+    --git-repo-dir="$BCM_CLUSTERS_DIR" \
+    --git-commit-message="Created cluster '$BCM_CLUSTER_NAME' and associated endpoints." \
+    --git-username="$BCM_CERT_USERNAME" \
+    --email-address="$BCM_CERT_USERNAME@$BCM_CERT_FQDN" \
+    --gpg-signing-key-id="$BCM_DEFAULT_KEY_ID"

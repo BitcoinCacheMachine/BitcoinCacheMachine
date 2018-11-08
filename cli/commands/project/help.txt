@@ -2,15 +2,14 @@ Description:
   Manage BCM projects.
 
 Usage:
-  bcm project [command] [projectname]
+  bcm project [command]
 
 Available Commands:
   create        Create BCM project.
   destroy       Destroy BCM project (deletes $BCM_RUNTIME_DIR/projects/<projectname>).
   list          List all bcm projects.
   deploy        Deploy a BCM project definition to an existing cluster.
-  get-default   Shows active BCM project.
-  set-default   Sets BCM active project.
+  remove        Remove an existing BCM project deployment from a cluster.
 
   Use "bcm project [command]" to get help for that command.
 

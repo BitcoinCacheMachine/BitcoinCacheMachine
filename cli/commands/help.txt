@@ -14,7 +14,8 @@ Usage:
 Available Commands:
   init       Initialize your management plane.
   cluster    Create, destroy, and manage BCM clusters (i.e., LXD cluster).
-  project    Manage BCM projects.
+  project    Create and destroy BCM projects. Deploy/undeploy BCM projects 
+             to an existing BCM cluster.
   git        Perform typical git operations with with your Trezor.
   file       Create and verify file signatures, encrypt and decrypt files 
              with your Trezor.

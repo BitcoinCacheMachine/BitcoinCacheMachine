@@ -61,7 +61,7 @@ fi
 export INPUT_FILE_DIR=$(dirname $BCM_FILE_PATH)
 export INPUT_FILE_NAME=$(basename $BCM_FILE_PATH)
 export BCM_FILE_PATH=$BCM_FILE_PATH
-export BCM_CERT_DIR=$BCM_CERT_DIR
+
 
 if [[ $BCM_CLI_VERB = "encrypt" ]]; then
     ./encrypt/encrypt.sh "$@"

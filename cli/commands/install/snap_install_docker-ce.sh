@@ -10,6 +10,5 @@ if [[ -z $(snap list | grep docker) ]]; then
     
     sudo snap install docker --stable
 
-    sudo snap disable docker
-    sudo snap enable docker
+    sleep 10
 fi

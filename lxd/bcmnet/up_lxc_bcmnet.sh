@@ -27,7 +27,7 @@ fi
 # create a bcmnet_template template if it doesn't exist.
 if [[ -z $(lxc list | grep "$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME") ]]; then
     # let's generate a LXC template to base our lxc container on.
-    lxc init bcm-template $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -p bcm_disk -p docker_privileged
+    lxc init bcm-template $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -p bcm_default -p docker_privileged
 fi
 
 lxc file push 10-lxc.yaml $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/netplan/10-lxc.yaml

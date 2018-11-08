@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
-
-# set the working directory to the location where the script is located
-# since all file references are relative to this script
+set -eu
 cd "$(dirname "$0")"
 
 # quit if there are no BCM environment variables
@@ -18,20 +15,19 @@ fi
 # echo "Calling ./bcmnet/destroy_lxc_bcmnet.sh"
 # bash -c "./bcmnet/destroy_lxc_bcmnet.sh template"
 
-echo "Calling ./gateway/destroy_lxc_gateway.sh"
-bash -c "./gateway/destroy_lxc_gateway.sh template"
+# echo "Calling ./gateway/destroy_lxc_gateway.sh"
+# bash -c "./gateway/destroy_lxc_gateway.sh template"
 
 echo "Calling ./host_template/destroy_lxc_host_template.sh"
-bash -c "./host_template/destroy_lxc_host_template.sh"
+./host_template/destroy_lxc_host_template.sh
 
 # ensure we have an LXD project defined for this deployment
 # you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)
-if [[ $(lxc project list | grep bcm) ]]; then
+if [[ $(lxc project list | grep "$BCM_PROJECT_NAME") ]]; then
   lxc project switch default
-  lxc project delete bcm
+  lxc project delete $BCM_PROJECT_NAME
 fi
 
-rm -rf $BCM_RUNTIME_DIR/runtime/$(lxc remote get-default)/
 
 # if [[ $BCM_BITCOIN_DELETE = "true" ]]; then
 #   echo "Calling ./bitcoin/destroy_lxd_bitcoin.sh"
