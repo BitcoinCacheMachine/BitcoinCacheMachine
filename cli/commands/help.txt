@@ -3,10 +3,12 @@ Description:
   be driven through the various commands below. If you just pulled BCM to 
   your local machine and want to get started consider the following steps:
   
-  1) Creating a new cluster with 'bcm cluster create'
-  2) Define one or more BCM projects with 'bcm project create'
-  3) Deploy a BCM project to an active cluster with 
-     'bcm project deploy -c=<BCM_CLUSTER_NAME>'
+  1) Initialize your management plane by running 'bcm init'.
+  1) Creating a new cluster with 'bcm cluster create'.
+  2) Define one or more BCM projects with 'bcm project create'.
+  3) Deploy a BCM project to an active cluster with:
+        bcm project deploy --project-name=<BCM_PROJECT_NAME> \
+                            --cluster-name=<BCM_CLUSTER_NAME>
 
 Usage:
   bcm [command]
@@ -19,8 +21,7 @@ Available Commands:
   git        Perform typical git operations with with your Trezor.
   file       Create and verify file signatures, encrypt and decrypt files 
              with your Trezor.
-  ssh        Perform SSH (new key identities and interactive login) operations 
-             with your Trezor.
+  ssh        Use your Trezor to issue SSH keys and perform SSH authentication.
   pass       Create and manage GPG-encrypted passwords protected by your Trezor.
 
 Help

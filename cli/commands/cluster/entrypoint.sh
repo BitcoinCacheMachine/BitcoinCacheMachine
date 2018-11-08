@@ -13,7 +13,7 @@ BCM_CLUSTER_NAME=
 BCM_PROVIDER_NAME=
 BCM_MGMT_TYPE=
 BCM_NODE_COUNT=
-BCM_SHOW_ENDPOINTS_FLAG=0
+BCM_ENDPOINTS_FLAG=0
 BCM_SHOW_DEPLOYMENTS_FLAG=0
 
 for i in "$@"
@@ -36,7 +36,7 @@ case $i in
     shift # past argument=value
     ;;
     --endpoints)
-    BCM_SHOW_ENDPOINTS_FLAG=1
+    BCM_ENDPOINTS_FLAG=1
     shift # past argument=value
     ;;
     --endpoints)
@@ -75,7 +75,7 @@ elif [[ $BCM_CLI_VERB = "list" ]]; then
     
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
     export BCM_CLUSTER_DIR=$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME
-    export BCM_SHOW_ENDPOINTS_FLAG=$BCM_SHOW_ENDPOINTS_FLAG
+    export BCM_ENDPOINTS_FLAG=$BCM_ENDPOINTS_FLAG
 
     bash -c ./list/list.sh
 else

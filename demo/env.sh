@@ -15,9 +15,3 @@ export BCM_CERT_USERNAME="$(whoami)"
 export BCM_CLUSTER_USERNAME="$(whoami)"
 export BCM_PROJECT_USERNAME="$(whoami)"
 export BCM_CERT_HOSTNAME="domain.com"
-
-./remove_demo.sh
-
-sleep 5
-
-./up_demo.sh

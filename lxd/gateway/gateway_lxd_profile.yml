@@ -12,10 +12,10 @@ config:
 devices:
   eth0:
     nictype: bridged
-    parent: lxdbrGateway
+    parent: bcmbrGWNat
     type: nic
 
   eth1:
     nictype: bridged
-    parent: lxdbrBCMNET
+    parent: bcmNet
     type: nic

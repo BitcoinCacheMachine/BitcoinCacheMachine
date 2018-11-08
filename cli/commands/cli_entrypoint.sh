@@ -51,6 +51,8 @@ if [[ $BCM_DEBUG = "true" ]]; then
 fi
 
 export BCM_HELP_FLAG=$BCM_HELP_FLAG
+export BCM_FORCE_FLAG=$BCM_FORCE_FLAG
+export BCM_DEBUG=$BCM_DEBUG
 
 if [[ $BCM_CLI_COMMAND = "init" ]]; then 
     ./init.sh "$@"

@@ -37,7 +37,7 @@ BCM components are deployed exclusively over the [LXD REST API](https://github.c
 
 Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu 18.04 machines, but should work with most Debian-based distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used. You start with deploying a basic BCM instance to your development machine (i.e., `dev machine`).
 
- `README.md` files in each directory tells you what you need to know about deploying the various infrastructure components at that level.  It is recommended that the commands be manually typed into the terminal rather than using copy/paste. This helps improve your Linux [muscle memory](https://en.wikipedia.org/wiki/Muscle_memory) which is especially useful if you want to start developing on BCM.
+ `README.md` files in each directory describe the general architecture of BCM at that level, as well as describes the purpose of each script.
 
 ## Getting Started
 
@@ -52,11 +52,12 @@ BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
 ```
 
-You can now clone the BCM repository to your machine over TOR:
+You can now clone the BCM repository to your machine over TOR and run setup.
 
 ```bash
 export BCM_LOCAL_GIT_REPO_DIR="$HOME/git/github/bcm"
 mkdir -p $BCM_LOCAL_GIT_REPO_DIR
+export PATH=$PATH:$BCM_LOCAL_GIT_REPO_DIR/cli
 git clone $BCM_GITHUB_REPO_URL $BCM_LOCAL_GIT_REPO_DIR
 cd $BCM_LOCAL_GIT_REPO_DIR
 ./setup.sh
@@ -64,7 +65,17 @@ cd $BCM_LOCAL_GIT_REPO_DIR
 
 Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_LOCAL_GIT_REPO_DIR' variable.
 
-`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's command line interface.
+`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The CLI help output guides you on how to use the CLI. In general, the steps you take to deploy your own infrastructure is as follows:
+
+1) download BCM from github and run setup to configure your environment (done above).
+2) Run `bcm init`, which downloads and installs BCM dependencies, creates docker images for the management plane (Trezor integration)
+, and creates GPG certificates.
+3) Create a cluster by running `bcm cluster create`. Clusters are where your BCM projects actually run.
+4) Create one or more BCM Project definitions using `bcm project create`. A BCM project defintion represents the containerized software stack you want deployed.
+5) Deploy a BCM Project defintion (software stack) to an exiting BCM Cluster using `bcm project deploy`. New root GPG certificates are created in this step as well. This is for [separation-of-duties](https://en.wikipedia.org/wiki/Separation_of_duties) concerns, and to allow for [multi-tenancy](https://en.wikipedia.org/wiki/Multitenancy).
+
+
+If you just want to quickly see what Bitcoin Cache Machine is capable of, visit [./demo](./demo/). [`./demo/up_demo.sh`](./demo/up_demo.sh) is a script that uses the BCM CLI to automatically deploy a Bitcoin Core full node, c-lightning, and Spark, a cross-platform web-based GUI. `up_demo.sh` provides an example of exposing a component service over an authenticated onion service..
 
 ## How to contribute
 

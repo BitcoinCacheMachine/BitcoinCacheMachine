@@ -40,12 +40,11 @@ if [[ ! -d $BCM_DEPLOYMENTS_DIR ]]; then
     exit
 fi
 
-
 export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
 
-source $BCM_LOCAL_GIT_REPO_DIR/lxd/defaults.sh 
+source $BCM_LOCAL_GIT_REPO_DIR/lxd/defaults.sh
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/bcm_project_destroy.sh"
+$BCM_LOCAL_GIT_REPO_DIR/lxd/bcm_project_destroy.sh --remove-template
 
 if [[ -d $BCM_DEPLOYMENT_DIR ]]; then
     sudo rm -Rf $BCM_DEPLOYMENT_DIR

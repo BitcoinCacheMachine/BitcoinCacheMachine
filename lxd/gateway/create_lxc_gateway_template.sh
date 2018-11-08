@@ -13,18 +13,24 @@ fi
 
 if [[ $BCM_GATEWAY_NETWORKS_CREATE = "true" ]]; then
     # create and populate the required networks
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/create_lxc_network_bridge_nat.sh lxdbrGateway basicnat"
+    for endpoint in $(lxc cluster list | grep $BCM_CLUSTER_NAME | cut -f1,2 -d'|' | awk '{print $2}')
+    do
+        lxc network create --target $endpoint bcmbrGWNat
+    done
+
+    lxc network create bcmbrGWNat ipv4.nat=true
 fi
 
 # create the 'bcm-gateway-profile' lxc profile
 if [[ $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE = "true" ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/create_lxc_profile.sh bcm-gateway-profile $BCM_LOCAL_GIT_REPO_DIR/lxd/gateway/gateway_lxd_profile.yml"
+    lxc profile create bcm-gateway-profile
+    cat ./gateway_lxd_profile.yml | lxc profile edit bcm-gateway-profile
 fi
 
 #create and populate the required networks
-if [[ $BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE = "true" ]]; then
+if [[ $BCM_HOSTTEMPLATE_NETWORK_BCMNET_CREATE = "true" ]]; then
     #bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/connect_container_to_underlay.sh"
-    lxc network create lxdbrBCMNET 
+    lxc network create bcmNet 
 fi
 
 #### this is what we do when we are told to attach to physical network

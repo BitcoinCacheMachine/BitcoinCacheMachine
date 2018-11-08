@@ -2,8 +2,7 @@
 
 set -eu
 cd "$(dirname "$0")"
-
-
+source ./env.sh
 
 bcm init --cert-name="derek" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
 

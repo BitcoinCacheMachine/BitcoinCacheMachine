@@ -3,15 +3,9 @@
 set -eu
 cd "$(dirname "$0")"
 
-BCM_HELP_FLAG=0
-if [[ -z $2 ]]; then
-    BCM_HELP_FLAG=1
-fi
-
 BCM_CLI_VERB=$2
 BCM_PROJECT_NAME=
 BCM_CLUSTER_NAME=
-BCM_FORCE_FLAG=0
 BCM_DEPLOYMENTS_FLAG=0
 
 for i in "$@"
@@ -23,10 +17,6 @@ case $i in
     ;;
     --cluster-name=*)
     BCM_CLUSTER_NAME="${i#*=}"
-    shift # past argument=value
-    ;;
-    --force)
-    BCM_FORCE_FLAG=1
     shift # past argument=value
     ;;
     --deployments)
@@ -57,7 +47,7 @@ elif [[ $BCM_CLI_VERB = "destroy" ]]; then
     fi
     
     export BCM_PROJECT_NAME=$BCM_PROJECT_NAME
-    export BCM_FORCE_FLAG=$BCM_FORCE_FLAG
+
 
     ./destroy/destroy.sh "$@"
 elif [[ $BCM_CLI_VERB = "list" ]]; then
@@ -99,8 +89,4 @@ elif [[ $BCM_CLI_VERB = "undeploy" ]]; then
     ./undeploy/undeploy.sh "$@"
 else
     BCM_HELP_FLAG=1
-fi
-
-if [[ $BCM_HELP_FLAG = 1 ]]; then
-    cat ./help.txt
 fi
