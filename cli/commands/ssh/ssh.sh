@@ -44,8 +44,8 @@ if [[ -z $BCM_TREZOR_SSH_HOSTNAME ]]; then
 fi
 
 if [[ -z $BCM_CERT_DIR ]]; then
-    echo "BCM_CERT_DIR is empty. Setting to '~/.bcm/projects/bcm-dev/trezor'"
-    export BCM_CERT_DIR=~/.bcm/projects/bcm-dev/trezor
+    echo "BCM_CERT_DIR is empty. Setting to '$BCM_RUNTIME_DIR/projects/bcm-dev/trezor'"
+    export BCM_CERT_DIR="$BCM_RUNTIME_DIR/projects/bcm-dev/trezor"
 fi
 
 
@@ -55,13 +55,13 @@ echo "BCM_CERT_DIR: $BCM_CERT_DIR"
 
 
 if [[ -z $BCM_TREZOR_SSH_AUTHORIZED_KEYS_DIR ]]; then
-    echo "BCM_TREZOR_SSH_AUTHORIZED_KEYS_DIR is empty. Setting to ~/.bcm/projects/bcm-dev/mgmt_plane/ssh"
-    export BCM_TREZOR_SSH_AUTHORIZED_KEYS_DIR=~/.bcm/projects/bcm-dev/mgmt_plane/ssh
+    echo "BCM_TREZOR_SSH_AUTHORIZED_KEYS_DIR is empty. Setting to $BCM_RUNTIME_DIR/projects/bcm-dev/mgmt_plane/ssh"
+    export BCM_TREZOR_SSH_AUTHORIZED_KEYS_DIR=$BCM_RUNTIME_DIR/projects/bcm-dev/mgmt_plane/ssh
 fi
 
 echo "BCM_TREZOR_SSH_AUTHORIZED_KEYS_DIR: $BCM_TREZOR_SSH_AUTHORIZED_KEYS_DIR"
 
-source $BCM_LOCAL_GIT_REPO/dev_machine/mgmt_plane/export_usb_path.sh
+source $BCM_LOCAL_GIT_REPO_DIR/dev_machine/mgmt_plane/export_usb_path.sh
 
 
 

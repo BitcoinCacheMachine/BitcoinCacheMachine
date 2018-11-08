@@ -51,5 +51,3 @@ elif [ $IS_MASTER -ne 1 ]; then
 else
     echo "Incorrect usage. Please specify whether $BCM_CLUSTER_ENDPOINT_NAME is an LXD cluster master or member."
 fi
-
-bash -c "$BCM_LOCAL_GIT_REPO/cli/commands/commit_bcm.sh --git-commit-message='Added files associated with stub_env.sh'"

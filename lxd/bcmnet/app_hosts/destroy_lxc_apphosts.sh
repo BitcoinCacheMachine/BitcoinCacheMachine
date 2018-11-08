@@ -16,5 +16,5 @@ cd "$(dirname "$0")"
 bash -c ./rsync/destroy_lxc_rsyncd.sh
 
 # delete container 'bcm-gateway'
-bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_container.sh rsync rsync_template"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_container.sh rsync rsync_template"
 

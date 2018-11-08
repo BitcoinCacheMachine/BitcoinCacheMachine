@@ -11,12 +11,12 @@ Example:
       bcm cluster create -c=dev -t=local -x=net
 
 Parameters:
-  -c=<BCM_CLUSTER_NAME>    The name of the new cluster. ~/.bcm/clusters/<BCM_CLUSTER_NAME> will 
-                          be populated after successful cluster creation.
+  --cluster-name=         The name of the new cluster. $BCM_RUNTIME_DIR/clusters/<BCM_CLUSTER_NAME> will 
+  <BCM_CLUSTER_NAME>      be populated after successful cluster creation.
                           --cluster-name=<BCM_CLUSTER_NAME>
-
-  -t=<BCM_PROVIDER>       The provider is the mechanism by which an LXD instance will be made
-                          available. Valid option as are 'multipass', 'aws', and 'baremetal'. 
+    
+  --provider=             The provider is the mechanism by which an LXD instance will be made
+  <BCM_PROVIDER>          available. Valid option as are 'multipass', 'aws', and 'baremetal'. 
                           
                           'baremetal' installs LXD locally using snap and is recommended for 
                           testing and development. 
@@ -27,17 +27,16 @@ Parameters:
                           
                           'aws/azure' NOT SUPPORTED. BCM is meant for home and small office.
   
-  -l=<BCM_CLUSTER_COUNT>  Cluster count. Number of equal-size multipass VMs you want deployed.
+  --node-count=          Cluster count. Number of equal-size multipass VMs you want deployed.
+  <BCM_NODE_COUNT>  
 
-  -x=<BCM_MGMT_TYPE>      Valid values are 'local', 'net', and 'tor'. 
-                    
+  --mgmt-type             Valid values are 'local', and 'tor'. All LXD instances listen on the local network
+  <BCM_MGMT_TYPE>         on TCP/8443 to communicate with adjacent cluster members.
+                            
                           'local' is only compatible with '-t=baremetal' and configures your local LXD c
-                          lient to use the local unix socket for communication with the LXD daemon.
+                          lient to use TLS connect on a localhost address (127.0.10.1). Great for testing.
                           
-                          'net' exposes the LXD remote endpoint on a local network interface.
-                          will listen on the local network interface (use -TODO=<INTERFACE_TO_LISTEN_ON>)
-                          
-                          'tor' will expose the LXD remote API using an authenticated onion site. This 
-                          is recommended for geographically distant clusters and is default when using
-                          third party providers (e.g., AWS, AZURE).
+                          'tor' create a TOR onion service that exposes the LXD daemon TLS endpoint.
+                          Your management plane can use authenticated TOR onion sites to manage geographically
+                          remote cluster endpoints without having to open firewall ports.
  

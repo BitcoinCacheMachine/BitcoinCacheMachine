@@ -2,22 +2,22 @@
 
 if [[ $(lxc list | grep bcm-rsync-builder) ]]; then
     # let's get a fresh LXC host that's configured to push/pull to gateway registreis
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/delete_instance.sh bcm-rsync-builder"
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/bcmnet/delete_instance.sh bcm-rsync-builder"
     
     # delete 'BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME'
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh rsync bcm-bcmnet-builder-rsync-dockervol"
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_storage.sh rsync bcm-bcmnet-builder-rsync-dockervol"
 
-    rm -rf ~/.bcm/runtime/$(lxc remote get-default)/bcm-rsync-builder/
+    rm -rf $BCM_RUNTIME_DIR/runtime/$(lxc remote get-default)/bcm-rsync-builder/
 fi
 
 
 if [[ $(lxc list | grep bcm-rsync) ]]; then
     # let's get a fresh LXC host that's configured to push/pull to gateway registreis
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/bcmnet/delete_instance.sh bcm-rsync"
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/bcmnet/delete_instance.sh bcm-rsync"
 
     # delete 'BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME'
-    bash -c "$BCM_LOCAL_GIT_REPO/lxd/shared/delete_lxc_storage.sh rsync bcm-bcmnet-rsync-dockervol"
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_storage.sh rsync bcm-bcmnet-rsync-dockervol"
 
-    rm -rf ~/.bcm/runtime/$(lxc remote get-default)/bcm-rsync/
+    rm -rf $BCM_RUNTIME_DIR/runtime/$(lxc remote get-default)/bcm-rsync/
 fi
 

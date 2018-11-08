@@ -1,0 +1,15 @@
+Description:
+  Remove an existing BCM project deployment. This removes all data from the 
+  deployment. Use with caution.
+
+Usage:
+  bcm project remove --project-name=<BCM_PROJECT_NAME> 
+                      --cluster-name=<BCM_CLUSTER_NAME> \
+                      --user-name=<BCM_PROJECT_USERNAME> \
+
+Required Flags:
+    --project-name=<BCM_PROJECT_NAME>     The BCM project name you want removed.         
+    --cluster-name=<BCM_CLUSTER_NAME>     The BCM cluster that the BCM project is deployed to, 
+                                          and which will be removed.
+    --user-name=<BCM_PROJECT_USERNAME>    The username that appears on the runtime certificates for the
+                                          project deployment.

@@ -20,14 +20,14 @@ eval $(docker-machine env registry)
 # enable swarm mode so we can deploy a stack.
 docker swarm init
 
-# if ~/.abot/registry.config doesn't exist, create a new one. 
-if [[ ! -f ~/.abot/registry.config ]]; then
+# if $HOME/.abot/registry.config doesn't exist, create a new one. 
+if [[ ! -f $HOME/.abot/registry.config ]]; then
     REGISTRY_HTTP_SECRET=$(apg -n 1 -m 30 -M CN)
-    mkdir -p ~/.abot
-    echo "REGISTRY_HTTP_SECRET="$REGISTRY_HTTP_SECRET >> ~/.abot/registry.config
+    mkdir -p $HOME/.abot
+    echo "REGISTRY_HTTP_SECRET="$REGISTRY_HTTP_SECRET >> $HOME/.abot/registry.config
 else
     # if it does exist, source it.
-    source ~/.abot/registry.config
+    source $HOME/.abot/registry.config
 fi
 
 

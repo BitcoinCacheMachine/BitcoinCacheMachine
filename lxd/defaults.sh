@@ -1,19 +1,16 @@
 #!/bin/bash
 
-# if the user does not specify this, it will be generated automatically and stored at ~/.bcm/$(lxc remote get-default).env
-export BCM_LXD_SECRET="CHANGEME"
+# if the user does not specify this, it will be generated automatically and stored at $BCM_RUNTIME_DIR/$(lxc remote get-default).env
+
 export BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC="true"
 export BCM_ADMIN_RSYNC_INSTALL="true"
-export BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE="none"
 export BCM_DEFAULT_NGINX_DOCKER_IMAGE="nginx:1.15.2-perl"
-export BCM_HOSTTEMPLATE_PROFILE_BCM_DISK_DELETE="true"
-export BCM_HOSTTEMPLATE_PROFILE_BCM_DISK_CREATE="true"
 export BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_CREATE="true"
 export BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_DELETE="true"
 export BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILEGED_CREATE="true"
 export BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILEGED_DELETE="true"
 export BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_CREATE="true"
-export BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE="true"
+export BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE="false"
 export BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_CREATE="true"
 export BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE="true"
 export BCM_HOSTTEMPLATE_NETWORK_LXDBR0_CREATE="true"
@@ -25,10 +22,10 @@ export BCM_HOSTTEMPLATE_PROFILE_DEFAULT_DELETE="false"
 export BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIGED_CREATE="true"
 export BCM_HOSTTEMPLATE_PROFILE_DOCKER_UNPRIVILIGED_DELETE="true"
 export BCM_HOSTTEMPLATE_PROFILE_DOCKER_PRIVILEGED_CREATE="true"
-export BCM_STORAGE_BCM_DATA_CREATE="true"
-export BCM_STORAGE_BCM_DATA_DELETE="true"
-export BCM_LXD_OPS="$BCM_LOCAL_GIT_REPO/lxd/shared"
-export BCM_LXD_HOST_PROFILES="$BCM_LOCAL_GIT_REPO/lxd/host_template/lxd_profiles"
+export BCM_STORAGE_bcm_zfs_CREATE="true"
+export BCM_STORAGE_bcm_zfs_DELETE="true"
+export BCM_LXD_OPS="$BCM_LOCAL_GIT_REPO_DIR/lxd/shared"
+export BCM_LXD_HOST_PROFILES="$BCM_LOCAL_GIT_REPO_DIR/lxd/host_template/lxd_profiles"
 
 
 #####################

@@ -2,18 +2,22 @@
 
 set -eu
 
-if [[ ! -d ~/.bcm/projects ]]; then
-    mkdir -p ~/.bcm/projects
+if [[ ! -d $BCM_PROJECTS_DIR ]]; then
+    echo "$BCM_PROJECTS_DIR does not exist. You may need to re-run 'bcm init'."
+    exit
 fi
 
-if [[ $(ls -l ~/.bcm/projects | grep -c ^d) = "0" ]]; then
-    exit
-else
-    cd ~/.bcm/projects/
-    for project in `ls -d */ | sed 's/.$//'`; do
-        if [[ ! -z $project ]]; then
-            echo "$project"
-        fi
+if [[ $BCM_DEPLOYMENTS_FLAG = 1 ]]; then
+    # Let's display the deployed endpoints.
+    cd $BCM_DEPLOYMENTS_DIR >>/dev/null
+    for deployment in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
+        echo "$deployment"
     done
-    cd - >> /dev/null
+    cd - >>/dev/null
+else
+    cd $BCM_PROJECTS_DIR >>/dev/null
+    for project in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
+        echo "$project"
+    done
+    cd - >>/dev/null
 fi

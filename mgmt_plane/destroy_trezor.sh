@@ -16,9 +16,9 @@ if [[ -z $BCM_CURRENT_PROJECT_NAME ]]; then
   exit
 fi
 
-source $BCM_LOCAL_GIT_REPO/resources/export_bcm_envs.sh
+source $BCM_LOCAL_GIT_REPO_DIR/resources/export_bcm_envs.sh
 
-sudo rm -Rf ~/.bcm/projects/$BCM_CURRENT_PROJECT_NAME
+sudo rm -Rf $BCM_RUNTIME_DIR/projects/$BCM_CURRENT_PROJECT_NAME
 
 if [[ ! -z $(snap list | grep docker) ]]; then
     if [[ ! -z $(docker ps -a | grep trezorgpg) ]]; then

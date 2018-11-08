@@ -1,6 +1,6 @@
 # Creates a host on AWS and deploys a Private registry
 
-Create the  ~/.aws/credentials file
+Create the  $HOME/.aws/credentials file
 
 ```bash
 [default]

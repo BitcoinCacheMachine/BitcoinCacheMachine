@@ -9,7 +9,7 @@ if [[ -z $BCM_GIT_REPO_DIR ]]; then
     exit
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO/mgmt_plane/build.sh"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/build.sh"
 
 if [[ ! -z $(docker ps -a | grep "bcm-trezor-gitter") ]]; then
     #docker kill bcm-trezor-gitter
