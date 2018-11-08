@@ -36,5 +36,4 @@ createProfile docker_unprivileged
 # create the docker_privileged profile
 createProfile docker_privileged
 
-
 ./create_lxc_host_template.sh

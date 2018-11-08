@@ -1,9 +1,9 @@
 
 # <img src="./resources/images/bcmlogo_super_small.png" alt="Bitcoin Cache Machine Logo" style="float: left; margin-right: 20px;" /> Bitcoin Cache Machine
 
-Bitcoin Cache Machine is open-source software that allows you to create a self-hosted, privacy-centric, software-defined [data-center](https://en.wikipedia.org/wiki/Software-defined_data_center). BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization. The goal of BCM is to allow ANYONE to run their own software-defined data center enabling you to run your own Bitcoin software stack.
+Bitcoin Cache Machine is open-source software that allows you to create a self-hosted, privacy-centric, [software-defined data-center](https://en.wikipedia.org/wiki/Software-defined_data_center). BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization.
 
-> Note! Bitcoin Cache Machine REQUIRES a [Trezor-T](https://trezor.io/) to function!
+> Note! Bitcoin Cache Machine REQUIRES a [Trezor-T](https://trezor.io/) to function! Consider buying a dedicated device for your BCM data center.
 
 ## Project Status
 
@@ -31,11 +31,9 @@ Below you will find some of the development goals for Bitcoin Cache Machine:
 
 ## How to Run Bitcoin Cache Machine
 
-`BCM SHOULD BE CONSIDERED FOR TESTING PURPOSES ONLY!!! IT HAS NOT UNDERGONE A FORMAL SECURITY EVALUATION!!!`
-
 If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have one or more (BCM is a [distributed system](https://en.wikipedia.org/wiki/Distributed_computing)) always-on computers with a reliable Internet connection. You can run BCM in a hardware-based VM or preferably directly on bare-metal (for performance). 
 
-BCM components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can run a BCM project stack anywhere you can get an LXD endpoint! LXD is widely available on various free and open-source linux platforms.
+BCM components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can run a BCM project stack anywhere you can get an LXD endpoint! LXD is widely available on various free and open-source linux platforms. The BCM CLI automatically installs all the software your might need.
 
 Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu 18.04 machines, but should work with most Debian-based distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used. You start with deploying a basic BCM instance to your development machine (i.e., `dev machine`).
 

@@ -55,10 +55,12 @@ export BCM_LXD_OPS=$BCM_LOCAL_GIT_REPO_DIR/lxd/shared
 
 bash -c ./host_template/up_lxc_host_template.sh
 
-# if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
-#   echo "Deploying 'bcm-gateway'."
-#   bash -c ./gateway/up_lxc_gateway.sh
-# fi
+source ./defaults.sh
+
+if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
+  echo "Deploying 'bcm-gateway'."
+  bash -c ./gateway/up_lxc_gateway.sh
+fi
 
 # if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
 #     echo "Creating lxc container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' and associated snapshot 'bcmnet_template'."

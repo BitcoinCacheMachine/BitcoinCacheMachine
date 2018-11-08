@@ -12,10 +12,10 @@ fi
 # if [[ ! -z $(lxc network list | grep bcmbr0) ]]; then
 #     lxc network delete bcmbr0
 # fi
-
-# remove image bcm-template
-$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh bcm-template
-
+if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE = "true" ]]; then
+    # remove image bcm-template
+    $BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh bcm-template
+fi
 # remove image bcm-bionic-base
 if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE = "true" ]]; then
     $BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh bcm-bionic-base
