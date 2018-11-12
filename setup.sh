@@ -4,12 +4,9 @@
 # BCM-related LXD and multipass scripts against (local) or remote LXD
 # endpoints.
 
-# quit if there's an error
 set -e
-
-# set the working directory to the location where the script is located
-# since all file references are relative to this script
 cd "$(dirname "$0")"
+
 
 # first a common problem with new installations is that git itsn't fully configured.
 # let's test for this condition and quit if necessary.

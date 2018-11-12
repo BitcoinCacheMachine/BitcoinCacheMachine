@@ -20,7 +20,7 @@ lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HO
 lxc network attach bcmNet $LXC_HOST eth0
 
 # create the docker backing for 'bcm-gateway'
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/create_attach_lxc_storage_to_container.sh true $LXC_HOST $LXC_HOST-dockervol"
+../shared/create_attach_dockervol.sh --container-name="$LXC_HOST"
 
 # make sure we configure the docker daemon.
 lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json
@@ -31,7 +31,7 @@ lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json
 
 lxc start $LXC_HOST
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/wait_for_dockerd.sh $LXC_HOST"
+../shared/wait_for_dockerd.sh --container-name="$LXC_HOST"
 
 lxc exec $LXC_HOST -- mkdir -p /etc/docker/certs.d/bcmnet:5000
 

@@ -15,11 +15,12 @@ fi
 # echo "Calling ./bcmnet/destroy_lxc_bcmnet.sh"
 # bash -c "./bcmnet/destroy_lxc_bcmnet.sh template"
 
+echo ""
 echo "Calling ./gateway/destroy_lxc_gateway.sh"
-./gateway/destroy_lxc_gateway.sh "$@"
+./gateway/destroy_lxc_gateway.sh
 
 echo "Calling ./host_template/destroy_lxc_host_template.sh"
-./host_template/destroy_lxc_host_template.sh "$@"
+./host_template/destroy_lxc_host_template.sh
 
 # ensure we have an LXD project defined for this deployment
 # you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)

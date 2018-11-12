@@ -3,22 +3,11 @@
 set -eu
 cd "$(dirname "$0")"
 
-BCM_PROJECT_NAME=
-BCM_CLUSTER_NAME=
-
 for i in "$@"
 do
 case $i in
-    --project-name=*)
-    BCM_PROJECT_NAME="${i#*=}"
-    shift # past argument=value
-    ;;
-    --cluster-name=*)
-    BCM_CLUSTER_NAME="${i#*=}"
-    shift # past argument=value
-    ;;
-    --user-name=*)
-    BCM_PROJECT_USERNAME="${i#*=}"
+    --remove-template)
+    BCM_REMOVE_TEMPLATE_FLAG=1
     shift # past argument=value
     ;;
     *)
@@ -28,19 +17,13 @@ esac
 done
 
 
-
-if [[ -z $(bcm cluster list | grep "$BCM_CLUSTER_NAME") ]]; then
-    echo "BCM cluster '$BCM_CLUSTER_NAME' not found. Can't undeploy any projects."
-    exit
-fi
-
-BCM_DEPLOYMENT_DIR="$BCM_DEPLOYMENTS_DIR/$BCM_PROJECT_NAME"'_'"$BCM_CLUSTER_NAME"
-if [[ ! -d $BCM_DEPLOYMENTS_DIR ]]; then
+BCM_DEPLOYMENT_DIR=$BCM_DEPLOYMENTS_DIR/$BCM_PROJECT_NAME"_"$BCM_CLUSTER_NAME
+if [[ ! -d $BCM_DEPLOYMENT_DIR ]]; then
     echo "BCM Deployment directory '$BCM_DEPLOYMENT_DIR' does not exist. Exiting"
     exit
 fi
 
-export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
+export BCM_REMOVE_TEMPLATE_FLAG=$BCM_REMOVE_TEMPLATE_FLAG
 
 source $BCM_LOCAL_GIT_REPO_DIR/lxd/defaults.sh
 

@@ -20,8 +20,8 @@ There are many areas where your privacy can be compromised if you're not careful
 
 Below you will find some of the development goals for Bitcoin Cache Machine:
 
-* Provide a self-contained, event-driven, software-defined network that deploys a fully operational Bitcoin and Lightning-related IT infrastructure.
-* Run entirely on commodity x86_x64 hardware for home and small office settings. Run on bare-metal or in a self-hosted or cloud-based VM.
+* Provide a self-contained, event-driven, software-defined data that focuses on operational Bitcoin and Lightning-related IT infrastructure.
+* Run entirely on commodity x86_x64 hardware for home and small office settings.
 * Integrate exclusively free and open source software ([FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software))!
 * Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
@@ -43,7 +43,7 @@ Documentation for BCM and its components can be found in this repository. All do
 
 The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your machine. These instructions assume you're running some recent Debian distribution. Windows and MacOS products are not directly supported, though you can always run Ubuntu in a VM.
 
-You start start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) on your machine then you configure your local `git` client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.) Note that future BCM versions will be accessible using [IPFS](https://ipfs.io/).
+You start start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) on your machine then you configure your local `git` client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
 
 ```bash
 sudo apt-get update
@@ -65,17 +65,17 @@ cd $BCM_LOCAL_GIT_REPO_DIR
 
 Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_LOCAL_GIT_REPO_DIR' variable.
 
-`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The CLI help output guides you on how to use the CLI. In general, the steps you take to deploy your own infrastructure is as follows:
+`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI appending some updates `~/.profile`. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The CLI `--help` output guides you on how to use the CLI. In general, the steps you take to deploy your own infrastructure is as follows:
 
-1) download BCM from github and run setup to configure your environment (done above).
-2) Run `bcm init`, which downloads and installs BCM dependencies, creates docker images for the management plane (Trezor integration)
-, and creates GPG certificates.
-3) Create a cluster by running `bcm cluster create`. Clusters are where your BCM projects actually run.
-4) Create one or more BCM Project definitions using `bcm project create`. A BCM project defintion represents the containerized software stack you want deployed.
-5) Deploy a BCM Project defintion (software stack) to an exiting BCM Cluster using `bcm project deploy`. New root GPG certificates are created in this step as well. This is for [separation-of-duties](https://en.wikipedia.org/wiki/Separation_of_duties) concerns, and to allow for [multi-tenancy](https://en.wikipedia.org/wiki/Multitenancy).
+1) Download BCM from github and run setup to configure your environment (done above).
+2) Run `bcm init`, which initializes your management host. This command downloads and installs BCM software dependencies including docker-ce. `bcm init` builds the relevant docker images used at the management computer including Trezor integragration.
+3) Create a cluster by running `bcm cluster create`. Clusters are where BCM projects actually run; i.e., where BCM projects are deployed to. A BCM cluster is defined as one or more LXD endpoints with a private networking environment that is low latency and high bandwidth, such as a home or office LAN.
+4) Create one or more BCM Projects using `bcm project create`. A BCM Project represents the containerized software stack you want deployed.
+5) Deploy a BCM Project to a BCM Cluster using `bcm project deploy`. Deployment-specific GPG certificates are created in this step. You can deploy multiple instances of a project to the same cluster. Each deployment operates independently from other deployments on the same cluster and can be used for things like development pipelines, e.g., testing, staging, business1, business 2, etc.. Production workloads SHOULD be executed on BCM Clusters with AT LEAST 3 indepdent hardware failure domains. 
 
+You can quickly see what the BCM CLI is capable of by running [`./demo/up_demo.sh`](./demo/up_demo.sh). This script uses the BCM CLI to automatically deploy a Bitcoin Core full node and c-lightning to your local machine. BCM CLI commands automatically install needed software dependencies for you automatically. `up_demo.sh` deploys the BCM Project `BCMSparkStack` which exposes the c-lightning RPC interface as an authenticated onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project. This approach allows you to defined the software stack that meets your particular needs.
 
-If you just want to quickly see what Bitcoin Cache Machine is capable of, visit [./demo](./demo/). [`./demo/up_demo.sh`](./demo/up_demo.sh) is a script that uses the BCM CLI to automatically deploy a Bitcoin Core full node, c-lightning, and Spark, a cross-platform web-based GUI. `up_demo.sh` provides an example of exposing a component service over an authenticated onion service..
+> NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu 18.04 (Desktop or Server).
 
 ## How to contribute
 

@@ -6,8 +6,6 @@ For the `untrusted outside` interface, macvlan is used to obtain an IP address a
 
 It's important to understand that the network `bcmnet` can be configured to attach to a physical LAN segment. This is required when you want to run your home or office network on more than one computer which is required if you require any kind of scale or if you need to run a component on specialized hardware (e.g., Bitcoin miner or IoT sensors).
 
-To configure `gateway` to provide network services to a physical LAN segment (e.g., switch on a home/office network) ensure $BCM_GATEWAY_ATTACH_TO_UNDERLAY="true". The the $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE must also be specified. $BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE is the physical network interface of the computer hosting the `gateway` LXC container. Type `lxc network list` to show network interfaces known to LXD. LXC container `bcm-gateway` physically attached to the BCM_GATEWAY_PHYSICAL_TRUSTED_INSIDE_INTERFACE, so `bcm-gateway` has exclusive control of the physical network interface.
-
 ## Required Services provided by `bcm-gateway`
 
 ## DHCP 

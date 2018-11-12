@@ -9,7 +9,6 @@
 
 # remove any legacy lxd software and install install lxd via snap
 if [[ -z $(snap list | grep lxd) ]]; then
-    echo "LXD snap package not found. Installing."
 
     # if the lxd groups doesn't exist, create it.
     if [[ -z $(cat /etc/group | grep lxd) ]]; then
