@@ -37,7 +37,7 @@ lxc start $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
 
 sleep 10
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/wait_for_dockerd.sh $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME"
+../shared/wait_for_dockerd.sh --container-name=$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
 
 #we're going to update the docker daemon to use the HTTP/HTTPs proxy on gateway.
 lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/systemd/system/docker.service.d

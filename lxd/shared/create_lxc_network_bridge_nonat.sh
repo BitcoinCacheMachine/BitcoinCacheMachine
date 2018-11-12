@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ $1 = "true" ]]; then
-    # create the lxdbrGateway network if it doesn't exist.
+    # create the bcmbrGWNat network if it doesn't exist.
     if [[ -z $(lxc network list | grep $2) ]]; then
         if [[ -z $3 ]]; then
             # a bridged network network for mgmt and outbound NAT by hosts.

@@ -95,7 +95,6 @@ if [ ! -d $BCM_ENDPOINT_DIR ]; then
 fi
 
 ./stub_env.sh --endpoint-name="$BCM_CLUSTER_MASTER_NAME" --master --endpoint-dir="$BCM_ENDPOINT_DIR" --provider="$BCM_PROVIDER_NAME"
-
 source $BCM_ENDPOINT_DIR/.env
 
 # substitute the variables in lxd_master_preseed.yml

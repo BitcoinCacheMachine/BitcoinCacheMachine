@@ -1,43 +1,47 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -eu
-
-# set the working directory to the location where the script is located
 cd "$(dirname "$0")"
-
-# get the current directory where this script is so we can reference it later.
-SCRIPT_DIR=$(pwd)
-
-# delete container 'bcm-gateway'
-if [[ $BCM_GATEWAY_CONTAINER_DELETE = "true" ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_container.sh $BCM_LXC_GATEWAY_CONTAINER_NAME"
-fi
-
-# delete BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME
-if [[ $BCM_GATEWAY_STORAGE_DOCKERVOL_DELETE = "true" ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_storage.sh $BCM_LXC_GATEWAY_STORAGE_DOCKERVOL_NAME"
-fi
+source ./defaults.sh
 
 
-if [[ $1 == "template" ]]; then
+
+for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME); do
+    #echo $endpoint
+    HOST_ENDING=$(echo $endpoint | tail -c 2)
+    LXD_CONTAINER_NAME=bcm-gateway-$(printf %02d $HOST_ENDING)
+    # let's kill a bcm-gateway LXC instance on each cluster endpoint.
+    if [[ ! -z $(lxc list | grep $LXD_CONTAINER_NAME) ]]; then
+        lxc delete $LXD_CONTAINER_NAME --force
+    fi
+done
+
+if [[ $BCM_REMOVE_TEMPLATE_FLAG == 1 ]]; then
     # delte container gateway-template
-    if [[ $BCM_GATEWAY_CONTAINER_TEMPLATE_DELETE = "true" ]]; then
-        bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_container.sh $BCM_LXC_GATEWAY_CONTAINER_TEMPLATE_NAME"
+    if [[ $BCM_GATEWAY_CONTAINER_TEMPLATE_DELETE = 1 ]]; then
+        if [[ ! -z $(lxc list | grep "bcm-template") ]]; then
+            lxc delete bcm-template --force
+        fi
     fi
 
-    # delete the profile bcm-gateway-profile
-    if [[ $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_DELETE = "true" ]]; then
-        bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_profile.sh bcm-gateway-profile"
+    if [[ ! -z $(lxc network list | grep bcmbrGWNat) ]]; then
+        lxc network delete bcmbrGWNat
     fi
     
-    # delete lxc networks
-    if [[ $BCM_GATEWAY_NETWORKS_DELETE = "true" ]]; then
-        bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_network.sh lxdbrGateway"
-    fi
-
-    if [[ $BCM_GATEWAY_NETWORKS_DELETE = "true" ]]; then
-        bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_network.sh lxdbrBCMNET"
+    if [[ ! -z $(lxc network list | grep bcmNet) ]]; then
+        lxc network delete bcmNet
     fi
 fi
 
-rm -rf $BCM_RUNTIME_DIR/runtime/$(lxc remote get-default)/$BCM_LXC_GATEWAY_CONTAINER_NAME
+
+
+# this deletes the image from the cluster.
+lxc image delete bcm-gateway-template
+
+
+# delete the profile bcm-gateway-profile
+if [[ $BCM_GATEWAY_PROFILE_GATEWAYPROFILE_DELETE = 1 ]]; then
+    if [[ ! -z $(lxc profile list | grep "bcm-gateway-profile") ]]; then
+        lxc profile delete bcm-gateway-profile
+    fi
+fi

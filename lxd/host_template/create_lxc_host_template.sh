@@ -2,85 +2,81 @@
 
 set -eu
 cd "$(dirname "$0")"
+source ./defaults.sh
 
 if [[ ! -z $(lxc image list | grep bcm-template) ]]; then
     echo "The LXD image 'bcm-template' already exists. Exiting."
     exit
 fi
 
-
-
-
 echo "LXC image 'bcm-template' does not exist. Creating one."
 # only execute if bcm_zfs is non-zero
 if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
     # initialize the lxc container to the active lxd endpoint.
-    
-    #create and populate the required networks
-    if [[ -z $(lxc network list | grep bcmbr0) ]]; then
+    for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME); do
+        lxc network create --target $endpoint bcmbr0
+    done
+
+    if [[ ! -z $(lxc network list | grep bcmbr0 | grep PENDING) ]]; then
         lxc network create bcmbr0
     fi
 
-    lxc init bcm-bionic-base -p bcm_default -p docker_privileged -n bcmbr0 dockertemplate
-    lxc start dockertemplate
+    sleep 2
+    
+    lxc init bcm-bionic-base -p bcm_default -p docker_privileged -n bcmbr0 $BCM_HOSTTEMPLATE_NAME
+
+    lxc start $BCM_HOSTTEMPLATE_NAME
+else
+    echo "LXC image 'bcm-bionic-base' was not found. Exiting."
+    exit
 fi
 
-sleep 10
+sleep 5
 
 # TODO provide configuration item to route these requests over local TOR proxy
 echo "Installing required software on dockertemplate."
-#lxc exec dockertemplate -- apt-get install tor wait-for-it
-#lxc file push ./torrc dockertemplate/etc/tor/torrc
-#lxc exec dockertemplate -- service tor restart
-#lxc exec dockertemplate -- wait-for-it -t 0 127.0.11.1:9050
-
-# install docker - the script get-docker.sh does an apt-get update
-lxc file push get-docker.sh dockertemplate/root/get-docker.sh
-lxc exec dockertemplate -- bash -c "/root/get-docker.sh" >>/dev/null
-lxc exec dockertemplate -- rm /root/get-docker.sh
-
+lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get update
+lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install docker.io -qq
 
 if [[ $BCM_DEBUG = 1 ]]; then
-    lxc exec dockertemplate -- apt-get install -y jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump
+    lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump -qq
 fi
 
-#p the current template dockerd instance since we're about to create a snapshot
-#Enable the docker daemon to start by default.
-lxc exec dockertemplate -- systemctl stop docker
-lxc exec dockertemplate -- systemctl enable docker
 
 ## checking if this alleviates docker swarm troubles in lxc.
 #https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
-lxc exec dockertemplate -- touch /.dockerenv
+lxc exec $BCM_HOSTTEMPLATE_NAME -- touch /.dockerenv
+lxc exec $BCM_HOSTTEMPLATE_NAME -- mkdir -p /etc/docker
 
-lxc file push ./sysctl.conf dockertemplate/etc/sysctl.conf
-lxc exec dockertemplate -- chmod 0644 /etc/sysctl.conf
+# this helps suppress some warning messages.  TODO
+lxc file push ./sysctl.conf $BCM_HOSTTEMPLATE_NAME/etc/sysctl.conf
+lxc exec $BCM_HOSTTEMPLATE_NAME -- chmod 0644 /etc/sysctl.conf
 
-lxc exec dockertemplate -- apt-get autoremove -y
-lxc exec dockertemplate -- apt-get clean
-lxc exec dockertemplate -- rm -rf /tmp/*
+# clean up the image before publication
+lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get autoremove -qq
+lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get clean -qq
+lxc exec $BCM_HOSTTEMPLATE_NAME -- rm -rf /tmp/*
 
-# stop the template since we don't need it running anymore.
-lxc stop dockertemplate
+lxc exec $BCM_HOSTTEMPLATE_NAME -- systemctl stop docker
+lxc exec $BCM_HOSTTEMPLATE_NAME -- systemctl enable docker
 
-lxc profile remove dockertemplate docker_privileged
-lxc network detach bcmbr0 dockertemplate
-#lxc network delete bcmbr0
+#stop the template since we don't need it running anymore.
+lxc stop $BCM_HOSTTEMPLATE_NAME
+lxc profile remove $BCM_HOSTTEMPLATE_NAME docker_privileged
+lxc network detach bcmbr0 $BCM_HOSTTEMPLATE_NAME
 
-echo "Creating a snapshot of the lxd host 'dockertemplate' called 'bcmHostSnapshot'."
-lxc snapshot dockertemplate bcmHostSnapshot
+# echo "Creating a snapshot of the lxd host 'dockertemplate' called 'bcmHostSnapshot'."
+lxc snapshot $BCM_HOSTTEMPLATE_NAME bcmHostSnapshot
 
-# only do publish the 'bcm-template' if it doesn't exist already.
-if [[ -z $(lxc image list -c l | grep "bcm-template") ]]; then
-    # if instructed, serve the newly created snapshot to trusted LXD hosts.
-    if [[ $(lxc list | grep dockertemplate) ]]; then
-        if [[ $BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC = "true" ]]; then
-            # if the template doesn't exist, publish it so remote clients can reach it.
-            echo "Publishing dockertemplate/bcmHostSnapshot as a public lxd image 'bcm-template' on cluster '$(lxc remote get-default)'."
-            lxc publish dockertemplate/bcmHostSnapshot --alias bcm-template --public
-        else
-            echo "Publishing dockertemplate/bcmHostSnapshot as non-public lxd image cluster '$(lxc remote get-default)'."
-            lxc publish dockertemplate/bcmHostSnapshot --alias bcm-template
-        fi
+# if instructed, serve the newly created snapshot to trusted LXD hosts.
+if [[ $(lxc list | grep "$BCM_HOSTTEMPLATE_NAME") ]]; then
+    if [[ $BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC = 1 ]]; then
+        # if the template doesn't exist, publish it so remote clients can reach it.
+        echo "Publishing $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot as a public lxd image 'bcm-template' on cluster '$(lxc remote get-default)'."
+        lxc publish $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot --alias bcm-template 
+        #--public
+    else
+        echo "Publishing $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot as non-public lxd image cluster '$(lxc remote get-default)'."
+        lxc publish $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot --alias bcm-template
     fi
 fi

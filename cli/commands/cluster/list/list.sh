@@ -1,38 +1,35 @@
 #!/bin/bash
 
 set -eu
+cd "$(dirname "$0")"
 
-if [[ ! -d $BCM_CLUSTER_DIR ]]; then
-    mkdir -p $BCM_CLUSTER_DIR
+if [[ $BCM_HELP_FLAG = 1 ]]; then
+    cat ./help.txt
+    exit
 fi
 
-if [[ $(ls -l $BCM_CLUSTER_DIR | grep -c ^d) = "0" ]]; then
+if [[ ! -d $BCM_CLUSTERS_DIR ]]; then
+    echo "$BCM_CLUSTERS_DIR does not exist. You may need to re-run 'bcm init'."
     exit
-else
-    cd $BCM_CLUSTER_DIR
-    for cluster in `ls -d */ | sed 's/.$//'`; do
-        if [[ ! -z $cluster ]]; then
-            if [[ $BCM_SHOW_ENDPOINTS_FLAG = 1 ]]; then
-                if [[ ! -z $BCM_CLUSTER_NAME ]]; then
-                    if [[ $BCM_CLUSTER_NAME = "$cluster" ]]; then
-                        ENDPOINTS_DIR=$BCM_BCM_CLUSTER_DIR/
-                        if [[ $(ls -l $ENDPOINTS_DIR | grep -c ^d) = "0" ]]; then
-                            exit
-                        else
-                            cd $ENDPOINTS_DIR
-                            for endpoint in `ls -d */ | sed 's/.$//'`; do
-                                echo "$endpoint"
-                            done
-                            cd - >> /dev/null
-                        fi
-                    fi
-                else
-                    echo "BCM_CLUSTER_NAME flag was set to true, but no cluster name was given."
-                fi
-            else
-                echo "$cluster"
-            fi
-        fi
+fi
+
+if [[ $BCM_ENDPOINTS_FLAG = 1 ]]; then
+    if [[ -z $BCM_CLUSTER_NAME ]]; then
+        echo "BCM_CLUSTER_NAME must be set."
+        cat ./help.txt
+        exit
+    fi
+    
+    # Let's display the deployed endpoints.
+    cd $BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME/endpoints >>/dev/null
+    for clusterEndpoint in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
+        echo "$clusterEndpoint"
     done
-    cd - >> /dev/null
+    cd - >>/dev/null
+else
+    cd $BCM_CLUSTERS_DIR >>/dev/null
+    for cluster in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
+        echo "$cluster"
+    done
+    cd - >>/dev/null
 fi

@@ -3,7 +3,7 @@ config:
   core.trust_password: $BCM_LXD_SECRET
 storage_pools:
 - config:
-    size: 1GB
+    size: 10GB
   description: "ZFS storage backend for BCM system containers."
   name: bcm_zfs
   driver: zfs

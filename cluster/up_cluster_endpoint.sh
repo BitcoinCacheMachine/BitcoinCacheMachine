@@ -59,18 +59,16 @@ if [[ -z $BCM_PROVIDER_NAME ]]; then
   exit
 fi
 
-BCM_LISTEN_INTERFACE=
-if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
-  BCM_LISTEN_INTERFACE=ens3
-elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
-  echo "TODO PASS IN PHYSICAL INTERFACE FOR baremetal"
-  BCM_LISTEN_INTERFACE=eno1
-fi
-
 # prepare the cloud-init file
 if [[ $BCM_PROVIDER_NAME != "baremetal" ]]; then
   if [[ -f $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml ]]; then
     export BCM_CLUSTER_MASTER_LXD_PRESEED=$(cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | awk '{print "      " $0}')
+    
+    BCM_LISTEN_INTERFACE=
+    if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
+      BCM_LISTEN_INTERFACE=ens3
+    fi
+    
     export BCM_LISTEN_INTERFACE=$BCM_LISTEN_INTERFACE
     envsubst < ./cloud_init_template.yml > $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml
   fi

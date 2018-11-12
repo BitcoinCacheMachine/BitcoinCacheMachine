@@ -4,12 +4,9 @@
 # BCM-related LXD and multipass scripts against (local) or remote LXD
 # endpoints.
 
-# quit if there's an error
 set -e
-
-# set the working directory to the location where the script is located
-# since all file references are relative to this script
 cd "$(dirname "$0")"
+
 
 # first a common problem with new installations is that git itsn't fully configured.
 # let's test for this condition and quit if necessary.
@@ -55,7 +52,7 @@ else
 fi
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please open a new terminal session to refresh your envronment, then typ 'bcm' to continue."
-
+export PATH=$PATH/$BCM_LOCAL_GIT_REPO_DIR
 
 
 
@@ -77,7 +74,5 @@ echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Please 
 #   # this is what we will install on all BCM LXC hosts as the root certificate to trust; any cert signed by rootca.key will be trusted
 #   # and will be used as trust/authentication boundary, i.e., one self-signed Root CA per BIP32 path.
 #   openssl req -x509 -subj "/C=US/ST=BCM/L=INTERNET/O=BCM/CN=BCM ROOT CA" -new -nodes -key $BCM_RUNTIME_DIR/certs/rootca.key -sha256 -days 365 -out $BCM_RUNTIME_DIR/certs/rootca.cert
-
-else
 #   echo "BCM certs directory exists at $BCM_RUNTIME_DIR/certs"
 # fi

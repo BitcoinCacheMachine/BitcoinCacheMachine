@@ -33,13 +33,11 @@ case $i in
 esac
 done
 
-
 if [[ $BCM_DEBUG = 1 ]]; then
-    export BCM_DEBUG=$BCM_DEBUG
-    echo "BCM_CERTS_DIR: $BCM_CERTS_DIR"
-    echo "BCM_PROJECTS_DIR: $BCM_PROJECTS_DIR"
-    echo "BCM_CLUSTERS_DIR: $BCM_CLUSTERS_DIR"
-    echo "BCM_PASSWORDS_DIR: $BCM_PASSWORDS_DIR"
+    cat "BCM_CERTS_DIR: $BCM_CERTS_DIR" >>$BCM_CERTS_DEBUG_FILE
+    cat "BCM_PROJECTS_DIR: $BCM_PROJECTS_DIR" >>$BCM_CERTS_DEBUG_FILE
+    cat "BCM_CLUSTERS_DIR: $BCM_CLUSTERS_DIR" >>$BCM_CERTS_DEBUG_FILE
+    cat "BCM_PASSWORDS_DIR: $BCM_PASSWORDS_DIR" >>$BCM_CERTS_DEBUG_FILE
 fi
 
 # make sure docker is isstalled. Doing it here makes sure we don't have to
@@ -51,6 +49,8 @@ if [[ $BCM_DEBUG = "true" ]]; then
 fi
 
 export BCM_HELP_FLAG=$BCM_HELP_FLAG
+export BCM_FORCE_FLAG=$BCM_FORCE_FLAG
+export BCM_DEBUG=$BCM_DEBUG
 
 if [[ $BCM_CLI_COMMAND = "init" ]]; then 
     ./init.sh "$@"
@@ -64,6 +64,8 @@ elif [[ $BCM_CLI_COMMAND = "file" ]]; then
     ./file/entrypoint.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "info" ]]; then
     bash -c './info.sh "$@"'
+elif [[ $BCM_CLI_COMMAND = "show" ]]; then
+    $BCM_LOCAL_GIT_REPO_DIR/lxd/show_lxd.sh
 else
     cat ./help.txt
 fi
