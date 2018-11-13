@@ -1,0 +1,50 @@
+version: '3.6'
+services:
+  registry-mirror:
+    image: registry:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - registrymirrorimage-data:/data
+    # environment:
+    #   REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
+    configs:
+      - source: regmirror_config
+        target: /etc/docker/registry/config.yml
+        uid: '33'
+        gid: '33'
+        mode: 0640
+    # secrets:
+    #   - source: regmirror_tls_cert
+    #     target: /var/lib/registry/regmirror:5000.cert
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0400
+    #   - source: regmirror_tls_key
+    #     target: /var/lib/registry/regmirror:5000.key
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0400
+    #   - source: regmirror_ca_crt
+    #     target: /var/lib/registry/ca.crt
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0400
+    deploy:
+      mode: replicated
+      replicas: 1
+
+# secrets:
+#   regmirror_tls_cert:
+#     file: regmirror.cert
+#   regmirror_tls_key:
+#     file: regmirror.key
+#   regmirror_ca_crt:
+#     file: ca.crt
+
+configs:
+  regmirror_config:
+    file: config.yml
+
+volumes:
+  registrymirrorimage-data:

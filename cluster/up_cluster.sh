@@ -72,13 +72,7 @@ else
     echo "Invalid BCM_PROVIDER_NAME"
 fi
 
-
-##### Let's start by creating the master.
-if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
-    BCM_CLUSTER_ENDPOINT_NAME=`hostname`
-else
-    BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-00"
-fi
+BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-01"
 BCM_CLUSTER_MASTER_NAME=$BCM_CLUSTER_ENDPOINT_NAME
 
 # if $BCM_RUNTIME_DIR/clusters doesn't exist, create it.
@@ -143,7 +137,7 @@ if [[ $BCM_CLUSTER_NODE_COUNT -ge 2 ]]; then
 
     # spin up some member nodes
     echo "Member Count: $BCM_CLUSTER_NODE_COUNT"
-    for i in $(seq -f %02g 1 $BCM_CLUSTER_NODE_COUNT)
+    for i in $(seq -f %02g 2 $BCM_CLUSTER_NODE_COUNT)
     do
         echo "$BCM_CLUSTER_NAME-$i"
         export BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-$i"

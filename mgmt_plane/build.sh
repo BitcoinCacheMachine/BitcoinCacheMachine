@@ -10,3 +10,6 @@ else
     echo "Updating docker image bcm-trezor:latest ..."
     docker build -t bcm-trezor:latest . >> /dev/null
 fi
+
+
+docker pull ipfs/go-ipfs

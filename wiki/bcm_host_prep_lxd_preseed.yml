@@ -9,7 +9,7 @@ cluster: null
 
 # Storage pools
 storage_pools:
-- name: bcm_zfs
+- name: bcm_btrfs
   driver: zfs
   config:
     source: my-zfs-pool/my-zfs-dataset
@@ -28,7 +28,7 @@ profiles:
   devices:
     root:
       path: /
-      pool: bcm_zfs
+      pool: bcm_btrfs
       type: disk
 
 # - name: test-profile

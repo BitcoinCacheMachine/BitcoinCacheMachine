@@ -1,0 +1,43 @@
+version: '3.6'
+services:
+  private-registry:
+    image: registry:latest
+    ports: 
+      - "443:5000"
+    volumes:
+      - private-registry-data:/data
+    # environment:
+    #   REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
+    configs:
+      - source: regmirror_config
+        target: /etc/docker/registry/config.yml
+        uid: '33'
+        gid: '33'
+        mode: 0640
+    # secrets:
+    #   - source: privreg_tls_cert
+    #     target: /var/lib/registry/privreg.cert
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0400
+    #   - source: privreg_tls_key
+    #     target: /var/lib/registry/privreg.key
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0400
+    deploy:
+      mode: replicated
+      replicas: 1
+
+volumes:
+  private-registry-data:
+
+# secrets:
+#   privreg_tls_cert:
+#     file: "privreg.cert"
+#   privreg_tls_key:
+#     file: "privreg.key"
+
+configs:
+  regmirror_config:
+    file: config.yml

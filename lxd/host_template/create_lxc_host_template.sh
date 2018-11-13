@@ -10,14 +10,24 @@ if [[ ! -z $(lxc image list | grep bcm-template) ]]; then
 fi
 
 echo "LXC image 'bcm-template' does not exist. Creating one."
-# only execute if bcm_zfs is non-zero
+# only execute if bcm_btrfs is non-zero
 if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
     # initialize the lxc container to the active lxd endpoint.
+    MASTER_NODE=$(lxc info | grep "server_name: $(lxc remote get-default)" |  awk 'NF>1{print $NF}')
     for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME); do
-        lxc network create --target $endpoint bcmbr0
+        if [ "$endpoint" != "$MASTER_NODE" ]; then
+            source $BCM_CLUSTER_DIR/endpoints/$endpoint/.env
+            echo "BCM_LXD_PHYSICAL_INTERFACE: $BCM_LXD_PHYSICAL_INTERFACE"
+            if [[ ! -z $(lxc network list | grep "$BCM_LXD_PHYSICAL_INTERFACE") ]]; then
+                lxc network create --target $endpoint bcmbr0 bridge.external_interfaces=$BCM_LXD_PHYSICAL_INTERFACE
+            else
+                echo "The physical network interface isn't known the the LXD daemon. Can't configure parent interface on bcmbr0."
+                exit
+            fi
+        fi
     done
 
-    if [[ ! -z $(lxc network list | grep bcmbr0 | grep PENDING) ]]; then
+    if [[ -z $(lxc network list | grep bcmbr0) ]]; then
         lxc network create bcmbr0
     fi
 
@@ -36,7 +46,14 @@ sleep 5
 # TODO provide configuration item to route these requests over local TOR proxy
 echo "Installing required software on dockertemplate."
 lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get update
-lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install docker.io -qq
+
+# docker.io is the only package that seems to work seamlessly with
+# storage backends. Using BTRFS since docker recognizes underlying file system
+lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install docker.io wait-for-it -qq
+
+# lxc file push ./get-docker.sh $BCM_HOSTTEMPLATE_NAME/root/get-docker.sh
+# lxc exec $BCM_HOSTTEMPLATE_NAME -- chmod +x /root/get-docker.sh
+# lxc exec $BCM_HOSTTEMPLATE_NAME -- bash -c /root/get-docker.sh
 
 if [[ $BCM_DEBUG = 1 ]]; then
     lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump -qq

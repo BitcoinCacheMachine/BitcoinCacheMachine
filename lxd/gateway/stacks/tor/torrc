@@ -1,6 +1,6 @@
 
-SocksPort 127.0.15.1:9050
-DNSPort 127.0.15.1:9053
+SocksPort 0.0.0.0:9050
+DNSPort 0.0.0.0:9053
 
 # Log err to info
 Log info file /var/log/tor/tor.log

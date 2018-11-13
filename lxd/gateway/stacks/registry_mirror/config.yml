@@ -1,0 +1,14 @@
+version: 0.1
+storage:
+  filesystem:
+    rootdirectory: /data
+http:
+  addr: :5000
+  host: https://192.168.4.1:5000
+  # tls:
+  #   certificate: /var/lib/registry/192.168.4.1:5000.cert
+  #   key: /var/lib/registry/192.168.4.1:5000.key
+  #   clientcas:
+  #     - /var/lib/registry/ca.crt
+proxy:
+  remoteurl: https://registry-1.docker.io

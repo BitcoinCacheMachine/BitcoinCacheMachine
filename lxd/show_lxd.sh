@@ -13,6 +13,10 @@ echo "LXD storage:"
 lxc storage list
 
 echo ""
+echo "LXD storage bcm_btrfs volumes:"
+lxc storage volume list bcm_btrfs
+
+echo ""
 echo "LXD profiles:"
 lxc profile list
 

@@ -8,7 +8,7 @@ config:
           - type: dhcp
             ipv4: true
             control: auto
-        
+      
 devices:
   eth0:
     nictype: bridged

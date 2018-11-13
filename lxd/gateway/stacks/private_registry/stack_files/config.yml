@@ -1,9 +1,0 @@
-version: 0.1
-storage:
-  filesystem:
-    rootdirectory: /data
-http:
-  addr: :5000
-  tls:
-    certificate: /var/lib/registry/privreg.cert
-    key: /var/lib/registry/privreg.key

@@ -4,16 +4,16 @@ config:
 storage_pools:
 - config:
     size: 10GB
-  description: "ZFS storage backend for BCM system containers."
-  name: bcm_zfs
-  driver: zfs
+  description: "BTRFS storage backend for BCM system containers."
+  name: bcm_btrfs
+  driver: btrfs
 profiles:
 - config: {}
-  description: "Default BCM profile. Has ZFS backend only; no networking."
+  description: "Default BCM profile. Has BTRFS backend only; no networking."
   devices:
     root:
       path: /
-      pool: bcm_zfs
+      pool: bcm_btrfs
       type: disk
   name: bcm_default
 cluster:

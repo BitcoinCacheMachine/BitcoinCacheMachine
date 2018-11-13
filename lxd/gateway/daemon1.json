@@ -1,0 +1,7 @@
+{
+    "storage-driver": "btrfs",
+    "registry-mirrors": ["http://192.168.4.1:5000"],
+    "insecure-registries": [ "http://192.168.4.1:443" ],
+    "labels": [ "bcm.gateway=true" ],
+    "ip": "192.168.4.1"
+}

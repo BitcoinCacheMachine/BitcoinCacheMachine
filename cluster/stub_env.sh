@@ -44,7 +44,17 @@ export BCM_CLUSTER_ENDPOINT_NAME=$BCM_CLUSTER_ENDPOINT_NAME
 export BCM_PROVIDER_NAME=$BCM_PROVIDER_NAME
 export BCM_LXD_SECRET=$(apg -n 1 -m 30 -M CN)
 export BCM_DOCKERVOL_BLK_BACKEND=/media/derek/ELEMENTS/bcmdockervol
+BCM_LXD_PHYSICAL_INTERFACE=
 
+if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
+    BCM_LXD_PHYSICAL_INTERFACE=ens3
+elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
+    BCM_LXD_PHYSICAL_INTERFACE=eno1
+else
+    BCM_LXD_PHYSICAL_INTERFACE=error
+fi
+
+export BCM_LXD_PHYSICAL_INTERFACE=$BCM_LXD_PHYSICAL_INTERFACE
 
 if [ $IS_MASTER -eq 1 ]; then
     envsubst < ./env/master_defaults.env > $ENV_FILE
