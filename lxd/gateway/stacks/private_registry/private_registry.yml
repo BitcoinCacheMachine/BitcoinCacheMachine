@@ -3,10 +3,11 @@ services:
   private-registry:
     image: registry:latest
     ports: 
-      - "443:5000"
+      - "5005:5000"
     volumes:
       - private-registry-data:/data
-    # environment:
+    environment:
+      BCM_REGISTRY_HOSTNAME: ${TARGET_HOST}
     #   REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
     configs:
       - source: regmirror_config
@@ -26,8 +27,10 @@ services:
     #     gid: '0'
     #     mode: 0400
     deploy:
-      mode: replicated
       replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ${TARGET_HOST}
 
 volumes:
   private-registry-data:

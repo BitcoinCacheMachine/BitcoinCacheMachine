@@ -1,4 +1,4 @@
-FROM bcm-base:latest
+FROM bcm-gateway-01:443/bcm-base:latest
 RUN apt-get install -y tor
 RUN tor --version
 

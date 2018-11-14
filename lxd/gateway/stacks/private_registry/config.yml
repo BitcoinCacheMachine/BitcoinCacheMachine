@@ -4,6 +4,7 @@ storage:
     rootdirectory: /data
 http:
   addr: :5000
+  host: https://$BCM_REGISTRY_HOSTNAME:5005
   # tls:
   #   certificate: /var/lib/registry/privreg.cert
   #   key: /var/lib/registry/privreg.key

@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   torproxy:
-    image: 192.168.4.1:443/bcm-tor:latest
+    image: bcm-gateway-01:443/bcm-tor:latest
     ports:
       - "9050:9050/tcp"
       - "9053:9053/udp"
@@ -12,9 +12,10 @@ services:
         gid: '33'
         mode: 0640
     deploy:
+      mode: global
       placement:
         constraints:
-          - engine.labels.bcm.gateway == true
+          - node.role == manager
 
 configs:
   tor_config:

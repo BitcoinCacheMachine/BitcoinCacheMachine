@@ -20,7 +20,7 @@ There are many areas where your privacy can be compromised if you're not careful
 
 Below you will find some of the development goals for Bitcoin Cache Machine:
 
-* Provide a self-contained, event-driven, software-defined data that focuses on operational Bitcoin and Lightning-related IT infrastructure.
+* Provide a self-contained, distributed, event-driven, software-defined data center that focuses on operational Bitcoin and Lightning-related IT infrastructure.
 * Run entirely on commodity x86_x64 hardware for home and small office settings.
 * Integrate exclusively free and open source software ([FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software))!
 * Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
@@ -65,15 +65,15 @@ cd $BCM_LOCAL_GIT_REPO_DIR
 
 Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_LOCAL_GIT_REPO_DIR' variable.
 
-`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI appending some updates `~/.profile`. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The CLI `--help` output guides you on how to use the CLI. In general, the steps you take to deploy your own infrastructure is as follows:
+`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The CLI `--help` output guides you on how to use the CLI. In general, the steps you take to deploy your own infrastructure is as follows:
 
 1) Download BCM from github and run setup to configure your environment (done above).
 2) Run `bcm init`, which initializes your management host. This command downloads and installs BCM software dependencies including docker-ce. `bcm init` builds the relevant docker images used at the management computer including Trezor integragration.
 3) Create a cluster by running `bcm cluster create`. Clusters are where BCM projects actually run; i.e., where BCM projects are deployed to. A BCM cluster is defined as one or more LXD endpoints with a private networking environment that is low latency and high bandwidth, such as a home or office LAN.
 4) Create one or more BCM Projects using `bcm project create`. A BCM Project represents the containerized software stack you want deployed.
-5) Deploy a BCM Project to a BCM Cluster using `bcm project deploy`. Deployment-specific GPG certificates are created in this step. You can deploy multiple instances of a project to the same cluster. Each deployment operates independently from other deployments on the same cluster and can be used for things like development pipelines, e.g., testing, staging, business1, business 2, etc.. Production workloads SHOULD be executed on BCM Clusters with AT LEAST 3 indepdent hardware failure domains. 
+5) Deploy a BCM Project to a BCM Cluster using `bcm project deploy`. Deployment-specific GPG certificates are created in this step. You can deploy multiple instances of a project to the same cluster.
 
-You can quickly see what the BCM CLI is capable of by running [`./demo/up_demo.sh`](./demo/up_demo.sh). This script uses the BCM CLI to automatically deploy a Bitcoin Core full node and c-lightning to your local machine. BCM CLI commands automatically install needed software dependencies for you automatically. `up_demo.sh` deploys the BCM Project `BCMSparkStack` which exposes the c-lightning RPC interface as an authenticated onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project. This approach allows you to defined the software stack that meets your particular needs.
+sTODO: You can quickly see what the BCM CLI is capable of by running [`./demo/up_demo.sh`](./demo/up_demo.sh). This script uses the BCM CLI to automatically deploy a Bitcoin Core full node and c-lightning to your local machine. BCM CLI commands automatically install needed software dependencies for you automatically. `up_demo.sh` deploys the BCM Project `BCMSparkStack` which exposes the c-lightning RPC interface as an authenticated onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project. This approach allows you to defined the software stack that meets your particular needs.
 
 > NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu 18.04 (Desktop or Server).
 

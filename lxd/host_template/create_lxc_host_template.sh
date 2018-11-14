@@ -13,26 +13,10 @@ echo "LXC image 'bcm-template' does not exist. Creating one."
 # only execute if bcm_btrfs is non-zero
 if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
     # initialize the lxc container to the active lxd endpoint.
-    MASTER_NODE=$(lxc info | grep "server_name: $(lxc remote get-default)" |  awk 'NF>1{print $NF}')
-    for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME); do
-        if [ "$endpoint" != "$MASTER_NODE" ]; then
-            source $BCM_CLUSTER_DIR/endpoints/$endpoint/.env
-            echo "BCM_LXD_PHYSICAL_INTERFACE: $BCM_LXD_PHYSICAL_INTERFACE"
-            if [[ ! -z $(lxc network list | grep "$BCM_LXD_PHYSICAL_INTERFACE") ]]; then
-                lxc network create --target $endpoint bcmbr0 bridge.external_interfaces=$BCM_LXD_PHYSICAL_INTERFACE
-            else
-                echo "The physical network interface isn't known the the LXD daemon. Can't configure parent interface on bcmbr0."
-                exit
-            fi
-        fi
-    done
-
-    if [[ -z $(lxc network list | grep bcmbr0) ]]; then
-        lxc network create bcmbr0
-    fi
+    ./create_network.sh
 
     sleep 2
-    
+
     lxc init bcm-bionic-base -p bcm_default -p docker_privileged -n bcmbr0 $BCM_HOSTTEMPLATE_NAME
 
     lxc start $BCM_HOSTTEMPLATE_NAME
@@ -90,7 +74,7 @@ if [[ $(lxc list | grep "$BCM_HOSTTEMPLATE_NAME") ]]; then
     if [[ $BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC = 1 ]]; then
         # if the template doesn't exist, publish it so remote clients can reach it.
         echo "Publishing $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot as a public lxd image 'bcm-template' on cluster '$(lxc remote get-default)'."
-        lxc publish $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot --alias bcm-template 
+        lxc publish $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot --alias bcm-template
         #--public
     else
         echo "Publishing $BCM_HOSTTEMPLATE_NAME/bcmHostSnapshot as non-public lxd image cluster '$(lxc remote get-default)'."

@@ -4,10 +4,9 @@ set -eu
 cd "$(dirname "$0")"
 source ./env.sh
 
-
 bcm project undeploy --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --remove-template
 
-bcm project destroy --yproject-name="$BCM_PROJECT_NAME"
+bcm project destroy --project-name="$BCM_PROJECT_NAME"
 
 bcm cluster destroy --cluster-name="$BCM_CLUSTER_NAME"
 

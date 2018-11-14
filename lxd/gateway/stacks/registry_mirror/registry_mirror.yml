@@ -6,8 +6,9 @@ services:
       - "5000:5000"
     volumes:
       - registrymirrorimage-data:/data
-    # environment:
-    #   REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
+    environment:
+      BCM_REGISTRY_HOSTNAME: ${TARGET_HOST}
+      REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
     configs:
       - source: regmirror_config
         target: /etc/docker/registry/config.yml
@@ -31,8 +32,10 @@ services:
     #     gid: '0'
     #     mode: 0400
     deploy:
-      mode: replicated
       replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ${TARGET_HOST}
 
 # secrets:
 #   regmirror_tls_cert:

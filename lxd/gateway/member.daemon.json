@@ -1,0 +1,6 @@
+{
+    "storage-driver": "btrfs",
+    "registry-mirrors": ["http://bcm-gateway-01:5000", "http://bcm-gateway-02:5000"],
+    "insecure-registries": [ "bcm-gateway-01:443", "bcm-gateway-02:443" ],
+    "labels": [ "bcm.gateway=true" ]
+}
