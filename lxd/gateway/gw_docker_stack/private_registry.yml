@@ -1,20 +1,21 @@
 version: '3.6'
 services:
   private-registry:
-    image: registry:latest
+    image: ${DOCKER_IMAGE}
     ports: 
-      - "5005:5000"
+      - "${TARGET_PORT}:5000"
     volumes:
       - private-registry-data:/data
     environment:
-      BCM_REGISTRY_HOSTNAME: ${TARGET_HOST}
-    #   REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
-    configs:
-      - source: regmirror_config
-        target: /etc/docker/registry/config.yml
-        uid: '33'
-        gid: '33'
-        mode: 0640
+      REGISTRY_HTTP_ADDR: :5000
+      REGISTRY_HTTP_HOST: http://${TARGET_HOST}:${TARGET_PORT}
+      REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ${TARGET_HOST}
     # secrets:
     #   - source: privreg_tls_cert
     #     target: /var/lib/registry/privreg.cert
@@ -26,11 +27,7 @@ services:
     #     uid: '0'
     #     gid: '0'
     #     mode: 0400
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.hostname == ${TARGET_HOST}
+
 
 volumes:
   private-registry-data:
@@ -41,6 +38,3 @@ volumes:
 #   privreg_tls_key:
 #     file: "privreg.key"
 
-configs:
-  regmirror_config:
-    file: config.yml

@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   torproxy:
-    image: bcm-gateway-01:443/bcm-tor:latest
+    image: ${DOCKER_IMAGE}
     ports:
       - "9050:9050/tcp"
       - "9053:9053/udp"
@@ -20,3 +20,8 @@ services:
 configs:
   tor_config:
     file: torrc
+
+
+volumes:
+  private-registry-data:
+

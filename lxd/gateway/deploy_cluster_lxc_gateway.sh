@@ -63,11 +63,11 @@ lxc start $LXD_CONTAINER_NAME
 ../shared/wait_for_dockerd.sh --container-name="$LXD_CONTAINER_NAME"
 
 lxc exec $LXD_CONTAINER_NAME -- docker pull registry:latest
+lxc exec $LXD_CONTAINER_NAME -- docker tag registry:latest bcm-registry:latest
 
 lxc file push daemon1.json $LXD_CONTAINER_NAME/etc/docker/daemon.json
 
-lxc file push ./stacks/registry_mirror/ $LXD_CONTAINER_NAME/root/stacks/ -p -r
-lxc file push ./stacks/private_registry/ $LXD_CONTAINER_NAME/root/stacks/ -p -r
+lxc file push ./gw_docker_stack/ $LXD_CONTAINER_NAME/root/stacks/ -p -r
 
 lxc exec $LXD_CONTAINER_NAME -- docker swarm init --advertise-addr eth1 >> /dev/null
 
@@ -78,18 +78,18 @@ lxc restart $LXD_CONTAINER_NAME
 DOCKER_SWARM_MANAGER_JOIN_TOKEN=$(lxc exec $LXD_CONTAINER_NAME -- docker swarm join-token manager | grep token | awk '{ print $5 }')
 DOCKER_SWARM_WORKER_JOIN_TOKEN=$(lxc exec $LXD_CONTAINER_NAME -- docker swarm join-token worker | grep token | awk '{ print $5 }')
 
-lxc exec $LXD_CONTAINER_NAME -- env TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/registry_mirror/registry_mirror.yml regmirror
-lxc exec $LXD_CONTAINER_NAME -- env TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/private_registry/private_registry.yml privateregistry
+lxc exec $LXD_CONTAINER_NAME -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/gw_docker_stack/registry_mirror.yml regmirror
+lxc exec $LXD_CONTAINER_NAME -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/gw_docker_stack/private_registry.yml privateregistry
 
 lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 $LXD_CONTAINER_NAME:5000
-lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 $LXD_CONTAINER_NAME:443
+lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 $LXD_CONTAINER_NAME:5010
 
 sleep 3
 
 # first let's push the local registry image in our dockerd to the registry cache
 # so other nodes can dowload it.
-lxc exec $LXD_CONTAINER_NAME -- docker tag registry:latest bcm-gateway-01:443/bcm-registry:latest
-lxc exec $LXD_CONTAINER_NAME -- docker push bcm-gateway-01:443/bcm-registry:latest
+lxc exec $LXD_CONTAINER_NAME -- docker tag registry:latest bcm-gateway-01:5005/bcm-registry:latest
+lxc exec $LXD_CONTAINER_NAME -- docker push bcm-gateway-01:5005/bcm-registry:latest
 
 
 # now let's build some custom images that we're going run on each bcm-gateway
@@ -97,18 +97,18 @@ lxc exec $LXD_CONTAINER_NAME -- docker push bcm-gateway-01:443/bcm-registry:late
 export BCM_DOCKER_BASE_IMAGE="ubuntu:bionic-20181018"
 
 lxc exec $LXD_CONTAINER_NAME -- docker pull $BCM_DOCKER_BASE_IMAGE
-lxc exec $LXD_CONTAINER_NAME -- docker tag $BCM_DOCKER_BASE_IMAGE bcm-gateway-01:443/bcm-bionic-base:latest
-lxc exec $LXD_CONTAINER_NAME -- docker push bcm-gateway-01:443/bcm-bionic-base:latest
-lxc file push ./stacks/bcm-base.Dockerfile $LXD_CONTAINER_NAME/root/Dockerfile
-lxc exec $LXD_CONTAINER_NAME -- docker build -t bcm-gateway-01:443/bcm-base:latest .
+lxc exec $LXD_CONTAINER_NAME -- docker tag $BCM_DOCKER_BASE_IMAGE bcm-gateway-01:5005/bcm-bionic-base:latest
+lxc exec $LXD_CONTAINER_NAME -- docker push bcm-gateway-01:5005/bcm-bionic-base:latest
+lxc file push ./bcm-base.Dockerfile $LXD_CONTAINER_NAME/root/Dockerfile
+lxc exec $LXD_CONTAINER_NAME -- docker build -t bcm-gateway-01:5005/bcm-base:latest .
 
 lxc exec $LXD_CONTAINER_NAME -- mkdir -p /root/stacks/tor
-lxc file push ./stacks/tor/bcm-tor.Dockerfile $LXD_CONTAINER_NAME/root/stacks/tor/Dockerfile
-lxc file push ./stacks/tor/tor_socks5_dns.yml $LXD_CONTAINER_NAME/root/stacks/tor/tor_socks5_dns.yml
-lxc file push ./stacks/tor/torrc $LXD_CONTAINER_NAME/root/stacks/tor/torrc
+lxc file push ./tor/bcm-tor.Dockerfile $LXD_CONTAINER_NAME/root/stacks/tor/Dockerfile
+lxc file push ./tor/tor_socks5_dns.yml $LXD_CONTAINER_NAME/root/stacks/tor/tor_socks5_dns.yml
+lxc file push ./tor/torrc $LXD_CONTAINER_NAME/root/stacks/tor/torrc
 
-lxc exec $LXD_CONTAINER_NAME -- docker build -t bcm-gateway-01:443/bcm-tor:latest /root/stacks/tor/
-lxc exec $LXD_CONTAINER_NAME -- docker push bcm-gateway-01:443/bcm-tor:latest
+lxc exec $LXD_CONTAINER_NAME -- docker build -t bcm-gateway-01:5005/bcm-tor:latest /root/stacks/tor/
+lxc exec $LXD_CONTAINER_NAME -- docker push bcm-gateway-01:5005/bcm-tor:latest
 lxc exec $LXD_CONTAINER_NAME -- docker stack deploy -c /root/stacks/tor/tor_socks5_dns.yml gwtor
 
 
@@ -129,9 +129,22 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME)
 
             lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 bcm-gateway-01:2377
             lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 bcm-gateway-01:5000
-            lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 bcm-gateway-01:443
+            lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 bcm-gateway-01:5010
             
-            lxc exec $LXD_CONTAINER_NAME -- docker swarm join --token $DOCKER_SWARM_MANAGER_JOIN_TOKEN bcm-gateway-01:2377 
+            # we will stop at 3 manager hosts; should be adequate.
+            if [[ $HOST_ENDING -le 3 ]]; then
+                lxc exec $LXD_CONTAINER_NAME -- docker swarm join --token $DOCKER_SWARM_MANAGER_JOIN_TOKEN bcm-gateway-01:2377
+            fi
+
+            if [[ $HOST_ENDING = 2 ]]; then
+                lxc exec $LXD_CONTAINER_NAME -- docker swarm join
+
+                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/gw_docker_stack/registry_mirror.yml regmirror
+                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5011 TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/gw_docker_stack/private_registry.yml privateregistry
+
+                lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 $LXD_CONTAINER_NAME:5001
+                lxc exec $LXD_CONTAINER_NAME -- wait-for-it -t 0 $LXD_CONTAINER_NAME:5011
+            fi
         fi
     fi
 done

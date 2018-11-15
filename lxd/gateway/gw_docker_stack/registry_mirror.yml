@@ -1,20 +1,22 @@
 version: '3.6'
 services:
   registry-mirror:
-    image: registry:latest
+    image: ${DOCKER_IMAGE}
     ports:
-      - "5000:5000"
+      - "${TARGET_PORT}:5000"
     volumes:
       - registrymirrorimage-data:/data
     environment:
-      BCM_REGISTRY_HOSTNAME: ${TARGET_HOST}
+      REGISTRY_HTTP_ADDR: :5000
+      REGISTRY_HTTP_HOST: http://${TARGET_HOST}:5000
       REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
-    configs:
-      - source: regmirror_config
-        target: /etc/docker/registry/config.yml
-        uid: '33'
-        gid: '33'
-        mode: 0640
+      REGISTRY_PROXY_REMOTEURL: https://registry-1.docker.io
+      REGISTRY_FILESYSTEM_ROOTDIRECTORY: /data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ${TARGET_HOST}
     # secrets:
     #   - source: regmirror_tls_cert
     #     target: /var/lib/registry/regmirror:5000.cert
@@ -31,11 +33,7 @@ services:
     #     uid: '0'
     #     gid: '0'
     #     mode: 0400
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.hostname == ${TARGET_HOST}
+
 
 # secrets:
 #   regmirror_tls_cert:
@@ -44,10 +42,6 @@ services:
 #     file: regmirror.key
 #   regmirror_ca_crt:
 #     file: ca.crt
-
-configs:
-  regmirror_config:
-    file: config.yml
 
 volumes:
   registrymirrorimage-data:
