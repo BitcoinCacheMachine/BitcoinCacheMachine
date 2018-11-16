@@ -1,0 +1,13 @@
+ExitPolicy reject *:* # no exits allowed
+ControlPort 9051
+CookieAuthentication 1
+CookieAuthFileGroupReadable 1
+
+HiddenServiceDir /var/lib/tor/lightningd-service_v2/
+HiddenServicePort 1234 127.0.0.1:9735
+
+
+# see https://www.home-assistant.io/docs/ecosystem/tor/
+#HiddenServiceDir /var/lib/tor/homeassistant/
+#HiddenServicePort 80 127.0.0.1:8123
+#HiddenServiceAuthorizeClient stealth haremote1

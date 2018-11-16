@@ -34,14 +34,8 @@ lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get update
 # docker.io is the only package that seems to work seamlessly with
 # storage backends. Using BTRFS since docker recognizes underlying file system
 lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install docker.io wait-for-it -qq
+lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump -qq
 
-# lxc file push ./get-docker.sh $BCM_HOSTTEMPLATE_NAME/root/get-docker.sh
-# lxc exec $BCM_HOSTTEMPLATE_NAME -- chmod +x /root/get-docker.sh
-# lxc exec $BCM_HOSTTEMPLATE_NAME -- bash -c /root/get-docker.sh
-
-if [[ $BCM_DEBUG = 1 ]]; then
-    lxc exec $BCM_HOSTTEMPLATE_NAME -- apt-get install jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump -qq
-fi
 
 
 ## checking if this alleviates docker swarm troubles in lxc.

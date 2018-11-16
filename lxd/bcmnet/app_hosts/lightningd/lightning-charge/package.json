@@ -1,0 +1,49 @@
+{
+    "name": "lightning-charge",
+    "version": "0.4.1",
+    "description": "A simple drop-in solution for accepting lightning payments.",
+    "repository": "https://github.com/ElementsProject/lightning-charge",
+    "license": "MIT",
+    "bin": {
+      "charged": "bin/charged"
+    },
+    "scripts": {
+      "start": "bin/start.sh",
+      "test": "bin/test.sh",
+      "testenv": "bin/testenv.sh",
+      "dist": "bin/dist.sh",
+      "prepublishOnly": "npm test && npm run dist"
+    },
+    "dependencies": {
+      "babel-polyfill": "^6.26.0",
+      "basic-auth": "^2.0.0",
+      "big.js": "^5.1.2",
+      "body-parser": "^1.18.3",
+      "debug": "^3.1.0",
+      "express": "^4.16.3",
+      "knex": "^0.15.2",
+      "lightning-client": "github:shesek/lightning-client-js#0d2a610ea24919861e2051dbf43a15994d8e79df",
+      "meow": "^5.0.0",
+      "morgan": "^1.9.0",
+      "move-decimal-point": "0.0.4",
+      "nanoid": "^1.1.0",
+      "pug": "^2.0.3",
+      "qrcode": "^1.2.0",
+      "sqlite3": "^4.0.2",
+      "superagent": "^3.8.3",
+      "ws": "^6.0.0"
+    },
+    "devDependencies": {
+      "babel-cli": "^6.26.0",
+      "babel-plugin-syntax-object-rest-spread": "^6.13.0",
+      "babel-plugin-transform-object-rest-spread": "^6.26.0",
+      "babel-preset-env": "^1.7.0",
+      "babel-register": "^6.26.0",
+      "eventsource": "^1.0.5",
+      "get-port-cli": "^1.1.0",
+      "mocha": "^5.2.0",
+      "stylus": "^0.54.5",
+      "supertest": "^3.1.0",
+      "uglify-js": "^3.4.5"
+    }
+  }

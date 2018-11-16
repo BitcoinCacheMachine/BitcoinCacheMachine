@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -eu
-
 cd "$(dirname "$0")"
 
 # this is the directory that we're going to emit public key material; should be backed up
@@ -49,17 +48,19 @@ echo "BCM_CERT_FQDN: $BCM_CERT_FQDN"
 bash -c "$BCM_LOCAL_GIT_REPO_DIR/cluster/providers/lxd/snap_lxd_install.sh"
 
 # get the locatio of the trezor
-export BCM_TREZOR_USB_PATH=$(bcm info | grep "TREZOR_USB_PATH" | awk 'NF>1{print $NF}')
+source ./export_usb_path.sh
 
-# run the container.
-docker run -it --name trezorgpg --rm -v $BCM_CERT_DIR:/root/.gnupg \
-    -e BCM_CERT_NAME="$BCM_CERT_NAME" \
-    -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
-    -e BCM_CERT_FQDN="$BCM_CERT_FQDN" \
-    --device=$BCM_TREZOR_USB_PATH \
-    bcm-trezor:latest bash -c 'trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"'
+if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
+    # run the container.
+    docker run -it --name trezorgpg --rm -v $BCM_CERT_DIR:/root/.gnupg \
+        -e BCM_CERT_NAME="$BCM_CERT_NAME" \
+        -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
+        -e BCM_CERT_FQDN="$BCM_CERT_FQDN" \
+        --device=$BCM_TREZOR_USB_PATH \
+        bcm-trezor:latest bash -c 'trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"'
 
-echo "Your public key and public keyring material can be found at '$BCM_CERT_DIR/trezor'."
+    echo "Your public key and public keyring material can be found at '$BCM_CERT_DIR/trezor'."
+fi
 
 export GNUPGHOME=$BCM_CERT_DIR/trezor
 

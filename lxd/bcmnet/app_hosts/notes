@@ -1,0 +1,5 @@
+for the bitcoind.conf file, putting this here.
+
+# this is needed for any CURL/REST commands against the RPC interface.
+# currently this is only given to lightning daemons to query bitcoind
+#rpcauth=bitcoinrpcuser:3a99d7634a7767de5ee8f635ea277add$1d224b63f54a3017d507267308abff0ca95bf2f1dba0470f1026f2e1033ac1a2
