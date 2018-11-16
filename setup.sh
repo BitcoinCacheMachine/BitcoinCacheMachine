@@ -4,7 +4,7 @@
 # BCM-related LXD and multipass scripts against (local) or remote LXD
 # endpoints.
 
-set -e
+set -eu
 cd "$(dirname "$0")"
 
 
