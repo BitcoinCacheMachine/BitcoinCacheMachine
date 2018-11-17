@@ -10,7 +10,7 @@ echo "Starting 'up_lxc_host_template.sh'."
 # if it does exist, it SHOULD be the latest image (due to auto-update).
 if [[ ! $(lxc image list | grep "bcm-bionic-base") ]]; then
   echo "Copying the ubuntu/18.04 lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-bionic-base'"
-  lxc image copy images:ubuntu/18.04 $(lxc remote get-default): --alias bcm-bionic-base --auto-update
+  lxc image copy images:ubuntu/18.04 $(lxc remote get-default): --alias bcm-bionic-base --auto-update --public
 fi
 
 function createProfile {

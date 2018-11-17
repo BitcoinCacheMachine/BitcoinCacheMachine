@@ -48,7 +48,6 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME)
     LXD_CONTAINER_NAME="bcm-gateway-$(printf %02d $HOST_ENDING)"
     DOCKERVOL="$LXD_CONTAINER_NAME-dockerdisk"
     
-    echo "HOST_ENDING: $HOST_ENDING"
     echo "Creating volume '$DOCKERVOL' on storage pool bcm_btrfs on cluster member '$endpoint'."
     if [ $endpoint != $MASTER_NODE ]; then
         lxc storage volume create bcm_btrfs $DOCKERVOL block.filesystem=ext4 --target $endpoint
@@ -69,6 +68,7 @@ lxc start $LXD_CONTAINER_NAME
 
 ../shared/wait_for_dockerd.sh --container-name="$LXD_CONTAINER_NAME"
 
+lxc exec $LXD_CONTAINER_NAME -- ifmetric eth0 50
 lxc exec $LXD_CONTAINER_NAME -- docker pull registry:latest
 lxc exec $LXD_CONTAINER_NAME -- docker tag registry:latest bcm-registry:latest
 
@@ -82,6 +82,7 @@ lxc restart $LXD_CONTAINER_NAME
 
 ../shared/wait_for_dockerd.sh --container-name="$LXD_CONTAINER_NAME"
 
+lxc exec $LXD_CONTAINER_NAME -- ifmetric eth0 50
 lxc exec $LXD_CONTAINER_NAME -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/gw_docker_stack/registry_mirror.yml regmirror
 lxc exec $LXD_CONTAINER_NAME -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST=$LXD_CONTAINER_NAME docker stack deploy -c /root/stacks/gw_docker_stack/private_registry.yml privateregistry
 
@@ -100,7 +101,7 @@ lxc exec $LXD_CONTAINER_NAME -- docker push $PRIVATE_REGISTRY/bcm-registry:lates
 
 # now let's build some custom images that we're going run on each bcm-gateway
 # namely TOR
-export BCM_DOCKER_BASE_IMAGE="ubuntu:bionic"
+export BCM_DOCKER_BASE_IMAGE="ubuntu:cosmic"
 
 lxc exec $LXD_CONTAINER_NAME -- docker pull $BCM_DOCKER_BASE_IMAGE
 lxc exec $LXD_CONTAINER_NAME -- docker tag $BCM_DOCKER_BASE_IMAGE $PRIVATE_REGISTRY/bcm-bionic-base:latest
@@ -121,7 +122,7 @@ lxc exec $LXD_CONTAINER_NAME -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deplo
 
 
 DOCKER_SWARM_MANAGER_JOIN_TOKEN=$(lxc exec bcm-gateway-01 -- docker swarm join-token manager | grep token | awk '{ print $5 }')
-#DOCKER_SWARM_WORKER_JOIN_TOKEN=$(lxc exec $LXD_CONTAINER_NAME -- docker swarm join-token worker | grep token | awk '{ print $5 }')
+DOCKER_SWARM_WORKER_JOIN_TOKEN=$(lxc exec bcm-gateway-01 -- docker swarm join-token worker | grep token | awk '{ print $5 }')
 
 for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME); do
     if [[ $endpoint != $MASTER_NODE ]]; then
@@ -142,6 +143,10 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME)
             # we will stop at 3 manager hosts; should be adequate.
             if [[ $HOST_ENDING -le 3 ]]; then
                 lxc exec $LXD_CONTAINER_NAME -- docker swarm join --token $DOCKER_SWARM_MANAGER_JOIN_TOKEN bcm-gateway-01:2377
+            else
+                # All other LXD bcm-gateway-04 or greater will be workers in the swarm.
+                
+                lxc exec $LXD_CONTAINER_NAME -- docker swarm join --token $DOCKER_SWARM_WORKER_JOIN_TOKEN bcm-gateway-01:2377
             fi
 
             # only do this if we're on our second node. We're going to deploy

@@ -23,7 +23,7 @@ export BCM_STORAGE_bcm_btrfs_CREATE="true"
 export BCM_STORAGE_bcm_btrfs_DELETE="true"
 export BCM_LXD_OPS="$BCM_LOCAL_GIT_REPO_DIR/lxd/shared"
 export BCM_LXD_HOST_PROFILES="$BCM_LOCAL_GIT_REPO_DIR/lxd/host_template/lxd_profiles"
-
+export BCM_CLUSTER_DIR=$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME
 
 #####################
 ####################

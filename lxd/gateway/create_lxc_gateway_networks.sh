@@ -14,15 +14,13 @@ if [[ $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME | wc -l) >
     done
 fi
 
-sleep 10
-
 # bcmbrGWNat has outbound NAT
-if [[ ! -z $(lxc network list | grep bcmbrGWNat | grep PENDING) ]]; then
+if [[ ! -z $(lxc network list | grep bcmbrGWNat | grep PENDING) || -z $(lxc network list | grep bcmbrGWNat) ]]; then
     lxc network create bcmbrGWNat ipv4.nat=true ipv6.nat=false
 fi
 
 # bcmNet does not have NAT. Hosts on this net can get outside
 # via bcm-gateway LXD host docker services.
-if [[ ! -z $(lxc network list | grep bcmNet | grep PENDING) ]]; then
+if [[ ! -z $(lxc network list | grep bcmNet | grep PENDING) || -z $(lxc network list | grep bcmNet)  ]]; then
     lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
 fi

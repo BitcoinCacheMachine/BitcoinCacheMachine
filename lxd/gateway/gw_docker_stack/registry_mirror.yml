@@ -11,7 +11,7 @@ services:
       REGISTRY_HTTP_HOST: http://${TARGET_HOST}:5000
       REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
       REGISTRY_PROXY_REMOTEURL: ${REGISTRY_PROXY_REMOTEURL:-https://registry-1.docker.io}
-      REGISTRY_FILESYSTEM_ROOTDIRECTORY: /data
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
     deploy:
       replicas: 1
       placement:

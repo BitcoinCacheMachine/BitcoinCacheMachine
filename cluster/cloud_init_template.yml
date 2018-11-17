@@ -32,6 +32,7 @@ write_files:
       echo "Initializing LXD with the preseed file /etc/bcm/lxd_preseed.yml."
       bash -c "cat /etc/bcm/lxd_preseed.yml | sudo lxd init --preseed"
 
+
   - path: /etc/bcm/lxd_preseed_cloud-init.yml
     owner: root:root
     permissions: '0400'  

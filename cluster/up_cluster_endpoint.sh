@@ -85,7 +85,8 @@ elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     --cpus $BCM_ENDPOINT_CPU_COUNT \
     --name $BCM_CLUSTER_ENDPOINT_NAME \
     --cloud-init $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml \
-    bionic
+    cosmic
+
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
   echo "todo; baremetal in up_cluster_endpoint.sh"
 elif [[ $BCM_PROVIDER_NAME = "aws" ]]; then

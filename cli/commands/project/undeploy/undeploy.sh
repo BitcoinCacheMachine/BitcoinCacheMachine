@@ -27,7 +27,7 @@ export BCM_REMOVE_TEMPLATE_FLAG=$BCM_REMOVE_TEMPLATE_FLAG
 
 source $BCM_LOCAL_GIT_REPO_DIR/lxd/defaults.sh
 
-$BCM_LOCAL_GIT_REPO_DIR/lxd/bcm_project_destroy.sh --remove-template
+$BCM_LOCAL_GIT_REPO_DIR/lxd/destroy_bcm_project.sh --remove-template
 
 if [[ -d $BCM_DEPLOYMENT_DIR ]]; then
     sudo rm -Rf $BCM_DEPLOYMENT_DIR

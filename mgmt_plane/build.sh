@@ -12,4 +12,4 @@ else
 fi
 
 
-docker pull ipfs/go-ipfs
+#docker pull ipfs/go-ipfs
