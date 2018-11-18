@@ -53,37 +53,5 @@ fi
 
 export BCM_LXD_OPS=$BCM_LOCAL_GIT_REPO_DIR/lxd/shared
 
-bash -c ./host_template/up_lxc_host_template.sh
+bash -c ./bcm_core/up_lxc_core.sh
 
-source ./defaults.sh
-
-if [[ $BCM_ADMIN_GATEWAY_INSTALL = "true" ]]; then
-  echo "Deploying 'bcm-gateway'."
-  bash -c ./gateway/up_lxc_gateway.sh
-fi
-
-# if [[ $BCM_ADMIN_BCMNETTEMPLATE_CREATE = "true" ]]; then
-#     echo "Creating lxc container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' and associated snapshot 'bcmnet_template'."
-#     bash -c ./bcmnet/up_lxc_bcmnet.sh
-# fi
-
-
-# echo "Deploying app_hosts"
-# bash -c ./app_hosts/up_lxc_apphosts.sh
-
-
-
-
-
-
-
-# if [[ $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE = "none" ]]; then
-#   # in this case, we deploy cachestack.
-#   echo "Deploying local cachestack for BCM instance."
-#   bash -c ./cachestack/up_lxd_cachestack.sh
-# else
-#   # in this assume the cachestack is defined in $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE
-#   echo "Assuming external LXD endpoint '$BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE' is hosting a cachestack."
-#   echo "Copying a prepared LXD system host image from $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE"
-#   lxc image copy $BCM_LXD_EXTERNAL_BCM_TEMPLATE_REMOTE:bctemplate $(lxc remote get-default): --auto-update --copy-aliases
-# fi

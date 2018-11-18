@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  zoo1:
+    image: ${DOCKER_IMAGE}
+    hostname: ${ZOOKEEPER_LXC_HOSTNAME}
+    networks:
+      kafkanet:
+        aliases:
+          - ${OVERLAY_NETWORK_NAME}
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+    environment:
+      ZOO_MY_ID: ${ZOOKEPER_ID}
+      ZOO_SERVERS: ${ZOOKEEPER_SERVERS}
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ${TARGET_HOST}
+
+volumes:
+  zookeeper-data:
+  zookeeper-logs:
+
+
+# overlay network that swarm hosts can use to contact kafka, if needed
+networks:
+  kafkanet:
+    driver: overlay
+    attachable: true

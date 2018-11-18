@@ -16,8 +16,8 @@ fi
 # bash -c "./bcmnet/destroy_lxc_bcmnet.sh template"
 
 echo ""
-echo "Calling ./gateway/destroy_lxc_gateway.sh"
-./gateway/destroy_lxc_gateway.sh
+echo "Calling ./bcm_core/destroy_lxc_gateway.sh"
+./bcm_core/destroy_lxc_gateway.sh
 
 echo "Calling ./host_template/destroy_lxc_host_template.sh"
 ./host_template/destroy_lxc_host_template.sh

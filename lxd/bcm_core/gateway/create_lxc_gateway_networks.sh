@@ -22,5 +22,5 @@ fi
 # bcmNet does not have NAT. Hosts on this net can get outside
 # via bcm-gateway LXD host docker services.
 if [[ ! -z $(lxc network list | grep bcmNet | grep PENDING) || -z $(lxc network list | grep bcmNet)  ]]; then
-    lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
+    lxc network create bcmNet bridge.mode=fan
 fi

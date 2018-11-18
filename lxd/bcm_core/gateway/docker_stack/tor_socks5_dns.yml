@@ -12,10 +12,9 @@ services:
         gid: '33'
         mode: 0640
     deploy:
-      mode: global
       placement:
         constraints:
-          - node.role == manager
+          - engine.labels.gateway == true
 
 configs:
   tor_config:

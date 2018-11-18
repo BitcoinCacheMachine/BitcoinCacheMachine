@@ -5,9 +5,9 @@ cd "$(dirname "$0")"
 source ./defaults.sh
 
 # delete dockertemplate
-if [[ ! -z $(lxc list | grep "$BCM_HOSTTEMPLATE_NAME") ]]; then
+if [[ ! -z $(lxc list | grep "bcm-host-template") ]]; then
     echo "Deleting dockertemplate lxd host."
-    lxc delete --force $BCM_HOSTTEMPLATE_NAME
+    lxc delete --force bcm-host-template
 fi
 
 if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE = 1 ]]; then
@@ -19,8 +19,8 @@ if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE = 1 ]]; then
     $BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh bcm-bionic-base
 fi
 
-if [[ ! -z $(lxc storage list | grep "$BCM_HOSTTEMPLATE_NAME-dockervol") ]]; then
-    lxc storage delete "$BCM_HOSTTEMPLATE_NAME-dockervol"
+if [[ ! -z $(lxc storage list | grep "bcm-host-template-dockervol") ]]; then
+    lxc storage delete "bcm-host-template-dockervol"
 fi
 
 # delete profile 'docker-privileged'
