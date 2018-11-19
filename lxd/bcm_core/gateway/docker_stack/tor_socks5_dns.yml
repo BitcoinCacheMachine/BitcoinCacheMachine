@@ -19,8 +19,3 @@ services:
 configs:
   tor_config:
     file: torrc
-
-
-volumes:
-  private-registry-data:
-

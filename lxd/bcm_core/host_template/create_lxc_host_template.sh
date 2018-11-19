@@ -65,13 +65,6 @@ lxc snapshot bcm-host-template bcmHostSnapshot
 
 # if instructed, serve the newly created snapshot to trusted LXD hosts.
 if [[ $(lxc list | grep "bcm-host-template") ]]; then
-    if [[ $BCM_ADMIN_IMAGE_BCMTEMPLATE_MAKE_PUBLIC = 1 ]]; then
-        # if the template doesn't exist, publish it so remote clients can reach it.
-        echo "Publishing bcm-host-template/bcmHostSnapshot as a public lxd image 'bcm-template' on cluster '$(lxc remote get-default)'."
-        lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
-        #--public
-    else
-        echo "Publishing bcm-host-template/bcmHostSnapshot as non-public lxd image cluster '$(lxc remote get-default)'."
-        lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
-    fi
+    echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
+    lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
 fi

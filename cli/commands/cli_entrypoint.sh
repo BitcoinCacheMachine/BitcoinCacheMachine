@@ -62,6 +62,8 @@ elif [[ $BCM_CLI_COMMAND = "git" ]]; then
     ./git/entrypoint.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "file" ]]; then
     ./file/entrypoint.sh "$@"
+elif [[ $BCM_CLI_COMMAND = "ssh" ]]; then
+    ./ssh/entrypoint.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "info" ]]; then
     bash -c './info.sh "$@"'
 elif [[ $BCM_CLI_COMMAND = "show" ]]; then

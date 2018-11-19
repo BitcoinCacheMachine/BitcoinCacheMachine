@@ -34,6 +34,8 @@ if [[ $GATEWAY_HOSTNAME = "bcm-gateway-01" ]]; then
     lxc file push ./docker_stack/ bcm-gateway-01/root/stacks/ -p -r
 
     lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >> /dev/null
+
+    lxc file push ./bcm-gateway-01.daemon.json $GATEWAY_HOSTNAME/etc/docker/daemon.json
     sleep 5
 else
     lxc file push ./gateway.daemon.json $GATEWAY_HOSTNAME/etc/docker/daemon.json
@@ -85,7 +87,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME)
         GATEWAY_HOSTNAME="bcm-gateway-$(printf %02d $HOST_ENDING)"
 
         if [[ $HOST_ENDING -ge 2 ]]; then
-            lxc file push ./gateway.daemon.json bcm-gateway-01/etc/docker/daemon.json
+            lxc file push ./gateway.daemon.json $GATEWAY_HOSTNAME/etc/docker/daemon.json
             lxc file push ./gateway_ip_addr_template.yml $GATEWAY_HOSTNAME/etc/netplan/10-lxc.yaml
 
             lxc start $GATEWAY_HOSTNAME

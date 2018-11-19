@@ -1,0 +1,11 @@
+Description:
+  Use Trezor to generate new keys and connect to remote SSH servers.
+
+Usage:
+  bcm ssh [command]
+
+Available Commands:
+  connect      Connect to a remote SSH server and authenticate using your Trezor.
+  newkey       Generate a new SSH username@hostname keypair.
+
+  Use "bcm ssh [command] --help" to get help for that command.

@@ -26,12 +26,10 @@ fi
 cat ./lxd_profiles/kafka.yml | lxc profile edit bcm_kafka_profile
 
 
-# get all the bcm-gateway-xx containers deployed to the cluster.
+# get all the bcm-kafka-xx containers deployed to the cluster.
 bash -c "../spread_lxc_hosts.sh --hostname=kafka"
 
 source ../get_docker_swarm_tokens.sh
-DOCKER_SWARM_MANAGER_JOIN_TOKEN=$DOCKER_SWARM_MANAGER_JOIN_TOKEN
-DOCKER_SWARM_WORKER_JOIN_TOKEN=$DOCKER_SWARM_WORKER_JOIN_TOKEN
 
 echo "Running ./provision_bcm-kafka.sh"
 KAFKA_HOSTNAME="bcm-kafka-01"
@@ -50,13 +48,16 @@ if [[ -z $(lxc list | grep "$KAFKA_HOSTNAME") ]]; then
 fi
 
 lxc file push ./kafka.daemon.json $KAFKA_HOSTNAME/etc/docker/daemon.json
-lxc file push ./docker_stack/zookeeper.yml bcm-gateway-01/root/stacks/zookeeper.yml
+lxc file push ./docker_stack/zookeeper_master.yml bcm-gateway-01/root/stacks/zookeeper_master.yml
+lxc file push ./docker_stack/zookeeper_member.yml bcm-gateway-01/root/stacks/zookeeper_member.yml
 
 lxc start $KAFKA_HOSTNAME
 
 ../../shared/wait_for_dockerd.sh --container-name="$KAFKA_HOSTNAME"
 
-lxc exec $KAFKA_HOSTNAME -- docker swarm join --token $DOCKER_SWARM_WORKER_JOIN_TOKEN bcm-gateway-01:2377
+lxc exec $KAFKA_HOSTNAME -- wait-for-it -t 0 bcm-gateway-01:2377
+
+lxc exec $KAFKA_HOSTNAME -- docker swarm join --token $DOCKER_SWARM_WORKER_JOIN_TOKEN eth0:2377
 
 # if it's the first instance, let's download the kafka image from
 # docker hub; then we tag and push to our local private registry
@@ -78,16 +79,10 @@ if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
     lxc exec $KAFKA_HOSTNAME -- docker push $ZOOKEEPER_IMAGE
     lxc exec $KAFKA_HOSTNAME -- docker push $KAFKA_IMAGE
 
-
-    # we are initially going to standup zookkeeper with 1 node. We will update the ZOOKEEPER_SERVERS
-    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
-        --host-ending=1 \
-        --target-host=$KAFKA_HOSTNAME \
-        --zookeeper-servers="server.1=0.0.0.0:2888:3888"
-
     lxc exec $KAFKA_HOSTNAME -- docker tag confluentinc/cp-kafka $PRIVATE_REGISTRY/bcm-kafka:latest
     lxc exec $KAFKA_HOSTNAME -- docker push $PRIVATE_REGISTRY/bcm-kafka:latest
 fi
+
 
 
 
@@ -114,31 +109,44 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME)
 
             # All other LXD bcm-kafka nodes are workers.
             lxc exec $KAFKA_HOSTNAME -- docker swarm join --token $DOCKER_SWARM_WORKER_JOIN_TOKEN bcm-gateway-01:2377
-
-
-            # We deploy up to 3 zookeeper instances.
-            if [[ $HOST_ENDING -le 2 ]]; then
-                ZOOKEEPER_SERVERS=
-                if [[ $HOST_ENDING = 2 ]]; then
-                    ZOOKEEPER_SERVERS="server.1=zookeeper-01:2888:3888 server.2=zookeeper-02:2888:3888"
-
-                    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
-                        --host-ending=2 \
-                        --target-host=$KAFKA_HOSTNAME \
-                        --zookeeper-servers="$ZOOKEEPER_SERVERS"
-
-                    #Let's update the first service.
-                    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
-                        --host-ending=1 \
-                        --target-host="bcm-kafka-01" \
-                        --zookeeper-servers="$ZOOKEEPER_SERVERS"
-
-                    HOST_ENDING=2
-                elif [[ $HOST_ENDING = 3 ]]; then
-                    echo "NOT IMPLEMENTED"
-                    #ZOOKEEPER_SERVERS="server.2=bcm-zookeeper-02:2888:3888 server.3=bcm-zookeeper-02:2888:3888"
-                fi
-            fi
         fi
     fi
 done
+
+
+
+# now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
+# 3 nodes (if we have a cluster of that size).
+CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name=$(lxc remote get-default) --endpoints | wc -l)
+
+ZOOKEEPER_SERVERS="server.1=zookeeper-01:2888:3888"
+
+if [[ $CLUSTER_NODE_COUNT -ge 2 ]]; then
+    ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS server.2=zookeeper-02:2888:3888"
+fi
+
+if [[ $CLUSTER_NODE_COUNT -ge 3 ]]; then
+    ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS server.3=zookeeper-03:2888:3888"
+fi
+
+# Deploy the first zookeeper node.
+./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
+    --host-ending=1 \
+    --target-host="bcm-kafka-01" \
+    --zookeeper-servers="$ZOOKEEPER_SERVERS"
+
+# deploy 2nd zookeeper node if we can.
+if [[ $CLUSTER_NODE_COUNT -ge 2 ]]; then
+    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
+        --host-ending=2 \
+        --target-host="bcm-kafka-02" \
+        --zookeeper-servers="$ZOOKEEPER_SERVERS"
+fi
+
+# deploy 3rd zookeeper if we can
+if [[ $CLUSTER_NODE_COUNT -ge 3 ]]; then
+    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
+        --host-ending=3 \
+        --target-host="bcm-kafka-03" \
+        --zookeeper-servers="$ZOOKEEPER_SERVERS"
+fi

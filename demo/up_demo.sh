@@ -14,7 +14,8 @@ source ./env.sh
 bcm init --cert-name="derek" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
 
 # create a cluster named dev. LXD is deployed to localhost
-bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="multipass" --mgmt-type="local" --node-count=4
+bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="baremetal" --mgmt-type="local"
+# --node-count=2
 
 ## Create a basic project difintion.
 bcm project create --project-name="$BCM_PROJECT_NAME"

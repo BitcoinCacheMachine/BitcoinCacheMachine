@@ -89,3 +89,7 @@ fi
 if [[ -d $BCM_ENDPOINT_DIR ]]; then
   rm -rf $BCM_ENDPOINT_DIR
 fi
+
+if [[ ! -z $(lxc storage list | grep "bcm_btrfs") ]]; then
+  lxc storage delete bcm_btrfs
+fi

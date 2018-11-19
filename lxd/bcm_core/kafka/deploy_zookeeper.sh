@@ -54,5 +54,10 @@ if [[ -z ZOOKEEPER_SERVERS ]]; then
     exit
 fi
 
+if [[ $HOST_ENDING = 1 ]]; then
+    STACK_FILE=zookeeper_master.yml
+elif [[ $HOST_ENDING -ge 2 ]]; then
+    STACK_FILE=zookeeper_member.yml
+fi
 
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d $HOST_ENDING)" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d $HOST_ENDING)" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/zookeeper.yml "zookeeper-$(printf %02d $HOST_ENDING)"
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d $HOST_ENDING)" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d $HOST_ENDING)" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/$STACK_FILE "zookeeper-$(printf %02d $HOST_ENDING)"
