@@ -39,7 +39,7 @@ fi
 if [[ $(lxc remote get-default) != $BCM_CLUSTER_NAME ]]; then
     if [[ ! -z $(lxc remote list | grep "$BCM_CLUSTER_NAME") ]]; then
       echo "Changing the default LXD client remote to BCM cluster '$BCM_CLUSTER_NAME'."
-      lxc remote set-default "$BCM_CLUSTER_NAME"
+      lxc remote switch "$BCM_CLUSTER_NAME"
     fi
 fi
 

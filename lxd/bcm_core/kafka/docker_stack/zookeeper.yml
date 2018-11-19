@@ -1,10 +1,10 @@
 version: '3.6'
 services:
-  zoo1:
+  zookeeper:
     image: ${DOCKER_IMAGE}
-    hostname: ${ZOOKEEPER_LXC_HOSTNAME}
+    hostname: ${ZOOKEEPER_HOSTNAME}
     networks:
-      kafkanet:
+      zookeepernet:
         aliases:
           - ${OVERLAY_NETWORK_NAME}
     volumes:
@@ -26,6 +26,6 @@ volumes:
 
 # overlay network that swarm hosts can use to contact kafka, if needed
 networks:
-  kafkanet:
+  zookeepernet:
     driver: overlay
     attachable: true

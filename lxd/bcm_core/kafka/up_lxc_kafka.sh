@@ -67,6 +67,7 @@ REGISTRY="bcm-gateway-01:5010"
 ZOOKEEPER_IMAGE="$REGISTRY/bcm-zookeeper:latest"
 KAFKA_IMAGE="$REGISTRY/bcm-kafka:latest"
 
+
 if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
     lxc exec $KAFKA_HOSTNAME -- docker pull zookeeper
     lxc exec $KAFKA_HOSTNAME -- docker pull confluentinc/cp-kafka
@@ -78,12 +79,15 @@ if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
     lxc exec $KAFKA_HOSTNAME -- docker push $KAFKA_IMAGE
 
 
-    lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_LXC_HOSTNAME="bcm-zookeeper-01" OVERLAY_NETWORK_NAME="zookeeper_01" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="1" ZOOKEEPER_SERVERS="server.1=0.0.0.0:2888:3888" docker stack deploy -c /root/stacks/zookeeper.yml zookeeper-01
+    # we are initially going to standup zookkeeper with 1 node. We will update the ZOOKEEPER_SERVERS
+    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
+        --host-ending=1 \
+        --target-host=$KAFKA_HOSTNAME \
+        --zookeeper-servers="server.1=0.0.0.0:2888:3888"
 
     lxc exec $KAFKA_HOSTNAME -- docker tag confluentinc/cp-kafka $PRIVATE_REGISTRY/bcm-kafka:latest
     lxc exec $KAFKA_HOSTNAME -- docker push $PRIVATE_REGISTRY/bcm-kafka:latest
 fi
-
 
 
 
@@ -113,8 +117,27 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME)
 
 
             # We deploy up to 3 zookeeper instances.
-            if [[ $HOST_ENDING -le 3 ]]; then
-                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_LXC_HOSTNAME="bcm-zookeeper-$(printf %02d $HOST_ENDING)" OVERLAY_NETWORK_NAME="zookeeper_$(printf %02d $HOST_ENDING)" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="server.$HOST_ENDING=0.0.0.0:2888:3888" docker stack deploy -c /root/stacks/zookeeper.yml "zookeeper-$(printf %02d $HOST_ENDING)"
+            if [[ $HOST_ENDING -le 2 ]]; then
+                ZOOKEEPER_SERVERS=
+                if [[ $HOST_ENDING = 2 ]]; then
+                    ZOOKEEPER_SERVERS="server.1=zookeeper-01:2888:3888 server.2=zookeeper-02:2888:3888"
+
+                    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
+                        --host-ending=2 \
+                        --target-host=$KAFKA_HOSTNAME \
+                        --zookeeper-servers="$ZOOKEEPER_SERVERS"
+
+                    #Let's update the first service.
+                    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
+                        --host-ending=1 \
+                        --target-host="bcm-kafka-01" \
+                        --zookeeper-servers="$ZOOKEEPER_SERVERS"
+
+                    HOST_ENDING=2
+                elif [[ $HOST_ENDING = 3 ]]; then
+                    echo "NOT IMPLEMENTED"
+                    #ZOOKEEPER_SERVERS="server.2=bcm-zookeeper-02:2888:3888 server.3=bcm-zookeeper-02:2888:3888"
+                fi
             fi
         fi
     fi

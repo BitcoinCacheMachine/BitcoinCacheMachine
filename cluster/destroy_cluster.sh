@@ -54,7 +54,7 @@ for endpoint in `bcm cluster list --cluster-name=$BCM_CLUSTER_NAME --endpoints`;
 done
 
 if [[ $(lxc remote list | grep $BCM_CLUSTER_NAME) ]]; then
-  lxc remote set-default local
+  lxc remote switch local
   lxc remote remove $BCM_CLUSTER_NAME
 fi
 

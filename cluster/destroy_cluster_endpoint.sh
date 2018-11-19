@@ -47,7 +47,7 @@ function deleteLXDRemote {
   # Removing lxc remote vm
   if [[ ! -z $(lxc remote list | grep "$BCM_CLUSTER_ENDPOINT_NAME") ]]; then
       echo "Removing lxd remote $BCM_CLUSTER_ENDPOINT_NAME"
-      lxc remote set-default local
+      lxc remote switch local
       lxc remote remove $BCM_CLUSTER_ENDPOINT_NAME
   fi
 }

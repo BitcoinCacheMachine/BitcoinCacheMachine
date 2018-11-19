@@ -22,6 +22,6 @@ systemctl restart tor
 
 
 # we're going to set the LXD remote to LOCAL SINCE THIS SCRIPT IS MEANT TO BE RUN ON THE BASE HOST INTERACTIVELY
-lxc remote set-default local
+lxc remote switch local
 
 lxc config set core.https_address '127.0.0.1:8444'
