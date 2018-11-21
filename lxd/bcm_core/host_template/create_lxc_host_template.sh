@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 source ./defaults.sh
 
@@ -11,17 +11,17 @@ fi
 
 echo "LXC image 'bcm-template' does not exist. Creating one."
 # only execute if bcm_btrfs is non-zero
-if [[ $(lxc image list | grep "bcm-bionic-base") ]]; then
+if [[ $(lxc image list | grep "bcm-lxc-base") ]]; then
     # initialize the lxc container to the active lxd endpoint.
     ./create_network.sh
 
     sleep 2
 
-    lxc init bcm-bionic-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
+    lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
 
     lxc start bcm-host-template
 else
-    echo "LXC image 'bcm-bionic-base' was not found. Exiting."
+    echo "LXC image 'bcm-lxc-base' was not found. Exiting."
     exit
 fi
 

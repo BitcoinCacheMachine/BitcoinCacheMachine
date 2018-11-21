@@ -4,7 +4,7 @@
 # that's connected to either bcmNet for standalone deployments
 # or uses macvlan to connect to physical network interface.
 
-set -eu
+set -Eeuo pipefail
 
 # set the working directory to the location where the script is located
 # since all file references are relative to this script

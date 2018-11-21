@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 source ../defaults.sh
 source ./defaults.sh
@@ -63,10 +63,10 @@ if [[ $GATEWAY_HOSTNAME = "bcm-gateway-01" ]]; then
     export BCM_DOCKER_BASE_IMAGE="ubuntu:cosmic"
 
     lxc exec bcm-gateway-01 -- docker pull $BCM_DOCKER_BASE_IMAGE
-    lxc exec bcm-gateway-01 -- docker tag $BCM_DOCKER_BASE_IMAGE $PRIVATE_REGISTRY/bcm-bionic-base:latest
-    lxc exec bcm-gateway-01 -- docker push $PRIVATE_REGISTRY/bcm-bionic-base:latest
-    lxc file push ./bcm-base.Dockerfile bcm-gateway-01/root/Dockerfile
-    lxc exec bcm-gateway-01 -- docker build -t $PRIVATE_REGISTRY/bcm-base:latest .
+    lxc exec bcm-gateway-01 -- docker tag $BCM_DOCKER_BASE_IMAGE $PRIVATE_REGISTRY/bcm-docker-base:latest
+    lxc exec bcm-gateway-01 -- docker push $PRIVATE_REGISTRY/bcm-docker-base:latest
+    lxc file push ./bcm-docker-base.Dockerfile bcm-gateway-01/root/Dockerfile
+    lxc exec bcm-gateway-01 -- docker build -t $PRIVATE_REGISTRY/bcm-docker-base:latest .
 
     lxc exec bcm-gateway-01 -- mkdir -p /root/stacks/tor
     lxc file push ./tor/bcm-tor.Dockerfile bcm-gateway-01/root/stacks/tor/Dockerfile

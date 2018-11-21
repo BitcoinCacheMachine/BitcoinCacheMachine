@@ -3,7 +3,7 @@
 
 The `dev machine` is NOT meant to participate in production workloads. It is typically a laptop or desktop machine that you use on a day-to-day basis. It's meant primarily for development and testing of your BCM configurations. The `dev machine` is distinct from the `admin machine`, which acts as the secure BCM management plane for operational clusters (future work).
 
-`./up_dev_machine.sh` prepares the `dev machine` for using BCM scripts. It is meant to be executed on a freshly installed Ubuntu 18.04 (Server or Desktop should work) Here's what `./up_dev_machine.sh` does to the `dev machine`:
+`./up_dev_machine.sh` prepares the `dev machine` for using BCM scripts. It is meant to be executed on a freshly installed Ubuntu (cosmic) (Server or Desktop should work) Here's what `./up_dev_machine.sh` does to the `dev machine`:
 
 * Creates the `$BCM_RUNTIME_DIR/` directory - BCM scripts store LXD cluster, endpoint, and sensitive runtime files in this directory. `up_dev_machine.sh` initializes $BCM_RUNTIME_DIR as a git repository for versioning. BCM scripts make regular commits to the $BCM_RUNTIME_DIR repo as files are added or deleted.
 * (TODO:  $BCM_RUNTIME_DIR will be mounted using a encrypted [FUSE mount](https://github.com/netheril96/securefs) that can be unlocked interactively with a user-provided password or hardware wallet device).

@@ -1,6 +1,6 @@
 ## Architecture
 
-BCM is built entirely on Ubuntu 18.04 Bionic Beaver. BCM can run inside a VM or on bare-metal (preferred).  LXD/LXC system containers are used to provision system-level containers (analogous to a VM in the cloud). Docker daemon runs in each LXD system container and is responsible for running application-specific containers.
+BCM is built entirely on Ubuntu (cosmic). BCM can run inside a VM or on bare-metal (preferred).  LXD/LXC system containers are used to provision system-level containers (analogous to a VM in the cloud). Docker daemon runs in each LXD system container and is responsible for running application-specific containers.
 
 TCP 9050 (TOR) outbound is required for BCM to function. This is required since BCM exposes some of the services on the TOR overlay network facilitating client connections (e.g., a wallet app on your phone, or maybe a block explorer). This allows you to host your own infrastructure while maintaining a very cloud-like feel, all without having to fiddle with your external firewall.
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CERT_DIR=$BCM_RUNTIME_DIR/certs

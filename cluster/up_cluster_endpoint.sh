@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
@@ -38,8 +38,6 @@ case $i in
 esac
 done
 
-
-
 echo "up_cluster_endpoint.sh"
 echo "IS_MASTER: $IS_MASTER"
 echo "BCM_CLUSTER_ENDPOINT_NAME: $BCM_CLUSTER_ENDPOINT_NAME"
@@ -48,7 +46,8 @@ echo "BCM_CLUSTER_ENDPOINT_DIR: $BCM_CLUSTER_ENDPOINT_DIR"
 
 # if there's no .env file for the specified VM, we'll generate a new one.
 if [ -f $BCM_CLUSTER_ENDPOINT_DIR/.env ]; then
-  source $BCM_CLUSTER_ENDPOINT_DIR/.env
+  # shellcheck source=/dev/null
+  source "$BCM_CLUSTER_ENDPOINT_DIR/.env"
 else
   echo "Error. No $BCM_CLUSTER_ENDPOINT_DIR/.env file to source."
   exit
@@ -62,7 +61,8 @@ fi
 # prepare the cloud-init file
 if [[ $BCM_PROVIDER_NAME != "baremetal" ]]; then
   if [[ -f $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml ]]; then
-    export BCM_CLUSTER_MASTER_LXD_PRESEED=$(cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | awk '{print "      " $0}')
+    BCM_CLUSTER_MASTER_LXD_PRESEED=$(awk '{print "      " $0}' "$BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml" )
+    export BCM_CLUSTER_MASTER_LXD_PRESEED
     
     BCM_LISTEN_INTERFACE=
     if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
@@ -77,14 +77,14 @@ fi
 if [[ $BCM_PROVIDER_NAME = 'baremetal' ]]; then
   bash -c "cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | sudo lxd init --preseed"
 elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
-  ## launch the VM based on Ubuntu Bionic with a static cloud-init.
+  ## launch the VM based with a static cloud-init.
   # we'll create lxd preseed files AFTER boot so we know the IP address.
   multipass launch \
-    --disk $BCM_ENDPOINT_DISK_SIZE \
-    --mem $BCM_ENDPOINT_MEM_SIZE \
-    --cpus $BCM_ENDPOINT_CPU_COUNT \
-    --name $BCM_CLUSTER_ENDPOINT_NAME \
-    --cloud-init $BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml \
+    --disk "$BCM_ENDPOINT_DISK_SIZE" \
+    --mem "$BCM_ENDPOINT_MEM_SIZE" \
+    --cpus "$BCM_ENDPOINT_CPU_COUNT" \
+    --name "$BCM_CLUSTER_ENDPOINT_NAME" \
+    --cloud-init "$BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml" \
     cosmic
 
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
@@ -95,6 +95,6 @@ fi
 
 # if it's the cluster master add the LXC remote so we can manage it.
 if [[ $IS_MASTER = 1 ]]; then
-  BCM_ENDPOINT_VM_IP=`./get_endpoint_ip.sh --provider=$BCM_PROVIDER_NAME --endpoint-name=$BCM_CLUSTER_ENDPOINT_NAME`
-  ./add_endpoint_lxd_remote.sh --cluster-name=$BCM_CLUSTER_NAME --endpoint=$BCM_CLUSTER_ENDPOINT_NAME --endpoint-ip=$BCM_ENDPOINT_VM_IP --endpoint-lxd-secret=$BCM_LXD_SECRET
+  BCM_ENDPOINT_VM_IP=$(./get_endpoint_ip.sh --provider="$BCM_PROVIDER_NAME" --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME")
+  ./add_endpoint_lxd_remote.sh --cluster-name="$BCM_CLUSTER_NAME" --endpoint="$BCM_CLUSTER_ENDPOINT_NAME" --endpoint-ip="$BCM_ENDPOINT_VM_IP" --endpoint-lxd-secret="$BCM_LXD_SECRET"
 fi

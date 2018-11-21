@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 source ./defaults.sh
 
@@ -14,9 +14,9 @@ if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE = 1 ]]; then
     # remove image bcm-template
     $BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh "bcm-template"
 fi
-# remove image bcm-bionic-base
-if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_BIONIC_BASE_DELETE = 1 ]]; then
-    $BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh bcm-bionic-base
+# remove image bcm-lxc-base
+if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_BASE_DELETE = 1 ]]; then
+    $BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh bcm-lxc-base
 fi
 
 if [[ ! -z $(lxc storage list | grep "bcm-host-template-dockervol") ]]; then

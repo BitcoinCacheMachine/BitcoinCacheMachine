@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-bash -c ./kafka/destroy_lxc_kafka.sh
+./kafka/destroy_lxc_kafka.sh
 
-bash -c ./gateway/destroy_lxc_gateway.sh
+./gateway/destroy_lxc_gateway.sh
 
-bash -c ./host_template/destroy_lxc_host_template.sh
+./host_template/destroy_lxc_host_template.sh 

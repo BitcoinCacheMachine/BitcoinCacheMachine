@@ -26,4 +26,4 @@ volumes:
 networks:
   zookeepernet:
     external: true
-    name: zookeeper-01_zookeepernet
+    name: zookeepernet

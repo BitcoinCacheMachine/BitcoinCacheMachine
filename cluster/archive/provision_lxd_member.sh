@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -eu
+# set -Eeuo pipefail
 
 # BCM_CLUSTER_ENDPOINT_NAME=$1
 # ENDPOINTS_DIR=$2

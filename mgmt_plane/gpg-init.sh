@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # this is the directory that we're going to emit public key material; should be backed up

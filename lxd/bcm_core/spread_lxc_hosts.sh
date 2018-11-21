@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 
 BCM_LXC_HOSTNAME=
 

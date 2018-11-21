@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 if [[ -z $(docker image list | grep "bcm-trezor") ]]; then
@@ -8,7 +8,7 @@ if [[ -z $(docker image list | grep "bcm-trezor") ]]; then
 else
     # make sure the container is up-to-date, but don't display
     echo "Updating docker image bcm-trezor:latest ..."
-    docker build -t bcm-trezor:latest . >> /dev/null
+    docker build -t bcm-trezor:latest . >>/dev/null
 fi
 
 

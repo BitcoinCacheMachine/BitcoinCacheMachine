@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eu
+set -Eeuo pipefail
 
 echo "Copying /data/bitcoin.conf to /root/.bitcoin/bitcoin.conf so the bitcoin-cli works without issue"
 mkdir -p /root/.bitcoin

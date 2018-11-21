@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # quit if error
-set -eu
+set -Eeuo pipefail
 
 # set the working directory to the location where the script is located
 # since all file references are relative to this script

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 ZOOKEEPER_IMAGE=
@@ -39,25 +39,23 @@ if [[ -z $ZOOKEEPER_IMAGE ]]; then
     exit
 fi
 
-if [[ -z HOST_ENDING ]]; then
+if [[ -z $HOST_ENDING ]]; then
     echo "HOST_ENDING is empty."
     exit
 fi
 
-if [[ -z KAFKA_HOSTNAME ]]; then
+if [[ -z $KAFKA_HOSTNAME ]]; then
     echo "KAFKA_HOSTNAME is empty."
     exit
 fi
 
-if [[ -z ZOOKEEPER_SERVERS ]]; then
+if [[ -z $ZOOKEEPER_SERVERS ]]; then
     echo "ZOOKEEPER_SERVERS is empty."
     exit
 fi
 
-if [[ $HOST_ENDING = 1 ]]; then
-    STACK_FILE=zookeeper_master.yml
-elif [[ $HOST_ENDING -ge 2 ]]; then
-    STACK_FILE=zookeeper_member.yml
+if ! lxc exec bcm-gateway-01 -- docker network list | grep -q "zookeepernet"; then
+    lxc exec bcm-gateway-01 -- docker network create --driver=overlay --attachable=true zookeepernet
 fi
 
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d $HOST_ENDING)" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d $HOST_ENDING)" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/$STACK_FILE "zookeeper-$(printf %02d $HOST_ENDING)"
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d $HOST_ENDING)" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d $HOST_ENDING)" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/zookeeper.yml "zookeeper-$(printf %02d $HOST_ENDING)"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 echo "git entrypoint.sh"
 

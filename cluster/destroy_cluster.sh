@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-set -eu
+set -Eeuo pipefail
 
 BCM_CLUSTER_NAME=
 BCM_DEBUG=0

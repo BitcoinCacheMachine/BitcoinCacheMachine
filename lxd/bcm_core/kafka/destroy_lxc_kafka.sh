@@ -1,25 +1,43 @@
 #!/bin/bash
 
-set -eu
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-
-MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
-for endpoint in $(bcm cluster list --endpoints --cluster-name=$BCM_CLUSTER_NAME); do
+# iterate over endpoints and delete relevant resources
+for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
     #echo $endpoint
-    HOST_ENDING=$(echo $endpoint | tail -c 2)
-    KAFKA_HOST="bcm-kafka-$(printf %02d $HOST_ENDING)"
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    KAFKA_HOST="bcm-kafka-$(printf %02d "$HOST_ENDING")"
+    ZOOKEEPER_STACK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")"
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
 
-    if [[ ! -z $(lxc list | grep "$KAFKA_HOST") ]]; then
-        lxc delete $KAFKA_HOST --force
+
+    # remove swarm services related to kafka
+    if ! lxc list | grep -q "bcm-gateway-01"; then
+        if lxc exec bcm-gateway-01 -- docker stack ls | grep -q "$ZOOKEEPER_STACK_NAME"; then
+            lxc exec bcm-gateway-01 -- docker stack rm "$ZOOKEEPER_STACK_NAME"
+        fi
+
+        if lxc exec bcm-gateway-01 -- docker stack ls | grep -q "$BROKER_STACK_NAME"; then
+            lxc exec bcm-gateway-01 -- docker stack rm "$BROKER_STACK_NAME"
+        fi
+
     fi
 
-    if [[ ! -z $(lxc storage volume list bcm_btrfs | grep "$KAFKA_HOST-dockerdisk") ]]; then
-        lxc storage volume delete bcm_btrfs "$KAFKA_HOST-dockerdisk" --target $endpoint
+    if lxc list | grep -q "$KAFKA_HOST"; then
+        lxc delete "$KAFKA_HOST" --force
+    fi
+
+    if lxc storage volume list bcm_btrfs | grep -q "$KAFKA_HOST-dockerdisk"; then
+        lxc storage volume delete bcm_btrfs "$KAFKA_HOST-dockerdisk" --target "$endpoint"
     fi
 done
 
 
-if [[ ! -z $(lxc profile list | grep "bcm_kafka_profile") ]]; then
+if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+    lxc exec bcm-gateway-01 -- docker network rm kafkanet
+fi
+
+if lxc profile list | grep -q "bcm_kafka_profile"; then
     lxc profile delete bcm_kafka_profile
 fi

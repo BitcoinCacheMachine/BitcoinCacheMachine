@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 
 BCM_CLUSTER_ENDPOINT_NAME=
 BCM_ENDPOINT_VM_IP=

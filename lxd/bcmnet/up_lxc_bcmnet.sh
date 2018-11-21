@@ -4,7 +4,7 @@
 # ready to run docker containers and has 1 interface exclusively connecting
 # to bcmnet.
 
-set -eu
+set -Eeuo pipefail
 
 
 # set the working directory to the location where the script is located

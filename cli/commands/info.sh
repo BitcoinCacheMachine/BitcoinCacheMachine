@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TREZOR_USB_PATH=$(bash -c ./shared/get_trezor_usb_path.sh)

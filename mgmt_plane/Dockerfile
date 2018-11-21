@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:bionic
 RUN apt-get update
 RUN apt-get install -y apt-utils systemd lxd-client
 # so scripts won't ask for interactive input.

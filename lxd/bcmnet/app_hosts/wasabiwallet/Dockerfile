@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM bcm-docker-base:latest
 RUN apt-get update 
 RUN apt-get install -y tor
 COPY ./build_wasabi.sh /build_wasabi.sh

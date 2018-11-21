@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 echo "BCM_CERT_DIR: $BCM_CERT_DIR"

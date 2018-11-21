@@ -1,5 +1,6 @@
 Description:
-  Use Trezor to generate new keys and connect to remote SSH servers.
+  Use Trezor to generate new keys or connect to remote SSH servers using your
+  Trezor for SSH authentication.
 
 Usage:
   bcm ssh [command]

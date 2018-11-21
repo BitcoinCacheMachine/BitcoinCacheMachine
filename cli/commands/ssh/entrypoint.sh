@@ -1,11 +1,11 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # BCM_CLI_VERB=$2
-BCM_TREZOR_SSH_USERNAME=
-BCM_TREZOR_SSH_HOSTNAME=
+BCM_SSH_USERNAME=
+BCM_SSH_HOSTNAME=
 BCM_CERT_DIR=
 BCM_SSH_KEY_DIR=
 
@@ -13,15 +13,11 @@ for i in "$@"
 do
 case $i in
     --ssh-username=*)
-    BCM_TREZOR_SSH_USERNAME="${i#*=}"
+    BCM_SSH_USERNAME="${i#*=}"
     shift # past argument=value
     ;;
     --ssh-hostname=*)
-    BCM_TREZOR_SSH_HOSTNAME="${i#*=}"
-    shift # past argument=value
-    ;;
-    --cert-dir=*)
-    BCM_CERT_DIR="${i#*=}"
+    BCM_SSH_HOSTNAME="${i#*=}"
     shift # past argument=value
     ;;
     --ssh-key-dir=*)
@@ -34,9 +30,13 @@ case $i in
 esac
 done
 
-export BCM_TREZOR_SSH_USERNAME=$BCM_TREZOR_SSH_USERNAME
-export BCM_TREZOR_SSH_HOSTNAME=$BCM_TREZOR_SSH_HOSTNAME
-export BCM_CERT_DIR=$BCM_CERT_DIR
+if [[ -z $BCM_SSH_KEY_DIR ]]; then
+    echo "BCM_SSH_KEY_DIR is empty. Setting to $HOME/.ssh"
+    export BCM_SSH_KEY_DIR="$HOME/.ssh"
+fi
+
+export BCM_SSH_USERNAME=$BCM_SSH_USERNAME
+export BCM_SSH_HOSTNAME=$BCM_SSH_HOSTNAME
 export BCM_SSH_KEY_DIR=$BCM_SSH_KEY_DIR
 
 if [[ $BCM_CLI_VERB = "newkey" ]]; then
@@ -44,5 +44,5 @@ if [[ $BCM_CLI_VERB = "newkey" ]]; then
 elif [[ $BCM_CLI_VERB = "connect" ]]; then
     ./connect/connect.sh
 else
-    echo "Error, BCM_TREZOR_SSH_COMMAND invalid. Current value is '$BCM_TREZOR_SSH_COMMAND'"
+    cat ./help.txt
 fi

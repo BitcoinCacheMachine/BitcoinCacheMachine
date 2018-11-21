@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 
 if [[ $(lxc list | grep manager1) ]]; then
     # if manager1 exists, then let's see if the stack is up

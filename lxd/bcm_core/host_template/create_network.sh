@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.

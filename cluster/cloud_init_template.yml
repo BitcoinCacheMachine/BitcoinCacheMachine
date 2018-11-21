@@ -13,7 +13,7 @@ write_files:
     content: |
       #!/bin/bash
 
-      set -eu
+      set -Eeuo pipefail
       cd "$(dirname "$0")"
 
       echo "Removing existing lxd and lxd-client using apt."

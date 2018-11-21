@@ -1,0 +1,37 @@
+version: '3.6'
+services:
+  broker:
+    image: ${DOCKER_IMAGE}
+    networks:
+      zookeepernet:
+      kafkanet:
+        aliases:
+          - ${BROKER_ALIAS:-broker-01}
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    environment:
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID:-1}
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper-01:2181}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS:-INSIDE://broker-01:9092,PLAINTEXT://broker-01:9090}
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ${TARGET_HOST:-bcm-kafka-01}
+
+volumes:
+  kafka-data:
+
+networks:
+  kafkanet:
+    external: true
+    name: kafkanet
+    
+  zookeepernet:
+    external: true
+    name: zookeepernet

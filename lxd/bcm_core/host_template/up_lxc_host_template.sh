@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 source ./defaults.sh
 
@@ -8,9 +8,9 @@ echo "Starting 'up_lxc_host_template.sh'."
 
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
-if [[ ! $(lxc image list | grep "bcm-bionic-base") ]]; then
-  echo "Copying the ubuntu/18.04 lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-bionic-base'"
-  lxc image copy images:ubuntu/18.04 $(lxc remote get-default): --alias bcm-bionic-base --auto-update --public
+if [[ ! $(lxc image list | grep "bcm-lxc-base") ]]; then
+  echo "Copying the ubuntu/cosmic lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-lxc-base'"
+  lxc image copy images:ubuntu/cosmic $(lxc remote get-default): --alias bcm-lxc-base --auto-update
 fi
 
 function createProfile {

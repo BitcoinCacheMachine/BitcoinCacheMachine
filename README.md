@@ -18,14 +18,14 @@ There are many areas where your privacy can be compromised if you're not careful
 
 ## Goals of Bitcoin Cache Machine
 
-Below you will find some of the development goals for Bitcoin Cache Machine:
+Here are some of the development goals for Bitcoin Cache Machine:
 
 * Provide a self-contained, distributed, event-driven, software-defined data center that focuses on operational Bitcoin and Lightning-related IT infrastructure.
-* Run entirely on commodity x86_x64 hardware for home and small office settings.
+* Enable small-to-medium-sized scalability by adding commodity x86_x64 hardware for home and small office settings.
 * Integrate exclusively free and open source software ([FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software))!
 * Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
-* Embrace hardware wallets for cryptographic  operations (trust boundaries, e.g., distinct lines of business accounting) where possible (e.g., Trezor-generated SSH keys or PGP certificates for authentication and encryption).
+* Require hardware wallets for cryptographic operations (PGP, SSH, etc.).
 * Pre-configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.).
 * Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications, etc...
 
@@ -35,7 +35,7 @@ If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/)
 
 BCM components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can run a BCM project stack anywhere you can get an LXD endpoint! LXD is widely available on various free and open-source linux platforms. The BCM CLI installs all the software you need.
 
-Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu 18.04 machines, but should work with most Debian-based distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used.
+Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu (>=18.04) machines, but should work with most Debian-based distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used.
 
  `README.md` files in each directory describe the general architecture of BCM at that level, as well as describes the purpose of each script.
 
@@ -75,7 +75,7 @@ Feel free to change the directory in which you store the BCM repository on your 
 
 TODO: You can quickly see what the BCM CLI is capable of by running [`./demo/up_demo.sh`](./demo/up_demo.sh). This script uses the BCM CLI to automatically deploy a Bitcoin Core full node and c-lightning to your local machine. BCM CLI commands automatically installs all software for you. `up_demo.sh` deploys the BCM Project `BCMSparkStack` which exposes the c-lightning RPC interface as an authenticated onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
 
-> NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu 18.04 (Desktop or Server).
+> NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu (Desktop or Server).
 
 ## How to contribute
 

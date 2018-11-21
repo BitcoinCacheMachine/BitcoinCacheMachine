@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-set -eu
+set -Eeuo pipefail
 
 BCM_LXC_CONTAINER_NAME=
 

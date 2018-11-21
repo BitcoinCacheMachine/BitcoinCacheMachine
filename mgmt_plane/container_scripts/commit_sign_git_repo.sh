@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 
 # set our working directory to the /gitrepo is which where out git repository
 # should be mounted. This is what we're committing.

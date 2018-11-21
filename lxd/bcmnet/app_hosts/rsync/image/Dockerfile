@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM bcm-docker-base
 
 ENV http_proxy=http://squid.bcmnet:3128 \
     https_proxy=http://squid.bcmnet:3128

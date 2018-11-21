@@ -1,0 +1,13 @@
+Description:
+  Connect to a remote server using SSH and Trezor for authentication. The remote server MUST 
+  explicitly trust the SSH public key that was previously generated through the 'bcm ssh newkey'
+  command.
+
+Usage:
+  bcm ssh connect --ssh-username=<BCM_SSH_USERNAME> \
+                  --ssh-hostname=<BCM_SSH_HOSTNAME>
+
+Required Parameters:
+  --ssh-username=<BCM_SSH_USERNAME>  Required. The username to use in the SSH key.
+  
+  --ssh-hostname=<BCM_SSH_HOSTNAME>  Required. The hostname or domain name of the SSH key.

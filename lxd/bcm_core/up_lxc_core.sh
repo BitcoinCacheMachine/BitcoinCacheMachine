@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-set -eu
-cd "$(dirname "$0")"
+set -Eeuo pipefail
+cd "$(dirname "$0")" 
 
 # At a high level, this script works towards getting active bcm-gateway docker daemons
 # running on each cluster member. The cluster master '01' is responsible for bootstrapping
@@ -15,3 +15,4 @@ bash -c ./host_template/up_lxc_host_template.sh
 bash -c ./gateway/up_lxc_gateway.sh
 
 bash -c ./kafka/up_lxc_kafka.sh
+ 

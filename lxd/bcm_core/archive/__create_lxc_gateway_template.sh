@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 source ../host_template/defaults.sh
 source ./defaults.sh

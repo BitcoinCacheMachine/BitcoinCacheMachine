@@ -1,20 +1,21 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
-source ./env.sh
 
+source ./.env 
+ 
 # This script is a sample BCM CLI program that instantiates 
 # a datacenter stack. First, the SDN Controller is initialized
 # then a 4 node cluster is created using multipass. 
-# next a default project scaffolding is created
+# next a default project scadffolding is created
 # Then we deploy the project definition to the cluster we created.
 
 
 bcm init --cert-name="derek" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
 
 # create a cluster named dev. LXD is deployed to localhost
-bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="baremetal" --mgmt-type="local"
+bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="multipass" --mgmt-type="local" --node-count=4
 # --node-count=2
 
 ## Create a basic project difintion.

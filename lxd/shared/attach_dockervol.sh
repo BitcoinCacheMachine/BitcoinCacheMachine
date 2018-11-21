@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -Eeuo pipefail
 
 LXC_CONTAINER_NAME=
 LXC_DOCKERVOL_NAME=

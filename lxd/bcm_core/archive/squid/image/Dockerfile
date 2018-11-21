@@ -1,4 +1,4 @@
-FROM <FIXME>/bcm-base:latest
+FROM <FIXME>/bcm-docker-base:latest
 RUN apt-get -y install squid
 
 ADD entrypoint.sh /entrypoint.sh
