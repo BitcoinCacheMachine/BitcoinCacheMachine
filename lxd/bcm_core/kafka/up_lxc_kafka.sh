@@ -10,12 +10,6 @@ if ! lxc image list | grep -q "bcm-template"; then
     exit
 fi
 
-# let's make sure we have the dockertemplate to init from.
-if ! lxc list | grep -q "bcm-host-template"; then
-    echo "Error. LXC host 'bcm-host-template' doesn't exist."
-    exit
-fi
-
 # create the 'bcm_kafka_profile' lxc profile
 if ! lxc profile list | grep -q "bcm_kafka_profile"; then
     lxc profile create bcm_kafka_profile
@@ -84,7 +78,7 @@ fi
 
 
 # let's cycle through the other cluster members (other than the master)
-# and get their bcm-gateway host going.
+# and get their bcm-kafka-XX LXC host deployed
 for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
     if [[ "$endpoint" != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$endpoint" | tail -c 2)
@@ -112,51 +106,93 @@ done
 
 
 # now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
-# 3 nodes (if we have a cluster of that size).
+# 5 nodes (if we have a cluster of that size). 5 should be more than enough for
+# most deployments.
 CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)
-
 ZOOKEEPER_SERVERS="server.1=zookeeper-01:2888:3888"
 ZOOKEEPER_CONNECT="zookeeper-01:2181"
+MAX_ZOOKEEPER_NODES=5
 
-if [[ $CLUSTER_NODE_COUNT -ge 2 ]]; then
-    ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS server.2=zookeeper-02:2888:3888"
-    ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT,zookeeper-02:2181"
-fi
+NODE=2
+while [[ "$NODE" -le "$MAX_ZOOKEEPER_NODES" && "$NODE" -le "$CLUSTER_NODE_COUNT" ]]; do
+    ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS server.$NODE=zookeeper-$(printf %02d "$NODE"):2888:3888"
+    ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT,zookeeper-$(printf %02d "$NODE"):2181"
+    NODE=$(( "$NODE" + 1 ))
+done
 
-if [[ $CLUSTER_NODE_COUNT -ge 3 ]]; then
-    ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS server.3=zookeeper-03:2888:3888"
-    ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT,zookeeper-03:2181"
-fi
+echo "ZOOKEEPER_SERVERS: $ZOOKEEPER_SERVERS"
+echo "ZOOKEEPER_CONNECT: $ZOOKEEPER_CONNECT"
 
-# Deploy the first zookeeper node.
-./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
-    --host-ending=1 \
-    --target-host="bcm-kafka-01" \
-    --zookeeper-servers="$ZOOKEEPER_SERVERS"
+for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    KAFKA_HOSTNAME="bcm-kafka-$(printf %02d "$HOST_ENDING")"
+    ./deploy_zookeeper.sh --docker-image-name="$ZOOKEEPER_IMAGE" \
+                                --host-ending="$HOST_ENDING" \
+                                --target-host="$KAFKA_HOSTNAME" \
+                                --zookeeper-servers="$ZOOKEEPER_SERVERS"
 
-# deploy 2nd zookeeper node if we can.
-if [[ $CLUSTER_NODE_COUNT -ge 2 ]]; then
-    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
-        --host-ending=2 \
-        --target-host="bcm-kafka-02" \
-        --zookeeper-servers="$ZOOKEEPER_SERVERS"
-fi
+    if [[ $HOST_ENDING -gt $MAX_ZOOKEEPER_NODES || $HOST_ENDING -gt $CLUSTER_NODE_COUNT ]]; then
+        break;
+    fi
+done
 
-# deploy 3rd zookeeper if we can
-if [[ $CLUSTER_NODE_COUNT -ge 3 ]]; then
-    ./deploy_zookeeper.sh --docker-image-name=$ZOOKEEPER_IMAGE \
-        --host-ending=3 \
-        --target-host="bcm-kafka-03" \
-        --zookeeper-servers="$ZOOKEEPER_SERVERS"
-fi
+
 
 # now let's deploy kafka
 lxc file push ./docker_stack/kafka.yml bcm-gateway-01/root/stacks/kafka.yml
 
-# let's deploy a kafka node to each cluster endpoint.
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
-    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-    KAFKA_HOSTNAME="bcm-kafka-$(printf %02d "$HOST_ENDING")"
+if ! lxc exec bcm-gateway-01 -- docker network list | grep "kafkanet" | grep "overlay" | grep -q "swarm"; then
+    lxc exec bcm-gateway-01 -- docker network create --driver=overlay --opt=encrypted --attachable=true kafkanet
 
-    ./deploy_kafka.sh --docker-image-name="$KAFKA_IMAGE" --host-ending="$HOST_ENDING" --zookeeper-connect="$ZOOKEEPER_CONNECT" --advertised-listeners="INSIDE://broker-$(printf %02d "$HOST_ENDING"):9092,PLAINTEXT://broker-$(printf %02d "$HOST_ENDING"):9090"
-done
+    # let's deploy a kafka node to each cluster endpoint.
+    for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+        HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+        KAFKA_HOSTNAME="bcm-kafka-$(printf %02d "$HOST_ENDING")"
+        BROKER_HOSTNAME="broker-$(printf %02d "$HOST_ENDING")"
+        KAFKA_ADVERTISED_LISTENERS="INSIDE://$BROKER_HOSTNAME:9092,PLAINTEXT://$BROKER_HOSTNAME:9090"
+
+        lxc exec bcm-gateway-01 -- env DOCKER_IMAGE=$KAFKA_IMAGE BROKER_ALIAS="$BROKER_HOSTNAME" KAFKA_BROKER_ID="$HOST_ENDING" KAFKA_ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT" KAFKA_ADVERTISED_LISTENERS="$KAFKA_ADVERTISED_LISTENERS" TARGET_HOST="$TARGET_HOST" docker stack deploy -c /root/stacks/kafka.yml "$BROKER_HOSTNAME"
+    done
+fi
+
+
+
+
+
+
+    
+
+
+
+
+# SCHEMA_REGISTRY_IMAGE="$REGISTRY/bcm-schema-registry:latest"
+# KAFKA_HOSTNAME="bcm-kafka-01"
+
+# if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
+#     lxc exec $KAFKA_HOSTNAME -- docker pull confluentinc/cp-schema-registry:5.0.1
+#     lxc exec $KAFKA_HOSTNAME -- docker tag confluentinc/cp-schema-registry:5.0.1 "$SCHEMA_REGISTRY_IMAGE"
+#     lxc exec $KAFKA_HOSTNAME -- docker push "$SCHEMA_REGISTRY_IMAGE"
+# fi
+
+
+# # now let's deploy kafka
+# lxc file push ./docker_stack/schema-registry.yml bcm-gateway-01/root/stacks/schema-registry.yml
+
+# lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$SCHEMA_REGISTRY_IMAGE" KAFKA_ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT" docker stack deploy -c /root/stacks/schema-registry.yml schemaregistry
+
+
+
+
+
+
+
+# KAFKA_REST_IMAGE="$REGISTRY/bcm-kafka-rest:latest"
+# if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
+#     lxc exec $KAFKA_HOSTNAME -- docker pull confluentinc/cp-kafka-rest:5.0.1
+#     lxc exec $KAFKA_HOSTNAME -- docker tag confluentinc/cp-kafka-rest:5.0.1 "$KAFKA_REST_IMAGE"
+#     lxc exec $KAFKA_HOSTNAME -- docker push "$KAFKA_REST_IMAGE"
+# fi
+
+
+# #
+

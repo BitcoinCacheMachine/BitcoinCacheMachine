@@ -1,0 +1,35 @@
+version: '3.6'
+services:
+  schema-registry:
+    image: ${DOCKER_IMAGE}
+    ports:
+      - "8081:8081"
+    networks:
+      schemaregistrynet:
+        aliases:
+          - schemaregistry
+      zookeepernet:
+      kafkanet:
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper-01:2181}
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_DEBUG: "true"
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints:
+          - engine.labels.kafka = true
+
+networks:
+  kafkanet:
+    external: true
+    name: kafkanet
+
+  zookeepernet:
+    external: true
+    name: zookeepernet
+
+  schemaregistrynet:
+    attachable: true

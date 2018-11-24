@@ -14,7 +14,7 @@ services:
     deploy:
       placement:
         constraints:
-          - engine.labels.gateway == true
+          - engine.labels.bcm-gateway == true
 
 configs:
   tor_config:

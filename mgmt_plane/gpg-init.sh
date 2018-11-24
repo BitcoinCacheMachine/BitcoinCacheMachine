@@ -56,7 +56,7 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
         -e BCM_CERT_NAME="$BCM_CERT_NAME" \
         -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
         -e BCM_CERT_FQDN="$BCM_CERT_FQDN" \
-        --device=$BCM_TREZOR_USB_PATH \
+        --device="$BCM_TREZOR_USB_PATH" \
         bcm-trezor:latest bash -c 'trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"'
 
     echo "Your public key and public keyring material can be found at '$BCM_CERT_DIR/trezor'."
@@ -68,11 +68,13 @@ LINE=$(sudo GNUPGHOME="$GNUPGHOME" su -p root -c 'gpg --no-permission-warning --
 #echo $LINE
 LINE="${LINE#*/}"
 #echo $LINE
-LINE="$(echo $LINE | grep -o '^\S*')"
-LINE="$(echo $LINE | xargs)"
+LINE="$(echo "$LINE" | grep -o '^\S*')"
+LINE="$(echo "$LINE" | xargs)"
 
-echo '#!/bin/bash' > "$BCM_CERT_DIR/.env"
-echo "export BCM_DEFAULT_KEY_ID="'"'$LINE'"' >> "$BCM_CERT_DIR/.env"
-echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"' >> "$BCM_CERT_DIR/.env"
-echo "export BCM_CERT_USERNAME="'"'$BCM_CERT_USERNAME'"' >> "$BCM_CERT_DIR/.env"
-echo "export BCM_CERT_FQDN="'"'$BCM_CERT_FQDN'"' >> "$BCM_CERT_DIR/.env"
+{
+    echo '#!/bin/bash'
+    echo "export BCM_DEFAULT_KEY_ID="'"'"$LINE"'"'
+    echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"'
+    echo "export BCM_CERT_USERNAME="'"'$BCM_CERT_USERNAME'"'
+    echo "export BCM_CERT_FQDN="'"'$BCM_CERT_FQDN'"' 
+} >> "$BCM_CERT_DIR/.env"

@@ -55,7 +55,7 @@ if [[ -z $ZOOKEEPER_SERVERS ]]; then
 fi
 
 if ! lxc exec bcm-gateway-01 -- docker network list | grep -q "zookeepernet"; then
-    lxc exec bcm-gateway-01 -- docker network create --driver=overlay --attachable=true zookeepernet
+    lxc exec bcm-gateway-01 -- docker network create --driver overlay --opt encrypted --attachable zookeepernet
 fi
 
 lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d $HOST_ENDING)" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d $HOST_ENDING)" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/zookeeper.yml "zookeeper-$(printf %02d $HOST_ENDING)"

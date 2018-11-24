@@ -46,6 +46,7 @@ else
   {
     echo "$BCM_BASHRC_START_FLAG"
     echo "export BCM_LOCAL_GIT_REPO_DIR=$BCM_LOCAL_GIT_REPO_DIR"
+    # shellcheck disable=SC2016
     echo "export PATH="'$PATH:'""'$BCM_LOCAL_GIT_REPO_DIR/cli'""
     echo "export BCM_RUNTIME_DIR=$BCM_RUNTIME_DIR"
     echo "$BCM_BASHRC_END_FLAG"
