@@ -128,19 +128,27 @@ if [[ $BCM_CLI_VERB = "commit" ]]; then
     # shellcheck disable=SC1090
     source "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/export_usb_path.sh"
 
-    docker run -d --name gitter \
-        -v $BCM_CERT_DIR:/root/.gnupg \
-        -v $BCM_GIT_REPO_DIR:/gitrepo \
-        --device="$BCM_TREZOR_USB_PATH" \
-        -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
-        -e BCM_EMAIL_ADDRESS="$BCM_EMAIL_ADDRESS" \
-        -e BCM_GIT_COMMIT_MESSAGE="$BCM_GIT_COMMIT_MESSAGE" \
-        -e BCM_GPG_SIGNING_KEY_ID="$BCM_GPG_SIGNING_KEY_ID" \
-        bcm-gpgagent:latest
+    if ! docker ps | grep -q "gitter"; then
+        docker system prune -f 
+        sleep 5
+        docker run -d --name gitter \
+            -v $BCM_CERT_DIR:/root/.gnupg \
+            -v $BCM_GIT_REPO_DIR:/gitrepo \
+            --device="$BCM_TREZOR_USB_PATH" \
+            -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
+            -e BCM_EMAIL_ADDRESS="$BCM_EMAIL_ADDRESS" \
+            -e BCM_GIT_COMMIT_MESSAGE="$BCM_GIT_COMMIT_MESSAGE" \
+            -e BCM_GPG_SIGNING_KEY_ID="$BCM_GPG_SIGNING_KEY_ID" \
+            bcm-gpgagent:latest
         
-    sleep 1
+        sleep 3
+    fi
 
-    docker exec -it gitter  /bcm/commit_sign_git_repo.sh
+    if docker ps | grep -q "gitter"; then
+        docker exec -it gitter  /bcm/commit_sign_git_repo.sh
+    else    
+        echo "Error. Docker container 'gitter' was not running."
+    fi
 
 elif [[ $BCM_CLI_VERB = "push" ]]; then
     echo "git push TODO"

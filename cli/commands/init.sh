@@ -9,30 +9,27 @@ BCM_CERT_USERNAME=
 BCM_CERT_FQDN=
 BCM_CERT_DIR_OVERRIDE=
 
-if [[ "$@" = "init" ]]; then
-    BCM_HELP_FLAG=1
-fi
 
 for i in "$@"
 do
 case $i in
-    -o=*|--cert-dir=*)
+    --cert-dir=*)
     BCM_CERT_DIR="${i#*=}"
     shift # past argument=value
     ;;
-    -n=*|--cert-name=*)
+    --cert-name=*)
     BCM_CERT_NAME="${i#*=}"
     shift # past argument=value
     ;;
-    -u=*|--cert-username=*)
+    --cert-username=*)
     BCM_CERT_USERNAME="${i#*=}"
     shift # past argument=value
     ;;
-    -c=*|--cert-fqdn=*)
+    --cert-fqdn=*)
     BCM_CERT_FQDN="${i#*=}"
     shift # past argument=value
     ;;
-    -o=*|--cert-dir-override=*)
+    --cert-dir-override=*)
     BCM_CERT_DIR_OVERRIDE="${i#*=}"
     shift # past argument=value
     ;;
@@ -55,10 +52,16 @@ fi
 
 
 # if $BCM_RUNTIME_DIR doesn't exist, create it. THIS IS NOT A GIT REPO
-if [ ! -d $BCM_RUNTIME_DIR ]; then
+if [ ! -d "$BCM_RUNTIME_DIR" ]; then
     echo "Creating Bitcoin Cache Machine git repo at $BCM_RUNTIME_DIR"
     mkdir -p "$BCM_RUNTIME_DIR"
-    echo "Created $BCM_RUNTIME_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > $BCM_RUNTIME_DIR/debug.log
+    echo "Created $BCM_RUNTIME_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > "$BCM_RUNTIME_DIR/debug.log"
+fi
+
+# if $BCM_RUNTIME_DIR doesn't exist, create it. THIS IS NOT A GIT REPO
+if [ ! -d "$HOME/.password-store" ]; then
+    echo "Creating $HOME/.password-store"
+    mkdir -p "$HOME/.password-store"
 fi
 
 function createBCMGitRepo {
@@ -68,10 +71,11 @@ function createBCMGitRepo {
         echo "Creating Bitcoin Cache Machine repo at $BCM_DIR"
         mkdir -p "$BCM_DIR"
         git init "$BCM_DIR/"
-        echo "Created $BCM_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > $BCM_DIR/debug.log
+        echo "Created $BCM_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." > "$BCM_DIR/debug.log"
     fi
 }
 
+# shellcheck disable=SC2153
 createBCMGitRepo "$BCM_CERTS_DIR"
 createBCMGitRepo "$BCM_PROJECTS_DIR"
 createBCMGitRepo "$BCM_CLUSTERS_DIR"
