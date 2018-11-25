@@ -95,20 +95,20 @@ if [[ $BCM_CLI_VERB = "commit" ]]; then
         exit
     fi
     
-    # we need to stop any existing containers if there is any.
-    if [[ $(docker ps | grep "gitter") ]]; then
-        docker kill gitter
-        sleep 2
-    fi
+    # # we need to stop any existing containers if there is any.
+    # if ! docker ps | grep -q "gitter"; then
+    #     docker kill gitter
+    #     sleep 2
+    # fi
 
-    # we need to stop any existing containers if there is any.
-    if [[ $(docker ps -a | grep "gitter") ]]; then
-        docker system prune -f
-        sleep 3
-    fi
+    # # we need to stop any existing containers if there is any.
+    # if ! docker ps -a | grep -q "gitter"; then
+    #     docker system prune -f
+    #     sleep 3
+    # fi
 
     bash -c "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/build.sh"
-    if [[ ! -z $(docker image list | grep "bcm-gpgagent:latest") ]]; then
+    if docker image list | grep -q "bcm-gpgagent:latest"; then
         docker build -t bcm-gpgagent:latest .
     else
         # make sure the container is up-to-date, but don't display
@@ -125,7 +125,9 @@ if [[ $BCM_CLI_VERB = "commit" ]]; then
         echo "BCM_GPG_SIGNING_KEY_ID: $BCM_GPG_SIGNING_KEY_ID"
     fi
     # get the locatio of the trezor
-    export BCM_TREZOR_USB_PATH=$(bcm info | grep "TREZOR_USB_PATH" | awk 'NF>1{print $NF}')
+    # shellcheck disable=SC1090
+    source "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/export_usb_path.sh"
+
     docker run -d --name gitter \
         -v $BCM_CERT_DIR:/root/.gnupg \
         -v $BCM_GIT_REPO_DIR:/gitrepo \
@@ -135,7 +137,9 @@ if [[ $BCM_CLI_VERB = "commit" ]]; then
         -e BCM_GIT_COMMIT_MESSAGE="$BCM_GIT_COMMIT_MESSAGE" \
         -e BCM_GPG_SIGNING_KEY_ID="$BCM_GPG_SIGNING_KEY_ID" \
         bcm-gpgagent:latest
+        
     sleep 1
+
     docker exec -it gitter  /bcm/commit_sign_git_repo.sh
 
 elif [[ $BCM_CLI_VERB = "push" ]]; then

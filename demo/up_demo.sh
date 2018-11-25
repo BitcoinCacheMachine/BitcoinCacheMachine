@@ -11,15 +11,18 @@ source ./.env
 # next a default project scadffolding is created
 # Then we deploy the project definition to the cluster we created.
 
-
+# run bcm init
 bcm init --cert-name="derek" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
 
-# create a cluster named dev. LXD is deployed to localhost
-bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="multipass" --mgmt-type="local" --node-count=3
-# --node-count=2
 
 ## Create a basic project difintion.
 bcm project create --project-name="$BCM_PROJECT_NAME"
+
+# create a cluster named dev. LXD is deployed to localhost
+bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="baremetal" --mgmt-type="local"
+# --node-count=5
+# --node-count=2
+
 
 # then deploy that project definition to an existing cluster.
 bcm project deploy --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --user-name="$BCM_PROJECT_USERNAME"

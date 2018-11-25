@@ -7,4 +7,4 @@ cd "$(dirname "$0")"
 
 ./gateway/destroy_lxc_gateway.sh
 
-./host_template/destroy_lxc_host_template.sh 
+./host_template/destroy_lxc_host_template.sh

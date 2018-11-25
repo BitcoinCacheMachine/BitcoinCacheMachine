@@ -6,23 +6,24 @@ services:
       zookeepernet:
       kafkanet:
         aliases:
-          - ${BROKER_ALIAS:-broker-01}
+          - ${BROKER_HOSTNAME}
     volumes:
       - kafka-data:/var/lib/kafka/data
     environment:
-      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID:-1}
-      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper-01:2181}
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS:-INSIDE://broker-01:9092,PLAINTEXT://broker-01:9090}
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://${BROKER_HOSTNAME}:9092,PLAINTEXT://${BROKER_HOSTNAME}:9090
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
     deploy:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == ${TARGET_HOST:-bcm-kafka-01}
+          - node.hostname == ${TARGET_HOST}
 
 volumes:
   kafka-data:

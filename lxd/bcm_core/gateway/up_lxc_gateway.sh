@@ -5,23 +5,22 @@ cd "$(dirname "$0")"
 
 
 # if bcm-template lxc image exists, run the gateway template creation script.
-if [[ -z $(lxc image list | grep "bcm-template") ]]; then
-    echo "Required LXC image 'bcm-template' does not exist! Ensure your current LXD remote $(lxc remote get-default) creates or downloads a remote 'bcm-template'."
+if ! lxc image list | grep -q "bcm-template"; then
+    echo "Required LXC image 'bcm-template' does not exist. Exiting"
     exit
 fi
 
 ./create_lxc_gateway_networks.sh
 
 # create the 'bcm_gateway_profile' lxc profile
-if [[ -z $(lxc profile list | grep "bcm_gateway_profile") ]]; then
+if ! lxc profile list | grep -q "bcm_gateway_profile"; then
     lxc profile create bcm_gateway_profile
 fi
 
-cat ./lxd_profiles/gateway.yml | lxc profile edit bcm_gateway_profile
-
+lxc profile edit bcm_gateway_profile < ./lxd_profiles/gateway.yml 
 
 # let's make sure we have the dockertemplate to init from.
-if [[ -z $(lxc list | grep "bcm-host-template") ]]; then
+if ! lxc list | grep -q "bcm-host-template"; then
     echo "Error. LXC host 'bcm-host-template' doesn't exist."
     exit
 fi
