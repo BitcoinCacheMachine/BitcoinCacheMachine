@@ -123,17 +123,23 @@ done
 export ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS"
 export ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT"
 
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
-    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-    KAFKA_HOSTNAME="bcm-kafka-$(printf %02d "$HOST_ENDING")"
-    ./deploy_zookeeper.sh --docker-image-name="$ZOOKEEPER_IMAGE" \
-                                --host-ending="$HOST_ENDING" \
-                                --target-host="$KAFKA_HOSTNAME" \
-                                --zookeeper-servers="$ZOOKEEPER_SERVERS"
 
-    if [[ $HOST_ENDING -gt $MAX_ZOOKEEPER_NODES || $HOST_ENDING -gt $CLUSTER_NODE_COUNT ]]; then
+if ! lxc exec bcm-gateway-01 -- docker network list | grep -q "zookeepernet"; then
+    lxc exec bcm-gateway-01 -- docker network create --driver overlay --opt encrypted --attachable zookeepernet
+fi
+
+NODE=1
+for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+    if [[ "$NODE" -ge "$MAX_ZOOKEEPER_NODES" ]]; then
         break;
     fi
+    
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    KAFKA_HOSTNAME="bcm-kafka-$(printf %02d "$HOST_ENDING")"
+
+    lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d "$HOST_ENDING")" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")" TARGET_HOST="$KAFKA_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/zookeeper.yml "zookeeper-$(printf %02d "$HOST_ENDING")"
+
+    NODE=$(( "$NODE" + 1 ))
 done
 
 
@@ -165,13 +171,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
     KAFKA_HOSTNAME="bcm-kafka-$(printf %02d "$HOST_ENDING")"
     BROKER_HOSTNAME="broker-$(printf %02d "$HOST_ENDING")"
 
-    REPLICAS=1
-    if [[ $CLUSTER_NODE_COUNT -le 3 ]]; then
-        REPLICAS=$CLUSTER_NODE_COUNT
-    fi
-
     lxc exec bcm-gateway-01 -- env DOCKER_IMAGE=$KAFKA_IMAGE BROKER_HOSTNAME="$BROKER_HOSTNAME" KAFKA_BROKER_ID="$HOST_ENDING" KAFKA_ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT" TARGET_HOST="$KAFKA_HOSTNAME" docker stack deploy -c /root/stacks/kafka.yml "$BROKER_HOSTNAME"
-
 done
 
 export REGISTRY=$REGISTRY

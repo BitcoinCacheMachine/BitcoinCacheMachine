@@ -2,10 +2,10 @@
 
 
 # let's install and configure docker-ce
-if [[ -z $(snap list | grep docker) ]]; then
-    if [[ -z $(groups | grep docker) ]]; then
+if ! snap list | grep -q docker; then
+    if ! groups | grep -q docker; then
         sudo addgroup --system docker
-        sudo adduser $(whoami) docker
+        sudo adduser "$(whoami)" docker
     fi
     
     sudo snap install docker --stable

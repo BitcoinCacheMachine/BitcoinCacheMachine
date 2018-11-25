@@ -62,11 +62,11 @@ if [[ -d $BCM_CLUSTER_DIR ]]; then
   rm -rf $BCM_CLUSTER_DIR
 fi
 
-source $BCM_CERTS_DIR/.env
-bcm git commit \
-    --cert-dir="$BCM_CERTS_DIR" \
-    --git-repo-dir="$BCM_CLUSTERS_DIR" \
-    --git-commit-message="Destroyed cluster $BCM_CLUSTER_NAME and all associated files." \
-    --git-username="$BCM_CERT_USERNAME" \
-    --email-address="$BCM_CERT_USERNAME@$BCM_CERT_FQDN" \
-    --gpg-signing-key-id="$BCM_DEFAULT_KEY_ID"
+# source $BCM_CERTS_DIR/.env
+# bcm git commit \
+#     --cert-dir="$BCM_CERTS_DIR" \
+#     --git-repo-dir="$BCM_CLUSTERS_DIR" \
+#     --git-commit-message="Destroyed cluster $BCM_CLUSTER_NAME and all associated files." \
+#     --git-username="$BCM_CERT_USERNAME" \
+#     --email-address="$BCM_CERT_USERNAME@$BCM_CERT_FQDN" \
+#     --gpg-signing-key-id="$BCM_DEFAULT_KEY_ID"
