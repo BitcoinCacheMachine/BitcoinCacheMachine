@@ -4,19 +4,20 @@ services:
   # REST commands come over 8083 to control the configuratino of kafka connect
   # Listens on TCP 514 (syslog)
   kafka-connect:
-    image: <FIXME>/kafkaconnect:latest
+    image: ${DOCKER_IMAGE}
     ports:
       - "8083:8083"
       - "514:5514"
     networks:
-      kafka_kafkanet:
+      zookeepernet:
+      kafkanet:
       schemaregistrynet:
       kafkaconnectnet:
         aliases:
           - kafkaconnect
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: broker1:9092,broker2:9092,broker3:9092
-      CONNECT_ZOOKEEPER_CONNECT: zoo1:2181,zoo2:2182,zoo3:2183
+      CONNECT_BOOTSTRAP_SERVERS: ${KAFKA_BOOSTRAP_SERVERS}
+      CONNECT_ZOOKEEPER_CONNECT: ${ZOOKEEPER_CONNECT}
       CONNECT_REST_ADVERTISED_HOST_NAME: kafkaconnect
       CONNECT_REST_PORT: 8083
       CONNECT_GROUP_ID: kafka-connect-group
@@ -37,8 +38,21 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
       CONNECT_PLUGIN_PATH: /etc/kafka-connect/jars
     deploy:
-      mode: replicated
-      replicas: 1
+      mode: global
       placement:
         constraints:
-          - node.hostname == manager1
+          - engine.labels.bcm-kafka == true
+
+networks:
+  kafkaconnectnet:
+    attachable: true
+  
+  zookeepernet:
+    external: true
+  
+  kafkanet:
+    external: true
+
+  schemaregistrynet:
+    external: true
+    name: schemaregistry_schemaregistrynet

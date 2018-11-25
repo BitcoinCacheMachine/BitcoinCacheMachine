@@ -3,6 +3,7 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+bash -c ./kafka_connect/destroy_kafka_connect.sh
 bash -c ./kafka_rest/destroy_kafka_rest.sh
 bash -c ./kafka_schema_registry/destroy_schema-registry.sh
 

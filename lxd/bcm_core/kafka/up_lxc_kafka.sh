@@ -142,22 +142,6 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
     NODE=$(( "$NODE" + 1 ))
 done
 
-
-
-
-KAFKA_BOOSTRAP_SERVERS="broker-01:9092"
-BOOSTRAP_SERVER_MAX=3
-for i in $(seq 1 "$CLUSTER_NODE_COUNT"); do
-    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-    KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS,broker-$(printf %02d "$HOST_ENDING")"
-
-    if [[ $i -gt $BOOSTRAP_SERVER_MAX ]]; then
-        break;
-    fi
-done
-
-export KAFKA_BOOSTRAP_SERVERS=$KAFKA_BOOSTRAP_SERVERS
-echo "KAFKA_BOOSTRAP_SERVERS: $KAFKA_BOOSTRAP_SERVERS"
 # now let's deploy kafka
 lxc file push ./docker_stack/kafka.yml bcm-gateway-01/root/stacks/kafka.yml
 
@@ -166,12 +150,22 @@ if ! lxc exec bcm-gateway-01 -- docker network list | grep "kafkanet" | grep "ov
 fi
 
 # let's deploy a kafka node to each cluster endpoint.
+KAFKA_BOOSTRAP_SERVERS="broker-01:9092"
+BOOSTRAP_SERVER_MAX=3
+NODE=1
 for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
     KAFKA_HOSTNAME="bcm-kafka-$(printf %02d "$HOST_ENDING")"
     BROKER_HOSTNAME="broker-$(printf %02d "$HOST_ENDING")"
-
+    
+    # three brokers is more than sufficient for first contact.
+    if [[ $NODE -gt 1 && $NODE -le $BOOSTRAP_SERVER_MAX ]]; then
+        KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS,broker-$(printf %02d "$HOST_ENDING"):9092"
+    fi
+    
     lxc exec bcm-gateway-01 -- env DOCKER_IMAGE=$KAFKA_IMAGE BROKER_HOSTNAME="$BROKER_HOSTNAME" KAFKA_BROKER_ID="$HOST_ENDING" KAFKA_ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT" TARGET_HOST="$KAFKA_HOSTNAME" docker stack deploy -c /root/stacks/kafka.yml "$BROKER_HOSTNAME"
+
+    NODE=$(( "$NODE" + 1 ))
 done
 
 export REGISTRY=$REGISTRY
@@ -180,3 +174,4 @@ export KAFKA_BOOSTRAP_SERVERS=$KAFKA_BOOSTRAP_SERVERS
 
 ./kafka_schema_registry/up_schema-registry.sh
 ./kafka_rest/up_kafka-rest.sh
+./kafka_connect/up_kafka-connect.sh
