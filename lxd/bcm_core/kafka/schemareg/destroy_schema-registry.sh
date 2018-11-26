@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -Eeuo pipefail
+
 if lxc list | grep -q "bcm-gateway-01"; then
     if [[ "$(lxc exec bcm-gateway-01 -- docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]]; then
         if lxc exec bcm-gateway-01 -- docker stack ls | grep -q "schemaregistry"; then

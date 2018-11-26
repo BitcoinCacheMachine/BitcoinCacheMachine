@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 #### this is what we do when we are told to attach an underlay or stay on virtual network
+BCM_BCMNETTEMPLATE_MACVLAN_TO_UNDERLAY="false"
+BCM_BCMNETTEMPLATE_MACVLAN_INTERFACE="none"
+
 if [[ $BCM_BCMNETTEMPLATE_MACVLAN_TO_UNDERLAY = "true" ]]; then
     # then update the profile with the user-specified interface
     echo "Setting lxc profile 'bcm-bcmnet_template-profile' eth0 to host interface '$BCM_BCMNETTEMPLATE_MACVLAN_INTERFACE'."

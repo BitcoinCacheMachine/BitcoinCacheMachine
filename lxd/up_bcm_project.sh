@@ -24,13 +24,13 @@ if [[ -z $BCM_CLUSTER_DIR ]]; then
 fi 
 
 
-# let's make sure the cluster exists.
+# exit if the cluster definition is missing
 if ! bcm cluster list | grep -q "$BCM_CLUSTER_NAME"; then
   echo "Cluster '$BCM_CLUSTER_NAME' does not exist. BCM Project '$BCM_PROJECT_NAME' will not be deployed."
   exit
 fi
 
-# let's make sure the project exists.
+# Exit if the project already exists.
 if ! bcm project list | grep -q "$BCM_PROJECT_NAME"; then
   echo "Project '$BCM_PROJECT_NAME' does not exist. Can't deploy."
   exit
@@ -54,4 +54,3 @@ fi
 export BCM_LXD_OPS=$BCM_LOCAL_GIT_REPO_DIR/lxd/shared
 
 bash -c ./bcm_core/up_lxc_core.sh
-

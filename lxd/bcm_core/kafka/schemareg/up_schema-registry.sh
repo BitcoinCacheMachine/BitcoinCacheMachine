@@ -1,17 +1,15 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 PUBLIC_SCHEMA_REGISTRY_IMAGE="confluentinc/cp-schema-registry:5.0.1"
-SCHEMA_REGISTRY_IMAGE="$REGISTRY/bcm-kafka-schema-registry:latest"
-KAFKA_HOSTNAME="bcm-kafka-01"
+SCHEMA_REGISTRY_IMAGE="$PRIVATE_REGISTRY/bcm-kafka-schema-registry:latest"
 
-if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
-    lxc exec $KAFKA_HOSTNAME -- docker pull $PUBLIC_SCHEMA_REGISTRY_IMAGE
-    lxc exec $KAFKA_HOSTNAME -- docker tag $PUBLIC_SCHEMA_REGISTRY_IMAGE "$SCHEMA_REGISTRY_IMAGE"
-    lxc exec $KAFKA_HOSTNAME -- docker push "$SCHEMA_REGISTRY_IMAGE"
-fi
+lxc exec bcm-kafka-01 -- docker pull $PUBLIC_SCHEMA_REGISTRY_IMAGE
+lxc exec bcm-kafka-01 -- docker tag $PUBLIC_SCHEMA_REGISTRY_IMAGE "$SCHEMA_REGISTRY_IMAGE"
+lxc exec bcm-kafka-01 -- docker push "$SCHEMA_REGISTRY_IMAGE"
+
 
 # now let's deploy kafka
 lxc file push ./schema-registry.yml bcm-gateway-01/root/stacks/schema-registry.yml

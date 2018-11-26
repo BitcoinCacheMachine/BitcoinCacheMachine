@@ -1,18 +1,14 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-
 PUBLIC_KAFKA_REST_IMAGE="confluentinc/cp-kafka-rest:5.0.1"
-KAFKA_REST_IMAGE="$REGISTRY/bcm-kafka-rest:latest"
-KAFKA_HOSTNAME="bcm-kafka-01"
+KAFKA_REST_IMAGE="$PRIVATE_REGISTRY/bcm-kafka-rest:latest"
 
-if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
-    lxc exec $KAFKA_HOSTNAME -- docker pull $PUBLIC_KAFKA_REST_IMAGE
-    lxc exec $KAFKA_HOSTNAME -- docker tag $PUBLIC_KAFKA_REST_IMAGE "$KAFKA_REST_IMAGE"
-    lxc exec $KAFKA_HOSTNAME -- docker push "$KAFKA_REST_IMAGE"
-fi
+lxc exec bcm-kafka-01 -- docker pull $PUBLIC_KAFKA_REST_IMAGE
+lxc exec bcm-kafka-01 -- docker tag $PUBLIC_KAFKA_REST_IMAGE "$KAFKA_REST_IMAGE"
+lxc exec bcm-kafka-01 -- docker push "$KAFKA_REST_IMAGE"
 
 # now let's deploy kafka
 lxc file push ./kafka-rest.yml bcm-gateway-01/root/stacks/kafka-rest.yml

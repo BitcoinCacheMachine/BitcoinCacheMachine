@@ -2,7 +2,6 @@
 
 # the goal of this script is to get us a running instance named $1
 # that's connected to either bcmNet for standalone deployments
-# or uses macvlan to connect to physical network interface.
 
 set -Eeuo pipefail
 
