@@ -5,7 +5,7 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 > Note! Bitcoin Cache Machine REQUIRES a [Trezor-T](https://trezor.io/) to function! Consider buying a dedicated device for your BCM data center.
 
-## Project Status 
+## Project Status
 
 > **IMPORTANT!**
 > BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real bitcoin on it. Stable builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!
