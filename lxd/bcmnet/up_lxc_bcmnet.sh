@@ -1,68 +1,62 @@
-#!/bin/bash
+# #!/bin/bash
 
-# goal of this script is to spin up a basic working LXC container that's
-# ready to run docker containers and has 1 interface exclusively connecting
-# to bcmnet.
+# # goal of this script is to spin up a basic working LXC container that's
+# # ready to run docker containers and has 1 interface exclusively connecting
+# # to bcmnet.
 
-set -Eeuo pipefail
-
-
-# set the working directory to the location where the script is located
-# since all file references are relative to this script
-cd "$(dirname "$0")"
-
-# Create the bcmnet_template template lxc container only it doesnt exist yet.
-if [[ $(lxc list | grep $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME) ]]; then
-    echo "LXC container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' exists."
-    exit 1
-fi
+# set -Eeuo pipefail
 
 
-# if bcm-template lxc image exists, run the rest of the script.
-if [[ -z $(lxc image list | grep "bcm-template") ]]; then
-    echo "Required LXC image 'bcm-template' does not exist! Ensure your current LXD remote $(lxc remote get-default)."
-    exit 1
-fi
+# # set the working directory to the location where the script is located
+# # since all file references are relative to this script
+# cd "$(dirname "$0")"
 
-# create a bcmnet_template template if it doesn't exist.
-if [[ -z $(lxc list | grep "$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME") ]]; then
-    # let's generate a LXC template to base our lxc container on.
-    lxc init bcm-template $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -p bcm_default -p docker_privileged
-fi
+# # Create the bcmnet_template template lxc container only it doesnt exist yet.
+# if [[ $(lxc list | grep $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME) ]]; then
+#     echo "LXC container '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' exists."
+#     exit 1
+# fi
 
-lxc file push 10-lxc.yaml $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/netplan/10-lxc.yaml
 
-echo "Starting '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME'."
-lxc start $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
+# # create a bcmnet_template template if it doesn't exist.
+# if [[ -z $(lxc list | grep "$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME") ]]; then
+#     # let's generate a LXC template to base our lxc container on.
+#     lxc init bcm-template $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -p bcm_default -p docker_privileged
+# fi
 
-sleep 10
+# lxc file push 10-lxc.yaml $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/netplan/10-lxc.yaml
 
-../shared/wait_for_dockerd.sh --container-name=$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
+# echo "Starting '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME'."
+# lxc start $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
 
-#we're going to update the docker daemon to use the HTTP/HTTPs proxy on gateway.
-lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/systemd/system/docker.service.d
-lxc file push https-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/https-proxy.conf
-lxc file push http-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/http-proxy.conf
+# sleep 10
 
-# configure default environment to also use the squid proxy on gateway.
-lxc config set $BCM_LXC_BCMNETTEMPLATE_CONTAINER_NAME environment.HTTP_PROXY http://squid:3128/
-lxc config set $BCM_LXC_BCMNETTEMPLATE_CONTAINER_NAME environment.HTTPS_PROXY http://squid:3128/
+# ../shared/wait_for_dockerd.sh --container-name=$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
 
-# put the squid proxy certificate on the template.
-lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/squid/ssl_cert
-lxc file push $BCM_RUNTIME_DIR/runtime/$(lxc remote get-default)/bcm-gateway/squid/squid.DER $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/squid/ssl_cert/myCA.pem
+# #we're going to update the docker daemon to use the HTTP/HTTPs proxy on gateway.
+# lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/systemd/system/docker.service.d
+# lxc file push https-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/https-proxy.conf
+# lxc file push http-proxy.conf $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/systemd/system/docker.service.d/http-proxy.conf
 
-# let's disable the docker daemon because we have to start it a special way due to HTTPS proxy
-lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- systemctl disable docker
+# # configure default environment to also use the squid proxy on gateway.
+# lxc config set $BCM_LXC_BCMNETTEMPLATE_CONTAINER_NAME environment.HTTP_PROXY http://squid:3128/
+# lxc config set $BCM_LXC_BCMNETTEMPLATE_CONTAINER_NAME environment.HTTPS_PROXY http://squid:3128/
 
-# update docker client to support HTTP/HTTPS
-lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir /root/.docker
+# # put the squid proxy certificate on the template.
+# lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir -p /etc/squid/ssl_cert
+# lxc file push $BCM_RUNTIME_DIR/runtime/$(lxc remote get-default)/bcm-gateway/squid/squid.DER $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/etc/squid/ssl_cert/myCA.pem
 
-lxc file push docker_client.config.json $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/root/.docker/config.json
+# # let's disable the docker daemon because we have to start it a special way due to HTTPS proxy
+# lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- systemctl disable docker
 
-lxc stop $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
+# # update docker client to support HTTP/HTTPS
+# lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- mkdir /root/.docker
 
-# create a snapshot from which all production managers will be based.
-lxc snapshot $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME "bcmnet_template"
+# lxc file push docker_client.config.json $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/root/.docker/config.json
 
-echo "Done creating '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' LXC conatiner snapshot. Deploying bcmnet hosts."
+# lxc stop $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME
+
+# # create a snapshot from which all production managers will be based.
+# lxc snapshot $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME "bcmnet_template"
+
+# echo "Done creating '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' LXC conatiner snapshot. Deploying bcmnet hosts."

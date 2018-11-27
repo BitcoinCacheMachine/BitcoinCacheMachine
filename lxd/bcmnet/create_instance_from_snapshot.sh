@@ -18,8 +18,7 @@ lxc copy $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME/bcmnet_template $LXC_HO
 
 lxc network attach bcmNet $LXC_HOST eth0
 
-# create the docker backing for 'bcm-gateway'
-../shared/create_attach_dockervol.sh --container-name="$LXC_HOST"
+# TODO need to attach dockervol
 
 # make sure we configure the docker daemon.
 lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json

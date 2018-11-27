@@ -3,9 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")" 
 
-# if bcm-template lxc image exists, run the gateway template creation script.
-if ! lxc image list | grep -q "bcm-template"; then
-    echo "LXC image 'bcm-template' does not exist. Exiting."
+# quit if the template isn't there.
+if ! lxc image show "bcm-template" | grep -q "release:"; then
+    echo "Required LXC image 'bcm-template' does not exist. Exiting"
     exit
 fi
 

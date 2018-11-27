@@ -2,9 +2,6 @@
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"
-source ../defaults.sh
-source ./defaults.sh
-
 
 if [[ -z $GATEWAY_HOSTNAME ]]; then
     echo "GATEWAY_HOSTNAME not set."
@@ -83,6 +80,7 @@ fi
 # shellcheck disable=SC1090
 source "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/get_docker_swarm_tokens.sh"
 
+MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
 for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
     if [[ $endpoint != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$endpoint" | tail -c 2)

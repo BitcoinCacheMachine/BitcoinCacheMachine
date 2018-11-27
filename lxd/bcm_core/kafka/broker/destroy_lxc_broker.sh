@@ -10,9 +10,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
     BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
 
     # remove swarm services related to kafka
-    if ! lxc list | grep -q "bcm-gateway-01"; then
-        lxc exec bcm-gateway-01 -- docker stack rm "$BROKER_STACK_NAME" || true
-    fi
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
 done
 
 if lxc list | grep -q "bcm-gateway-01"; then

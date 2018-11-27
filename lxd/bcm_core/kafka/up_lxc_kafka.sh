@@ -3,12 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# if bcm-template lxc image exists, run the gateway template creation script.
-if ! lxc image list | grep -q "bcm-template"; then
-    echo "LXC image 'bcm-template' does not exist. Exiting."
-    exit
-fi
-
 # create the 'bcm_kafka_profile' lxc profile
 if ! lxc profile list | grep -q "bcm_kafka_profile"; then
     lxc profile create bcm_kafka_profile

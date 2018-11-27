@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
 BCM_PROFILE_NAME=
 
@@ -18,7 +18,7 @@ esac
 done
 
 # delete the profile if it exists.
-if [[ $(lxc profile list | grep "$BCM_PROFILE_NAME") ]]; then
+if lxc profile list | grep -q "$BCM_PROFILE_NAME"; then
     echo "Deleting lxd profile '$BCM_PROFILE_NAME'."
     lxc profile delete "$BCM_PROFILE_NAME"
 fi

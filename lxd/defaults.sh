@@ -56,8 +56,6 @@ export BCM_BCMNETTEMPLATE_RSYNCD_BUILD_IMAGE="cachestack.lan/rsyncd:latest"
 export BCM_BCMNETINST_RSYNC_BUILDER_NAME="bcm-rsync-builder"
 
 
-
-
 # if yes, then the 'gateway' LXD host will be created
 export BCM_ADMIN_GATEWAY_INSTALL="true"
 export BCM_GATEWAY_DELETE="false"
@@ -65,23 +63,7 @@ export BCM_GATEWAY_DELETE="false"
 export BCM_GATEWAY_CONTAINER_CREATE="true"
 
 export BCM_GATEWAY_CONTAINER_TEMPLATE_CREATE="true"
-export BCM_GATEWAY_PROFILE_GATEWAYPROFILE_CREATE="true"
+
 export BCM_GATEWAY_NETWORKS_CREATE="true"
 
-
-export BCM_GATEWAY_CONTAINER_DELETE="true"
-export BCM_GATEWAY_STORAGE_DOCKERVOL_DELETE="true"
-export BCM_GATEWAY_CONTAINER_TEMPLATE_DELETE="true"
-export BCM_GATEWAY_PROFILE_GATEWAYPROFILE_DELETE="true"
 export BCM_GATEWAY_NETWORKS_DELETE="true"
-
-
-
-
-
-
-
-# needed during scripts, do not remove
-export BCM_GW_TEMPLATE_NAME="bcm-template-gateway"
-export BCM_LXC_GATEWAY_CONTAINER_NAME="bcm-gateway"
-
