@@ -2,8 +2,6 @@
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"
-
-source ./defaults.sh 
  
 # let's make sure the cluster exists.
 if [[ -z $BCM_CLUSTER_NAME ]]; then

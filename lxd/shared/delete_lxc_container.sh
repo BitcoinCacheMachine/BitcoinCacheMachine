@@ -22,7 +22,7 @@ if [[ -z $LXC_CONTAINER_NAME ]]; then
     exit
 fi
 
-if lxc list --format csv | grep -q "$LXC_CONTAINER_NAME"; then
+if lxc list --format csv -c n | grep -q "$LXC_CONTAINER_NAME"; then
     echo "Deleting lxc container '$LXC_CONTAINER_NAME'."
     lxc delete --force $LXC_CONTAINER_NAME
 fi

@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-if lxc list --format csv | grep -q "bcm-lxc-base"; then
+if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
     echo "The LXD image 'bcm-lxc-base' doesn't exist. Exiting."
     exit
 fi

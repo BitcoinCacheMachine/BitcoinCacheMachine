@@ -9,6 +9,7 @@ cd "$(dirname "$0")"
 
 # let's create a client certificate for the instance and store it in /etc/docker/certs.d/$INSTANCE_NAME/
 # https://docs.docker.com/engine/security/certificates/#understanding-the-configuration
+BCM_BCMNETINST_RSYNC_BUILDER_NAME="bcm-rsync-builder"
 bash -c "$BCM_LXD_OPS/generate_and_sign_client_certificate.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME rsyncd $BCM_BCMNETINST_RSYNC_BUILDER_NAME"
 
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis

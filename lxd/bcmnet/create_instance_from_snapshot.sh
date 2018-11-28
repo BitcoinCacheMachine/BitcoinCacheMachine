@@ -29,7 +29,7 @@ lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json
 
 lxc start $LXC_HOST
 
-../../shared/wait_for_dockerd.sh --container-name="$LXC_HOST"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/wait_for_dockerd.sh --container-name=$LXC_HOST"
 
 lxc exec $LXC_HOST -- mkdir -p /etc/docker/certs.d/bcmnet:5000
 
@@ -48,25 +48,6 @@ lxc start $LXC_HOST
 #     lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_NAME -- docker swarm init --advertise-addr eth0
 # fi
 
-
-
-# # Deploy RSYNCD
-# if [[ $BCM_BCMNETTEMPLATE_RSYNCD_INSTALL = 'true' ]]; then
-#     bash -c ./stacks/rsyncd/up_lxd_rsyncd.sh
-# fi
-    #bash -c "$BCM_LOCAL_GIT_REPO_DIR/docker_stacks/cachestack/squid/up_lxd_squid.sh bcm-gateway"
-
-
-
-# # Deploy a HTTP/HTTPS proxy based on squid if requested.
-# if [[ $BCM_BCMNETTEMPLATE_SQUID_INSTALL = 'true' ]]; then
-#     bash -c ./stacks/squid/up_lxd_squid.sh
-# fi
-
-# # Deploy a tor SOCKS5 proxy
-# if [[ $BCM_BCMNETTEMPLATE_TOR_SOCKS5_PROXY_INSTALL = 'true' ]]; then
-#     bash -c ./stacks/tor_socks5_proxy/up_lxd_torsocks5.sh
-# fi
 
 
 

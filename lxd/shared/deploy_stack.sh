@@ -11,6 +11,7 @@ BCM_STACK_FILE_PATH=
 BCM_STACK_NAME=
 BCM_MAX_INSTANCES=2
 BCM_SERVICE_NAME=
+BCM_SERVICE_PORT=
 
 for i in "$@"
 do
@@ -47,6 +48,10 @@ case $i in
     BCM_SERVICE_NAME="${i#*=}"
     shift # past argument=value
     ;;
+    --service-port=*)
+    BCM_SERVICE_PORT="${i#*=}"
+    shift # past argument=value
+    ;;
     *)
           # unknown option
     ;;
@@ -68,7 +73,7 @@ bash -c "$BCM_LXD_OPS/image_pull_tag_push.sh --container-name=$BCM_LXC_HOST_TIER
 lxc file push -p "$BCM_STACK_FILE_PATH" bcm-gateway-01/root/stacks/$BCM_STACK_NAME.yml
 
 # run the stack.
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_IMAGE" docker stack deploy -c "/root/stacks/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_IMAGE" BCM_SERVICE_PORT="$BCM_SERVICE_PORT" docker stack deploy -c "/root/stacks/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
 
 # let's scale the schema registry count to UP TO 3.
 CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)
@@ -79,5 +84,8 @@ if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
         REPLICAS=$BCM_MAX_INSTANCES
     fi
 
-    lxc exec bcm-gateway-01 -- docker service scale "$BCM_STACK_NAME""_""$BCM_SERVICE_NAME=$REPLICAS"
+    SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$BCM_STACK_NAME")
+    if [[ $SERVICE_MODE = "replicated" ]]; then
+        lxc exec bcm-gateway-01 -- docker service scale "$BCM_STACK_NAME""_""$BCM_SERVICE_NAME=$REPLICAS"
+    fi
 fi

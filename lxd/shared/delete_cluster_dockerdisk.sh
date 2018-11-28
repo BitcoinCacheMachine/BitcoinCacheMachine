@@ -2,13 +2,18 @@
 
 set -Eeuox pipefail
 
-STORAGE_VOLUME_NAME=
+LXC_HOSTNAME=
+CLUSTER_ENDPOINT=
 
 for i in "$@"
 do
 case $i in
-    --volume-name=*)
-    STORAGE_VOLUME_NAME="${i#*=}"
+    --container-name=*)
+    LXC_HOSTNAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    --endpoint=*)
+    CLUSTER_ENDPOINT="${i#*=}"
     shift # past argument=value
     ;;
     *)
@@ -17,17 +22,19 @@ case $i in
 esac
 done
 
-if [[ -z $STORAGE_VOLUME_NAME ]]; then
-    echo "Error. STORAGE_VOLUME_NAME was empty."
+if [[ -z $LXC_HOSTNAME ]]; then
+    echo "Error. LXC_HOSTNAME was empty."
     exit
 fi
-echo "STORAGE_VOLUME_NAME: $STORAGE_VOLUME_NAME"
 
-for ENDPOINT in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
-    HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
-    VOLUME_NAME=$(echo "$STORAGE_VOLUME_NAME"-"$(printf %02d "$HOST_ENDING")"-dockerdisk)
 
-    if lxc storage volume list bcm_btrfs | grep -q "$VOLUME_NAME"; then
-        lxc storage volume delete bcm_btrfs "$VOLUME_NAME" --target "$ENDPOINT"
-    fi
-done
+if [[ -z $CLUSTER_ENDPOINT ]]; then
+    echo "Error. CLUSTER_ENDPOINT was empty."
+    exit
+fi
+
+VOLUME_NAME="$LXC_HOSTNAME-dockerdisk"
+
+if lxc storage volume list bcm_btrfs | grep "$VOLUME_NAME" | grep -q "$CLUSTER_ENDPOINT"; then
+    lxc storage volume delete bcm_btrfs "$VOLUME_NAME" --target "$CLUSTER_ENDPOINT"
+fi

@@ -27,15 +27,15 @@ Here are some of the development goals for Bitcoin Cache Machine:
 * Integrate exclusively free and open source software ([FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software))!
 * Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
-* Require hardware wallets for cryptographic operations (PGP, SSH, etc.).
+* Require hardware wallets for cryptographic operations (PGP, SSH, and Bitcoin transactions).
 * Pre-configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.).
 * Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications, etc...
 
 ## How to Run Bitcoin Cache Machine
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have one or more (BCM is a [distributed system](https://en.wikipedia.org/wiki/Distributed_computing)) always-on computers with a reliable Internet connection. You can run BCM in a hardware-based VM or preferably directly on bare-metal (for performance). 
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have one or more always-on computers with a reliable Internet connection. You can run BCM in a hardware-based VM or preferably directly on bare-metal (for performance). BCM is a [distributed system](https://en.wikipedia.org/wiki/Distributed_computing), so it gets more reliable and performant as you add commodity hardware.
 
-BCM components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md), so you can run a BCM project stack anywhere you can get an LXD endpoint! LXD is widely available on various free and open-source linux platforms. The BCM CLI installs all the software you need.
+BCM application components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](www.docker.com). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI installs all the software you will need.
 
 Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu (>=18.04) machines, but should work with most Debian-based distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used.
 
@@ -47,7 +47,7 @@ The first step to getting started with Bitcoin Cache Machine is to clone the git
 
 > NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu (Desktop or Server) >= 18.04. Windows and MacOS are not directly supported, though you can always run Ubuntu in a VM.
 
-You start start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) on your machine then you configure your local `git` client to download the BCM repository from github using TOR. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
+Start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads). Next, configure your local `git` client to download (clone) the BCM github repository using TOR for transport. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
 
 ```bash
 sudo apt-get update

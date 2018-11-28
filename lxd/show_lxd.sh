@@ -9,7 +9,7 @@ echo "LXD networks:"
 lxc network list
 
 echo ""
-echo "LXD storage:"
+echo "LXD storage pools:"
 lxc storage list
 
 echo ""
