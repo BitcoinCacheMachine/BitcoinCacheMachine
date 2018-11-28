@@ -14,10 +14,10 @@ if [[ ! -z $1 ]]; then
     INSTANCE=$1
 
     # delete container '$INSTANCE'
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_container.sh true $INSTANCE"
+    bash -c "$BCM_LXD_OPS/delete_lxc_container.sh true $INSTANCE"
 
     # delete $INSTANCE-dockervol
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_storage.sh true $INSTANCE-dockervol"
+    bash -c "$BCM_LXD_OPS/delete_lxc_storage.sh true $INSTANCE-dockervol"
 
 else
     echo "Usage: './destroy_instance.sh INSTANCE' where INSTANCE is a lxc container."

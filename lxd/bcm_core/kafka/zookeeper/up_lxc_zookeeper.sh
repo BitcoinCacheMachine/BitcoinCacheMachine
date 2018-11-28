@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-ZOOKEEPER_IMAGE="$PRIVATE_REGISTRY/bcm-zookeeper:latest"
+ZOOKEEPER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-zookeeper:latest"
 KAFKA_HOSTNAME="bcm-kafka-01"
 SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.4.13"
 

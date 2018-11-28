@@ -3,11 +3,11 @@ services:
   #listens on 8000
   #PROXY: true makes to so topicsUI proxies kafka-rest calls so we don't have to expose kafka rest to network
   topics-ui:
-    image: landoop/kafka-topics-ui:latest
+    image: ${DOCKER_IMAGE:-landoop/kafka-topics-ui:0.9.4}
     ports:
-      - "8001:8000"
+      - "8000:8000"
     networks:
-      kafka_kafkarestnet:
+      kafkarestnet:
     environment:
       KAFKA_REST_PROXY_URL: http://kafkarest:8082
       PROXY: "true"
@@ -16,8 +16,9 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.role == manager
+          - engine.labels.bcm-uidmz == true
 
 networks:
-  kafka_kafkarestnet:
+  kafkarestnet:
     external: true
+    name: kafkarest_kafkarestnet

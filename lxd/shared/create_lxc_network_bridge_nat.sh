@@ -15,7 +15,7 @@ if [[ -z $(lxc network list | grep "$LXD_NETWORK_NAME") ]]; then
 
         exit
     else
-        for endpoint in $(bash -c $BCM_LOCAL_GIT_REPO_DIR/lxd/shared/get_lxc_cluster_members.sh)
+        for endpoint in $(bash -c $BCM_LXD_OPS/get_lxc_cluster_members.sh)
         do
             lxc network create --target $endpoint $LXD_NETWORK_NAME
         done

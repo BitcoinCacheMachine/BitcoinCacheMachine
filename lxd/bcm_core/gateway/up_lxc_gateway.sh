@@ -19,8 +19,7 @@ if ! lxc list | grep -q "bcm-host-template"; then
 fi
 
 # get all the bcm-gateway-xx containers deployed to the cluster.
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/spread_lxc_hosts.sh --hostname=gateway"
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --hostname=gateway"
 
 export GATEWAY_HOSTNAME="bcm-gateway-01"
-export PRIVATE_REGISTRY="bcm-gateway-01:5010"
 ./provision_bcm-gateway.sh

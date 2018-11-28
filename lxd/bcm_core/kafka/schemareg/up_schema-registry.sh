@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 PUBLIC_SCHEMA_REGISTRY_IMAGE="confluentinc/cp-schema-registry:5.0.1"
-SCHEMA_REGISTRY_IMAGE="$PRIVATE_REGISTRY/bcm-kafka-schema-registry:latest"
+SCHEMA_REGISTRY_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-kafka-schema-registry:latest"
 
 lxc exec bcm-kafka-01 -- docker pull $PUBLIC_SCHEMA_REGISTRY_IMAGE
 lxc exec bcm-kafka-01 -- docker tag $PUBLIC_SCHEMA_REGISTRY_IMAGE "$SCHEMA_REGISTRY_IMAGE"

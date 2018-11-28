@@ -9,12 +9,6 @@ config:
             ipv4: true
             control: auto
 
-      - type: physical
-        name: eth1
-        subnets:
-          - type: dhcp
-            ipv4: true
-            control: auto
 
 description: "LXD Profile for the ui_dmz LXC container type."
 devices:
@@ -22,9 +16,3 @@ devices:
     nictype: bridged
     parent: bcmNet
     type: nic
-  eth1:
-    nictype: macvlan
-    parent: wlp3s0
-    type: nic
-    # limits.ingress: 10Mbit
-    # limits.egress: 10Mbit

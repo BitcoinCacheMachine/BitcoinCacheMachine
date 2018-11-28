@@ -51,6 +51,6 @@ else
     echo "LXC project '$BCM_PROJECT_NAME' already exists."
 fi
 
-export BCM_LXD_OPS=$BCM_LOCAL_GIT_REPO_DIR/lxd/shared
+export BCM_LXD_OPS=$BCM_LXD_OPS
 
 bash -c ./bcm_core/up_lxc_core.sh

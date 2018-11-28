@@ -11,3 +11,5 @@ bash -c ./host_template/up_lxc_host_template.sh
 bash -c ./gateway/up_lxc_gateway.sh
 
 bash -c ./kafka/up_lxc_kafka.sh
+
+bash -c ./ui_dmz/up_lxc_ui_dmz.sh

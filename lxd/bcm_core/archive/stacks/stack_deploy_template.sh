@@ -13,7 +13,7 @@ echo "################################"
 echo "Running ./stack_deploy_template.sh with Stack of '$LXC_STACK', a CERT_CN of '$CERT_CN', and waiting for TCP PORT '$TCP_PORT'."
 
 # Let's generate some HTTPS certificate for the lxc host stack
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/generate_and_sign_client_certificate.sh $LXC_HOST $LXC_STACK $CERT_CN"
+bash -c "$BCM_LXD_OPS/generate_and_sign_client_certificate.sh $LXC_HOST $LXC_STACK $CERT_CN"
 
 DIR=$BCM_RUNTIME_DIR/runtime/$LXC_REMOTE/$LXC_HOST/$LXC_STACK
 

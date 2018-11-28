@@ -50,26 +50,13 @@ lxc start $LXC_HOST
 
 
 
-# # Deploy the registry mirrors if specified.
-# if [[ $BCM_BCMNETTEMPLATE_REGISTRYMIRRORS_INSTALL = 'true' ]]; then
-#     bash -c ./stacks/registry_mirrors/up_lxd_registrymirrors.sh
-#     lxc exec cachestack -- wait-for-it -t 0 127.0.0.1:5000
-# fi
-
 # # Deploy RSYNCD
 # if [[ $BCM_BCMNETTEMPLATE_RSYNCD_INSTALL = 'true' ]]; then
 #     bash -c ./stacks/rsyncd/up_lxd_rsyncd.sh
 # fi
     #bash -c "$BCM_LOCAL_GIT_REPO_DIR/docker_stacks/cachestack/squid/up_lxd_squid.sh bcm-gateway"
 
-# # Deploy IPFS Cache if specified.
-# if [[ $BCM_BCMNETTEMPLATE_IPFSCACHE_INSTALL = 'true' ]]; then
-#     # TODO refactor to subdirectory
-#     echo "Deploying IPFS cache to the `cachestack`."
-#     lxc exec cachestack -- mkdir -p /apps/ipfs_cache
-#     lxc file push ./stacks/ipfs_cache/ipfs_cache.yml cachestack/apps/ipfs_cache/ipfs_cache.yml
-#     lxc exec cachestack -- docker stack deploy -c /apps/ipfs_cache/ipfs_cache.yml ipfscache
-# fi
+
 
 # # Deploy a HTTP/HTTPS proxy based on squid if requested.
 # if [[ $BCM_BCMNETTEMPLATE_SQUID_INSTALL = 'true' ]]; then
@@ -79,12 +66,6 @@ lxc start $LXC_HOST
 # # Deploy a tor SOCKS5 proxy
 # if [[ $BCM_BCMNETTEMPLATE_TOR_SOCKS5_PROXY_INSTALL = 'true' ]]; then
 #     bash -c ./stacks/tor_socks5_proxy/up_lxd_torsocks5.sh
-# fi
-
-
-# # Deploy the bitcoind archival node if specified.
-# if [[ $BCM_BCMNETTEMPLATE_BITCOIND_TESTNET_INSTALL = 'true' ]]; then
-#     bash -c ./stacks/bitcoind_archivalnode/up_lxd_bitcoind.sh
 # fi
 
 

@@ -1,11 +1,12 @@
 version: '3.6'
 services:
+  # container listens on 8000
   schema-registry-ui:
-    image: landoop/schema-registry-ui:latest
+    image: ${DOCKER_IMAGE}
     ports:
-      - "8000:8000"
+      - "8001:8000"
     networks:
-      - kafka_schemaregistrynet
+      - schemaregistrynet
     environment:
       SCHEMAREGISTRY_URL: http://schemaregistry:8081
       PROXY: "true"
@@ -14,8 +15,9 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.role == manager
+          - engine.labels.bcm-uidmz == true
 
 networks:
-  kafka_schemaregistrynet:
+  schemaregistrynet:
     external: true
+    name: schemaregistry_schemaregistrynet

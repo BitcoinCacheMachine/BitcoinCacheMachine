@@ -46,13 +46,13 @@ if [[ $GATEWAY_HOSTNAME = "bcm-gateway-01" ]]; then
     # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
     lxc exec bcm-gateway-01 -- ifmetric eth0 50
     lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST=bcm-gateway-01 docker stack deploy -c /root/stacks/docker_stack/registry_mirror.yml regmirror
-    lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST=bcm-gateway-01 docker stack deploy -c /root/stacks/docker_stack/private_registry.yml privateregistry
+    lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST=bcm-gateway-01 docker stack deploy -c /root/stacks/docker_stack/BCM_PRIVATE_REGISTRY.yml privateregistry
 
     lxc exec bcm-gateway-01 -- wait-for-it -t 0 bcm-gateway-01:5000
     lxc exec bcm-gateway-01 -- wait-for-it -t 0 bcm-gateway-01:5010
 
-    lxc exec bcm-gateway-01 -- docker tag registry:latest "$PRIVATE_REGISTRY/bcm-registry:latest"
-    lxc exec bcm-gateway-01 -- docker push "$PRIVATE_REGISTRY/bcm-registry:latest"
+    lxc exec bcm-gateway-01 -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
+    lxc exec bcm-gateway-01 -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
 
     # now let's build some custom images that we're going run on each bcm-gateway
@@ -60,15 +60,15 @@ if [[ $GATEWAY_HOSTNAME = "bcm-gateway-01" ]]; then
     export BCM_DOCKER_BASE_IMAGE="ubuntu:cosmic"
 
     lxc exec bcm-gateway-01 -- docker pull $BCM_DOCKER_BASE_IMAGE
-    lxc exec bcm-gateway-01 -- docker tag $BCM_DOCKER_BASE_IMAGE "$PRIVATE_REGISTRY/bcm-docker-base:latest"
-    lxc exec bcm-gateway-01 -- docker push "$PRIVATE_REGISTRY/bcm-docker-base:latest"
+    lxc exec bcm-gateway-01 -- docker tag $BCM_DOCKER_BASE_IMAGE "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
+    lxc exec bcm-gateway-01 -- docker push "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
     lxc file push ./bcm-docker-base.Dockerfile bcm-gateway-01/root/Dockerfile
-    lxc exec bcm-gateway-01 -- docker build -t "$PRIVATE_REGISTRY/bcm-docker-base:latest" .
+    lxc exec bcm-gateway-01 -- docker build -t "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest" .
 
     lxc exec bcm-gateway-01 -- mkdir -p /root/stacks/tor
     lxc file push ./tor/bcm-tor.Dockerfile bcm-gateway-01/root/stacks/tor/Dockerfile
 
-    TOR_IMAGE="$PRIVATE_REGISTRY/bcm-tor:latest"
+    TOR_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-tor:latest"
     lxc exec bcm-gateway-01 -- docker build -t "$TOR_IMAGE" /root/stacks/tor/
     lxc exec bcm-gateway-01 -- docker push "$TOR_IMAGE"
     lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c /root/stacks/docker_stack/tor_socks5_dns.yml torsocksdns
@@ -78,7 +78,7 @@ fi
 # let's cycle through the other cluster members (other than the master)
 # and get their bcm-gateway host going.
 # shellcheck disable=SC1090
-source "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/get_docker_swarm_tokens.sh"
+source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
 for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
@@ -112,7 +112,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
             # another registry mirror and private registry in case node1 goes offline.
             # We will only have 2 locations for docker image distribution.
             if [[ $HOST_ENDING = 2 ]]; then
-                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://bcm-gateway-01:5010" docker stack deploy -c /root/stacks/docker_stack/registry_mirror.yml regmirror2
+                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://bcm-gateway-01:5010" docker stack deploy -c /root/stacks/docker_stack/registry_mirror.yml regmirror2
             fi
         fi
     fi

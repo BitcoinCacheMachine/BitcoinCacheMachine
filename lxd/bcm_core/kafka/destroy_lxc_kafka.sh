@@ -20,7 +20,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
     KAFKA_HOST="bcm-kafka-$(printf %02d "$HOST_ENDING")"
 
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/remove_docker_node.sh --node-name=$KAFKA_HOST"
+    bash -c "$BCM_LXD_OPS/remove_docker_node.sh --node-name=$KAFKA_HOST"
 
     if [[ ! -z $(lxc list | grep "$KAFKA_HOST") ]]; then
         lxc delete "$KAFKA_HOST" --force

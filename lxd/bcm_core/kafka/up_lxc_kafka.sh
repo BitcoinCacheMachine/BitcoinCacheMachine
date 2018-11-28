@@ -12,14 +12,13 @@ fi
 lxc profile edit bcm_kafka_profile < ./lxd_profiles/kafka.yml
 
 # get all the bcm-kafka-xx containers deployed to the cluster.
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/spread_lxc_hosts.sh --hostname=kafka"
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --hostname=kafka"
 
 # shellcheck disable=SC1090
-source "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/get_docker_swarm_tokens.sh"
+source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 echo "Running ./provision_bcm-kafka.sh"
 export KAFKA_HOSTNAME="bcm-kafka-01"
-export PRIVATE_REGISTRY="bcm-gateway-01:5010"
 
 if ! lxc list | grep -q "$KAFKA_HOSTNAME"; then
     echo "'$KAFKA_HOSTNAME' does not exist. Can't provision bcm-kafka-01"

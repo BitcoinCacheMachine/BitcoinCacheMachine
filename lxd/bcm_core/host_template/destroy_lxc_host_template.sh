@@ -12,20 +12,20 @@ fi
 export BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE=1
 if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE = 1 ]]; then
     # remove image bcm-template
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh --image-name=bcm-template"
+    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-template"
 fi
 
 # remove image bcm-lxc-base
 export BCM_HOSTTEMPLATE_IMAGE_BCM_BASE_DELETE=0
 if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_BASE_DELETE = 1 ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_image.sh --image-name=bcm-lxc-base"
+    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-lxc-base"
 fi
 
 # delete profile 'docker-privileged'
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_profile.sh --profile-name=docker_privileged"
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_privileged"
 
 # delete profile 'docker-unprivileged'
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/lxd/shared/delete_lxc_profile.sh --profile-name=docker_unprivileged"
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_unprivileged"
 
 if lxc network list | grep -q bcmbr0; then
     lxc network delete bcmbr0

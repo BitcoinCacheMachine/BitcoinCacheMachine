@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:5.0.1-1"
-BROKER_IMAGE="$PRIVATE_REGISTRY/bcm-broker:latest"
+BROKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-broker:latest"
 
 # if it's the first instance, let's download the kafka image from
 # docker hub; then we tag and push to our local private registry

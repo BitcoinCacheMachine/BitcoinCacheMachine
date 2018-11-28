@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 PUBLIC_KAFKA_CONNECT_IMAGE="confluentinc/cp-kafka-connect:5.0.1"
-KAFKA_CONNECT_IMAGE="$PRIVATE_REGISTRY/bcm-kafka-connect:latest"
+KAFKA_CONNECT_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-kafka-connect:latest"
 
 lxc exec bcm-kafka-01 -- docker pull $PUBLIC_KAFKA_CONNECT_IMAGE
 lxc exec bcm-kafka-01 -- docker tag $PUBLIC_KAFKA_CONNECT_IMAGE "$KAFKA_CONNECT_IMAGE"

@@ -45,7 +45,7 @@ else
   echo "Writing commands to $HOME/.profile to support running BCM from the admin machine."
 
   {
-    echo "$BCM_BASHRC_START_FLAG"
+    echo "$BCM_BASHRC_START_FLAG" 
     echo "export BCM_LOCAL_GIT_REPO_DIR=$BCM_LOCAL_GIT_REPO_DIR"
     
     # shellcheck disable=SC2016
