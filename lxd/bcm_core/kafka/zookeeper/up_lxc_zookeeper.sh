@@ -12,7 +12,7 @@ if [[ $KAFKA_HOSTNAME = "bcm-kafka-01" ]]; then
     lxc exec $KAFKA_HOSTNAME -- docker tag $SOURCE_ZOOKEEPER_IMAGE "$ZOOKEEPER_IMAGE"
     lxc exec $KAFKA_HOSTNAME -- docker push "$ZOOKEEPER_IMAGE"
 fi
-
+ 
 if ! lxc exec bcm-gateway-01 -- docker network list | grep -q "zookeepernet"; then
     lxc exec bcm-gateway-01 -- docker network create --driver overlay --opt encrypted --attachable zookeepernet
 fi
