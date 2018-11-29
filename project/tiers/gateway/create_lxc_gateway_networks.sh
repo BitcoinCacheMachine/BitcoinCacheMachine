@@ -27,7 +27,7 @@ function createBCMNet {
 # we only run this block if we have a cluster of size 2 or more.
 if lxc network list | grep bcmbrGWNat | grep -q PENDING; then
     createBCMBRGW
-elif lxc network list | grep -q bcmbrGWNat; then
+elif ! lxc network list | grep -q bcmbrGWNat; then
     createBCMBRGW
 else
     echo "We have a problem."
@@ -37,7 +37,7 @@ fi
 # we only run this block if we have a cluster of size 2 or more.
 if lxc network list | grep bcmNet | grep -q PENDING; then
     createBCMNet
-elif lxc network list | grep -q bcmNet; then
+elif ! lxc network list | grep -q bcmNet; then
     createBCMNet
 else
     echo "We have a problem."

@@ -36,13 +36,16 @@ lxc start bcm-host-template
 sleep 5
 
 # TODO provide configuration item to route these requests over local TOR proxy
-echo "Installing required software on dockertemplate."
+echo "Installing required software on LXC host 'bcm-host-template'."
 lxc exec bcm-host-template -- apt-get update
 
 # docker.io is the only package that seems to work seamlessly with
 # storage backends. Using BTRFS since docker recognizes underlying file system
 lxc exec bcm-host-template -- apt-get install docker.io wait-for-it -qq
-lxc exec bcm-host-template -- apt-get install jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump -qq
+
+if [[ $BCM_DEBUG = 1 ]]; then
+    lxc exec bcm-host-template -- apt-get install jq nmap curl ifmetric slurm tcptrack dnsutils tcpdump -qq
+fi
 
 
 

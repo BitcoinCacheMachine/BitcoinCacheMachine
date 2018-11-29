@@ -51,4 +51,15 @@ fi
 
 export BCM_LXD_OPS=$BCM_LXD_OPS
 
-bash -c ./bcm_core/up_lxc_core.sh
+
+# This brings up 'bcm-gateway' and 'bcm-kafka' LXC hosts and populates
+# the respective docker daemons.
+bash -c ./host_template/up.sh
+
+# All tiers require that the bcm-template image be available.
+# let's look for it before we even attempt anything.
+if lxc image list --format csv | grep -q "bcm-template"; then
+    bash -c ./tiers/up.sh
+else
+    echo "LXC image 'bcm-template' doesn't exist. Can't deploy BCM tiers."
+fi

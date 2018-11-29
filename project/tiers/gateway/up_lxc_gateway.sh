@@ -25,8 +25,7 @@ fi
 lxc profile edit bcm_gateway_profile < tier_profile.yml
 
 # get all the bcm-gateway-xx containers deployed to the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --hostname=gateway"
-
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=gateway"
 
 # let's start the LXD container on the LXD cluster master.
 lxc file push ./dhcpd_conf.yml "$GATEWAY_HOSTNAME/etc/netplan/10-lxc.yaml"

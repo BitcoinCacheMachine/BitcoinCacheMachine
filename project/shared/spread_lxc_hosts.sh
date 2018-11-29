@@ -1,14 +1,14 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
-BCM_LXC_HOSTNAME=
+BCM_TIER_NAME=
 
 for i in "$@"
 do
 case $i in
-    --hostname=*)
-    BCM_LXC_HOSTNAME="${i#*=}"
+    --tier-name=*)
+    BCM_TIER_NAME="${i#*=}"
     shift # past argument=value
     ;;
     *)
@@ -17,8 +17,8 @@ case $i in
 esac
 done
 
-if [[ -z $BCM_LXC_HOSTNAME ]]; then
-    echo "BCM_LXC_HOSTNAME not set."
+if [[ -z $BCM_TIER_NAME ]]; then
+    echo "BCM_TIER_NAME not set."
     exit
 fi
 
@@ -26,7 +26,7 @@ fi
 MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
 for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-    LXC_HOSTNAME="bcm-$BCM_LXC_HOSTNAME-$(printf %02d "$HOST_ENDING")"
+    LXC_HOSTNAME="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
     LXC_DOCKERVOL="$LXC_HOSTNAME-dockerdisk"
     
     # only create the new storage volume if it doesn't already exist
@@ -46,7 +46,8 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
 
     # create the LXC host with the attached profiles.
     # TODO allow options of unprivileged.
-    lxc init --target "$endpoint" bcm-template "$LXC_HOSTNAME" --profile=bcm_default --profile=docker_privileged -p 'bcm_'"$BCM_LXC_HOSTNAME"'_profile'
+    PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
+    lxc init --target "$endpoint" bcm-template "$LXC_HOSTNAME" --profile=bcm_default --profile=docker_privileged --profile="$PROFILE_NAME"
 
     # attach the lxc storage volume 'dockervol' to the new LXC host for the docker backing.
     lxc storage volume attach bcm_btrfs "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker

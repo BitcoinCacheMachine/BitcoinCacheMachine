@@ -12,7 +12,7 @@ fi
 lxc profile edit bcm_uidmz_profile < ./lxd_profiles/bcm_ui_dmz.yml
 
 # get all the bcm-kafka-xx containers deployed to the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --hostname=uidmz --apply-profile=bcm_uidmz_profile"
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=ui"
 
 # shellcheck disable=SC1090
 source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"

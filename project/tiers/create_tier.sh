@@ -30,7 +30,7 @@ fi
 lxc profile edit "$PROFILE_NAME" < "./$BCM_TIER_NAME/tier_profile.yml"
 
 # get all the bcm-kafka-xx containers deployed to the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --hostname=$BCM_TIER_NAME --apply-profile=$PROFILE_NAME"
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$BCM_TIER_NAME"
 
 # shellcheck disable=SC1090
 source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
