@@ -1,2 +1,0 @@
-HiddenServiceDir /var/lib/tor/hidden_service/
-HiddenServicePort 18332 bitcoindrpc:18332

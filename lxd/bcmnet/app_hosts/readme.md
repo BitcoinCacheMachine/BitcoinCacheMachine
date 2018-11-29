@@ -1,1 +1,0 @@
-# The stacks here are meant to be deployed on an LXC based on the lxc host '$BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME' snapshot 'bcmnet_template'

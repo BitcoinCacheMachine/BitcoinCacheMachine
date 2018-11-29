@@ -1,7 +1,0 @@
-{
-    "registry-mirrors": ["http://cachestack.lxd:5000"],
-    "insecure-registries": [ "http://cachestack.lxd" ],
-    "labels": [
-        "purpose=bitcoin"
-    ]
-}
