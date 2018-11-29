@@ -1,0 +1,40 @@
+version: '3.6'
+services:
+  private-registry:
+    image: ${DOCKER_IMAGE}
+    ports: 
+      - "${TARGET_PORT}:5000"
+    volumes:
+      - private-registry-data:/data
+    environment:
+      REGISTRY_HTTP_ADDR: :5000
+      REGISTRY_HTTP_HOST: http://${TARGET_HOST}:${TARGET_PORT}
+      REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == ${TARGET_HOST}
+    # secrets:
+    #   - source: privreg_tls_cert
+    #     target: /var/lib/registry/privreg.cert
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0400
+    #   - source: privreg_tls_key
+    #     target: /var/lib/registry/privreg.key
+    #     uid: '0'
+    #     gid: '0'
+    #     mode: 0400
+
+
+volumes:
+  private-registry-data:
+
+# secrets:
+#   privreg_tls_cert:
+#     file: "privreg.cert"
+#   privreg_tls_key:
+#     file: "privreg.key"
+

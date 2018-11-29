@@ -1,0 +1,22 @@
+version: '3.6'
+services:
+  
+  ## TODO bootstrap process of downloading needed data.
+  ipfscache:
+    image: ipfs/go-ipfs:latest
+    ports:
+      - "4001:4001/tcp" # swarm TCP, external firewall config or UPNP required
+      - "4002:4002/udp" # swarm uTP
+      - "5001:5001/tcp" # HTTP API
+      - "8080:8080/tcp" # gateway
+      - "8081:8081/tcp" # swarm websockets
+    volumes:
+      - ipfs-data:/data/ipfs
+    environment:
+      IPFS_PATH: /data/ipfs
+    deploy:
+      mode: replicated
+      replicas: 1
+
+volumes:
+  ipfs-data:

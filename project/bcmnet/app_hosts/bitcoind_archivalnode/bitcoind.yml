@@ -1,0 +1,40 @@
+version: '3.6'
+services:
+  bitcoind:
+    image: <FIXME>/bitcoind:16.1
+    hostname: bitcoind
+    ports:
+      - "18333:18333"
+      - "8333:8333"
+    volumes:
+      - bitcoind-data:/data
+      - bitcoind-log-data:/var/log/bitcoind
+      - bitcoind-cookie-data:/cookie
+    environment:
+      BITCOIND_CHAIN: ${BCM_BITCOIN_CHAIN:-testnet}
+    networks:
+      bitcoindrpcnet:
+        aliases:
+          - bitcoindrpc
+    secrets:
+      - source: bitcoin_config
+        target: /data/bitcoin.conf
+        uid: '0'
+        gid: '0'
+        mode: 0400
+    deploy:
+      mode: replicated
+      replicas: 1
+
+secrets:
+  bitcoin_config:
+    file: "./bitcoind-${CHAIN:-testnet}.conf"
+
+volumes:
+  bitcoind-data:
+  bitcoind-log-data:
+  bitcoind-cookie-data:
+
+networks:
+  bitcoindrpcnet:
+    attachable: true

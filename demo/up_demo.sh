@@ -12,13 +12,14 @@ source ./.env
 # Then we deploy the project definition to the cluster we created.
 
 # run bcm init
-bcm init --cert-name="derek" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
+bcm init --cert-name="alice" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
 
 ## Create a basic project difintion.
 bcm project create --project-name="$BCM_PROJECT_NAME"
 
 # create a cluster named dev. LXD is deployed to localhost
-bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="multipass" --mgmt-type="local" --node-count=3
+bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" --provider="baremetal" --mgmt-type="local" 
+# --node-count=3
 #--node-count=6
 
 # then deploy that project definition to an existing cluster.

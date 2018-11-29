@@ -1,0 +1,10 @@
+{
+  "name": "syslog",
+  "config": {
+    "connector.class": "com.github.jcustenborder.kafka.connect.syslog.TCPSyslogSourceConnector",
+    "tasks.max": "1",
+    "kafka.topic": "syslog",
+    "syslog.port": "5514",
+    "syslog.reverse.dns.remote.ip": "true"
+  }
+}

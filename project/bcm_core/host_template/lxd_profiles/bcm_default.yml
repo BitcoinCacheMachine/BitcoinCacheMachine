@@ -1,0 +1,8 @@
+config: {}
+description: Default BCM profile. Has ZFS backend only; no networking.
+devices:
+  root:
+    path: /
+    pool: bcm_btrfs
+    type: disk
+name: bcm_default

@@ -67,7 +67,7 @@ elif [[ $BCM_CLI_COMMAND = "ssh" ]]; then
 elif [[ $BCM_CLI_COMMAND = "info" ]]; then
     bash -c './info.sh "$@"'
 elif [[ $BCM_CLI_COMMAND = "show" ]]; then
-    $BCM_LOCAL_GIT_REPO_DIR/lxd/show_lxd.sh
+    $BCM_LOCAL_GIT_REPO_DIR/project/show_lxd.sh
 else
     cat ./help.txt
 fi

@@ -1,0 +1,20 @@
+config:
+  user.network-config: |
+    version: 1
+    config:      
+      # underlay
+      - type: physical
+        name: eth0
+        subnets:
+          - type: dhcp
+            ipv4: true
+            control: auto
+
+description:
+devices:
+
+  # get's IP address attached network
+  eth0:
+    nictype: bridged
+    parent: bcmNet
+    type: nic

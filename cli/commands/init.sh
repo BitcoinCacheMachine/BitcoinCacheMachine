@@ -86,9 +86,9 @@ if [[ ! -z $BCM_CERT_DIR_OVERRIDE ]]; then
     BCM_CERT_DIR=$BCM_CERT_DIR_OVERRIDE
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/build.sh"
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/controller/build.sh"
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/mgmt_plane/gpg-init.sh \
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/controller/gpg-init.sh \
     --cert-dir='$BCM_CERT_DIR' \
     --cert-name='$BCM_CERT_NAME' \
     --cert-username='$BCM_CERT_USERNAME' \

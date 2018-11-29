@@ -1,0 +1,40 @@
+version: '3.6'
+services:
+  kafka-rest:
+    image: ${DOCKER_IMAGE}
+    networks:
+      kafkanet:
+      zookeepernet:
+      schemaregistrynet:
+      kafkarestnet:
+        aliases:
+          - kafkarest
+    environment:
+      KAFKA_REST_ZOOKEEPER_CONNECT: ${ZOOKEEPER_CONNECT}
+      KAFKA_REST_LISTENERS: http://0.0.0.0:8082
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schemaregistry:8081
+      KAFKA_REST_HOST_NAME: kafkarest
+      #KAFKA_REST_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      # KAFKA_REST_ACCESS_CONTROL_ALLOW_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+      # KAFKA_REST_ACCESS_CONTROL_ALLOW_ORIGIN: "*"
+      # KAFKA_REST_ACCESS_CONTROL_ALLOW_HEADERS: "Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Mx-ReqToken,X-Requested-With"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-kafka == true
+
+networks:
+  kafkarestnet:
+    attachable: true
+  
+  kafkanet:
+    external: true
+  
+  zookeepernet:
+    external: true
+
+  schemaregistrynet:
+    external: true
+    name: kafkaschemaregistry_schemaregistrynet
