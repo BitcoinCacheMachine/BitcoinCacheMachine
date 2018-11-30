@@ -70,10 +70,10 @@ BCM_IMAGE="$BCM_PRIVATE_REGISTRY/$BCM_IMAGE_NAME"
 bash -c "$BCM_LXD_OPS/image_pull_tag_push.sh --container-name=$BCM_LXC_HOST_TIER-01 --image-name=$DOCKERHUB_IMAGE --priv-image-name=$BCM_IMAGE"
 
 # push the stack file.
-lxc file push -p "$BCM_STACK_FILE_PATH" bcm-gateway-01/root/stacks/$BCM_STACK_NAME.yml
+lxc file push -p "$BCM_STACK_FILE_PATH" "bcm-gateway-01/root/stacks/$BCM_LXC_HOST_TIER/$BCM_STACK_NAME.yml"
 
 # run the stack.
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_IMAGE" BCM_SERVICE_PORT="$BCM_SERVICE_PORT" docker stack deploy -c "/root/stacks/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_IMAGE" BCM_SERVICE_PORT="$BCM_SERVICE_PORT" docker stack deploy -c "/root/stacks/$BCM_LXC_HOST_TIER/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
 
 # let's scale the schema registry count to UP TO 3.
 CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)

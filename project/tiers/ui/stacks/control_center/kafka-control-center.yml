@@ -24,7 +24,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - engine.labels.bcm-uidmz == true
+          - engine.labels.bcm-ui == true
 
 networks:
   kafkanet:

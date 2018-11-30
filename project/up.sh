@@ -3,6 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
  
+source ./.env
+
 # let's make sure the cluster exists.
 if [[ -z $BCM_CLUSTER_NAME ]]; then
   echo "BCM_CLUSTER_NAME not set."
@@ -54,12 +56,20 @@ export BCM_LXD_OPS=$BCM_LXD_OPS
 
 # This brings up 'bcm-gateway' and 'bcm-kafka' LXC hosts and populates
 # the respective docker daemons.
+
+
+if [[ $BCM_DEPLOY_HOST_TEMPLATE = 1 ]]; then
+  ./host_template/destroy.sh
+fi
+
 bash -c ./host_template/up.sh
 
-# All tiers require that the bcm-template image be available.
-# let's look for it before we even attempt anything.
-if lxc image list --format csv | grep -q "bcm-template"; then
+if [[ $BCM_DEPLOY_TIERS = 1 ]]; then
+  # All tiers require that the bcm-template image be available.
+  # let's look for it before we even attempt anything.
+  if lxc image list --format csv | grep -q "bcm-template"; then
     bash -c ./tiers/up.sh
-else
+  else
     echo "LXC image 'bcm-template' doesn't exist. Can't deploy BCM tiers."
-fi
+  fi
+fi 

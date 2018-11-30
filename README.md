@@ -35,7 +35,7 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have one or more always-on computers with a reliable Internet connection. You can run BCM in a hardware-based VM or preferably directly on bare-metal (for performance). BCM is a [distributed system](https://en.wikipedia.org/wiki/Distributed_computing), so it gets more reliable and performant as you add commodity hardware.
 
-BCM application components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](www.docker.com). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI installs all the software you will need.
+BCM application components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](https://www.docker.com/). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI installs all the software you will need.
 
 Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu (>=18.04) machines, but should work with most Debian-based distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used.
 

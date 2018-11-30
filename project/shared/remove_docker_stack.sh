@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 STACK_NAME=
 
@@ -17,7 +17,7 @@ case $i in
 esac
 done
 
-if lxc list --format csv -c n state=RUNNING | grep -q "bcm-gateway-01"; then
+if lxc list --format csv | grep -q "bcm-gateway-01"; then
     if [[ "$(lxc exec bcm-gateway-01 -- docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]]; then
         if lxc exec bcm-gateway-01 -- docker stack ls --format "{{.Name}}" | grep -q "$STACK_NAME"; then
             lxc exec bcm-gateway-01 -- docker stack rm "$STACK_NAME"
