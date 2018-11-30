@@ -10,7 +10,7 @@ services:
         aliases:
           - kafkarest
     environment:
-      KAFKA_REST_ZOOKEEPER_CONNECT: ${ZOOKEEPER_CONNECT}
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper-01:2181
       KAFKA_REST_LISTENERS: http://0.0.0.0:8082
       KAFKA_REST_SCHEMA_REGISTRY_URL: http://schemaregistry:8081
       KAFKA_REST_HOST_NAME: kafkarest

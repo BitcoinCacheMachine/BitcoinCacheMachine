@@ -48,31 +48,3 @@ lxc start $LXC_HOST
 #     lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_NAME -- docker swarm init --advertise-addr eth0
 # fi
 
-
-
-
-
-
-######################3
-# CAN PROBABLY DELETE
-#
-
-# # Apply the resulting profile and start the container.
-# if [[ -z $(lxc list | grep cachestack | grep RUNNING) ]]; then
-#     #lxc profile device add cachestackprofile root disk path=/ pool=$bcm_d1ata
-#     lxc profile apply cachestack default,cachestackprofile
-
-#     # push necessary files to the template including daemon.json
-#     lxc file push ./daemon.json cachestack/etc/docker/daemon.json
-
-#     lxc start cachestack
-
-
-
-#     # update routes to prefer eth0 for outbound access.
-#     lxc exec cachestack -- ifmetric eth0 0
-# else
-#     echo "LXD host 'cachestack' is already in a running state. Exiting."
-#     exit 1
-# fi
-
