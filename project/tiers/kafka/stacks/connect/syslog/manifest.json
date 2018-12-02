@@ -1,0 +1,27 @@
+{
+  "name" : "kafka-connect-syslog",
+  "version" : "1.0.0-preview",
+  "title" : "Kafka Connect Syslog",
+  "description" : "The Confluent Syslog Connector is used to move messages from Network devices into Kafka.",
+  "owner" : {
+    "username" : "confluentinc",
+    "type" : "organization",
+    "name" : "Confluent, Inc.",
+    "url" : "https://confluent.io/",
+    "logo" : "assets/confluent.png"
+  },
+  "support" : {
+    "summary" : "This connector is not currently supported and is instead provided as a preview covered by the Confluent Software Evaluation License."
+  },
+  "tags" : [ "Logging", "Syslog", "Network" ],
+  "features" : {
+    "supported_encodings" : [ "any" ],
+    "single_message_transforms" : true,
+    "confluent_control_center_integration" : true,
+    "kafka_connect_api" : true
+  },
+  "documentation_url" : "https://docs.confluent.io/connect/kafka-connect-syslog/",
+  "docker_image" : { },
+  "component_types" : [ "source" ],
+  "release_date" : "2018-11-23"
+}

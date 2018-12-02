@@ -12,7 +12,7 @@ BCM_STACK_FILE_PATH=
 BCM_STACK_NAME=
 BCM_MAX_INSTANCES=2
 BCM_SERVICE_NAME=
-BCM_SERVICE_PORT=
+BCM_BUILD_FLAG=0
 
 for i in "$@"
 do
@@ -35,13 +35,7 @@ fi
 
 echo "BCM_ENV_FILE_PATH: $BCM_ENV_FILE_PATH"
 source "$BCM_ENV_FILE_PATH"
-
-
-
-if [[ -z $DOCKERHUB_IMAGE ]]; then
-    echo "DOCKERHUB_IMAGE not set. Exiting."
-    exit
-fi
+DIR_NAME="$(dirname $BCM_ENV_FILE_PATH)"
 
 if [[ -z $BCM_IMAGE_NAME ]]; then
     echo "BCM_IMAGE_NAME not set. Exiting."
@@ -63,15 +57,35 @@ if [[ -z $BCM_SERVICE_NAME ]]; then
     exit
 fi
 
+CONTAINER_NAME="bcm-$BCM_HOST_TIER-01"
+if [[ $BCM_BUILD_FLAG = 1 ]]; then
+    bash -c "$BCM_LXD_OPS/docker_image_ops.sh --build --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --priv-image-name=$BCM_IMAGE_NAME --registry=$BCM_PRIVATE_REGISTRY"
+fi
+
+if [[ $BCM_BUILD_FLAG = 0 ]]; then
+    bash -c "$BCM_LXD_OPS/docker_image_ops.sh --container-name=$CONTAINER_NAME --image-name=$DOCKERHUB_IMAGE --priv-image-name=$BCM_IMAGE_NAME"
+fi
+
 BCM_STACK_FILE_DIRNAME=$(dirname $BCM_ENV_FILE_PATH)
 BCM_STACK_FILE_PATH=$BCM_STACK_FILE_DIRNAME/$BCM_STACK_FILE
 
-./deploy_stack.sh   --private-registry="$BCM_PRIVATE_REGISTRY" \
-                    --dockerhub-image="$DOCKERHUB_IMAGE" \
-                    --bcm-image-name="$BCM_IMAGE_NAME" \
-                    --lxc-host-tier="$BCM_HOST_TIER" \
-                    --stack-file-path="$BCM_STACK_FILE_PATH" \
-                    --stack-name="$BCM_STACK_NAME" \
-                    --max-instances="$BCM_MAX_INSTANCES" \
-                    --service-name="$BCM_SERVICE_NAME" \
-                    --service-port="$BCM_SERVICE_PORT"
+# push the stack file.
+lxc file push -p "$BCM_STACK_FILE_PATH" "bcm-gateway-01/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME.yml"
+
+# run the stack by passing in the ENV vars.
+lxc exec bcm-gateway-01 -- source "$BCM_ENV_FILE_PATH" && docker stack deploy -c "/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
+
+# let's scale the schema registry count to UP TO 3.
+CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)
+if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
+    REPLICAS=$CLUSTER_NODE_COUNT
+
+    if [[ $CLUSTER_NODE_COUNT -ge $BCM_MAX_INSTANCES ]]; then
+        REPLICAS=$BCM_MAX_INSTANCES
+    fi
+
+    SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$BCM_STACK_NAME")
+    if [[ $SERVICE_MODE = "replicated" ]]; then
+        lxc exec bcm-gateway-01 -- docker service scale "$BCM_STACK_NAME""_""$BCM_SERVICE_NAME=$REPLICAS"
+    fi
+fi

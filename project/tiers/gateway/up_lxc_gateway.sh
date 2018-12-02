@@ -3,7 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source ./tier.env
+# shellcheck disable=SC1091
+source ./.env
 
 # first let's check to see if we have any gateways
 # if so, we quit unless the user has told us to override.

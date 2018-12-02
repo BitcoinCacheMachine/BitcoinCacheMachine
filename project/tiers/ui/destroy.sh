@@ -3,7 +3,8 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-source ./tier.env
+# shellcheck disable=SC1091
+source ./.env
 
 if [[ $BCM_DEPLOY_STACK_CONNECTUI = 1 ]]; then
     bash -c ./stacks/connect_ui/destroy_connect_ui.sh

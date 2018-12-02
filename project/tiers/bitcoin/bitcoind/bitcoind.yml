@@ -1,0 +1,41 @@
+version: '3.6'
+services:
+  bitcoind:
+    image: ${DOCKER_IMAGE}
+    hostname: bitcoind
+    volumes:
+      - bitcoin_data:/bitcoindata
+    environment:
+      BITCOIND_CHAIN: ${BCM_BITCOIN_CHAIN:-testnet}
+    networks:
+      bitcoindrpcnet:
+        aliases:
+          - bitcoindrpc
+    secrets:
+      - source: bitcoin_config
+        target: /secrets/bitcoin.conf
+        uid: '0'
+        gid: '0'
+        mode: 0400
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+secrets:
+  bitcoin_config:
+    file: testnet.conf
+
+volumes:
+  bitcoin_data:
+
+networks:
+  bitcoindrpcnet:
+    driver: overlay
+    attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24

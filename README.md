@@ -18,7 +18,7 @@ There are many areas where your privacy can be compromised if you're not careful
 
 For more information about the motivations behind Bitcoin Cache Machine, visit the [public website](https://bitcoincachemachine.org/2018/09/23/introducing-bitcoin-cache-machine-a-bitcoin-focused-software-defined-network/).
 
-## Goals of Bitcoin Cache Machine
+## Development Goals
 
 Here are some of the development goals for Bitcoin Cache Machine:
 
@@ -37,9 +37,7 @@ If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/)
 
 BCM application components are deployed exclusively over the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](https://www.docker.com/). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI installs all the software you will need.
 
-Documentation for BCM and its components can be found in this repository. All documentation was written against freshly installed Ubuntu (>=18.04) machines, but should work with most Debian-based distros. The documentation is designed to read like a tutorial helping you understand how BCM is architected and how it can be used.
-
- `README.md` files in each directory describe the general architecture of BCM at that level, as well as describes the purpose of each script.
+Documentation for BCM is being migrated to [BCM Docs](https://www.bitcoincachemachine.org/docs/) website.
 
 ## Getting Started
 
@@ -69,7 +67,7 @@ cd $BCM_LOCAL_GIT_REPO_DIR
 
 Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_LOCAL_GIT_REPO_DIR' variable.
 
-`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The CLI `--help` output guides you on how to use the CLI. 
+`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus. For example, `bcm init --help`.
 
 ## Deploying your own BCM Infrastructure
 

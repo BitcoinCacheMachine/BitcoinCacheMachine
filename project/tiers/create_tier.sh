@@ -44,7 +44,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
     fi
 
     # let's source the tier and get required config variables.
-    source "./$BCM_TIER_NAME/tier.env"
+    source "./$BCM_TIER_NAME/.env"
 
     # TIER_TYPE of value 2 means one interface (eth1) in container is 
     # using MACVLAN to expose services to the physical network underlay

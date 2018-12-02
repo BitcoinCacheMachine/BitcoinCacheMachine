@@ -3,7 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")" 
 
-source ./tier.env
+# shellcheck disable=SC1091
+source ./.env
 
 # bring up the docker UI STACKS.
 # TODO eventually we'll hide these behind a VPN gateway (so you first have to VPN eg wireguard)
