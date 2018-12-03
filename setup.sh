@@ -36,7 +36,7 @@ export BCM_RUNTIME_DIR="$HOME/.bcm"
 
 BCM_BASHRC_START_FLAG='###START_BCM###'
 BCM_BASHRC_END_FLAG='###END_BCM###'
-PROFILE_FILE="$HOME/.profile"
+PROFILE_FILE="$HOME/.bashrc"
 if grep -Fxq "$BCM_BASHRC_START_FLAG" "$PROFILE_FILE"
 then
   # code if found

@@ -67,7 +67,7 @@ cd $BCM_LOCAL_GIT_REPO_DIR
 
 Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_LOCAL_GIT_REPO_DIR' variable.
 
-`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus. For example, `bcm init --help`.
+`setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus. Run `bcm --help` for guidance on how to continue, or visit [`./demo/up.sh`](./demo/up.sh). This script uses the BCM CLI to automatically deploys BCM infrastructure to an LXD endpoint running on your localhost. The BCM CLI automatically installs all software for you. `up_demo.sh` deploys the BCM Project `BCMSparkStack` which exposes the c-lightning RPC interface as an authenticated onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
 
 ## Deploying your own BCM Infrastructure
 
@@ -79,13 +79,11 @@ In general, the steps you take to deploy your own infrastructure is as follows:
 4) Create one or more BCM Projects using `bcm project create`. A BCM Project represents the containerized software stack that can be independently deployed to one or more clusters. You can use the BCM cli to customize deployment stacks to suit your particular needs.
 5) Deploy a BCM Project to a BCM Cluster using `bcm project deploy`. Deployment-specific GPG certificates are created in this step. You can deploy multiple instances of a project to the same cluster. The BCM SDN Controller intelligently deploys components across failure domains to achieve local high-availability.
 
-TODO: You can quickly see what the BCM CLI is capable of by running [`./demo/up_demo.sh`](./demo/up_demo.sh). This script uses the BCM CLI to automatically deploys BCM infrastructure to an LXD endpoint running on your localhost. The BCM CLI automatically installs all software for you. `up_demo.sh` deploys the BCM Project `BCMSparkStack` which exposes the c-lightning RPC interface as an authenticated onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
-
 ## How to contribute
 
 Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate. [Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
 
-You can also donate to the development of BCM by donating Bitcoin (BTC).
+You can also donate to the development of BCM by sending Bitcoin (BTC) to the following address.
 
 * Public on-chain donations: 3KNX4GTmXETtnFWFXvFqXg9sDJCbLvD8Zf
 

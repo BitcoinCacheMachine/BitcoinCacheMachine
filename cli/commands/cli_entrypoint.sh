@@ -34,15 +34,17 @@ esac
 done
 
 if [[ $BCM_DEBUG = 1 ]]; then
-    cat "BCM_CERTS_DIR: $BCM_CERTS_DIR" >>$BCM_CERTS_DEBUG_FILE
-    cat "BCM_PROJECTS_DIR: $BCM_PROJECTS_DIR" >>$BCM_CERTS_DEBUG_FILE
-    cat "BCM_CLUSTERS_DIR: $BCM_CLUSTERS_DIR" >>$BCM_CERTS_DEBUG_FILE
-    cat "BCM_PASSWORDS_DIR: $BCM_PASSWORDS_DIR" >>$BCM_CERTS_DEBUG_FILE
+    {
+        cat "BCM_CERTS_DIR: $BCM_CERTS_DIR" 
+        cat "BCM_PROJECTS_DIR: $BCM_PROJECTS_DIR"
+        cat "BCM_CLUSTERS_DIR: $BCM_CLUSTERS_DIR" 
+        cat "BCM_PASSWORDS_DIR: $BCM_PASSWORDS_DIR" 
+    } >> "$BCM_CERTS_DEBUG_FILE"
 fi
 
 # make sure docker is isstalled. Doing it here makes sure we don't have to
 # do it anywhere else.
-$BCM_LOCAL_GIT_REPO_DIR/cli/commands/install/snap_install_docker-ce.sh
+bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/install/snap_install_docker-ce.sh"
 
 if [[ $BCM_DEBUG = "true" ]]; then
     echo "BCM_CLI_COMMAND: $BCM_CLI_COMMAND"
@@ -67,7 +69,7 @@ elif [[ $BCM_CLI_COMMAND = "ssh" ]]; then
 elif [[ $BCM_CLI_COMMAND = "info" ]]; then
     bash -c './info.sh "$@"'
 elif [[ $BCM_CLI_COMMAND = "show" ]]; then
-    $BCM_LOCAL_GIT_REPO_DIR/project/show_lxd.sh
+    bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/show_lxd.sh"
 else
     cat ./help.txt
 fi

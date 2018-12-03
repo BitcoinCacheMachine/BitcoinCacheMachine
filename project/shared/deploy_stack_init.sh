@@ -67,10 +67,9 @@ if [[ $BCM_BUILD_FLAG = 0 ]]; then
 fi
 
 BCM_STACK_FILE_DIRNAME=$(dirname $BCM_ENV_FILE_PATH)
-BCM_STACK_FILE_PATH=$BCM_STACK_FILE_DIRNAME/$BCM_STACK_FILE
 
 # push the stack file.
-lxc file push -p "$BCM_STACK_FILE_PATH" "bcm-gateway-01/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME.yml"
+lxc file push -p -r "$BCM_STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_HOST_TIER/"
 
 # run the stack by passing in the ENV vars.
 lxc exec bcm-gateway-01 -- source "$BCM_ENV_FILE_PATH" && docker stack deploy -c "/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
