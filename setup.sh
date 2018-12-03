@@ -5,17 +5,13 @@ cd "$(dirname "$0")"
 
 # first a common problem with new installations is that git itsn't fully configured.
 # let's test for this condition and quit if necessary.
-if [[ -z $(git config --get --global user.name) ]]; then
-  echo "You need to configure the git user.name configuration parameter so we can make commits. Run the following command:"
-  echo "    git config --global user.name bubba"
-  exit
+if [[ -z $(git config --get --local user.name) ]]; then
+    git config --local user.name "$USER"
 fi
  
 # same for email address
-if [[ -z $(git config --get --global user.email) ]]; then
-  echo "You need to configure the git email parameter so we can make commits. Run the following command:"
-  echo "    git config --global user.email bubba@nowhere.com"
-  exit
+if [[ -z $(git config --get --local user.email) ]]; then
+  git config --local user.email "$USER@$(hostname)"
 fi
 
 # let's make sure the local git client is using TOR for git push/pull operations for the BCM github URL only.
