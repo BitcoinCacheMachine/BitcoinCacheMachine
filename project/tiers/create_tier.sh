@@ -3,8 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")" 
 
-
 BCM_TIER_NAME=
+
+source "$BCM_GIT_DIR/.env"
 
 for i in "$@"
 do

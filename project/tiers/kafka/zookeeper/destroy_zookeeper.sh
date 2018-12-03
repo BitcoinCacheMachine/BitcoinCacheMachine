@@ -1,7 +1,9 @@
 #!/bin/bash
 
 set -Eeuo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" 
+source ./.env
+source "$BCM_GIT_DIR/.env"
 
 # iterate over endpoints and delete relevant resources
 for endpoint in $(bcm cluster list --endpoints); do

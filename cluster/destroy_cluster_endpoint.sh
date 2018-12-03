@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source "$BCM_LXD_OPS/.env"
+source "$BCM_GIT_DIR/.env"
 
 BCM_CLUSTER_NAME=
 BCM_CLUSTER_ENDPOINT_NAME=
@@ -43,7 +43,7 @@ fi
 
 function deleteLXDRemote {
   # Removing lxc remote vm
-  if lxc remote list --format | grep -q "$BCM_CLUSTER_ENDPOINT_NAME"; then
+  if lxc remote list --format csv | grep -q "$BCM_CLUSTER_ENDPOINT_NAME"; then
       echo "Removing lxd remote $BCM_CLUSTER_ENDPOINT_NAME"
       lxc remote switch local
       lxc remote remove $BCM_CLUSTER_ENDPOINT_NAME
@@ -76,7 +76,6 @@ if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     echo "$BCM_CLUSTER_ENDPOINT_NAME doesn't exist."
   fi
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
-    echo "Removing LXD from your system."
     deleteLXDRemote
 fi
 

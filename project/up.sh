@@ -69,9 +69,6 @@ else
     echo "LXC project '$BCM_PROJECT_NAME' already exists."
 fi
 
-export BCM_LXD_OPS=$BCM_LXD_OPS
-
-
 # This brings up 'bcm-gateway' and 'bcm-kafka' LXC hosts and populates
 # the respective docker daemons.
 bash -c ./host_template/up.sh

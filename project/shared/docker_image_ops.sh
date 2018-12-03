@@ -57,13 +57,12 @@ if [[ -z $BCM_IMAGE_NAME ]]; then
     exit
 fi
 
-FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTY/$BCM_IMAGE_NAME"
+if [[ -z $BCM_PRIVATE_REGISTY ]]; then
+    echo "BCM_PRIVATE_REGISTY is empty. Exiting"
+    exit
+fi
 
-# if a registry has been passed, let's ensure the image name properly reflects
-# otherwise this script assumes that the user has properly namespaced the image name
-if [[ ! -z $PUSH_DEST_REGISTRY ]]; then
-    FULLY_QUALIFIED_IMAGE_NAME="$PUSH_DEST_REGISTRY/$BCM_IMAGE_NAME"
-fi 
+FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTY/$BCM_IMAGE_NAME"
 
 if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
     echo "LXC host '$LXC_HOST' doesn't exist. Exiting"
