@@ -13,7 +13,7 @@ BCM_BCMNETINST_RSYNC_BUILDER_NAME="bcm-rsync-builder"
 bash -c "$BCM_LXD_OPS/generate_and_sign_client_certificate.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME rsyncd $BCM_BCMNETINST_RSYNC_BUILDER_NAME"
 
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/bcmnet/create_instance_from_snapshot.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME rsyncd $BCM_BCMNETINST_RSYNC_BUILDER_NAME"
+bash -c "$BCM_GIT_DIR/project/bcmnet/create_instance_from_snapshot.sh $BCM_BCMNETINST_RSYNC_BUILDER_NAME rsyncd $BCM_BCMNETINST_RSYNC_BUILDER_NAME"
 
 #for debugging in curl
 lxc exec $BCM_LXC_BCMNETTEMPLATE_CONTAINER_TEMPLATE_NAME -- apt-get install strace -y
@@ -35,7 +35,7 @@ lxc exec $BCM_BCMNETINST_RSYNC_BUILDER_NAME -- docker push bcm-rsync:latest
 
 
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis
-#bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/bcmnet/delete_instance.sh bcm-rsync-builder"
+#bash -c "$BCM_GIT_DIR/project/bcmnet/delete_instance.sh bcm-rsync-builder"
 
 
 

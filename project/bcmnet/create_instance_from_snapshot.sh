@@ -29,7 +29,7 @@ lxc file push daemon.json $LXC_HOST/etc/docker/daemon.json
 
 lxc start $LXC_HOST
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/shared/wait_for_dockerd.sh --container-name=$LXC_HOST"
+bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$LXC_HOST"
 
 lxc exec $LXC_HOST -- mkdir -p /etc/docker/certs.d/bcmnet:5000
 

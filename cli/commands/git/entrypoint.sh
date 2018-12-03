@@ -95,7 +95,7 @@ if [[ $BCM_CLI_VERB = "commit" ]]; then
         exit
     fi
 
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/controller/build.sh"
+    bash -c "$BCM_GIT_DIR/controller/build.sh"
     if docker image list | grep -q "bcm-gpgagent:latest"; then
         docker build -t bcm-gpgagent:latest .
     else
@@ -115,7 +115,7 @@ if [[ $BCM_CLI_VERB = "commit" ]]; then
 
     if ! docker ps | grep -q "gitter"; then
         # shellcheck disable=SC1090
-        source "$BCM_LOCAL_GIT_REPO_DIR/controller/export_usb_path.sh"
+        source "$BCM_GIT_DIR/controller/export_usb_path.sh"
         docker run -d --name gitter \
             -v $BCM_CERT_DIR:/root/.gnupg \
             -v $BCM_GIT_REPO_DIR:/gitrepo \

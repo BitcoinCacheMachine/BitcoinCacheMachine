@@ -17,4 +17,4 @@ if [[ -d $CERT_DIR ]]; then
     echo "" > "$BCM_RUNTIME_DIR/certs/.env"
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/cluster/providers/lxd/snap_lxd_uninstall.sh"
+bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_uninstall.sh"

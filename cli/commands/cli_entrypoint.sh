@@ -42,10 +42,6 @@ if [[ $BCM_DEBUG = 1 ]]; then
     } >> "$BCM_CERTS_DEBUG_FILE"
 fi
 
-# make sure docker is isstalled. Doing it here makes sure we don't have to
-# do it anywhere else.
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/cli/commands/install/snap_install_docker-ce.sh"
-
 if [[ $BCM_DEBUG = "true" ]]; then
     echo "BCM_CLI_COMMAND: $BCM_CLI_COMMAND"
 fi
@@ -69,7 +65,7 @@ elif [[ $BCM_CLI_COMMAND = "ssh" ]]; then
 elif [[ $BCM_CLI_COMMAND = "info" ]]; then
     bash -c './info.sh "$@"'
 elif [[ $BCM_CLI_COMMAND = "show" ]]; then
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/show_lxd.sh"
+    bash -c "$BCM_GIT_DIR/project/show_lxd.sh"
 else
     cat ./help.txt
 fi

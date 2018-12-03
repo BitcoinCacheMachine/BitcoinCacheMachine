@@ -28,10 +28,9 @@ if [[ $(git config --get --global http.$BCM_GITHUB_URL.proxy) != "$BCM_LOCAL_REP
 fi
 
 # get the current directory where this script is so we can reference it later
-echo "Setting BCM_LOCAL_GIT_REPO_DIR environment variable in current shell to '$(pwd)'"
-BCM_LOCAL_GIT_REPO_DIR=$(pwd)
-export BCM_LOCAL_GIT_REPO_DIR
-
+echo "Setting BCM_GIT_DIR environment variable in current shell to '$(pwd)'"
+BCM_GIT_DIR=$(pwd)
+export BCM_GIT_DIR
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 
 BCM_BASHRC_START_FLAG='###START_BCM###'
@@ -40,20 +39,20 @@ PROFILE_FILE="$HOME/.bashrc"
 if grep -Fxq "$BCM_BASHRC_START_FLAG" "$PROFILE_FILE"
 then
   # code if found
-  echo "BCM flag discovered in $HOME/.profile. Please inspect your $HOME/.profile to clear any BCM-related content, if appropriate."
+  echo "BCM flag discovered in '$PROFILE_FILE'. Please inspect your '$PROFILE_FILE' to clear any BCM-related content, if appropriate."
 else
-  echo "Writing commands to $HOME/.profile to support running BCM from the admin machine."
+  echo "Writing commands to '$PROFILE_FILE' to support running BCM from the admin machine."
 
   {
     echo "$BCM_BASHRC_START_FLAG" 
-    echo "export BCM_LOCAL_GIT_REPO_DIR=$BCM_LOCAL_GIT_REPO_DIR"
+    echo "export BCM_GIT_DIR=$BCM_GIT_DIR"
     
     # shellcheck disable=SC2016
-    echo "export PATH="'$PATH:'""'$BCM_LOCAL_GIT_REPO_DIR/cli'""
+    echo "export PATH="'$PATH:'""'$BCM_GIT_DIR/cli'""
     echo "export BCM_RUNTIME_DIR=$BCM_RUNTIME_DIR"
     echo "$BCM_BASHRC_END_FLAG"
   } >> "$PROFILE_FILE"
 fi
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Type 'bcm' to continue."
-export PATH=$PATH/$BCM_LOCAL_GIT_REPO_DIR
+export PATH=$PATH/$BCM_GIT_DIR

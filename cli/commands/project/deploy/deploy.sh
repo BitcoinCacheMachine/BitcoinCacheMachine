@@ -46,7 +46,7 @@ if [[ ! -d $BCM_DEPLOYMENT_DIR ]]; then
     mkdir $BCM_DEPLOYMENT_DIR
 
     # first let's get some certificates generated for our new BCM deployment.
-    $BCM_LOCAL_GIT_REPO_DIR/controller/gpg-init.sh \
+    $BCM_GIT_DIR/controller/gpg-init.sh \
         --cert-dir="$BCM_DEPLOYMENT_DIR" \
         --cert-name="$BCM_PROJECT_NAME" \
         --cert-username="$BCM_PROJECT_USERNAME" \
@@ -57,4 +57,4 @@ export BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
 export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
 export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 
-$BCM_LOCAL_GIT_REPO_DIR/project/up.sh
+$BCM_GIT_DIR/project/up.sh

@@ -57,15 +57,14 @@ git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
 You can now clone the BCM repository to your machine over TOR and run setup.
 
 ```bash
-export BCM_LOCAL_GIT_REPO_DIR="$HOME/git/github/bcm"
-mkdir -p $BCM_LOCAL_GIT_REPO_DIR
-export PATH=$PATH:$BCM_LOCAL_GIT_REPO_DIR/cli
-git clone $BCM_GITHUB_REPO_URL $BCM_LOCAL_GIT_REPO_DIR
-cd $BCM_LOCAL_GIT_REPO_DIR
+export BCM_GIT_DIR="$HOME/git/github/bcm"
+mkdir -p "$BCM_GIT_DIR"
+git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
+cd "$BCM_GIT_DIR"
 ./setup.sh
 ```
 
-Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_LOCAL_GIT_REPO_DIR' variable.
+Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_GIT_DIR' variable.
 
 `setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus. Run `bcm --help` for guidance on how to continue, or visit [`./demo/up.sh`](./demo/up.sh). This script uses the BCM CLI to automatically deploys BCM infrastructure to an LXD endpoint running on your localhost. The BCM CLI automatically installs all software for you. `up_demo.sh` deploys the BCM Project `BCMSparkStack` which exposes the c-lightning RPC interface as an authenticated onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
 

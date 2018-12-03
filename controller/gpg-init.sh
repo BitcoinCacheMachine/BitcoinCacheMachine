@@ -45,7 +45,7 @@ echo "BCM_CERT_USERNAME: $BCM_CERT_USERNAME"
 echo "BCM_CERT_FQDN: $BCM_CERT_FQDN"
 
 # TODO move this into the mgmtplan container rather than installing on host.
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/cluster/providers/lxd/snap_lxd_install.sh"
+bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_install.sh"
 
 # get the locatio of the trezor
 source ./export_usb_path.sh

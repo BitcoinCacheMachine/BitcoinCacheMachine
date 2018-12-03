@@ -25,7 +25,7 @@ fi
 
 export BCM_REMOVE_TEMPLATE_FLAG=$BCM_REMOVE_TEMPLATE_FLAG
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/destroy.sh --remove-template"
+bash -c "$BCM_GIT_DIR/project/destroy.sh --remove-template"
 
 if [[ -d "$BCM_DEPLOYMENT_DIR" ]]; then
     sudo rm -Rf "$BCM_DEPLOYMENT_DIR"

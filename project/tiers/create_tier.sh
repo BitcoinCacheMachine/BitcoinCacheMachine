@@ -57,7 +57,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
     # let's bring up the host then wait for dockerd to start.
     lxc start "$HOSTNAME"
 
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
+    bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
     
     # if TIER type is >=1 then we wait for gateway which is assumed to exist.
     # all nodes from this script are workers. Manager hosts are implemented

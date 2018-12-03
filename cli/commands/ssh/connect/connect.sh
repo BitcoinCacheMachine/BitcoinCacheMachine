@@ -20,7 +20,7 @@ if [[ -z $BCM_SSH_HOSTNAME ]]; then
 fi
 
 # get the locatio of the trezor
-source $BCM_LOCAL_GIT_REPO_DIR/controller/export_usb_path.sh
+source $BCM_GIT_DIR/controller/export_usb_path.sh
 echo "BCM_TREZOR_USB_PATH: $BCM_TREZOR_USB_PATH"
 echo "BCM_SSH_KEY_DIR: $BCM_SSH_KEY_DIR"
 echo "BCM_SSH_USERNAME: $BCM_SSH_USERNAME"

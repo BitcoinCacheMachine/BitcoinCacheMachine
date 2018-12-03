@@ -62,7 +62,7 @@ if [[ $BCM_CLI_VERB = "create" ]]; then
         exit
     fi
 
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/cluster/up_cluster.sh --cluster-name=$BCM_CLUSTER_NAME --node-count=$BCM_NODE_COUNT --provider=$BCM_PROVIDER_NAME --mgmt-type=$BCM_MGMT_TYPE"
+    bash -c "$BCM_GIT_DIR/cluster/up_cluster.sh --cluster-name=$BCM_CLUSTER_NAME --node-count=$BCM_NODE_COUNT --provider=$BCM_PROVIDER_NAME --mgmt-type=$BCM_MGMT_TYPE"
 elif [[ $BCM_CLI_VERB = "destroy" ]]; then
     if [[ -z $BCM_CLUSTER_NAME ]]; then
         echo "BCM_CLUSTER_NAME not set. Exiting"
@@ -70,7 +70,7 @@ elif [[ $BCM_CLI_VERB = "destroy" ]]; then
     fi
 
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/cluster/destroy_cluster.sh --cluster-name="$BCM_CLUSTER_NAME""
+    bash -c "$BCM_GIT_DIR/cluster/destroy_cluster.sh --cluster-name="$BCM_CLUSTER_NAME""
 elif [[ $BCM_CLI_VERB = "list" ]]; then
     
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME

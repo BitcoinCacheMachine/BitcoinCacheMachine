@@ -86,9 +86,12 @@ if [[ ! -z $BCM_CERT_DIR_OVERRIDE ]]; then
     BCM_CERT_DIR=$BCM_CERT_DIR_OVERRIDE
 fi
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/controller/build.sh"
+# make sure docker is installed. Doing it here makes sure we don't have to do it anywhere else.
+bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker-ce.sh"
 
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/controller/gpg-init.sh \
+bash -c "$BCM_GIT_DIR/controller/build.sh"
+
+bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
     --cert-dir='$BCM_CERT_DIR' \
     --cert-name='$BCM_CERT_NAME' \
     --cert-username='$BCM_CERT_USERNAME' \

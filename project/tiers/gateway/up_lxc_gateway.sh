@@ -29,7 +29,7 @@ lxc start "$HOSTNAME"
 
 # let's configure the bcm-gateway-01 first since it is the first member
 # of the docker swarm.
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
+bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
 
 lxc exec "$HOSTNAME" -- ifmetric eth0 50
 lxc exec "$HOSTNAME" -- docker pull registry:latest
@@ -42,7 +42,7 @@ lxc exec "$HOSTNAME" -- docker swarm init --advertise-addr eth1 >> /dev/null
 lxc file push "./$HOSTNAME.daemon.json" "$HOSTNAME/etc/docker/daemon.json"
 
 lxc restart "$HOSTNAME"
-bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
+bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
 
 
 # TODO - make static 
@@ -93,7 +93,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
 
             lxc start "$HOSTNAME"
 
-            bash -c "$BCM_LOCAL_GIT_REPO_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
+            bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
 
             # make sure gateway and kafka hosts can reach the swarm master.
             # this steps helps resolve networking before we issue any meaningful

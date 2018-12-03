@@ -58,12 +58,12 @@ if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
     echo "Performing a local LXD installation (bare-metal). Note this provides no fault tolerance."
 
     # first let's make sure the lxd snap is installed.
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/cluster/providers/lxd/snap_lxd_install.sh"
+    bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_install.sh"
 elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
     echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
 
     # install multipass so we can get started.
-    bash -c "$BCM_LOCAL_GIT_REPO_DIR/cluster/providers/multipass/snap_multipass_install.sh"
+    bash -c "$BCM_GIT_DIR/cluster/providers/multipass/snap_multipass_install.sh"
     
 elif [[ $BCM_PROVIDER_NAME = "aws" ]]; then
     echo "Creating a remote LXD cluster running on someone else's computers (AWS)."
