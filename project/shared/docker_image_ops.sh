@@ -8,8 +8,10 @@ DOCKER_HUB_IMAGE=
 BCM_IMAGE_NAME=
 BCM_HELP_FLAG=0
 BUILD_CONTEXT=
-PUSH_DEST_REGISTRY=
 IMAGE_TAGGED_FLAG=0
+BCM_PRIVATE_REGISTY=
+
+source "$BCM_GIT_DIR/.env"
 
 for i in "$@"
 do
@@ -23,7 +25,7 @@ case $i in
     shift # past argument=value
     ;;
     --registry=*)
-    PUSH_DEST_REGISTRY="${i#*=}"
+    BCM_PRIVATE_REGISTY="${i#*=}"
     shift # past argument=value
     ;;
     --priv-image-name=*)
@@ -55,10 +57,12 @@ if [[ -z $BCM_IMAGE_NAME ]]; then
     exit
 fi
 
+FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTY/$BCM_IMAGE_NAME"
+
 # if a registry has been passed, let's ensure the image name properly reflects
 # otherwise this script assumes that the user has properly namespaced the image name
 if [[ ! -z $PUSH_DEST_REGISTRY ]]; then
-    BCM_IMAGE_NAME="$PUSH_DEST_REGISTRY/$BCM_IMAGE_NAME"
+    FULLY_QUALIFIED_IMAGE_NAME="$PUSH_DEST_REGISTRY/$BCM_IMAGE_NAME"
 fi 
 
 if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
@@ -80,10 +84,10 @@ if [[ $BCM_HELP_FLAG = 1 ]]; then
             exit
         fi
 
-        if [[ ! -z $BCM_IMAGE_NAME ]]; then
+        if [[ ! -z $FULLY_QUALIFIED_IMAGE_NAME ]]; then
             echo "Pushing contents of the build context to LXC host '$LXC_HOST'."
             lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
-            lxc exec "$LXC_HOST" -- docker build -t "$BCM_IMAGE_NAME" /root/build/
+            lxc exec "$LXC_HOST" -- docker build -t "$FULLY_QUALIFIED_IMAGE_NAME" /root/build/
             IMAGE_TAGGED_FLAG=1
         else 
             echo "BCM_IMAGE_NAME was empty."
@@ -96,7 +100,7 @@ fi
 
 
 if [[ $IMAGE_TAGGED_FLAG = 0 ]]; then
-    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$BCM_IMAGE_NAME"
+    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$FULLY_QUALIFIED_IMAGE_NAME"
 fi
 
-lxc exec "$LXC_HOST" -- docker push "$BCM_IMAGE_NAME"
+lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
