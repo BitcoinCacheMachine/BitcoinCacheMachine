@@ -4,7 +4,7 @@ set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 #MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+for endpoint in $(bcm cluster list --endpoints); do
     #echo $endpoint
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
     GATEWAY_HOST="bcm-gateway-$(printf %02d "$HOST_ENDING")"

@@ -4,11 +4,11 @@ set -Eeuox pipefail
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
-if [[ $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME" | wc -l) -gt 1 ]]; then
+if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
     # create and populate the required network
 
     # we have to do this for each cluster node
-    for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+    for endpoint in $(bcm cluster list --endpoints); do
         lxc network create --target "$endpoint" bcmbrGWNat
         lxc network create --target "$endpoint" bcmNet
     done

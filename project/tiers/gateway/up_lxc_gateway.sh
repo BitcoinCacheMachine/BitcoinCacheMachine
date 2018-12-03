@@ -5,6 +5,7 @@ cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
 source ./.env
+source "$BCM_GIT_DIR/.env"
 
 # first let's check to see if we have any gateways
 # if so, we quit unless the user has told us to override.
@@ -82,7 +83,7 @@ lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/r
 source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+for endpoint in $(bcm cluster list --endpoints); do
     if [[ $endpoint != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$endpoint" | tail -c 2)
         HOSTNAME="bcm-gateway-$(printf %02d "$HOST_ENDING")"
@@ -100,7 +101,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
             # commands.
             lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:2377
             lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:5000
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:5010
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$BCM_PRIVATE_REGISTRY"
 
             if [[ $HOST_ENDING -le 3 ]]; then
                 lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_MANAGER_JOIN_TOKEN" bcm-gateway-01:2377
@@ -113,7 +114,7 @@ for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME
             # another registry mirror and private registry in case node1 goes offline.
             # We will only have 2 locations for docker image distribution.
             if [[ $HOST_ENDING = 2 ]]; then
-                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://bcm-gateway-01:5010" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror2
+                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://$BCM_PRIVATE_REGISTRY" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror2
             fi
         fi
     fi

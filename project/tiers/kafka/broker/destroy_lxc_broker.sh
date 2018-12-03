@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # iterate over endpoints and delete relevant resources
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+for endpoint in $(bcm cluster list --endpoints); do
     #echo $endpoint
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
     BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"

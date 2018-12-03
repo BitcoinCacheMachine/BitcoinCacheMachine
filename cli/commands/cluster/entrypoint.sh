@@ -9,9 +9,9 @@ if [[ -z $2 ]]; then
 fi
 
 BCM_CLI_VERB=$2
-BCM_CLUSTER_NAME=
+BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_PROVIDER_NAME=
-BCM_MGMT_TYPE=
+BCM_EXPOSE_TOR_MGMT=0
 BCM_NODE_COUNT=
 BCM_ENDPOINTS_FLAG=0
 BCM_SHOW_DEPLOYMENTS_FLAG=0
@@ -27,8 +27,8 @@ case $i in
     BCM_PROVIDER_NAME="${i#*=}"
     shift # past argument=value
     ;;
-    --mgmt-type=*)
-    BCM_MGMT_TYPE="${i#*=}"
+    --tor)
+    BCM_EXPOSE_TOR_MGMT="${i#*=}"
     shift # past argument=value
     ;;
     --node-count=*)
@@ -55,13 +55,6 @@ if [[ $BCM_HELP_FLAG = 1 ]]; then
 fi
 
 if [[ $BCM_CLI_VERB = "create" ]]; then
-
-    if [[ !($BCM_MGMT_TYPE = "local" || $BCM_MGMT_TYPE = "tor") ]]; then
-        echo "Error. BCM_MGMT_TYPE should be either 'local' or 'tor'."
-        cat ./create/help.txt
-        exit
-    fi
-
     bash -c "$BCM_GIT_DIR/cluster/up_cluster.sh --cluster-name=$BCM_CLUSTER_NAME --node-count=$BCM_NODE_COUNT --provider=$BCM_PROVIDER_NAME --mgmt-type=$BCM_MGMT_TYPE"
 elif [[ $BCM_CLI_VERB = "destroy" ]]; then
     if [[ -z $BCM_CLUSTER_NAME ]]; then

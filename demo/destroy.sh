@@ -17,4 +17,5 @@ if [[ -d $CERT_DIR ]]; then
     echo "" > "$BCM_RUNTIME_DIR/certs/.env"
 fi
 
-bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_uninstall.sh"
+# this resets the lxd configuration to defaults.
+sudo lxd init --preseed < "$BCM_GIT_DIR/cluster/lxd_preseed/blank.yml"

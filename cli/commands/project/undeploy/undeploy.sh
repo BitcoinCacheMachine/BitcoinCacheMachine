@@ -3,6 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+source "$BCM_GIT_DIR/.env"
+
 for i in "$@"
 do
 case $i in

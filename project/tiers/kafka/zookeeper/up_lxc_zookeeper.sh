@@ -21,7 +21,7 @@ NODE=1
 
 lxc file push -p ./zookeeper.yml bcm-gateway-01/root/stacks/kafka/zookeeper.yml
 
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+for endpoint in $(bcm cluster list --endpoints); do
     if [[ "$NODE" -ge "$MAX_ZOOKEEPER_NODES" ]]; then
         break;
     fi

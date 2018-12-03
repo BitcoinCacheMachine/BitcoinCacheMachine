@@ -55,9 +55,9 @@ fi
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
-if [[ $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME" | wc -l) -gt 1 ]]; then
+if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
     # we run the following command if it's a cluster having more than 1 LXD node.
-    for ENDPOINT in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+    for ENDPOINT in $(bcm cluster list --endpoints); do
         lxc network create --target "$ENDPOINT" bcmbr0
     done
 else

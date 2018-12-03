@@ -3,12 +3,12 @@
 # brings up LXD cluster of at least 1 member. Increase the number
 # by providing $1 as a number 2 or above.
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_NODE_COUNT=
 BCM_CLUSTER_NAME=
-BCM_PROVIDER_NAME=
+BCM_PROVIDER_NAME=baremetal
 BCM_MGMT_TYPE=
 BCM_CLUSTER_MASTER_NAME=
 
@@ -53,23 +53,14 @@ if [[ -d $BCM_CLUSTER_DIR ]]; then
     exit
 fi
 
-
 if [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
-    echo "Performing a local LXD installation (bare-metal). Note this provides no fault tolerance."
-
-    # first let's make sure the lxd snap is installed.
-    bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_install.sh"
+    BCM_CLUSTER_NODE_COUNT=1
 elif [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
-    echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
-
-    # install multipass so we can get started.
     bash -c "$BCM_GIT_DIR/cluster/providers/multipass/snap_multipass_install.sh"
-    
-elif [[ $BCM_PROVIDER_NAME = "aws" ]]; then
-    echo "Creating a remote LXD cluster running on someone else's computers (AWS)."
-else
-    echo "Invalid BCM_PROVIDER_NAME"
 fi
+
+# first let's make sure the lxd snap 
+bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_install.sh"
 
 BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-01"
 BCM_CLUSTER_MASTER_NAME=$BCM_CLUSTER_ENDPOINT_NAME

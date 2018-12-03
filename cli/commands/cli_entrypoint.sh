@@ -62,8 +62,10 @@ elif [[ $BCM_CLI_COMMAND = "file" ]]; then
     ./file/entrypoint.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "ssh" ]]; then
     ./ssh/entrypoint.sh "$@"
+elif [[ $BCM_CLI_COMMAND = "tier" ]]; then
+    ./tier/entrypoint.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "info" ]]; then
-    bash -c './info.sh "$@"'
+    ./info.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "show" ]]; then
     bash -c "$BCM_GIT_DIR/project/show_lxd.sh"
 else

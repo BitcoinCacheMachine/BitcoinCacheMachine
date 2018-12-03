@@ -53,8 +53,7 @@ if [[ ! -d $BCM_DEPLOYMENT_DIR ]]; then
         --cert-hostname="$BCM_CLUSTER_NAME"
 fi
 
-export BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
-export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
-export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
+BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
+BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
 
-$BCM_GIT_DIR/project/up.sh
+bash -c "$BCM_GIT_DIR/project/up.sh --project-name=$BCM_PROJECT_NAME --cluster-name=$BCM_CLUSTER_NAME"

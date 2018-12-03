@@ -3,6 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+source "$BCM_LXD_OPS/.env"
+
 BCM_CLUSTER_NAME=
 BCM_CLUSTER_ENDPOINT_NAME=
 BCM_REMOVE_SOFTWARE=0
@@ -18,10 +20,6 @@ case $i in
     BCM_CLUSTER_ENDPOINT_NAME="${i#*=}"
     shift # past argument=value
     ;;
-    --remove-software)
-    BCM_REMOVE_SOFTWARE=1
-    shift # past argument=value
-    ;;
     *)
 
     ;;
@@ -33,9 +31,9 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
   exit
 fi
 
-BCM_CLUSTER_DIR=$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME
-ENDPOINTS_DIR=$BCM_CLUSTER_DIR/endpoints
-BCM_ENDPOINT_DIR=$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME
+BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
+ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
+BCM_ENDPOINT_DIR="$ENDPOINTS_DIR/$BCM_CLUSTER_ENDPOINT_NAME"
 
 if [[ $BCM_DEBUG = 1 ]]; then
   echo "BCM_CLUSTER_DIR: $BCM_CLUSTER_DIR"
@@ -45,7 +43,7 @@ fi
 
 function deleteLXDRemote {
   # Removing lxc remote vm
-  if [[ ! -z $(lxc remote list | grep "$BCM_CLUSTER_ENDPOINT_NAME") ]]; then
+  if lxc remote list --format | grep -q "$BCM_CLUSTER_ENDPOINT_NAME"; then
       echo "Removing lxd remote $BCM_CLUSTER_ENDPOINT_NAME"
       lxc remote switch local
       lxc remote remove $BCM_CLUSTER_ENDPOINT_NAME
@@ -80,14 +78,10 @@ if [[ $BCM_PROVIDER_NAME = "multipass" ]]; then
 elif [[ $BCM_PROVIDER_NAME = "baremetal" ]]; then
     echo "Removing LXD from your system."
     deleteLXDRemote
-
-    if [[ ! -z $(lxc profile list | grep "bcm_default") ]]; then
-      lxc profile delete bcm_default
-    fi
 fi
 
 if [[ -d $BCM_ENDPOINT_DIR ]]; then
-  rm -rf $BCM_ENDPOINT_DIR
+  rm -rf "$BCM_ENDPOINT_DIR"
 fi
 
 if [[ ! -z $(lxc storage list | grep "bcm_btrfs") ]]; then

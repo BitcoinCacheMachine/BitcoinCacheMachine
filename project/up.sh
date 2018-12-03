@@ -2,8 +2,26 @@
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"
- 
+
+source "$BCM_GIT_DIR/.env"
 source ./.env
+
+for i in "$@"
+do
+case $i in
+    --project-name=*)
+    BCM_PROJECT_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    --cluster-name=*)
+    BCM_CLUSTER_NAME="${i#*=}"
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
 
 # let's make sure the cluster exists.
 if [[ -z $BCM_CLUSTER_NAME ]]; then
@@ -18,11 +36,12 @@ if [[ -z $BCM_PROJECT_NAME ]]; then
 fi
 
 # let's make sure the cluster exists.
+BCM_CLUSTERS_DIR="$BCM_RUNTIME_DIR/clusters"
+BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 if [[ -z $BCM_CLUSTER_DIR ]]; then
   echo "BCM_CLUSTER_DIR not set."
   exit
 fi 
-
 
 # exit if the cluster definition is missing
 if ! bcm cluster list | grep -q "$BCM_CLUSTER_NAME"; then
@@ -32,8 +51,7 @@ fi
 
 # Exit if the project already exists.
 if ! bcm project list | grep -q "$BCM_PROJECT_NAME"; then
-  echo "Project '$BCM_PROJECT_NAME' does not exist. Can't deploy."
-  exit
+  echo "WARNING: LXC project '$BCM_PROJECT_NAME' already exists."
 fi
 
 if [[ $(lxc remote get-default) != "$BCM_CLUSTER_NAME" ]]; then
@@ -56,12 +74,6 @@ export BCM_LXD_OPS=$BCM_LXD_OPS
 
 # This brings up 'bcm-gateway' and 'bcm-kafka' LXC hosts and populates
 # the respective docker daemons.
-
-
-if [[ $BCM_DEPLOY_HOST_TEMPLATE = 1 ]]; then
-  ./host_template/destroy.sh
-fi
-
 bash -c ./host_template/up.sh
 
 if [[ $BCM_DEPLOY_TIERS = 1 ]]; then

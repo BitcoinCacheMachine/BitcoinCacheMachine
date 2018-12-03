@@ -30,7 +30,7 @@ bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$BCM_TIER_NAME"
 source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 # configure and start the containers
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+for endpoint in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
     HOSTNAME="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
     

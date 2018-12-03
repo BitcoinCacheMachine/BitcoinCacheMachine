@@ -1,8 +1,9 @@
 #!/bin/bash
 
 cd "$(dirname "$0")"
-
 set -Eeuo pipefail
+
+source "$BCM_GIT_DIR/.env"
 
 BCM_CLUSTER_NAME=
 BCM_DEBUG=0
@@ -29,7 +30,7 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
   exit
 fi
 
-if [[ ! -d $BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME ]]; then
+if [[ ! -d "$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME" ]]; then
   echo "BCM cluster definition '$BCM_CLUSTER_NAME' does not exist. Nothing to destroy."
   exit
 fi
@@ -49,8 +50,8 @@ if [[ $BCM_DEBUG = 1 ]]; then
   echo "ENDPOINTS_DIR: $ENDPOINTS_DIR"
 fi
 
-for endpoint in `bcm cluster list --cluster-name=$BCM_CLUSTER_NAME --endpoints`; do
-  bash -c "./destroy_cluster_endpoint.sh --cluster-name=$BCM_CLUSTER_NAME --endpoint-name=$endpoint"
+for endpoint in $(bcm cluster list --endpoints); do
+  ./destroy_cluster_endpoint.sh --cluster-name=$BCM_CLUSTER_NAME --endpoint-name=$endpoint
 done
 
 if [[ $(lxc remote list | grep $BCM_CLUSTER_NAME) ]]; then
@@ -58,9 +59,12 @@ if [[ $(lxc remote list | grep $BCM_CLUSTER_NAME) ]]; then
   lxc remote remove $BCM_CLUSTER_NAME
 fi
 
-if [[ -d $BCM_CLUSTER_DIR ]]; then
-  rm -rf $BCM_CLUSTER_DIR
+if [[ -d "$BCM_CLUSTER_DIR" ]]; then
+  rm -rf "$BCM_CLUSTER_DIR"
 fi
+
+# delete profile 'docker-privileged'
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=bcm_default"
 
 # source $BCM_CERTS_DIR/.env
 # bcm git commit \

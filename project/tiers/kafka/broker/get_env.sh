@@ -7,7 +7,7 @@ KAFKA_BOOSTRAP_SERVERS="broker-01:9092"
 BOOSTRAP_SERVER_MAX=3
 NODE=1
 
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+for endpoint in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
     
     # three brokers is more than sufficient for first contact.

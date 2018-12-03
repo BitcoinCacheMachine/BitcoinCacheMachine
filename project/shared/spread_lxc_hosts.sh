@@ -24,7 +24,7 @@ fi
 
 # let's get a bcm-gateway LXC instance on each cluster endpoint.
 MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
-for endpoint in $(bcm cluster list --endpoints --cluster-name="$BCM_CLUSTER_NAME"); do
+for endpoint in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
     LXC_HOSTNAME="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
     LXC_DOCKERVOL="$LXC_HOSTNAME-dockerdisk"

@@ -3,14 +3,13 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+source "$BCM_GIT_DIR/.env"
+
 BCM_ENV_FILE_PATH=
-BCM_PRIVATE_REGISTRY="bcm-gateway-01:5010"
 DOCKERHUB_IMAGE=
 BCM_IMAGE_NAME=
 BCM_HOST_TIER=
-BCM_STACK_FILE_PATH=
 BCM_STACK_NAME=
-BCM_MAX_INSTANCES=2
 BCM_SERVICE_NAME=
 BCM_BUILD_FLAG=0
 
@@ -73,18 +72,3 @@ lxc file push -p -r "$BCM_STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_
 
 # run the stack by passing in the ENV vars.
 lxc exec bcm-gateway-01 -- source "$BCM_ENV_FILE_PATH" && docker stack deploy -c "/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
-
-# let's scale the schema registry count to UP TO 3.
-CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)
-if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
-    REPLICAS=$CLUSTER_NODE_COUNT
-
-    if [[ $CLUSTER_NODE_COUNT -ge $BCM_MAX_INSTANCES ]]; then
-        REPLICAS=$BCM_MAX_INSTANCES
-    fi
-
-    SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$BCM_STACK_NAME")
-    if [[ $SERVICE_MODE = "replicated" ]]; then
-        lxc exec bcm-gateway-01 -- docker service scale "$BCM_STACK_NAME""_""$BCM_SERVICE_NAME=$REPLICAS"
-    fi
-fi
