@@ -3,18 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 
-# make the following environment variables available to child shells
-export BCM_CERTS_DIR=$BCM_RUNTIME_DIR/certs
-export BCM_PROJECTS_DIR=$BCM_RUNTIME_DIR/projects
-export BCM_CLUSTERS_DIR=$BCM_RUNTIME_DIR/clusters
-export BCM_PASSWORDS_DIR=$BCM_RUNTIME_DIR/passwords
-export BCM_DEPLOYMENTS_DIR=$BCM_RUNTIME_DIR/deployments
-
-export BCM_CERTS_DEBUG_FILE=$BCM_CERTS_DIR/debug.log
-export BCM_PROJECTS_DEBUG_FILE=$BCM_PROJECTS_DIR/debug.log
-export BCM_CLUSTERS_DEBUG_FILE=$BCM_CLUSTERS_DIR/debug.log
-export BCM_PASSWORDS_DEBUG_FILE=$BCM_PASSWORDS_DIR/debug.log
-export BCM_DEPLOYMENTS_DEBUG_FILE=$BCM_DEPLOYMENTS_DIR/debug.log
+source "$BCM_GIT_DIR/.env"
 
 if [[ -z $BCM_DEBUG ]]; then
     export BCM_DEBUG=0

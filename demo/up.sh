@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source ./.env
- 
 # This script is a sample BCM CLI program that instantiates 
 # a datacenter stack on a single computer (thus no fault tolerance)
 # First, the SDN Controller is initialized with 'bcm init'
@@ -16,8 +14,12 @@ source ./.env
 # Next, a default project created with 'bcm project create'.
 # Finally, we deploy the project definition to the cluster we created.
 
+
+# let's get our default environment variables.
+source "$BCM_GIT_DIR/.env"
+
 # run bcm init
-bcm init --cert-name="alice" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME" --runtime-dir="$HOME/protected/.bcm"
+bcm init --cert-name="BCM" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
 
 ## Create a basic project difintion.
 bcm project create --project-name="$BCM_PROJECT_NAME"

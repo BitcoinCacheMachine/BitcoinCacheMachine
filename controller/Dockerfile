@@ -37,3 +37,5 @@ RUN chmod +x /entrypoint.sh
 RUN mkdir -p /root/.bcm
 
 ENV GNUPGHOME=/root/.gnupg/trezor
+
+RUN apt-get install -y pass

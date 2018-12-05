@@ -47,7 +47,7 @@ fi
 
 
 # see if the directory exists already; if so we exit
-export BCM_CLUSTER_DIR=$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME
+export BCM_CLUSTER_DIR=$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME
 if [[ -d $BCM_CLUSTER_DIR ]]; then
     echo "ERROR: The BCM_CLUSTER_DIR directory already exists. Exiting."
     exit

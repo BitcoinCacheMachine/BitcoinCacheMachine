@@ -42,7 +42,7 @@ if [[ $BCM_DEBUG = 1 ]]; then
 fi
 
 echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
-export BCM_CLUSTER_DIR=$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME
+export BCM_CLUSTER_DIR=$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
 
 if [[ $BCM_DEBUG = 1 ]]; then

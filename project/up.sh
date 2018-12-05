@@ -36,7 +36,6 @@ if [[ -z $BCM_PROJECT_NAME ]]; then
 fi
 
 # let's make sure the cluster exists.
-BCM_CLUSTERS_DIR="$BCM_RUNTIME_DIR/clusters"
 BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 if [[ -z $BCM_CLUSTER_DIR ]]; then
   echo "BCM_CLUSTER_DIR not set."

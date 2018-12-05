@@ -24,14 +24,14 @@ fi
 
 # let's set the local git client user and email settings to prevent error messages.
 if [[ -z $(git config --get --local user.name) ]]; then
-    git config --local user.name "$USER"
+    git config --local user.name "bcm"
 fi
 
 if [[ -z $(git config --get --local user.email) ]]; then
-  git config --local user.email "$USER@$(hostname)"
+  git config --local user.email "bcm@$(hostname)"
 fi
 
-# let's make sure the local git client is using TOR for git push/pull operations.
+# let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already, but we'll set the local
 # settings as well.
 BCM_TOR_PROXY="socks5://localhost:9050"
@@ -67,16 +67,5 @@ else
     echo "$BCM_BASHRC_END_FLAG"
   } >> "$BASHRC_FILE"
 fi
-
-sudo apt-get install -y encfs
-
-# update /etc/fuse.conf to allow non-root users to specify the allow_root mount option
-sudo sed -i -e 's/#user_allow_other/user_allow_other/g' /etc/fuse.conf
-
-# 60 minute idle timeout in which case the encrypted mount will be unmounted
-mkdir -p "$HOME/.bcm_encrypted"
-mkdir -p "$HOME/.bcm"
-
-encfs -o allow_root "$HOME/.bcm_encrypted" "$HOME/.bcm" -i=60 --standard --extpass='bcm pass'
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Open a new terminal then type 'bcm --help'."

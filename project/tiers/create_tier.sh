@@ -51,7 +51,7 @@ for endpoint in $(bcm cluster list --endpoints); do
     # using MACVLAN to expose services to the physical network underlay
     if [[ $BCM_TIER_TYPE = 2 ]]; then
         # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
-        source "$BCM_RUNTIME_DIR/clusters/$BCM_CLUSTER_NAME/endpoints/$endpoint/.env"
+        source "$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME/endpoints/$endpoint/.env"
         lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan parent="$BCM_LXD_PHYSICAL_INTERFACE" name=eth1 
     fi
 

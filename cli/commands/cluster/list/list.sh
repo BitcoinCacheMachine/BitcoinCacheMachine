@@ -12,24 +12,15 @@ fi
 
 if [[ $BCM_ENDPOINTS_FLAG = 1 ]]; then
     if [[ -z $BCM_CLUSTER_NAME ]]; then
-        echo "BCM_CLUSTER_NAME must be set."
-        cat ./help.txt
         exit
     fi
     
     # Let's display the deployed endpoints.
     ENDPOINTS_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME/endpoints"
-    if [[ -d $ENDPOINTS_DIR ]]; then
-        cd $ENDPOINTS_DIR >>/dev/null
-        for ENDPOINT in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
-            echo "$ENDPOINT"
-        done
-        cd - >>/dev/null
-    fi
+    find "$ENDPOINTS_DIR/" -mindepth 1 -maxdepth 1 -type d -printf '%f\n'
 else
-    cd $BCM_CLUSTERS_DIR >>/dev/null
-    for cluster in $(ls -l | grep '^d' | awk 'NF>1{print $NF}'); do
-        echo "$cluster"
-    done
-    cd - >>/dev/null
+    #echo "$(pwd)"
+    #echo "$BCM_CLUSTERS_DIR"
+    # CLUSTERS="$(echo $BCM_CLUSTERS_DIR/*/)"
+    find "$BCM_CLUSTERS_DIR/" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | grep -v ".git"
 fi
