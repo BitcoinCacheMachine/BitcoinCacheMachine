@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 source "$BCM_GIT_DIR/.env"
@@ -25,9 +25,6 @@ if [[ $BCM_ENDPOINTS_FLAG = 1 ]]; then
             echo "$ENDPOINT"
         done
         cd - >>/dev/null
-    else
-        echo "$ENDPOINTS_DIR directory not found."
-        exit
     fi
 else
     cd $BCM_CLUSTERS_DIR >>/dev/null

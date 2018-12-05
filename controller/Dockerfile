@@ -1,6 +1,7 @@
-FROM ubuntu:bionic
+FROM ubuntu:cosmic
+
 RUN apt-get update
-RUN apt-get install -y apt-utils systemd lxd-client
+RUN apt-get install -y apt-utils systemd
 # so scripts won't ask for interactive input.
 ENV DEBIAN_FRONTEND=noninteractive
 

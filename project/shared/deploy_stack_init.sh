@@ -71,4 +71,6 @@ BCM_STACK_FILE_DIRNAME=$(dirname $BCM_ENV_FILE_PATH)
 lxc file push -p -r "$BCM_STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_HOST_TIER/"
 
 # run the stack by passing in the ENV vars.
-lxc exec bcm-gateway-01 -- source "$BCM_ENV_FILE_PATH" && docker stack deploy -c "/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME.yml" "$BCM_STACK_NAME"
+
+CONTAINER_STACK_DIR="/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME"
+lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/.env && docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"

@@ -17,7 +17,7 @@ source ./.env
 # Finally, we deploy the project definition to the cluster we created.
 
 # run bcm init
-bcm init --cert-name="alice" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME"
+bcm init --cert-name="alice" --cert-username="$BCM_CERT_USERNAME" --cert-fqdn="$BCM_CERT_HOSTNAME" --runtime-dir="$HOME/protected/.bcm"
 
 ## Create a basic project difintion.
 bcm project create --project-name="$BCM_PROJECT_NAME"

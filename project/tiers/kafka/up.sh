@@ -3,6 +3,7 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+source ./params.sh "$@"
 
 # now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
 # 5 nodes (if we have a cluster of that size). 5 should be more than enough for
@@ -23,6 +24,15 @@ source ./broker/get_env.sh
 export KAFKA_BOOSTRAP_SERVERS=$KAFKA_BOOSTRAP_SERVERS
 bash -c "./broker/up_lxc_broker.sh"
 
-bash -c "./stacks/schemareg/up_schema-registry.sh"
-bash -c "./stacks/rest/up_kafka-rest.sh"
-bash -c "./stacks/connect/up_kafka-connect.sh"
+
+if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY = 1 ]]; then
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/schemareg/.env)"
+fi
+
+if [[ $BCM_DEPLOY_STACK_KAFKA_REST = 1 ]]; then
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/kafkarest/.env)"
+fi
+
+if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT = 1 ]]; then
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/kafkaconnect/.env)"
+fi

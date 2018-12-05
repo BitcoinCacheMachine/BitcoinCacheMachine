@@ -4,7 +4,7 @@ services:
   # REST commands come over 8083 to control the configuratino of kafka connect
   # Listens on TCP 514 (syslog)
   kafka-connect:
-    image: ${DOCKER_IMAGE}
+    image: ${BCM_IMAGE_NAME}
     ports:
       - "8083:8083"
       - "514:5514"
@@ -55,4 +55,4 @@ networks:
 
   schemaregistrynet:
     external: true
-    name: kafkaschemaregistry_schemaregistrynet
+    name: schemareg_schemaregistrynet

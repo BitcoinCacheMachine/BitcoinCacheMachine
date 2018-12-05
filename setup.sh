@@ -3,6 +3,25 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+BCM_RUNTIME_DIR=
+
+for i in "$@"
+do
+case $i in
+    --runtime-dir=*)
+    BCM_RUNTIME_DIR="${i#*=}"
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
+
+if [[ -z $BCM_RUNTIME_DIR ]]; then
+  BCM_RUNTIME_DIR="$HOME/.bcm"
+fi
+
 # let's set the local git client user and email settings to prevent error messages.
 if [[ -z $(git config --get --local user.name) ]]; then
     git config --local user.name "$USER"
@@ -25,7 +44,7 @@ fi
 echo "Setting BCM_GIT_DIR environment variable in current shell to '$(pwd)'"
 BCM_GIT_DIR=$(pwd)
 export BCM_GIT_DIR="$BCM_GIT_DIR"
-export BCM_RUNTIME_DIR="$HOME/.bcm"
+export BCM_RUNTIME_DIR="$BCM_RUNTIME_DIR"
 
 # commands in ~/.bashrc are delimited by these literals.
 BCM_BASHRC_START_FLAG='###START_BCM###'
@@ -48,5 +67,16 @@ else
     echo "$BCM_BASHRC_END_FLAG"
   } >> "$BASHRC_FILE"
 fi
+
+sudo apt-get install -y encfs
+
+# update /etc/fuse.conf to allow non-root users to specify the allow_root mount option
+sudo sed -i -e 's/#user_allow_other/user_allow_other/g' /etc/fuse.conf
+
+# 60 minute idle timeout in which case the encrypted mount will be unmounted
+mkdir -p "$HOME/.bcm_encrypted"
+mkdir -p "$HOME/.bcm"
+
+encfs -o allow_root "$HOME/.bcm_encrypted" "$HOME/.bcm" -i=60 --standard --extpass='bcm pass'
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Open a new terminal then type 'bcm --help'."

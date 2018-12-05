@@ -27,9 +27,11 @@ done
 PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
 if ! lxc profile list | grep -q "$PROFILE_NAME"; then
     lxc profile create "$PROFILE_NAME"
-fi
 
-if [[ -f $BCM_YAML_PATH ]]; then
-    # apply the default kafka.yml
-    lxc profile edit "$PROFILE_NAME" < "$BCM_YAML_PATH"
+    if [[ -f $BCM_YAML_PATH ]]; then
+        # apply the default kafka.yml
+        lxc profile edit "$PROFILE_NAME" < "$BCM_YAML_PATH"
+    fi
+else
+    echo "WARNING: LXC profile '$PROFILE_NAME' already exists. It was left unmodified."
 fi

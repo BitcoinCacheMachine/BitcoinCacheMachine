@@ -1,12 +1,27 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# remove stateless docker stacks.
-bash -c ./stacks/connect/destroy_kafka_connect.sh
-bash -c ./stacks/rest/destroy_kafka_rest.sh
-bash -c ./stacks/schemareg/destroy_schema-registry.sh
+source ./params.sh "$@"
+
+if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY = 1 ]]; then
+    source ./stacks/schemareg/.env
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
+    BCM_STACK_NAME=
+fi
+
+if [[ $BCM_DEPLOY_STACK_KAFKA_REST = 1 ]]; then
+    source ./stacks/rest/.env
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
+    BCM_STACK_NAME=
+fi
+
+if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT = 1 ]]; then
+    source ./stacks/connect/.env
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
+    BCM_STACK_NAME=
+fi
 
 # destroy the brokers and zookeeper stacks which are deployed as distinct docker services
 bash -c ./broker/destroy_lxc_broker.sh

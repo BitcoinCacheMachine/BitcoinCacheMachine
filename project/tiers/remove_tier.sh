@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 cd "$(dirname "$0")" 
-source ./.env
+
 source "$BCM_GIT_DIR/.env"
 
 BCM_TIER_NAME=

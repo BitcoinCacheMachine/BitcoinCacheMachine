@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")" 
 
 BCM_TIER_NAME=
@@ -71,4 +71,4 @@ for endpoint in $(bcm cluster list --endpoints); do
 done
 
 # call the tier up script, which performs tier-specific actions.
-bash -c "./$BCM_TIER_NAME/up.sh"
+bash -c "./$BCM_TIER_NAME/up.sh --all"

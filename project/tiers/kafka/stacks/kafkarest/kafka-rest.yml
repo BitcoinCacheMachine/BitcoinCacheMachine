@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   kafka-rest:
-    image: ${DOCKER_IMAGE}
+    image: ${BCM_IMAGE_NAME}
     networks:
       kafkanet:
       zookeepernet:
@@ -37,4 +37,4 @@ networks:
 
   schemaregistrynet:
     external: true
-    name: kafkaschemaregistry_schemaregistrynet
+    name: schemareg_schemaregistrynet

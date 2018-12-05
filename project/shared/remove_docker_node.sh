@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set  pipefail
 
 NODE_NAME=
 

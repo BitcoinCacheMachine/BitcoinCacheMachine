@@ -64,6 +64,8 @@ elif [[ $BCM_CLI_COMMAND = "ssh" ]]; then
     ./ssh/entrypoint.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "tier" ]]; then
     ./tier/entrypoint.sh "$@"
+elif [[ $BCM_CLI_COMMAND = "pass" ]]; then
+    ./pass/entrypoint.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "info" ]]; then
     ./info.sh "$@"
 elif [[ $BCM_CLI_COMMAND = "show" ]]; then

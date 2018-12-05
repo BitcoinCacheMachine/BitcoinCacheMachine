@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
@@ -9,7 +9,7 @@ BCM_IMAGE_NAME=
 BCM_HELP_FLAG=0
 BUILD_CONTEXT=
 IMAGE_TAGGED_FLAG=0
-BCM_PRIVATE_REGISTY=
+BCM_PRIVATE_REGISTY="bcm-gateway-01:5010"
 
 source "$BCM_GIT_DIR/.env"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 echo "Copying /setcrets/bitcoin.conf to /root/.bitcoin/bitcoin.conf so the bitcoin-cli works without issue"
 mkdir -p /root/.bitcoin

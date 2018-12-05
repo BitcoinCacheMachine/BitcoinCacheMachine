@@ -10,12 +10,5 @@ if ! snap list | grep -q docker; then
     
     sudo snap install docker --stable
 
-    while true; do
-        if systemctl is-active docker = "active"; then
-            break
-        fi
-
-        sleep 1
-        printf "."
-    done
+    sleep 10
 fi
