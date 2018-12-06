@@ -12,7 +12,7 @@ bcm cluster destroy --cluster-name="$BCM_CLUSTER_NAME"
 
 CERT_DIR="$BCM_RUNTIME_DIR"
 if [[ -d $BCM_RUNTIME_DIR/encrypted ]]; then
-    fusermount -u "$BCM_RUNTIME_DIR/encrypted"
+	fusermount -u "$BCM_RUNTIME_DIR/encrypted"
 fi
 
 sudo rm -Rf "$CERT_DIR"

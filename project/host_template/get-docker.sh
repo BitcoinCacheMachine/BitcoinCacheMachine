@@ -18,7 +18,6 @@ set -e
 # the script was uploaded (Should only be modified by upload job):
 SCRIPT_COMMIT_SHA=36b78b2
 
-
 # This value will automatically get changed for:
 #   * edge
 #   * test
@@ -83,31 +82,31 @@ mirror=''
 DRY_RUN=${DRY_RUN:-}
 while [ $# -gt 0 ]; do
 	case "$1" in
-		--mirror)
-			mirror="$2"
-			shift
-			;;
-		--dry-run)
-			DRY_RUN=1
-			;;
-		--*)
-			echo "Illegal option $1"
-			;;
+	--mirror)
+		mirror="$2"
+		shift
+		;;
+	--dry-run)
+		DRY_RUN=1
+		;;
+	--*)
+		echo "Illegal option $1"
+		;;
 	esac
-	shift $(( $# > 0 ? 1 : 0 ))
+	shift $(($# > 0 ? 1 : 0))
 done
 
 case "$mirror" in
-	Aliyun)
-		DOWNLOAD_URL="https://mirrors.aliyun.com/docker-ce"
-		;;
-	AzureChinaCloud)
-		DOWNLOAD_URL="https://mirror.azure.cn/docker-ce"
-		;;
+Aliyun)
+	DOWNLOAD_URL="https://mirrors.aliyun.com/docker-ce"
+	;;
+AzureChinaCloud)
+	DOWNLOAD_URL="https://mirror.azure.cn/docker-ce"
+	;;
 esac
 
 command_exists() {
-	command -v "$@" > /dev/null 2>&1
+	command -v "$@" >/dev/null 2>&1
 }
 
 is_dry_run() {
@@ -144,7 +143,10 @@ add_debian_backport_repo() {
 	debian_version="$1"
 	backports="deb http://ftp.debian.org/debian $debian_version-backports main"
 	if ! grep -Fxq "$backports" /etc/apt/sources.list; then
-		(set -x; $sh_c "echo \"$backports\" >> /etc/apt/sources.list")
+		(
+			set -x
+			$sh_c "echo \"$backports\" >> /etc/apt/sources.list"
+		)
 	fi
 }
 
@@ -183,7 +185,7 @@ check_forked() {
 	if command_exists lsb_release; then
 		# Check if the `-u` option is supported
 		set +e
-		lsb_release -a -u > /dev/null 2>&1
+		lsb_release -a -u >/dev/null 2>&1
 		lsb_release_exit_code=$?
 		set -e
 
@@ -191,7 +193,7 @@ check_forked() {
 		if [ "$lsb_release_exit_code" = "0" ]; then
 			# Print info about current distro
 			cat <<-EOF
-			You're using '$lsb_dist' version '$dist_version'.
+				You're using '$lsb_dist' version '$dist_version'.
 			EOF
 
 			# Get the upstream release info
@@ -200,7 +202,7 @@ check_forked() {
 
 			# Print info about upstream distro
 			cat <<-EOF
-			Upstream release is '$lsb_dist' version '$dist_version'.
+				Upstream release is '$lsb_dist' version '$dist_version'.
 			EOF
 		else
 			if [ -r /etc/debian_version ] && [ "$lsb_dist" != "ubuntu" ] && [ "$lsb_dist" != "raspbian" ]; then
@@ -213,14 +215,14 @@ check_forked() {
 				fi
 				dist_version="$(sed 's/\/.*//' /etc/debian_version | sed 's/\..*//')"
 				case "$dist_version" in
-					9)
-						dist_version="stretch"
+				9)
+					dist_version="stretch"
 					;;
-					8|'Kali Linux 2')
-						dist_version="jessie"
+				8 | 'Kali Linux 2')
+					dist_version="jessie"
 					;;
-					7)
-						dist_version="wheezy"
+				7)
+					dist_version="wheezy"
 					;;
 				esac
 			fi
@@ -266,33 +268,36 @@ do_install() {
 
 		cat >&2 <<-'EOF'
 			Warning: the "docker" command appears to already exist on this system.
-
+			
 			If you already have Docker installed, this script can cause trouble, which is
 			why we're displaying this warning and provide the opportunity to cancel the
 			installation.
-
+			
 			If you installed the current Docker package using this script and are using it
 		EOF
 
 		if [ $shouldWarn -eq 1 ]; then
 			cat >&2 <<-'EOF'
-			again to update Docker, we urge you to migrate your image store before upgrading
-			to v1.10+.
-
-			You can find instructions for this here:
-			https://github.com/docker/docker/wiki/Engine-v1.10.0-content-addressability-migration
+				again to update Docker, we urge you to migrate your image store before upgrading
+				to v1.10+.
+				
+				You can find instructions for this here:
+				https://github.com/docker/docker/wiki/Engine-v1.10.0-content-addressability-migration
 			EOF
 		else
 			cat >&2 <<-'EOF'
-			again to update Docker, you can safely ignore this message.
+				again to update Docker, you can safely ignore this message.
 			EOF
 		fi
 
 		cat >&2 <<-'EOF'
-
+			
 			You may press Ctrl+C now to abort this script.
 		EOF
-		( set -x; sleep 20 )
+		(
+			set -x
+			sleep 20
+		)
 	fi
 
 	user="$(id -un 2>/dev/null || true)"
@@ -305,8 +310,8 @@ do_install() {
 			sh_c='su -c'
 		else
 			cat >&2 <<-'EOF'
-			Error: this installer needs the ability to run commands as root.
-			We are unable to find either "sudo" or "su" available to make this happen.
+				Error: this installer needs the ability to run commands as root.
+				We are unable to find either "sudo" or "su" available to make this happen.
 			EOF
 			exit 1
 		fi
@@ -317,53 +322,53 @@ do_install() {
 	fi
 
 	# perform some very rudimentary platform detection
-	lsb_dist=$( get_distribution )
+	lsb_dist=$(get_distribution)
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
 
 	case "$lsb_dist" in
 
-		ubuntu)
-			if command_exists lsb_release; then
-				dist_version="$(lsb_release --codename | cut -f2)"
-			fi
-			if [ -z "$dist_version" ] && [ -r /etc/lsb-release ]; then
-				dist_version="$(. /etc/lsb-release && echo "$DISTRIB_CODENAME")"
-			fi
+	ubuntu)
+		if command_exists lsb_release; then
+			dist_version="$(lsb_release --codename | cut -f2)"
+		fi
+		if [ -z "$dist_version" ] && [ -r /etc/lsb-release ]; then
+			dist_version="$(. /etc/lsb-release && echo "$DISTRIB_CODENAME")"
+		fi
 		;;
 
-		debian|raspbian)
-			dist_version="$(sed 's/\/.*//' /etc/debian_version | sed 's/\..*//')"
-			case "$dist_version" in
-				9)
-					dist_version="stretch"
-				;;
-				8)
-					dist_version="jessie"
-				;;
-				7)
-					dist_version="wheezy"
-				;;
-			esac
-		;;
-
-		centos)
-			if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
-				dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
-			fi
-		;;
-
-		rhel|ol|sles)
-			ee_notice "$lsb_dist"
-			exit 1
+	debian | raspbian)
+		dist_version="$(sed 's/\/.*//' /etc/debian_version | sed 's/\..*//')"
+		case "$dist_version" in
+		9)
+			dist_version="stretch"
 			;;
+		8)
+			dist_version="jessie"
+			;;
+		7)
+			dist_version="wheezy"
+			;;
+		esac
+		;;
 
-		*)
-			if command_exists lsb_release; then
-				dist_version="$(lsb_release --release | cut -f2)"
-			fi
-			if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
-				dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
-			fi
+	centos)
+		if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
+			dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
+		fi
+		;;
+
+	rhel | ol | sles)
+		ee_notice "$lsb_dist"
+		exit 1
+		;;
+
+	*)
+		if command_exists lsb_release; then
+			dist_version="$(lsb_release --release | cut -f2)"
+		fi
+		if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
+			dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
+		fi
 		;;
 
 	esac
@@ -374,148 +379,148 @@ do_install() {
 	# Check if we actually support this configuration
 	if ! echo "$SUPPORT_MAP" | grep "$(uname -m)-$lsb_dist-$dist_version" >/dev/null; then
 		cat >&2 <<-'EOF'
-
-		Either your platform is not easily detectable or is not supported by this
-		installer script.
-		Please visit the following URL for more detailed installation instructions:
-
-		https://docs.docker.com/engine/installation/
-
+			
+			Either your platform is not easily detectable or is not supported by this
+			installer script.
+			Please visit the following URL for more detailed installation instructions:
+			
+			https://docs.docker.com/engine/installation/
+			
 		EOF
 		exit 1
 	fi
 
 	# Run setup for each distro accordingly
 	case "$lsb_dist" in
-		ubuntu|debian|raspbian)
-			pre_reqs="apt-transport-https ca-certificates curl"
-			if [ "$lsb_dist" = "debian" ]; then
-				if [ "$dist_version" = "wheezy" ]; then
-					add_debian_backport_repo "$dist_version"
-				fi
-				# libseccomp2 does not exist for debian jessie main repos for aarch64
-				if [ "$(uname -m)" = "aarch64" ] && [ "$dist_version" = "jessie" ]; then
-					add_debian_backport_repo "$dist_version"
-				fi
+	ubuntu | debian | raspbian)
+		pre_reqs="apt-transport-https ca-certificates curl"
+		if [ "$lsb_dist" = "debian" ]; then
+			if [ "$dist_version" = "wheezy" ]; then
+				add_debian_backport_repo "$dist_version"
 			fi
+			# libseccomp2 does not exist for debian jessie main repos for aarch64
+			if [ "$(uname -m)" = "aarch64" ] && [ "$dist_version" = "jessie" ]; then
+				add_debian_backport_repo "$dist_version"
+			fi
+		fi
 
-			# TODO: August 31, 2018 delete from here,
-			if [ "$lsb_dist" =  "ubuntu" ] && [ "$dist_version" = "artful" ]; then
-				deprecation_notice "$lsb_dist $dist_version" "August 31, 2018"
-			fi
-			# TODO: August 31, 2018 delete to here,
+		# TODO: August 31, 2018 delete from here,
+		if [ "$lsb_dist" = "ubuntu" ] && [ "$dist_version" = "artful" ]; then
+			deprecation_notice "$lsb_dist $dist_version" "August 31, 2018"
+		fi
+		# TODO: August 31, 2018 delete to here,
 
-			if ! command -v gpg > /dev/null; then
-				pre_reqs="$pre_reqs gnupg"
+		if ! command -v gpg >/dev/null; then
+			pre_reqs="$pre_reqs gnupg"
+		fi
+		apt_repo="deb [arch=$(dpkg --print-architecture)] $DOWNLOAD_URL/linux/$lsb_dist $dist_version $CHANNEL"
+		(
+			if ! is_dry_run; then
+				set -x
 			fi
-			apt_repo="deb [arch=$(dpkg --print-architecture)] $DOWNLOAD_URL/linux/$lsb_dist $dist_version $CHANNEL"
-			(
-				if ! is_dry_run; then
-					set -x
-				fi
-				$sh_c 'apt-get update -qq >/dev/null'
-				$sh_c "apt-get install -y -qq $pre_reqs >/dev/null"
-				$sh_c "curl -fsSL \"$DOWNLOAD_URL/linux/$lsb_dist/gpg\" | apt-key add -qq - >/dev/null"
-				$sh_c "echo \"$apt_repo\" > /etc/apt/sources.list.d/docker.list"
-				if [ "$lsb_dist" = "debian" ] && [ "$dist_version" = "wheezy" ]; then
-					$sh_c 'sed -i "/deb-src.*download\.docker/d" /etc/apt/sources.list.d/docker.list'
-				fi
-				$sh_c 'apt-get update -qq >/dev/null'
-			)
-			pkg_version=""
-			if [ ! -z "$VERSION" ]; then
-				if is_dry_run; then
-					echo "# WARNING: VERSION pinning is not supported in DRY_RUN"
-				else
-					# Will work for incomplete versions IE (17.12), but may not actually grab the "latest" if in the test channel
-					pkg_pattern="$(echo "$VERSION" | sed "s/-ce-/~ce~.*/g" | sed "s/-/.*/g").*-0~$lsb_dist"
-					search_command="apt-cache madison 'docker-ce' | grep '$pkg_pattern' | head -1 | cut -d' ' -f 4"
-					pkg_version="$($sh_c "$search_command")"
-					echo "INFO: Searching repository for VERSION '$VERSION'"
-					echo "INFO: $search_command"
-					if [ -z "$pkg_version" ]; then
-						echo
-						echo "ERROR: '$VERSION' not found amongst apt-cache madison results"
-						echo
-						exit 1
-					fi
-					pkg_version="=$pkg_version"
-				fi
+			$sh_c 'apt-get update -qq >/dev/null'
+			$sh_c "apt-get install -y -qq $pre_reqs >/dev/null"
+			$sh_c "curl -fsSL \"$DOWNLOAD_URL/linux/$lsb_dist/gpg\" | apt-key add -qq - >/dev/null"
+			$sh_c "echo \"$apt_repo\" > /etc/apt/sources.list.d/docker.list"
+			if [ "$lsb_dist" = "debian" ] && [ "$dist_version" = "wheezy" ]; then
+				$sh_c 'sed -i "/deb-src.*download\.docker/d" /etc/apt/sources.list.d/docker.list'
 			fi
-			(
-				if ! is_dry_run; then
-					set -x
-				fi
-				$sh_c "apt-get install -y -qq --no-install-recommends docker-ce$pkg_version >/dev/null"
-			)
-			echo_docker_as_nonroot
-			exit 0
-			;;
-		centos|fedora)
-			yum_repo="$DOWNLOAD_URL/linux/$lsb_dist/$REPO_FILE"
-			if ! curl -Ifs "$yum_repo" > /dev/null; then
-				echo "Error: Unable to curl repository file $yum_repo, is it valid?"
-				exit 1
-			fi
-			if [ "$lsb_dist" = "fedora" ]; then
-				if [ "$dist_version" -lt "26" ]; then
-					echo "Error: Only Fedora >=26 are supported"
+			$sh_c 'apt-get update -qq >/dev/null'
+		)
+		pkg_version=""
+		if [ ! -z "$VERSION" ]; then
+			if is_dry_run; then
+				echo "# WARNING: VERSION pinning is not supported in DRY_RUN"
+			else
+				# Will work for incomplete versions IE (17.12), but may not actually grab the "latest" if in the test channel
+				pkg_pattern="$(echo "$VERSION" | sed "s/-ce-/~ce~.*/g" | sed "s/-/.*/g").*-0~$lsb_dist"
+				search_command="apt-cache madison 'docker-ce' | grep '$pkg_pattern' | head -1 | cut -d' ' -f 4"
+				pkg_version="$($sh_c "$search_command")"
+				echo "INFO: Searching repository for VERSION '$VERSION'"
+				echo "INFO: $search_command"
+				if [ -z "$pkg_version" ]; then
+					echo
+					echo "ERROR: '$VERSION' not found amongst apt-cache madison results"
+					echo
 					exit 1
 				fi
+				pkg_version="=$pkg_version"
+			fi
+		fi
+		(
+			if ! is_dry_run; then
+				set -x
+			fi
+			$sh_c "apt-get install -y -qq --no-install-recommends docker-ce$pkg_version >/dev/null"
+		)
+		echo_docker_as_nonroot
+		exit 0
+		;;
+	centos | fedora)
+		yum_repo="$DOWNLOAD_URL/linux/$lsb_dist/$REPO_FILE"
+		if ! curl -Ifs "$yum_repo" >/dev/null; then
+			echo "Error: Unable to curl repository file $yum_repo, is it valid?"
+			exit 1
+		fi
+		if [ "$lsb_dist" = "fedora" ]; then
+			if [ "$dist_version" -lt "26" ]; then
+				echo "Error: Only Fedora >=26 are supported"
+				exit 1
+			fi
 
-				pkg_manager="dnf"
-				config_manager="dnf config-manager"
-				enable_channel_flag="--set-enabled"
-				pre_reqs="dnf-plugins-core"
-				pkg_suffix="fc$dist_version"
+			pkg_manager="dnf"
+			config_manager="dnf config-manager"
+			enable_channel_flag="--set-enabled"
+			pre_reqs="dnf-plugins-core"
+			pkg_suffix="fc$dist_version"
+		else
+			pkg_manager="yum"
+			config_manager="yum-config-manager"
+			enable_channel_flag="--enable"
+			pre_reqs="yum-utils"
+			pkg_suffix="el"
+		fi
+		(
+			if ! is_dry_run; then
+				set -x
+			fi
+			$sh_c "$pkg_manager install -y -q $pre_reqs"
+			$sh_c "$config_manager --add-repo $yum_repo"
+
+			if [ "$CHANNEL" != "stable" ]; then
+				$sh_c "$config_manager $enable_channel_flag docker-ce-$CHANNEL"
+			fi
+			$sh_c "$pkg_manager makecache"
+		)
+		pkg_version=""
+		if [ ! -z "$VERSION" ]; then
+			if is_dry_run; then
+				echo "# WARNING: VERSION pinning is not supported in DRY_RUN"
 			else
-				pkg_manager="yum"
-				config_manager="yum-config-manager"
-				enable_channel_flag="--enable"
-				pre_reqs="yum-utils"
-				pkg_suffix="el"
+				pkg_pattern="$(echo "$VERSION" | sed "s/-ce-/\\\\.ce.*/g" | sed "s/-/.*/g").*$pkg_suffix"
+				search_command="$pkg_manager list --showduplicates 'docker-ce' | grep '$pkg_pattern' | tail -1 | awk '{print \$2}'"
+				pkg_version="$($sh_c "$search_command")"
+				echo "INFO: Searching repository for VERSION '$VERSION'"
+				echo "INFO: $search_command"
+				if [ -z "$pkg_version" ]; then
+					echo
+					echo "ERROR: '$VERSION' not found amongst $pkg_manager list results"
+					echo
+					exit 1
+				fi
+				# Cut out the epoch and prefix with a '-'
+				pkg_version="-$(echo "$pkg_version" | cut -d':' -f 2)"
 			fi
-			(
-				if ! is_dry_run; then
-					set -x
-				fi
-				$sh_c "$pkg_manager install -y -q $pre_reqs"
-				$sh_c "$config_manager --add-repo $yum_repo"
-
-				if [ "$CHANNEL" != "stable" ]; then
-					$sh_c "$config_manager $enable_channel_flag docker-ce-$CHANNEL"
-				fi
-				$sh_c "$pkg_manager makecache"
-			)
-			pkg_version=""
-			if [ ! -z "$VERSION" ]; then
-				if is_dry_run; then
-					echo "# WARNING: VERSION pinning is not supported in DRY_RUN"
-				else
-					pkg_pattern="$(echo "$VERSION" | sed "s/-ce-/\\\\.ce.*/g" | sed "s/-/.*/g").*$pkg_suffix"
-					search_command="$pkg_manager list --showduplicates 'docker-ce' | grep '$pkg_pattern' | tail -1 | awk '{print \$2}'"
-					pkg_version="$($sh_c "$search_command")"
-					echo "INFO: Searching repository for VERSION '$VERSION'"
-					echo "INFO: $search_command"
-					if [ -z "$pkg_version" ]; then
-						echo
-						echo "ERROR: '$VERSION' not found amongst $pkg_manager list results"
-						echo
-						exit 1
-					fi
-					# Cut out the epoch and prefix with a '-'
-					pkg_version="-$(echo "$pkg_version" | cut -d':' -f 2)"
-				fi
+		fi
+		(
+			if ! is_dry_run; then
+				set -x
 			fi
-			(
-				if ! is_dry_run; then
-					set -x
-				fi
-				$sh_c "$pkg_manager install -y -q docker-ce$pkg_version"
-			)
-			echo_docker_as_nonroot
-			exit 0
-			;;
+			$sh_c "$pkg_manager install -y -q docker-ce$pkg_version"
+		)
+		echo_docker_as_nonroot
+		exit 0
+		;;
 	esac
 	exit 1
 }

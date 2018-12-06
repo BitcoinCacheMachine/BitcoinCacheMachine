@@ -10,35 +10,35 @@ BCM_REBUILD_TEMPLATE=0
 # if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
 # it (being the lxc image 'bcm-template') will be rebuilt.
 if lxc image list --format csv | grep -q "bcm-template"; then
-  if $BCM_REBUILD_TEMPLATE -eq 1; then
-    echo "TODO: implement rebuild logic"
-  else
-    echo "LXC image bcm-template exists and BCM_REBUILD_TEMPLATE was not set. The existing image will not be modified."
-    exit
-  fi
+	if $BCM_REBUILD_TEMPLATE -eq 1; then
+		echo "TODO: implement rebuild logic"
+	else
+		echo "LXC image bcm-template exists and BCM_REBUILD_TEMPLATE was not set. The existing image will not be modified."
+		exit
+	fi
 fi
 
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
 if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
-  echo "Copying the ubuntu/cosmic lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-lxc-base'"
-  lxc image copy images:ubuntu/cosmic "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
+	echo "Copying the ubuntu/cosmic lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-lxc-base'"
+	lxc image copy images:ubuntu/cosmic "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
 fi
 
-function createProfile {
-    PROFILE_NAME=$1
+function createProfile() {
+	PROFILE_NAME=$1
 
-    # create the profile if it doesn't exist.
-    if ! lxc profile list | grep -q "$PROFILE_NAME"; then
-        lxc profile create "$PROFILE_NAME"
-    fi
+	# create the profile if it doesn't exist.
+	if ! lxc profile list | grep -q "$PROFILE_NAME"; then
+		lxc profile create "$PROFILE_NAME"
+	fi
 
-    echo "Applying $PROFILE_NAME to lxc profile '$PROFILE_NAME'."
-    lxc profile edit "$PROFILE_NAME" < "./lxd_profiles/$PROFILE_NAME.yml"
+	echo "Applying $PROFILE_NAME to lxc profile '$PROFILE_NAME'."
+	lxc profile edit "$PROFILE_NAME" <"./lxd_profiles/$PROFILE_NAME.yml"
 }
 
 if lxc profile list | grep -q "bcm_default"; then
-  createProfile bcm_default
+	createProfile bcm_default
 fi
 
 # create the docker_unprivileged profile
@@ -47,29 +47,28 @@ createProfile docker_unprivileged
 # create the docker_privileged profile
 createProfile docker_privileged
 
-
 if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
-    echo "The LXD image 'bcm-lxc-base' doesn't exist. Exiting."
-    exit
+	echo "The LXD image 'bcm-lxc-base' doesn't exist. Exiting."
+	exit
 fi
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
 if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
-    # we run the following command if it's a cluster having more than 1 LXD node.
-    for ENDPOINT in $(bcm cluster list --endpoints); do
-        lxc network create --target "$ENDPOINT" bcmbr0
-    done
+	# we run the following command if it's a cluster having more than 1 LXD node.
+	for ENDPOINT in $(bcm cluster list --endpoints); do
+		lxc network create --target "$ENDPOINT" bcmbr0
+	done
 else
-    # but if it's just one node, we just create the network.
-    lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
+	# but if it's just one node, we just create the network.
+	lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
 fi
 
 # If there was more than one node, this is the last command we need
-# to run to initiailze the network across the cluster. This isn't 
+# to run to initiailze the network across the cluster. This isn't
 # executed when we have a cluster of size 1.
 if lxc network list | grep bcmbr0 | grep -q PENDING; then
-    lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
+	lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
 fi
 
 echo "Creating host 'bcm-host-template' which is what ALL BCM LXC system containers are based on."
@@ -87,8 +86,8 @@ lxc exec bcm-host-template -- apt-get update
 # storage backends. Using BTRFS since docker recognizes underlying file system
 lxc exec bcm-host-template -- apt-get install docker.io wait-for-it ifmetric -qq
 
-if [[ $BCM_DEBUG = 1 ]]; then
-    lxc exec bcm-host-template -- apt-get install jq nmap curl slurm tcptrack dnsutils tcpdump -qq
+if [[ $BCM_DEBUG == 1 ]]; then
+	lxc exec bcm-host-template -- apt-get install jq nmap curl slurm tcptrack dnsutils tcpdump -qq
 fi
 
 ## checking if this alleviates docker swarm troubles in lxc.
@@ -118,6 +117,6 @@ lxc snapshot bcm-host-template bcmHostSnapshot
 
 # if instructed, serve the newly created snapshot to trusted LXD hosts.
 if lxc list | grep -q "bcm-host-template"; then
-    echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
-    lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
+	echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
+	lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
 fi

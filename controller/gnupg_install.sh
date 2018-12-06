@@ -38,5 +38,5 @@ cd npth-1.6 && ./configure && make && make install && cd ../
 #cd pinentry-1.1.0 && ./configure --enable-pinentry-curses --disable-pinentry-qt4
 make && make install && cd ../
 cd gnupg-2.2.10 && ./configure && make && make install
-echo "/usr/local/lib" > /etc/ld.so.conf.d/gpg2.conf && ldconfig -v
+echo "/usr/local/lib" >/etc/ld.so.conf.d/gpg2.conf && ldconfig -v
 echo "Complete!!!"

@@ -1,0 +1,7 @@
+{
+    "editor.detectIndentation": false,
+    "editor.renderWhitespace": "boundary",
+    "editor.cursorBlinking": "phase",
+    "editor.cursorWidth": 3,
+    "editor.formatOnSave": true
+}

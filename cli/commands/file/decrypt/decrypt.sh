@@ -2,7 +2,6 @@
 
 echo "entering decrypt.sh"
 
-
 # echo "BCM_PROJECT_DIR: $BCM_PROJECT_DIR"
 # echo "File to decrypt: $BCM_TREZOR_FILE_PATH"
 

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-if [[ ! -z $(sudo snap list | grep lxd) ]]; then
-    sudo snap remove lxd
+if ! snap list | grep -q lxd; then
+	sudo snap remove lxd
 fi

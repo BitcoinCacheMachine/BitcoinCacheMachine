@@ -23,7 +23,6 @@ Available Commands:
              with your Trezor.
   ssh        Use your Trezor to issue SSH keys and perform SSH authentication.
   pass       Create and manage GPG-encrypted passwords protected by your Trezor.
-  info       Get info about your current BCM environment.
   show       Show detailed LXC-related information for your active LXD endpoint.
 
 Help

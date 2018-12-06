@@ -27,7 +27,7 @@ git config --global user.email "$BCM_EMAIL_ADDRESS"
 echo "git config --global user.email set to '$(git config --global --get user.email)'"
 
 echo "Staging all outstanding changes."
-git add *
+git add "*"
 
 echo "Committing and signing. Get ready to check your Trezor."
 git commit -S -m "$BCM_GIT_COMMIT_MESSAGE"

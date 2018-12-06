@@ -14,7 +14,6 @@ RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 RUN pip3 install Cython hidapi
 RUN pip3 install trezor_agent
 
-
 WORKDIR /gitrepo
 
 # run this script to quickly configure and commit and sign a repo

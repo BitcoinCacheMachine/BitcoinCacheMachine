@@ -24,7 +24,6 @@ echo ""
 echo "LXD config:"
 lxc config show
 
-
 echo ""
 echo "LXD images:"
 lxc image list

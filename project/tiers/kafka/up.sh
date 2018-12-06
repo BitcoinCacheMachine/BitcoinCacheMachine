@@ -3,6 +3,7 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+# shellcheck disable=1091
 source ./params.sh "$@"
 
 # now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
@@ -18,21 +19,19 @@ bash -c "./zookeeper/up_lxc_zookeeper.sh"
 export ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT"
 export ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS"
 
-
 # shellcheck disable=SC1091
 source ./broker/get_env.sh
 export KAFKA_BOOSTRAP_SERVERS=$KAFKA_BOOSTRAP_SERVERS
 bash -c "./broker/up_lxc_broker.sh"
 
-
-if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY = 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/schemareg/.env)"
+if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY == 1 ]]; then
+	bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/schemareg/.env)"
 fi
 
-if [[ $BCM_DEPLOY_STACK_KAFKA_REST = 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/kafkarest/.env)"
+if [[ $BCM_DEPLOY_STACK_KAFKA_REST == 1 ]]; then
+	bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/kafkarest/.env)"
 fi
 
-if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT = 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/kafkaconnect/.env)"
+if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT == 1 ]]; then
+	bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/kafkaconnect/.env)"
 fi

@@ -1,30 +1,29 @@
 #!/bin/bash
 
-set  pipefail
+set pipefail
 
 NODE_NAME=
 
-for i in "$@"
-do
-case $i in
-    --node-name=*)
-    NODE_NAME="${i#*=}"
-    shift # past argument=value
-    ;;
-    *)
-          # unknown option
-    ;;
-esac
+for i in "$@"; do
+	case $i in
+	--node-name=*)
+		NODE_NAME="${i#*=}"
+		shift # past argument=value
+		;;
+	*)
+		# unknown option
+		;;
+	esac
 done
 
 # remove swarm services related to kafka
 if lxc list --format csv -c n state=RUNNING | grep -q "bcm-gateway-01"; then
-    NODES=$(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format "{{.ID}}")
+	NODES=$(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format "{{.ID}}")
 
-    # if we got something back, let's remove them.
-    if [[ ! -z $NODES ]]; then
-        for NODE_ID in $NODES; do
-            lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
-        done
-    fi
+	# if we got something back, let's remove them.
+	if [[ ! -z $NODES ]]; then
+		for NODE_ID in $NODES; do
+			lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
+		done
+	fi
 fi
