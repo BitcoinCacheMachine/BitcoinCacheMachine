@@ -16,6 +16,7 @@ cd "$(dirname "$0")"
 
 
 # let's get our default environment variables.
+# shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
 
 # run bcm init

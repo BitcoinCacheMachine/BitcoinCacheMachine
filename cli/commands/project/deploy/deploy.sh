@@ -36,17 +36,18 @@ if ! bcm cluster list | grep -q "$BCM_CLUSTER_NAME"; then
 
 fi
 
+# shellcheck disable=2153
 BCM_DEPLOYMENT_DIR="$BCM_DEPLOYMENTS_DIR/$BCM_PROJECT_NAME"'_'"$BCM_CLUSTER_NAME"
 
 if [[ ! -d $BCM_DEPLOYMENT_DIR ]]; then
-    mkdir $BCM_DEPLOYMENT_DIR
+    mkdir "$BCM_DEPLOYMENT_DIR"
 
     # first let's get some certificates generated for our new BCM deployment.
-    $BCM_GIT_DIR/controller/gpg-init.sh \
-        --cert-dir="$BCM_DEPLOYMENT_DIR" \
-        --cert-name="$BCM_PROJECT_NAME" \
-        --cert-username="$BCM_PROJECT_USERNAME" \
-        --cert-hostname="$BCM_CLUSTER_NAME"
+    bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
+                --cert-dir=$BCM_DEPLOYMENT_DIR \
+                --cert-name=$BCM_PROJECT_NAME \
+                --cert-username=$BCM_PROJECT_USERNAME \
+                --cert-hostname=$BCM_CLUSTER_NAME"
 fi
 
 BCM_PROJECT_NAME="$BCM_PROJECT_NAME"

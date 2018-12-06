@@ -12,17 +12,25 @@ source ./.env
 # from a docker container.
 
 if [[ $BCM_DEPLOY_STACK_CONNECTUI = 1 ]]; then
-    bash -c ./stacks/connect_ui/up_connect_ui.sh
+    source ./stacks/connect_ui/.env
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
+    BCM_STACK_NAME=
 fi
 
 if [[ $BCM_DEPLOY_STACK_SCHEMAREGUI = 1 ]]; then
-    bash -c ./stacks/schema_registry_ui/up_schema_registry_ui.sh
+    source ./stacks/schema_registry_ui/.env
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
+    BCM_STACK_NAME=
 fi
 
 if [[ $BCM_DEPLOY_STACK_KAFKATOPICSUI = 1 ]]; then
-    bash -c ./stacks/topics_ui/up_topics_ui.sh
+    source ./stacks/topics_ui/.env
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
+    BCM_STACK_NAME=
 fi
 
 if [[ $BCM_DEPLOY_STACK_KAFKACONTROLCENTER = 1 ]]; then
-    bash -c ./stacks/control_center/up_control_center.sh
+    source ./stacks/control_center/.env
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
+    BCM_STACK_NAME=
 fi

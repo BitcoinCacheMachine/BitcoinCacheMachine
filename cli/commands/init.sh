@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+# shellcheck disable=SC2153
 BCM_CERT_DIR="$BCM_CERTS_DIR"
 BCM_CERT_NAME=
 BCM_CERT_USERNAME=

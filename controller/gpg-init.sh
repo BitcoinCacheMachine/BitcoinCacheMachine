@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+# shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
 
 # The certs uid displays as:  "$BCM_CERT_NAME <BCM_CERT_USERNAME@BCM_CERT_FQDN>"
@@ -41,6 +42,8 @@ if [[ -z $BCM_CERT_NAME || -z $BCM_CERT_USERNAME || -z $BCM_CERT_FQDN ]]; then
 fi
 
 ./build.sh
+
+# shellcheck disable=SC1091
 source ./export_usb_path.sh
 
 echo "BCM_CERT_NAME: $BCM_CERT_NAME"

@@ -22,7 +22,7 @@ fi
 
 export BCM_PROJECT_NAME=$BCM_PROJECT_NAME
 if [[ $BCM_DEPLOY_TIERS = 1 ]]; then
-  ./tiers/destroy.sh
+  ./tiers/destroy.sh --all
 fi
 
 if [[ $BCM_DEPLOY_HOST_TEMPLATE = 1 ]]; then

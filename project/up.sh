@@ -3,7 +3,10 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+#shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
+
+#shellcheck disable=SC1091
 source ./.env
 
 for i in "$@"
@@ -36,6 +39,7 @@ if [[ -z $BCM_PROJECT_NAME ]]; then
 fi
 
 # let's make sure the cluster exists.
+# shellcheck disable=SC2153
 BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 if [[ -z $BCM_CLUSTER_DIR ]]; then
   echo "BCM_CLUSTER_DIR not set."
@@ -76,7 +80,7 @@ if [[ $BCM_DEPLOY_TIERS = 1 ]]; then
   # All tiers require that the bcm-template image be available.
   # let's look for it before we even attempt anything.
   if lxc image list --format csv | grep -q "bcm-template"; then
-    bash -c ./tiers/up.sh
+    bash -c "./tiers/up.sh --all"
   else
     echo "LXC image 'bcm-template' doesn't exist. Can't deploy BCM tiers."
   fi

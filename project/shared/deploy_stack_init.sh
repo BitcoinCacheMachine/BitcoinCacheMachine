@@ -58,7 +58,7 @@ fi
 
 CONTAINER_NAME="bcm-$BCM_HOST_TIER-01"
 if [[ $BCM_BUILD_FLAG = 1 ]]; then
-    bash -c "$BCM_LXD_OPS/docker_image_ops.sh --build --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --priv-image-name=$BCM_IMAGE_NAME --registry=$BCM_PRIVATE_REGISTRY"
+    bash -c "$BCM_LXD_OPS/docker_image_ops.sh --build --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --priv-image-name=$BCM_IMAGE_NAME"
 fi
 
 if [[ $BCM_BUILD_FLAG = 0 ]]; then
@@ -73,4 +73,5 @@ lxc file push -p -r "$BCM_STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_
 # run the stack by passing in the ENV vars.
 
 CONTAINER_STACK_DIR="/root/stacks/$BCM_HOST_TIER/$BCM_STACK_NAME"
-lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/.env && docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"
+echo "CONTAINER_STACK_DIR: $CONTAINER_STACK_DIR"
+lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/.env && env BCM_IMAGE_NAME=$BCM_PRIVATE_REGISTRY/$BCM_IMAGE_NAME docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"

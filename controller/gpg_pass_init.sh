@@ -3,7 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+# shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
+# shellcheck disable=SC1090
 source "$BCM_CERTS_DIR/.env"
 
 # This is where we will store our GPG-encrypted passwords.
@@ -14,6 +16,7 @@ fi
 
 # let's call bcm pass init to initialze the password store using our 
 # recently generated trezor-backed GPG certificates.
+#shellcheck disable=SC1091
 source ./export_usb_path.sh
 docker run -it --name pass --rm \
     -v "$BCM_CERTS_DIR":/root/.gnupg \

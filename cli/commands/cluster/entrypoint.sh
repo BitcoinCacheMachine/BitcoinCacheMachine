@@ -11,10 +11,8 @@ fi
 BCM_CLI_VERB=$2
 BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_PROVIDER_NAME=
-BCM_EXPOSE_TOR_MGMT=0
 BCM_NODE_COUNT=
 BCM_ENDPOINTS_FLAG=0
-BCM_SHOW_DEPLOYMENTS_FLAG=0
 
 for i in "$@"
 do
@@ -27,20 +25,12 @@ case $i in
     BCM_PROVIDER_NAME="${i#*=}"
     shift # past argument=value
     ;;
-    --tor)
-    BCM_EXPOSE_TOR_MGMT="${i#*=}"
-    shift # past argument=value
-    ;;
     --node-count=*)
     BCM_NODE_COUNT="${i#*=}"
     shift # past argument=value
     ;;
     --endpoints)
     BCM_ENDPOINTS_FLAG=1
-    shift # past argument=value
-    ;;
-    --endpoints)
-    BCM_SHOW_DEPLOYMENTS_FLAG=1
     shift # past argument=value
     ;;
 
@@ -63,11 +53,13 @@ elif [[ $BCM_CLI_VERB = "destroy" ]]; then
     fi
 
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-    bash -c "$BCM_GIT_DIR/cluster/destroy_cluster.sh --cluster-name="$BCM_CLUSTER_NAME""
+    bash -c "$BCM_GIT_DIR/cluster/destroy_cluster.sh --cluster-name=$BCM_CLUSTER_NAME"
 elif [[ $BCM_CLI_VERB = "list" ]]; then
     
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-    export BCM_CLUSTER_DIR=$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME
+
+    # shellcheck disable=SC2153
+    export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
     export BCM_ENDPOINTS_FLAG=$BCM_ENDPOINTS_FLAG
 
     bash -c ./list/list.sh

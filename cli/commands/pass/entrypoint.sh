@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+# shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
 
 BCM_CLI_VERB=$2
@@ -25,6 +26,7 @@ if [[ -z $BCM_PASS_NAME ]]; then
     echo "BCM_PASS_NAME cannot be empty"
 fi
 
+# shellcheck disable=SC1090
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 if [[ $BCM_CLI_VERB = "new" ]]; then
     # How we reference the password.
