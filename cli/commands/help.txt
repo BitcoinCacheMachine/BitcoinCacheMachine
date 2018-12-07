@@ -26,4 +26,4 @@ Available Commands:
   show       Show detailed LXC-related information for your active LXD endpoint.
 
 Help
-  Use "bcm [command]" to get help for that command.
+  Use "bcm [command] --help" to get help for that command.

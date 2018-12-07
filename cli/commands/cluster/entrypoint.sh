@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -9,7 +9,7 @@ if [[ -z $2 ]]; then
 fi
 
 BCM_CLI_VERB=$2
-BCM_CLUSTER_NAME="$(lxc remote get-default)"
+BCM_CLUSTER_NAME=
 BCM_PROVIDER_NAME=
 BCM_NODE_COUNT=
 BCM_ENDPOINTS_FLAG=0

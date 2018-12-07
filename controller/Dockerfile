@@ -9,14 +9,21 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y python3-pip python3-dev python3-tk libusb-1.0-0-dev libudev-dev
 RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 
+# RUN pip3 install --upgrade setuptools
+# RUN apt-get install -y python3-dev python3-pip cython3 libusb-1.0-0-dev libudev-dev
+# RUN pip3 install trezor_agent[hidapi]
+
+# RUN pip3 install --upgrade setuptools
+# RUN pip3 install trezor
 # 2. Install the TREZOR agent
 RUN pip3 install Cython hidapi
-RUN pip3 install trezor_agent==v0.9.3
-# RUN mkdir /tmp/trezor
-# RUN git clone https://github.com/romanz/trezor-agent /tmp/trezor
-# WORKDIR /tmp/trezor
-# RUN git checkout latest-trezorlib
-# RUN pip3 install -e /tmp/trezor/agents/trezor
+RUN pip3 install trezor_agent
+#RUN pip3 install git+https://github.com/romanz/trezor-agent.git@latest-trezorlib
+RUN mkdir /tmp/trezor
+RUN git clone https://github.com/romanz/trezor-agent /tmp/trezor
+WORKDIR /tmp/trezor
+RUN git checkout latest-trezorlib
+RUN pip3 install -e /tmp/trezor/agents/trezor
 
 WORKDIR /gitrepo
 

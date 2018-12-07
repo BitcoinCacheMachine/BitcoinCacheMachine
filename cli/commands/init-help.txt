@@ -1,11 +1,10 @@
 Description:
   bcm init  Initialize your localhost to become an SDN controller (mgmt plane) for your BCM deployments.
-            This tool creates installs docker, and creates a docker image that contains all the software
-            that are needed to manage BCM clusters and deployed projects. This command creates new GPG 
-            certificates, so have your Trezor handy.
+            This tool installs docker via snap, and creates docker images needed at the SDN controller. 
+            This command creates new GPG certificates, so have your Trezor handy.
 
 Usage:
-  bcm init --cert-name="BCM backup/recovery" --cert-username="bob" --cert-fqdn="domain.com"
+  bcm init --cert-name="BCM" --cert-username="$USER" --cert-fqdn="$HOSTNAME"
 
 Options:
   --cert-name=<BCM_CERT_NAME>           Required. The name that will appear in the PGP certificate.

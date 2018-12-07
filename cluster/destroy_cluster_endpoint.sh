@@ -62,7 +62,7 @@ source "$BCM_ENDPOINT_DIR/.env"
 # Ensure the endpoint name is in our env.
 if env | grep -q "$BCM_CLUSTER_ENDPOINT_NAME"; then
 	echo "BCM_CLUSTER_ENDPOINT_NAME variable not set."
-	exit 1
+	exit
 fi
 
 if [[ $BCM_PROVIDER_NAME == "multipass" ]]; then

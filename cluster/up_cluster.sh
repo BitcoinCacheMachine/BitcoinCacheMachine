@@ -3,7 +3,7 @@
 # brings up LXD cluster of at least 1 member. Increase the number
 # by providing $1 as a number 2 or above.
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_NODE_COUNT=
@@ -50,6 +50,8 @@ export BCM_CLUSTER_DIR=$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME
 if [[ -d $BCM_CLUSTER_DIR ]]; then
 	echo "ERROR: The BCM_CLUSTER_DIR directory already exists. Exiting."
 	exit
+else
+	mkdir -p "$BCM_CLUSTER_DIR"
 fi
 
 if [[ $BCM_PROVIDER_NAME == "baremetal" ]]; then

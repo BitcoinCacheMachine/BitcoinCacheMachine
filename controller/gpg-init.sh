@@ -36,7 +36,6 @@ for i in "$@"; do
 done
 
 ./build.sh
-source ./export_usb_path.sh
 
 echo "BCM_CERT_DIR: $BCM_CERT_DIR"
 echo "BCM_CERT_NAME: $BCM_CERT_NAME"
@@ -48,15 +47,18 @@ bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_install.sh"
 
 # get the locatio of the trezor
 source ./export_usb_path.sh
+BCM_TREZOR_USB_PATH="$(echo $BCM_TREZOR_USB_PATH | xargs)"
+BCM_CERT_DIR="$(echo $BCM_CERT_DIR | xargs)"
+BCM_CERT_NAME="$(echo $BCM_CERT_NAME | xargs)"
+BCM_CERT_FQDN="$(echo $BCM_CERT_FQDN | xargs)"
 
 if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 	# run the container.
 	docker run -it --name trezorgpg --rm \
-		-v $BCM_CERT_DIR:/root/.gnupg \
+		-v "$BCM_CERT_DIR":/root/.gnupg \
 		-e BCM_CERT_NAME="$BCM_CERT_NAME" \
 		-e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
 		-e BCM_CERT_FQDN="$BCM_CERT_FQDN" \
-		-e TREZOR_PATH="$BCM_TREZOR_USB_PATH" \
 		--device="$BCM_TREZOR_USB_PATH" \
 		bcm-trezor:latest trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"
 
