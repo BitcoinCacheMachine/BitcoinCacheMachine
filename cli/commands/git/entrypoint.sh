@@ -90,12 +90,6 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
 	fi
 
 	bash -c "$BCM_GIT_DIR/controller/build.sh"
-	if docker image list | grep -q "bcm-gpgagent:latest"; then
-		docker build -t bcm-gpgagent:latest .
-	else
-		# make sure the container is up-to-date, but don't display
-		docker build -t bcm-gpgagent:latest . >>/dev/null
-	fi
 
 	if [[ $BCM_DEBUG == 1 ]]; then
 		echo "BCM_CERT_DIR: $BCM_CERT_DIR"

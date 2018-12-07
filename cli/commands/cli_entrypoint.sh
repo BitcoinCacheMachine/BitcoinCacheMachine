@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 cd "$(dirname "$0")"
 
 export BCM_CLI_COMMAND=$1

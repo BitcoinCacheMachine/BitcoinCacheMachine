@@ -3,8 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1090
-source "$BCM_GIT_DIR/.env"
+# this is the directory that we're going to emit public key material; should be backed up
+BCM_CERT_DIR=
 
 # The certs uid displays as:  "$BCM_CERT_NAME <BCM_CERT_USERNAME@BCM_CERT_FQDN>"
 BCM_CERT_NAME=
@@ -14,7 +14,7 @@ BCM_CERT_FQDN=
 for i in "$@"; do
 	case $i in
 	--cert-dir=*)
-		BCM_CERTS_DIR="${i#*=}"
+		BCM_CERT_DIR="${i#*=}"
 		shift # past argument=value
 		;;
 	--cert-name=*)
@@ -35,38 +35,36 @@ for i in "$@"; do
 	esac
 done
 
-# let's quit if they didn't pass the required arguments.
-if [[ -z $BCM_CERT_NAME || -z $BCM_CERT_USERNAME || -z $BCM_CERT_FQDN ]]; then
-	echo "You must set BCM_CERT_NAME, BCM_CERT_USERNAME, and BCM_CERT_FQDN"
-fi
-
 ./build.sh
-
-# shellcheck disable=SC1091
 source ./export_usb_path.sh
 
+echo "BCM_CERT_DIR: $BCM_CERT_DIR"
 echo "BCM_CERT_NAME: $BCM_CERT_NAME"
 echo "BCM_CERT_USERNAME: $BCM_CERT_USERNAME"
 echo "BCM_CERT_FQDN: $BCM_CERT_FQDN"
 
 # TODO move this into the mgmtplan container rather than installing on host.
 bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_install.sh"
-BCM_CERTIFICATE_NAME="$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"
+
+# get the locatio of the trezor
+source ./export_usb_path.sh
 
 if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 	# run the container.
 	docker run -it --name trezorgpg --rm \
-		-v "$BCM_CERTS_DIR":/root/.gnupg \
-		-e BCM_CERTIFICATE_NAME="$BCM_CERTIFICATE_NAME" \
+		-v $BCM_CERT_DIR:/root/.gnupg \
+		-e BCM_CERT_NAME="$BCM_CERT_NAME" \
+		-e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
+		-e BCM_CERT_FQDN="$BCM_CERT_FQDN" \
+		-e TREZOR_PATH="$BCM_TREZOR_USB_PATH" \
 		--device="$BCM_TREZOR_USB_PATH" \
-		bcm-trezor:latest bash -c 'trezor-gpg init "$BCM_CERTIFICATE_NAME"'
+		bcm-trezor:latest trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"
 
-	echo "Your public key and public keyring material can be found at '$BCM_CERTS_DIR/trezor'."
+	echo "Your public key and public keyring material can be found at '$BCM_CERT_DIR/trezor'."
 fi
 
-export GNUPGHOME=$BCM_CERTS_DIR/trezor
+export GNUPGHOME=$BCM_CERT_DIR/trezor
 
-# TODO move this to a container operation to avoid sudo
 LINE=$(sudo GNUPGHOME="$GNUPGHOME" su -p root -c 'gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/'')
 #echo $LINE
 LINE="${LINE#*/}"
@@ -80,5 +78,4 @@ LINE="$(echo "$LINE" | xargs)"
 	echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"'
 	echo "export BCM_CERT_USERNAME="'"'$BCM_CERT_USERNAME'"'
 	echo "export BCM_CERT_FQDN="'"'$BCM_CERT_FQDN'"'
-	echo "export BCM_CERTIFICATE_NAME='$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>'"
-} >>"$BCM_CERTS_DIR/.env"
+} >>"$BCM_CERT_DIR/.env"

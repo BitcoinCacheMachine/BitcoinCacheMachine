@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC2153
@@ -8,7 +8,6 @@ BCM_CERT_DIR="$BCM_CERTS_DIR"
 BCM_CERT_NAME=
 BCM_CERT_USERNAME=
 BCM_CERT_FQDN=
-BCM_CERT_DIR_OVERRIDE=
 
 for i in "$@"; do
 	case $i in
@@ -26,10 +25,6 @@ for i in "$@"; do
 		;;
 	--cert-fqdn=*)
 		BCM_CERT_FQDN="${i#*=}"
-		shift # past argument=value
-		;;
-	--cert-dir-override=*)
-		BCM_CERT_DIR_OVERRIDE="${i#*=}"
 		shift # past argument=value
 		;;
 	*)
@@ -70,11 +65,7 @@ function createBCMGitRepo() {
 }
 
 # shellcheck disable=SC2153
-createBCMGitRepo "$BCM_CERTS_DIR"
-
-if [[ ! -z $BCM_CERT_DIR_OVERRIDE ]]; then
-	BCM_CERT_DIR=$BCM_CERT_DIR_OVERRIDE
-fi
+createBCMGitRepo "$BCM_CERT_DIR"
 
 # make sure docker is installed. Doing it here makes sure we don't have to do it anywhere else.
 bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker-ce.sh"
@@ -88,7 +79,7 @@ bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
     --cert-hostname='$BCM_CERT_FQDN'"
 
 # now let's initialize the password repository with the GPG key
-bash -c "$BCM_GIT_DIR/controller/gpg_pass_init.sh"
+#bash -c "$BCM_GIT_DIR/controller/gpg_pass_init.sh"
 
 # shellcheck disable=SC2153
 createBCMGitRepo "$BCM_PROJECTS_DIR"

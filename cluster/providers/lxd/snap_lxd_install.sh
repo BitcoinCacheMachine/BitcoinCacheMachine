@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # remove any legacy lxd software and install install lxd via snap
-if snap list | grep -q lxd; then
+if ! snap list | grep -q lxd; then
 
 	# if the lxd groups doesn't exist, create it.
-	if grep -q lxd </etc/group; then
+	if ! grep -q lxd </etc/group; then
 		sudo addgroup --system lxd
 	fi
 

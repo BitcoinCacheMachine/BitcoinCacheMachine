@@ -49,7 +49,6 @@ elif [[ $BCM_CLI_VERB == "destroy" ]]; then
 fi
 
 export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-export BCM_FORCE_FLAG=$BCM_FORCE_FLAG
 
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
 	./deploy/deploy.sh "$@"

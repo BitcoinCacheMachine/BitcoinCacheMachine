@@ -6,15 +6,21 @@ cd "$(dirname "$0")"
 # shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
 
-bcm project undeploy --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --remove-template
+bcm project undeploy --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --force || true
 
-bcm cluster destroy --cluster-name="$BCM_CLUSTER_NAME"
+bcm cluster destroy --cluster-name="$BCM_CLUSTER_NAME" || true
 
-CERT_DIR="$BCM_RUNTIME_DIR"
 if [[ -d $BCM_RUNTIME_DIR/encrypted ]]; then
-	fusermount -u "$BCM_RUNTIME_DIR/encrypted"
+	fusermount -u -q "$BCM_RUNTIME_DIR/encrypted" || true
+	sudo rm -Rf "$BCM_RUNTIME_DIR/encrypted"
+	sudo rm -Rf "$BCM_RUNTIME_DIR/.encrypted"
+
 fi
 
-sudo rm -Rf "$CERT_DIR"
-# this resets the lxd configuration to defaults.
-# sudo lxd init --preseed < "$BCM_GIT_DIR/cluster/lxd_preseed/blank.yml"
+if [[ -d $BCM_RUNTIME_DIR/.gnupg ]]; then
+	sudo rm -Rf "$BCM_RUNTIME_DIR/.gnupg"
+fi
+
+if [[ -d $BCM_RUNTIME_DIR/.pass ]]; then
+	sudo rm -Rf "$BCM_RUNTIME_DIR/.pass"
+fi

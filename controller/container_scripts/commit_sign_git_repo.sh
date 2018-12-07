@@ -3,7 +3,6 @@
 set -Eeuo pipefail
 
 cd /gitrepo
-export GNUPGHOME=/root/.gnupg/trezor
 
 echo "DOCKER_GNUPGHOME: '$GNUPGHOME'"
 echo "DOCKER_BCM_GIT_CLIENT_USERNAME: '$BCM_GIT_CLIENT_USERNAME'"

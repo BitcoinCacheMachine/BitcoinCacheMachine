@@ -1,7 +1,6 @@
 FROM ubuntu:cosmic
-
 RUN apt-get update
-RUN apt-get install -y apt-utils systemd
+RUN apt-get install -y apt-utils git
 # so scripts won't ask for interactive input.
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,7 +11,12 @@ RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 
 # 2. Install the TREZOR agent
 RUN pip3 install Cython hidapi
-RUN pip3 install trezor_agent
+RUN pip3 install trezor_agent==v0.9.3
+# RUN mkdir /tmp/trezor
+# RUN git clone https://github.com/romanz/trezor-agent /tmp/trezor
+# WORKDIR /tmp/trezor
+# RUN git checkout latest-trezorlib
+# RUN pip3 install -e /tmp/trezor/agents/trezor
 
 WORKDIR /gitrepo
 
@@ -36,5 +40,3 @@ RUN chmod +x /entrypoint.sh
 RUN mkdir -p /root/.bcm
 
 ENV GNUPGHOME=/root/.gnupg/trezor
-
-RUN apt-get install -y pass

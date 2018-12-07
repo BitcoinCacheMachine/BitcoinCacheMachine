@@ -42,10 +42,10 @@ if [[ ! -d $BCM_DEPLOYMENT_DIR ]]; then
 
 	# first let's get some certificates generated for our new BCM deployment.
 	bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
-                --cert-dir=$BCM_DEPLOYMENT_DIR \
-                --cert-name=$BCM_PROJECT_NAME \
-                --cert-username=$BCM_PROJECT_USERNAME \
-                --cert-hostname=$BCM_CLUSTER_NAME"
+        --cert-dir='$BCM_CERTS_DIR' \
+        --cert-name=$BCM_PROJECT_NAME \
+        --cert-username=$BCM_PROJECT_USERNAME \
+        --cert-hostname=$BCM_CLUSTER_NAME"
 fi
 
 BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
