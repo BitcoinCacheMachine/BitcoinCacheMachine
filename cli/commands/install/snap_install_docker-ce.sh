@@ -1,13 +1,20 @@
 #!/bin/bash
 
+set -Eeuox pipefail
+cd "$(dirname "$0")"
+
 # let's install and configure docker-ce
 if ! snap list | grep -q docker; then
-	if ! groups | grep -q docker; then
-		sudo addgroup --system docker
-		sudo adduser "$(whoami)" docker
-	fi
+    sudo snap install docker --stable
+fi
 
-	sudo snap install docker --stable
+if ! grep -q docker /etc/group; then
+    sudo addgroup docker
+fi
 
-	sleep 10
+if groups "$USER" | grep -q docker; then
+    sudo gpasswd -a "$USER" docker
+    #newgrp docker -
+    sudo cp ./daemon.json /var/snap/docker/current/config/daemon.json
+    sudo snap restart docker
 fi

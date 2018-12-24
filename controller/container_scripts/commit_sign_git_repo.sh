@@ -10,6 +10,7 @@ echo "DOCKER_BCM_EMAIL_ADDRESS: '$BCM_EMAIL_ADDRESS'"
 echo "DOCKER_BCM_GIT_COMMIT_MESSAGE: '$BCM_GIT_COMMIT_MESSAGE'"
 echo "DOCKER_BCM_GPG_SIGNING_KEY_ID: '$BCM_GPG_SIGNING_KEY_ID'"
 
+gpg2 --list-keys
 git config --global commit.gpgsign 1
 git config --global gpg.program "$(command -v gpg2)"
 git config --global user.signingkey "$BCM_GPG_SIGNING_KEY_ID"
@@ -30,3 +31,5 @@ git add "*"
 
 echo "Committing and signing. Get ready to check your Trezor."
 git commit -S -m "$BCM_GIT_COMMIT_MESSAGE"
+
+git log --show-signature -1

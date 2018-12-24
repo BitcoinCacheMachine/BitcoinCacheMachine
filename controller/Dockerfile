@@ -1,6 +1,6 @@
 FROM ubuntu:cosmic
 RUN apt-get update
-RUN apt-get install -y apt-utils git
+RUN apt-get install -y apt-utils git pass
 # so scripts won't ask for interactive input.
 ENV DEBIAN_FRONTEND=noninteractive
 

@@ -13,8 +13,8 @@ source "$BCM_GIT_DIR/.env"
 # if so, we quit unless the user has told us to override.
 export HOSTNAME="bcm-$BCM_TIER_NAME-01"
 if lxc list --format csv -c n | grep -q "$HOSTNAME"; then
-	echo "lxc host '$HOSTNAME' exists."
-	exit
+    echo "lxc host '$HOSTNAME' exists."
+    exit
 fi
 
 # first, create the profile that represents the tier.
@@ -82,38 +82,38 @@ source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
 for endpoint in $(bcm cluster list --endpoints); do
-	if [[ $endpoint != "$MASTER_NODE" ]]; then
-		HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-		HOSTNAME="bcm-gateway-$(printf %02d "$HOST_ENDING")"
-
-		if [[ $HOST_ENDING -ge 2 ]]; then
-			lxc file push ./daemon.json "$HOSTNAME/etc/docker/daemon.json"
-			lxc file push ./dhcpd_conf.yml "$HOSTNAME/etc/netplan/10-lxc.yaml"
-
-			lxc start "$HOSTNAME"
-
-			bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
-
-			# make sure gateway and kafka hosts can reach the swarm master.
-			# this steps helps resolve networking before we issue any meaningful
-			# commands.
-			lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:2377
-			lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:5000
-			lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$BCM_PRIVATE_REGISTRY"
-
-			if [[ $HOST_ENDING -le 3 ]]; then
-				lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_MANAGER_JOIN_TOKEN" bcm-gateway-01:2377
-			else
-				# All other LXD bcm-gateway-04 or greater will be workers in the swarm.
-				lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
-			fi
-
-			# only do this if we're on our second node. We're going to deploy
-			# another registry mirror and private registry in case node1 goes offline.
-			# We will only have 2 locations for docker image distribution.
-			if [[ $HOST_ENDING == 2 ]]; then
-				lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://$BCM_PRIVATE_REGISTRY" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror2
-			fi
-		fi
-	fi
+    if [[ $endpoint != "$MASTER_NODE" ]]; then
+        HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+        HOSTNAME="bcm-gateway-$(printf %02d "$HOST_ENDING")"
+        
+        if [[ $HOST_ENDING -ge 2 ]]; then
+            lxc file push ./daemon.json "$HOSTNAME/etc/docker/daemon.json"
+            lxc file push ./dhcpd_conf.yml "$HOSTNAME/etc/netplan/10-lxc.yaml"
+            
+            lxc start "$HOSTNAME"
+            
+            bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
+            
+            # make sure gateway and kafka hosts can reach the swarm master.
+            # this steps helps resolve networking before we issue any meaningful
+            # commands.
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:2377
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:5000
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$BCM_PRIVATE_REGISTRY"
+            
+            if [[ $HOST_ENDING -le 3 ]]; then
+                lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_MANAGER_JOIN_TOKEN" bcm-gateway-01:2377
+            else
+                # All other LXD bcm-gateway-04 or greater will be workers in the swarm.
+                lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
+            fi
+            
+            # only do this if we're on our second node. We're going to deploy
+            # another registry mirror and private registry in case node1 goes offline.
+            # We will only have 2 locations for docker image distribution.
+            if [[ $HOST_ENDING == 2 ]]; then
+                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://$BCM_PRIVATE_REGISTRY" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror2
+            fi
+        fi
+    fi
 done

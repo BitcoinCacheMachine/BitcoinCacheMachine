@@ -7,54 +7,51 @@ BCM_ENDPOINT_VM_IP=
 BCM_LXD_SECRET=
 
 for i in "$@"; do
-	case $i in
-	--cluster-name=*)
-		BCM_CLUSTER_NAME="${i#*=}"
-		shift # past argument=value
-		;;
-	--endpoint=*)
-		BCM_CLUSTER_ENDPOINT_NAME="${i#*=}"
-		shift # past argument=value
-		;;
-	--endpoint-ip=*)
-		BCM_ENDPOINT_VM_IP="${i#*=}"
-		shift # past argument=value
-		;;
-	--endpoint-lxd-secret=*)
-		BCM_LXD_SECRET="${i#*=}"
-		shift # past argument=value
-		;;
-	--provider=*)
-		BCM_PROVIDER_NAME="${i#*=}"
-		shift # past argument=value
-		;;
-	*)
-		# unknown option
-		;;
-	esac
+    case $i in
+        --cluster-name=*)
+            BCM_CLUSTER_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --endpoint=*)
+            BCM_CLUSTER_ENDPOINT_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --endpoint-ip=*)
+            BCM_ENDPOINT_VM_IP="${i#*=}"
+            shift # past argument=value
+        ;;
+        --endpoint-lxd-secret=*)
+            BCM_LXD_SECRET="${i#*=}"
+            shift # past argument=value
+        ;;
+        --provider=*)
+            BCM_PROVIDER_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
 done
 
 if [[ -z $BCM_CLUSTER_ENDPOINT_NAME ]]; then
-	echo "BCM_CLUSTER_ENDPOINT_NAME not set. Exiting"
-	exit
+    echo "BCM_CLUSTER_ENDPOINT_NAME not set. Exiting"
+    exit
 fi
 
 if [[ -z $BCM_LXD_SECRET ]]; then
-	echo "BCM_LXD_SECRET not set. Exiting"
-	exit
+    echo "BCM_LXD_SECRET not set. Exiting"
+    exit
 fi
 
-# first let's make sure we have
-bash -c "$BCM_GIT_DIR/cluster/providers/lxd/snap_lxd_install.sh"
-
 if [[ $BCM_PROVIDER_NAME == "baremetal" ]]; then
-	# to do, update this to multiple baremetals...
-	BCM_ENDPOINT_VM_IP="127.0.10.1"
+    # to do, update this to multiple baremetals...
+    BCM_ENDPOINT_VM_IP="127.0.10.1"
 fi
 
 if [[ -z $BCM_ENDPOINT_VM_IP ]]; then
-	echo "BCM_ENDPOINT_VM_IP not set. Exiting"
-	exit
+    echo "BCM_ENDPOINT_VM_IP not set. Exiting"
+    exit
 fi
 
 echo "Waiting for the remote lxd daemon to become available at $BCM_ENDPOINT_VM_IP."

@@ -1,5 +1,5 @@
 config: {}
-description: Default BCM profile. Has ZFS backend only; no networking.
+description: Default BCM profile consisting of root BTRFS backend.
 devices:
   root:
     path: /
