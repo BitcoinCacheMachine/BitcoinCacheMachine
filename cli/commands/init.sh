@@ -10,47 +10,47 @@ BCM_CERT_USERNAME=
 BCM_CERT_FQDN=
 
 for i in "$@"; do
-    case $i in
-        --cert-dir=*)
-            BCM_CERT_DIR="${i#*=}"
-            shift # past argument=value
-        ;;
-        --cert-name=*)
-            BCM_CERT_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --cert-username=*)
-            BCM_CERT_USERNAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --cert-fqdn=*)
-            BCM_CERT_FQDN="${i#*=}"
-            shift # past argument=value
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
+	case $i in
+	--cert-dir=*)
+		BCM_CERT_DIR="${i#*=}"
+		shift # past argument=value
+		;;
+	--cert-name=*)
+		BCM_CERT_NAME="${i#*=}"
+		shift # past argument=value
+		;;
+	--cert-username=*)
+		BCM_CERT_USERNAME="${i#*=}"
+		shift # past argument=value
+		;;
+	--cert-fqdn=*)
+		BCM_CERT_FQDN="${i#*=}"
+		shift # past argument=value
+		;;
+	*)
+		# unknown option
+		;;
+	esac
 done
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then
-    cat ./init-help.txt
-    exit
+	cat ./init-help.txt
+	exit
 fi
 
 if [[ -z $BCM_CERT_NAME ]]; then
-    echo "BCM_CERT_NAME not set."
-    exit
+	echo "BCM_CERT_NAME not set."
+	exit
 fi
 
 if [[ -z $BCM_CERT_USERNAME ]]; then
-    echo "BCM_CERT_USERNAME not set."
-    exit
+	echo "BCM_CERT_USERNAME not set."
+	exit
 fi
 
 if [[ -z $BCM_CERT_FQDN ]]; then
-    echo "BCM_CERT_FQDN not set."
-    exit
+	echo "BCM_CERT_FQDN not set."
+	exit
 fi
 
 # shellcheck disable=SC2153
@@ -67,7 +67,6 @@ bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
 # now let's initialize the password repository with the GPG key
 bash -c "$BCM_GIT_DIR/controller/gpg_pass_init.sh"
 
-
 # ok great, now we have it initialized. Let's create a new GPG-encrypted password
 # file for the encfs mount on our controller machine. This allows us to encrypt the
 # BCM files on disk using a password backed by the trezor.
@@ -75,12 +74,11 @@ BCM_PASS_ENCFS_PATH="bcm/controller/encfs"
 
 bcm pass new --name="$BCM_PASS_ENCFS_PATH"
 
-
-mkdir -p "$BCM_RUNTIME_DIR/.encrypted"
-mkdir -p "$BCM_RUNTIME_DIR/encrypted"
+mkdir -p "$BCM_ENCRYPTED_DIR"
+mkdir -p "$BCM_UNENCRYPTED_VIEW_DIR"
 
 # 60 minute idle timeout in which case the encrypted mount will be unmounted
-encfs -o allow_root "$BCM_RUNTIME_DIR/.encrypted" "$BCM_RUNTIME_DIR/encrypted" -i=60 --paranoia --extpass="bcm pass get --name=$BCM_PASS_ENCFS_PATH" >>/dev/null
+encfs -o allow_root "$BCM_ENCRYPTED_DIR" "$BCM_UNENCRYPTED_VIEW_DIR" -i=60 --paranoia --extpass="bcm pass get --name=$BCM_PASS_ENCFS_PATH" >>/dev/null
 echo "Created $BCM_RUNTIME_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." >"$BCM_RUNTIME_DIR/debug.log"
 
 # shellcheck disable=SC2153

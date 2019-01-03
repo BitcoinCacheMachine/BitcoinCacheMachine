@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Currently using https://github.com/romanz/trezor-agent
 # https://github.com/romanz/trezor-agent/blob/master/doc/INSTALL.md
-RUN apt-get install -y python3-pip python3-dev python3-tk libusb-1.0-0-dev libudev-dev
+RUN apt-get install -y python3-pip python3-dev python3-tk libusb-1.0-0-dev libudev-dev --fix-missing
 RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 
 # RUN pip3 install --upgrade setuptools

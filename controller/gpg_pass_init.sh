@@ -9,9 +9,9 @@ source "$BCM_GIT_DIR/.env"
 source "$BCM_CERTS_DIR/.env"
 
 # This is where we will store our GPG-encrypted passwords.
-# if [ ! -d "$BCM_PASSWORDS_DIR" ]; then
-#     bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_PASSWORDS_DIR"
-# fi
+if [ ! -d "$BCM_PASSWORDS_DIR" ]; then
+	bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_PASSWORDS_DIR"
+fi
 
 # let's call bcm pass init to initialze the password store using our
 # recently generated trezor-backed GPG certificates.
@@ -20,12 +20,12 @@ source ./export_usb_path.sh
 
 # initialize the password store
 docker run -it --name pass --rm -v "$BCM_CERTS_DIR":/root/.gnupg \
--v "$BCM_PASSWORDS_DIR":/root/.password-store \
--e BCM_CERT_NAME="$BCM_CERT_NAME" \
--e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
--e BCM_CERT_FQDN="$BCM_CERT_FQDN" \
---device="$BCM_TREZOR_USB_PATH" \
-bcm-trezor:latest pass init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"
+	-v "$BCM_PASSWORDS_DIR":/root/.password-store \
+	-e BCM_CERT_NAME="$BCM_CERT_NAME" \
+	-e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
+	-e BCM_CERT_FQDN="$BCM_CERT_FQDN" \
+	--device="$BCM_TREZOR_USB_PATH" \
+	bcm-trezor:latest pass init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_FQDN>"
 
 # # initialize the password store
 # docker run -it --name pass --rm -v "$BCM_CERTS_DIR":/root/.gnupg \
