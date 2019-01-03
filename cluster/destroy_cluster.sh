@@ -1,7 +1,9 @@
 #!/bin/bash
 
 cd "$(dirname "$0")"
-set -Eeuo pipefail
+set -Eeuox pipefail
+
+echo "!!!!!!!!!!!!!!!!!!!!!!!!"
 
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/.env"
@@ -30,12 +32,6 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
     exit
 fi
 
-# shellcheck disable=2153
-if [[ ! -d "$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME" ]]; then
-    echo "BCM cluster definition '$BCM_CLUSTER_NAME' does not exist. Nothing to destroy."
-    exit
-fi
-
 if [[ $BCM_DEBUG == 1 ]]; then
     echo "Running destroy_cluster.sh with the following parameters:"
     echo "BCM_CLUSTER_NAME: $BCM_CLUSTER_NAME"
@@ -43,7 +39,9 @@ if [[ $BCM_DEBUG == 1 ]]; then
 fi
 
 echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
-export BCM_CLUSTER_DIR=$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME
+
+# shellcheck disable=SC2153
+export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
 
 if [[ $BCM_DEBUG == 1 ]]; then
@@ -55,9 +53,9 @@ for endpoint in $(bcm cluster list --endpoints); do
     ./destroy_cluster_endpoint.sh --cluster-name="$BCM_CLUSTER_NAME" --endpoint-name="$endpoint"
 done
 
-if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
+if lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     lxc remote switch local
-    lxc remote remove $BCM_CLUSTER_NAME
+    lxc remote remove "$BCM_CLUSTER_NAME"
 fi
 
 if [[ -d "$BCM_CLUSTER_DIR" ]]; then

@@ -9,7 +9,6 @@ cd "$(dirname "$0")"
 BCM_CLUSTER_NODE_COUNT=
 BCM_CLUSTER_NAME=
 BCM_PROVIDER_NAME="baremetal"
-BCM_MGMT_TYPE=
 BCM_CLUSTER_MASTER_NAME=
 
 for i in "$@"; do
@@ -26,10 +25,6 @@ for i in "$@"; do
             BCM_PROVIDER_NAME="${i#*=}"
             shift # past argument=value
         ;;
-        --mgmt-type=*)
-            BCM_MGMT_TYPE="${i#*=}"
-            shift # past argument=value
-        ;;
         *)
             # unknown option
         ;;
@@ -41,7 +36,6 @@ if [[ $BCM_DEBUG == 1 ]]; then
     echo "BCM_CLUSTER_NODE_COUNT: '$BCM_CLUSTER_NODE_COUNT'"
     echo "BCM_CLUSTER_NAME: '$BCM_CLUSTER_NAME'"
     echo "BCM_PROVIDER_NAME: '$BCM_PROVIDER_NAME'"
-    echo "BCM_MGMT_TYPE: '$BCM_MGMT_TYPE'"
 fi
 
 # see if the directory exists already; if so we exit
@@ -58,8 +52,9 @@ if [[ $BCM_PROVIDER_NAME == "baremetal" ]]; then
     BCM_CLUSTER_NODE_COUNT=1
 fi
 
-# elif [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
-# bash -c "$BCM_GIT_DIR/cluster/providers/multipass/snap_multipass_install.sh"
+if [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
+    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_multipass_install.sh"
+fi
 
 BCM_CLUSTER_ENDPOINT_NAME="$BCM_CLUSTER_NAME-01"
 BCM_CLUSTER_MASTER_NAME=$BCM_CLUSTER_ENDPOINT_NAME

@@ -27,16 +27,13 @@ Parameters:
                           
                           'aws/azure' NOT SUPPORTED. BCM is meant for home and small office.
   
-  --node-count=          Cluster count. Number of equal-size multipass VMs you want deployed.
+  --node-count=           Cluster count. Number of equal-size multipass VMs you want deployed.
   <BCM_NODE_COUNT>  
 
-  --mgmt-type             Valid values are 'local', and 'tor'. All LXD instances listen on the local network
-  <BCM_MGMT_TYPE>         on TCP/8443 to communicate with adjacent cluster members.
-                            
-                          'local' is only compatible with '-t=baremetal' and configures your local LXD c
-                          lient to use TLS connect on a localhost address (127.0.10.1). Great for testing.
-                          
-                          'tor' create a TOR onion service that exposes the LXD daemon TLS endpoint.
-                          Your management plane can use authenticated TOR onion sites to manage geographically
-                          remote cluster endpoints without having to open firewall ports.
- 
+  --onion-ssh             If this flag is set, a onion service will be created that exposes the 
+                          endpoint's SSH service as an authenticated onion service allowing your to 
+                          remotely administer your endpoint.
+
+  --onion-lxd             If this flag is set, a onion service will be created that exposes the 
+                          LXD daemon TLS endpoint as an authenticated onion service allowing your to 
+                          remotely administer your BCM data center.

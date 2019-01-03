@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -32,7 +32,6 @@ for i in "$@"; do
             BCM_ENDPOINTS_FLAG=1
             shift # past argument=value
         ;;
-        
         *) ;;
         
     esac
@@ -43,14 +42,17 @@ if [[ $BCM_HELP_FLAG == 1 ]]; then
     exit
 fi
 
+if [[ -z $BCM_CLUSTER_NAME ]]; then
+    BCM_CLUSTER_NAME=$(lxc remote get-default)
+fi
+
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    bash -c "$BCM_GIT_DIR/cluster/up_cluster.sh --cluster-name=$BCM_CLUSTER_NAME --node-count=$BCM_NODE_COUNT --provider=$BCM_PROVIDER_NAME --mgmt-type=$BCM_MGMT_TYPE"
-    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
-    if [[ -z $BCM_CLUSTER_NAME ]]; then
-        echo "BCM_CLUSTER_NAME not set. Exiting"
-        exit
-    fi
+    bash -c "$BCM_GIT_DIR/cluster/up_cluster.sh \
+        --cluster-name=$BCM_CLUSTER_NAME \
+        --node-count=$BCM_NODE_COUNT \
+    --provider=$BCM_PROVIDER_NAME"
     
+    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
     bash -c "$BCM_GIT_DIR/cluster/destroy_cluster.sh --cluster-name=$BCM_CLUSTER_NAME"
     elif [[ $BCM_CLI_VERB == "list" ]]; then
@@ -61,7 +63,13 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
     export BCM_ENDPOINTS_FLAG=$BCM_ENDPOINTS_FLAG
     
-    bash -c ./list/list.sh
+    if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
+        lxc cluster list | grep "$BCM_CLUSTER_NAME" | awk '{print $2}'
+    else
+        if [[ -d $BCM_CLUSTERS_DIR ]]; then
+            find "$BCM_CLUSTERS_DIR/" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | grep -v ".git"
+        fi
+    fi
 else
     cat ./help.txt
 fi

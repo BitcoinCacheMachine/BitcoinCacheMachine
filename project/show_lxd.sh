@@ -12,6 +12,7 @@ echo ""
 echo "LXD storage pools:"
 lxc storage list
 
+lxc storage list | grep -1 bcm_btrfs
 echo ""
 echo "LXD storage bcm_btrfs volumes:"
 lxc storage volume list bcm_btrfs

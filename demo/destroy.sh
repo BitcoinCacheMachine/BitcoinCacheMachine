@@ -26,3 +26,5 @@ if [[ -d $BCM_PASSWORDS_DIR ]]; then
 fi
 
 sudo lxd init --auto
+
+bcm show
