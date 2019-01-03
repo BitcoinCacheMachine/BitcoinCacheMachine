@@ -1,23 +1,23 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1091
 source ./params.sh "$@"
 
 if [[ $BCM_DEPLOY_GATEWAY == 1 ]]; then
-    bash -c "./gateway/up_lxc_gateway.sh"
+	bash -c "./gateway/up_lxc_gateway.sh"
 fi
 
 if [[ $BCM_DEPLOY_TIER_KAFKA == 1 ]]; then
-    bash -c "./create_tier.sh --tier-name=kafka"
+	bash -c "./create_tier.sh --tier-name=kafka"
 fi
 
-if [[ $BCM_DEPLOY_TIER_UI = 1 ]]; then
-    bash -c "./create_tier.sh --tier-name=ui"
+if [[ $BCM_DEPLOY_TIER_UI == 1 ]]; then
+	bash -c "./create_tier.sh --tier-name=ui"
 fi
 
-if [[ $BCM_DEPLOY_TIER_BITCOIN = 1 ]]; then
-    bash -c "./create_tier.sh --tier-name=bitcoin"
+if [[ $BCM_DEPLOY_TIER_BITCOIN == 1 ]]; then
+	bash -c "./create_tier.sh --tier-name=bitcoin"
 fi
