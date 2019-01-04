@@ -10,7 +10,8 @@ if ! snap list | grep -q lxd; then
 
 	lxc config set core.https_address 0.0.0.0:8443
 
-	read -p -r "Enter the trust password for network clients:  " TRUST_PASSWORD
+	TRUST_PASSWORD=
+	read -rp "Enter the trust password for network clients: " TRUST_PASSWORD
 
 	lxc config set core.trust_password "$TRUST_PASSWORD"
 fi
