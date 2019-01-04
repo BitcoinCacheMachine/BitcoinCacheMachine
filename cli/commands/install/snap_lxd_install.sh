@@ -7,6 +7,12 @@ cd "$(dirname "$0")"
 if ! snap list | grep -q lxd; then
 	sudo snap install lxd --edge
 	sleep 10
+
+	lxc config set http.address 0.0.0.0:8443
+
+	read -p -r "Enter the trust password for network clients:  " TRUST_PASSWORD
+
+	lxc config set http.trust_password "$TRUST_PASSWORD"
 fi
 
 # if the lxd groups doesn't exist, create it.
