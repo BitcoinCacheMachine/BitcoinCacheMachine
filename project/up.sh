@@ -25,13 +25,13 @@ for i in "$@"; do
 	esac
 done
 
-# let's make sure the cluster exists.
+# let's make sure the cluster name is set.
 if [[ -z $BCM_CLUSTER_NAME ]]; then
 	echo "BCM_CLUSTER_NAME not set."
 	exit
 fi
 
-# let's make sure the cluster exists.
+# let's make sure the project name is specified.
 if [[ -z $BCM_PROJECT_NAME ]]; then
 	echo "BCM_PROJECT_NAME not set."
 	exit

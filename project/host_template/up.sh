@@ -10,7 +10,7 @@ BCM_REBUILD_TEMPLATE=0
 # if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
 # it (being the lxc image 'bcm-template') will be rebuilt.
 if lxc image list --format csv | grep -q "bcm-template"; then
-	if $BCM_REBUILD_TEMPLATE -eq 1; then
+	if [ $BCM_REBUILD_TEMPLATE = 1 ]; then
 		echo "TODO: implement rebuild logic"
 	else
 		echo "LXC image bcm-template exists and BCM_REBUILD_TEMPLATE was not set. The existing image will not be modified."

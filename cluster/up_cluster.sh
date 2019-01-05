@@ -3,7 +3,7 @@
 # brings up LXD cluster of at least 1 member. Increase the number
 # by providing $1 as a number 2 or above.
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_NODE_COUNT=

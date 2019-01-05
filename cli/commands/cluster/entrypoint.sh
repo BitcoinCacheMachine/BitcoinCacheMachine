@@ -65,8 +65,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 
 	#SSH_PUBKEY="$BCM_SSH_DIR/$BCM_SSH_USERNAME"'_'"$BCM_SSH_HOSTNAME"'.pub'
 
-	#ssh-copy-id -f -i "$SSH_PUBKEY" $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME
-
 	bash -c "$BCM_GIT_DIR/cluster/up_cluster.sh --cluster-name=$BCM_CLUSTER_NAME --node-count=$BCM_NODE_COUNT --provider=$BCM_PROVIDER_NAME"
 
 elif [[ $BCM_CLI_VERB == "destroy" ]]; then

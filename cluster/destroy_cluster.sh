@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd "$(dirname "$0")"
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 echo "!!!!!!!!!!!!!!!!!!!!!!!!"
 

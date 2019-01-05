@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
@@ -44,6 +44,7 @@ echo "BCM_PROVIDER_NAME: $BCM_PROVIDER_NAME"
 echo "BCM_CLUSTER_ENDPOINT_DIR: $BCM_CLUSTER_ENDPOINT_DIR"
 echo "BCM_CLUSTER_ENDPOINT_DIR: $BCM_CLUSTER_ENDPOINT_DIR"
 echo "BCM_SSH_HOSTNAME: $BCM_SSH_HOSTNAME"
+echo "BCM_SSH_USERNAME: $BCM_SSH_USERNAME"
 
 # if there's no .env file for the specified VM, we'll generate a new one.
 if [ -f $BCM_CLUSTER_ENDPOINT_DIR/.env ]; then
@@ -75,10 +76,6 @@ if [[ $BCM_PROVIDER_NAME != "local" ]]; then
 	fi
 fi
 
-if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
-	./provision_ssh.sh --endpoint-dir="$BCM_ENDPOINT_DIR"
-fi
-
 if [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
 	## launch the VM based with a static cloud-init.
 	# we'll create lxd preseed files AFTER boot so we know the IP address.
@@ -89,6 +86,18 @@ if [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
 		--name "$BCM_CLUSTER_ENDPOINT_NAME" \
 		--cloud-init "$BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml" \
 		cosmic
+fi
+
+if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
+	# let's mount the directory via sshfs. This contains the lxd seed file.
+	REMOTE_MOUNTPOINT="/home/$BCM_SSH_USERNAME/bcm"
+	SSH_KEY_FILE="$BCM_ENDPOINT_DIR/id_rsa"
+
+	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" mkdir -p "$REMOTE_MOUNTPOINT"
+	scp -i "$SSH_KEY_FILE" "$BCM_ENDPOINT_DIR/lxd_preseed.yml" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
+
+	# run the snap_install script on the remote host.
+	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "sudo eval $(cat "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh")"
 fi
 
 # if it's the cluster master add the LXC remote so we can manage it.

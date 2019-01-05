@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_ENDPOINT_NAME=
@@ -55,15 +55,22 @@ fi
 # if we're using SSH to provision, we need to figure out which
 # physical interfaces are availble. We need to do this interactively
 # over SSH.
+
 if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
 	# first let's check on the remote SSH service.
 	wait-for-it -t 30 "$BCM_SSH_HOSTNAME:22"
 
-	ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" ip link show
+	SSH_KEY_FILE="$BCM_ENDPOINT_DIR/id_rsa"
 
+	ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_FILE" -N ""
+	chmod 400 "$SSH_KEY_FILE.pub"
+
+	ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+
+	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" ip link show
+
+	# TODO Do some error checking on network interface selection.
 	read -rp "Enter the name of the physical network interface you want to use for the data path:  " BCM_LXD_PHYSICAL_INTERFACE
-
-	# TODO clean this up, error check.
 fi
 
 export BCM_LXD_PHYSICAL_INTERFACE="$BCM_LXD_PHYSICAL_INTERFACE"
