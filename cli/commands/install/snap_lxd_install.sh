@@ -1,7 +1,8 @@
 #!/bin/bash
 
-set -Eeuo pipefail
-cd "$(dirname "$0")"
+#set -Eeuo pipefail
+
+BCM_TRUST_PASSWORD=
 
 # remove any legacy lxd software and install install lxd via snap
 if ! snap list | grep -q lxd; then
@@ -10,10 +11,9 @@ if ! snap list | grep -q lxd; then
 
 	lxc config set core.https_address 0.0.0.0:8443
 
-	TRUST_PASSWORD=
-	read -rp "Enter the trust password for network clients: " TRUST_PASSWORD
-
-	lxc config set core.trust_password "$TRUST_PASSWORD"
+	if [[ ! -z $BCM_TRUST_PASSWORD ]]; then
+		lxc config set core.trust_password "$BCM_TRUST_PASSWORD"
+	fi
 fi
 
 # if the lxd groups doesn't exist, create it.

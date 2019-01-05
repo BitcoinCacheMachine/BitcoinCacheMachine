@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
@@ -42,6 +42,8 @@ echo "IS_MASTER: $IS_MASTER"
 echo "BCM_CLUSTER_ENDPOINT_NAME: $BCM_CLUSTER_ENDPOINT_NAME"
 echo "BCM_PROVIDER_NAME: $BCM_PROVIDER_NAME"
 echo "BCM_CLUSTER_ENDPOINT_DIR: $BCM_CLUSTER_ENDPOINT_DIR"
+echo "BCM_CLUSTER_ENDPOINT_DIR: $BCM_CLUSTER_ENDPOINT_DIR"
+echo "BCM_SSH_HOSTNAME: $BCM_SSH_HOSTNAME"
 
 # if there's no .env file for the specified VM, we'll generate a new one.
 if [ -f $BCM_CLUSTER_ENDPOINT_DIR/.env ]; then
@@ -58,7 +60,7 @@ if [[ -z $BCM_PROVIDER_NAME ]]; then
 fi
 
 # prepare the cloud-init file
-if [[ $BCM_PROVIDER_NAME != "baremetal" ]]; then
+if [[ $BCM_PROVIDER_NAME != "local" ]]; then
 	if [[ -f $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml ]]; then
 		BCM_CLUSTER_MASTER_LXD_PRESEED=$(awk '{print "      " $0}' "$BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml")
 		export BCM_CLUSTER_MASTER_LXD_PRESEED
@@ -73,9 +75,18 @@ if [[ $BCM_PROVIDER_NAME != "baremetal" ]]; then
 	fi
 fi
 
-if [[ $BCM_PROVIDER_NAME == 'baremetal' ]]; then
-	bash -c "cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml | sudo lxd init --preseed"
-elif [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
+if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
+	if [[ ! -z $BCM_SSH_HOSTNAME ]]; then
+		wait-for-it -t 15 "$BCM_SSH_HOSTNAME:8443"
+	else
+		exit
+	fi
+
+	PRESEED_TEXT="$(cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml)"
+	#ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo 'echo $PRESEED_TEXT | sudo lxd init --preseed'
+fi
+
+if [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
 	## launch the VM based with a static cloud-init.
 	# we'll create lxd preseed files AFTER boot so we know the IP address.
 	multipass launch \
@@ -85,15 +96,10 @@ elif [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
 		--name "$BCM_CLUSTER_ENDPOINT_NAME" \
 		--cloud-init "$BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml" \
 		cosmic
-
-elif [[ $BCM_PROVIDER_NAME == "baremetal" ]]; then
-	echo "todo; baremetal in up_cluster_endpoint.sh"
-elif [[ $BCM_PROVIDER_NAME == "aws" ]]; then
-	echo "todo; aws in up_cluster_endpoint.sh"
 fi
 
 # if it's the cluster master add the LXC remote so we can manage it.
 if [[ $IS_MASTER == 1 ]]; then
 	BCM_ENDPOINT_VM_IP=$(./get_endpoint_ip.sh --provider="$BCM_PROVIDER_NAME" --endpoint-name="$BCM_CLUSTER_ENDPOINT_NAME")
-	./add_endpoint_lxd_remote.sh --cluster-name="$BCM_CLUSTER_NAME" --endpoint="$BCM_CLUSTER_ENDPOINT_NAME" --endpoint-ip="$BCM_ENDPOINT_VM_IP" --endpoint-lxd-secret="$BCM_LXD_SECRET"
+	./add_endpoint_lxd_remote.sh --cluster-name="$BCM_CLUSTER_NAME" --provider="$BCM_PROVIDER_NAME" --endpoint="$BCM_CLUSTER_ENDPOINT_NAME" --endpoint-ip="$BCM_ENDPOINT_VM_IP" --endpoint-lxd-secret="$BCM_LXD_SECRET"
 fi

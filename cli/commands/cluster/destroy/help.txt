@@ -7,6 +7,6 @@ Usage:
 
 Parameters:
   -c=<BCM_CLUSTER_NAME>   The name of the new cluster be destroyed. Existing cloud-based cluster members
-                          (e.g., aws, multipass) will be destroyed and will not be recoverable. This command
+                          (e.g., multipass) will be destroyed and will not be recoverable. This command
                           also deletes the $BCM_RUNTIME_DIR/clusters/<BCM_CLUSTER_NAME> directory. Note that $BCM_RUNTIME_DIR/ is
                           an append-only git-repository.

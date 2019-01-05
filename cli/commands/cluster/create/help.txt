@@ -16,24 +16,25 @@ Parameters:
                           --cluster-name=<BCM_CLUSTER_NAME>
     
   --provider=             The provider is the mechanism by which an LXD instance will be made
-  <BCM_PROVIDER>          available. Valid option as are 'multipass', 'aws', and 'baremetal'. 
+  <BCM_PROVIDER>          available. Valid option as are 'local', 'ssh', and multipass.
                           
-                          'baremetal' installs LXD locally using snap and is recommended for 
-                          testing and development. 
+                          'local' installs LXD locally using snap and is recommended for testing 
+                          and development. 
+
+                          'ssh' creates a new cluster on a remote SSH endpoint.
                           
                           'multipass' install multipass as a snap and creates one or more QEMU-based
                           VMs on your local computer. Each VM will be cloud-init provisioned into a 
-                          cluster configuratino
-                          
-                          'aws/azure' NOT SUPPORTED. BCM is meant for home and small office.
-  
-  --node-count=           Cluster count. Number of equal-size multipass VMs you want deployed.
-  <BCM_NODE_COUNT>  
+                          cluster configuration.
 
-  --onion-ssh             If this flag is set, a onion service will be created that exposes the 
-                          endpoint's SSH service as an authenticated onion service allowing your to 
-                          remotely administer your endpoint.
+  --node-count=           Cluster count. Number of equal-size multipass VMs you want deployed. Only
+  <BCM_NODE_COUNT>        relevant when --provider=multipass.
 
-  --onion-lxd             If this flag is set, a onion service will be created that exposes the 
-                          LXD daemon TLS endpoint as an authenticated onion service allowing your to 
-                          remotely administer your BCM data center.
+# TODO
+#  --onion-ssh             If this flag is set, a onion service will be created that exposes the 
+#                          endpoint's SSH service as an authenticated onion service allowing your to 
+#                          remotely administer your endpoint.
+#
+#  --onion-lxd             If this flag is set, a onion service will be created that exposes the 
+#                          LXD daemon TLS endpoint as an authenticated onion service allowing your to 
+#                          remotely administer your BCM data center.

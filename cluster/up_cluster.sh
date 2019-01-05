@@ -3,12 +3,12 @@
 # brings up LXD cluster of at least 1 member. Increase the number
 # by providing $1 as a number 2 or above.
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_NODE_COUNT=
 BCM_CLUSTER_NAME=
-BCM_PROVIDER_NAME="baremetal"
+BCM_PROVIDER_NAME="local"
 BCM_CLUSTER_MASTER_NAME=
 
 for i in "$@"; do
@@ -48,7 +48,7 @@ else
 	mkdir -p "$BCM_CLUSTER_DIR"
 fi
 
-if [[ $BCM_PROVIDER_NAME == "baremetal" ]]; then
+if [[ $BCM_PROVIDER_NAME == "local" ]]; then
 	BCM_CLUSTER_NODE_COUNT=1
 fi
 
@@ -78,13 +78,13 @@ fi
 source "$BCM_ENDPOINT_DIR/.env"
 
 # substitute the variables in lxd_master_preseed.yml
-# shellcheck disable=SC2016
-BCM_LXD_CORE_HTTPS_ADDRESS='$BCM_LXD_CORE_HTTPS_ADDRESS'
-export BCM_LXD_CORE_HTTPS_ADDRESS
-
-if [[ $BCM_PROVIDER_NAME == "baremetal" ]]; then
+if [[ $BCM_PROVIDER_NAME == "local" ]]; then
 	BCM_LXD_CORE_HTTPS_ADDRESS="127.0.10.1:8443"
+elif [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
+	BCM_LXD_CORE_HTTPS_ADDRESS="0.0.0.0:8443"
 fi
+
+export BCM_LXD_CORE_HTTPS_ADDRESS="$BCM_LXD_CORE_HTTPS_ADDRESS"
 
 envsubst <./lxd_preseed/lxd_master_preseed.yml >"$BCM_ENDPOINT_DIR/lxd_preseed.yml"
 BCM_CLUSTER_MASTER_ENDPOINT_DIR="$BCM_ENDPOINT_DIR"

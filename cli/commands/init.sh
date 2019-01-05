@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC2153
@@ -85,3 +85,4 @@ echo "Created $BCM_RUNTIME_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." >"$BCM_R
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_PROJECTS_DIR"
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_CLUSTERS_DIR"
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_DEPLOYMENTS_DIR"
+bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_SSH_DIR"
