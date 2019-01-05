@@ -66,21 +66,31 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 			-e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
 			--device="$BCM_TREZOR_USB_PATH" \
 			bcm-trezor:latest bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME --connect --verbose"
-	elif [[ $BCM_CLI_VERB == "execute" ]]; then
-		if [[ ! -z $BCM_SSH_SCRIPT ]]; then
-			if [[ -f $BCM_SSH_SCRIPT ]]; then
-				echo "BCM_SSH_SCRIPT: '$BCM_SSH_SCRIPT'"
+		# elif [[ $BCM_CLI_VERB == "execute" ]]; then
+		# 	if [[ ! -z $BCM_SSH_SCRIPT ]]; then
+		# 		if [[ -f $BCM_SSH_SCRIPT ]]; then
+		# 			echo "BCM_SSH_SCRIPT: '$BCM_SSH_SCRIPT'"
 
-				docker run -it --rm --add-host="$BCM_SSH_HOSTNAME:$(dig +short "$BCM_SSH_HOSTNAME")" \
-					-v "$BCM_SSH_DIR":/root/.ssh \
-					-v "$BCM_SSH_SCRIPT":/root/script.sh \
-					-e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
-					-e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
-					--device="$BCM_TREZOR_USB_PATH" \
-					bcm-trezor:latest bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME -c -v"
+		# 			SCRIPT_TEXT="$(cat $BCM_SSH_SCRIPT)"
+		# 			#echo "SCRIPT_TEXT:  $SCRIPT_TEXT"
 
-			fi
-		fi
+		# 			docker kill ssher
+		# 			docker system prune -f
+
+		# 			docker run -d -t --name ssher \
+		# 				--add-host="$BCM_SSH_HOSTNAME:$(dig +short "$BCM_SSH_HOSTNAME")" \
+		# 				-v "$BCM_SSH_DIR":/root/.ssh \
+		# 				-e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
+		# 				-e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
+		# 				-e SCRIPT_TEXT="$SCRIPT_TEXT" \
+		# 				--device="$BCM_TREZOR_USB_PATH" \
+		# 				bcm-trezor:latest
+
+		# 			docker exec -it ssher trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME
+
+		# 			# docker exec -it ssher bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME -- eval $SCRIPT_TEXT"
+		# 		fi
+		# 	fi
 	else
 		cat ./help.txt
 	fi

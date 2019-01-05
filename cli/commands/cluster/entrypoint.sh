@@ -61,11 +61,11 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 	export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
 
 	# this prepares the remote SSH server so we can use SSH with passwordless login
-	bcm ssh newkey --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME"
+	#bcm ssh newkey --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME"
 
-	SSH_PUBKEY="$BCM_SSH_DIR/$BCM_SSH_USERNAME"'_'"$BCM_SSH_HOSTNAME"'.pub'
+	#SSH_PUBKEY="$BCM_SSH_DIR/$BCM_SSH_USERNAME"'_'"$BCM_SSH_HOSTNAME"'.pub'
 
-	ssh-copy-id -f -i "$SSH_PUBKEY" $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME
+	#ssh-copy-id -f -i "$SSH_PUBKEY" $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME
 
 	bash -c "$BCM_GIT_DIR/cluster/up_cluster.sh --cluster-name=$BCM_CLUSTER_NAME --node-count=$BCM_NODE_COUNT --provider=$BCM_PROVIDER_NAME"
 

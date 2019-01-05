@@ -59,24 +59,14 @@ if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
 	# first let's check on the remote SSH service.
 	wait-for-it -t 30 "$BCM_SSH_HOSTNAME:22"
 
-	#ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "sudo eval $(cat "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh")"
-	#"sudo eval $(cat "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh")"
-	bcm ssh execute --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME" --ssh-script="$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh"
-fi
-
-if [[ -z $BCM_LXD_PHYSICAL_INTERFACE ]]; then
-	# echo "Physical network interfaces:"
-	# lxc network list --format csv | grep physical | awk -F, '{print $1}'
-
-	#ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" ip link show
-	bcm ssh execute --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME" --ssh-command='ip link show'
+	ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" ip link show
 
 	read -rp "Enter the name of the physical network interface you want to use for the data path:  " BCM_LXD_PHYSICAL_INTERFACE
+
+	# TODO clean this up, error check.
 fi
 
 export BCM_LXD_PHYSICAL_INTERFACE="$BCM_LXD_PHYSICAL_INTERFACE"
-export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
-export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
 
 if [ $IS_MASTER -eq 1 ]; then
 	envsubst <./env/master_defaults.env >$ENV_FILE

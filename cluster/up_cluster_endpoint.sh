@@ -76,14 +76,7 @@ if [[ $BCM_PROVIDER_NAME != "local" ]]; then
 fi
 
 if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
-	if [[ ! -z $BCM_SSH_HOSTNAME ]]; then
-		wait-for-it -t 15 "$BCM_SSH_HOSTNAME:8443"
-	else
-		exit
-	fi
-
-	PRESEED_TEXT="$(cat $BCM_CLUSTER_ENDPOINT_DIR/lxd_preseed.yml)"
-	#ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo 'echo $PRESEED_TEXT | sudo lxd init --preseed'
+	./provision_ssh.sh --endpoint-dir="$BCM_ENDPOINT_DIR"
 fi
 
 if [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
