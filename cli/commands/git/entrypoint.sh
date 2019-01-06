@@ -89,8 +89,6 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
 		exit
 	fi
 
-	bash -c "$BCM_GIT_DIR/controller/build.sh"
-
 	if [[ $BCM_DEBUG == 1 ]]; then
 		echo "BCM_CERT_DIR: $BCM_CERT_DIR"
 		echo "BCM_GIT_COMMIT_MESSAGE: $BCM_GIT_COMMIT_MESSAGE"

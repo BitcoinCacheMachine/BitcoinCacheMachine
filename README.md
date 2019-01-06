@@ -40,11 +40,11 @@ Documentation for BCM is being migrated to [BCM Docs](https://www.bitcoincachema
 
 ## Getting Started
 
-The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your machine. 
+The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your new SDN controller, a user-facing desktop or laptop.
 
-> NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu (Desktop or Server) >= 18.04. Windows and MacOS are not directly supported, though you can always run Ubuntu in a VM.
+> NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu (Desktop or Server) >= 18.04. Windows and MacOS are not directly supported, though you can always run Ubuntu in a VM. This goes for both the user-facing SDN controller and dedicated back-end x86_64 data center hardware.
 
-Start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads). Next, configure your local `git` client to download (clone) the BCM github repository using TOR for transport. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
+Start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) from your SDN Controller. Next, configure your local `git` client to download (clone) the BCM github repository using TOR for transport. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
 
 ```bash
 sudo apt-get update
@@ -64,9 +64,11 @@ cd "$BCM_GIT_DIR"
 source "$HOME/.bashrc"
 ```
 
-Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_GIT_DIR' variable. `setup.sh` sets up your environment so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus. Run `bcm --help` for guidance on how to continue
+Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_GIT_DIR' variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
 
-Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. The BCM CLI automatically installs all software for you. The demo BCM Project is called `BCMSparkStack` which, which aside from deploying criticial data center componnets such as a TOR proxy, a comprehensive kafka stack, docker registries, TOR-enabled DNS, bitcoind, etc., exposes the c-lightning RPC interface as a v3 onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
+Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. You're effectively running BCM data center workloads on your local machine isntead of deploying your app to a distributed cluster of machines. The BCM CLI automatically installs all software for you. 
+
+The demo BCM Project is called `BCMSparkStack` which, which aside from deploying criticial data center componnets such as a TOR proxy, a comprehensive kafka stack, docker registries, TOR-enabled DNS, bitcoind, etc., exposes the c-lightning RPC interface as a v3 onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
 
 ## Deploying your own BCM Infrastructure
 

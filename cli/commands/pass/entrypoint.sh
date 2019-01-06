@@ -1,13 +1,17 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
 
-BCM_CLI_VERB=$2
+BCM_CLI_VERB=
 BCM_PASS_NAME=
+
+if [[ ! -z $2 ]]; then
+	BCM_CLI_VERB=$2
+fi
 
 for i in "$@"; do
 	case $i in
@@ -20,13 +24,16 @@ for i in "$@"; do
 	esac
 done
 
-if [[ -z $BCM_PASS_NAME ]]; then
-	echo "BCM_PASS_NAME cannot be empty"
-fi
-
 # shellcheck disable=SC1090
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 if [[ $BCM_CLI_VERB == "new" ]]; then
+
+	if [[ -z $BCM_PASS_NAME ]]; then
+		echo "BCM_PASS_NAME cannot be empty. Use '--name=<password_name>'"
+		cat ./help.txt
+		exit
+	fi
+
 	# How we reference the password.
 	docker run -it --name pass --rm \
 		-v "$BCM_CERTS_DIR":/root/.gnupg \
@@ -36,6 +43,13 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
 		bcm-trezor:latest bash -c "pass generate $BCM_PASS_NAME 32 >>/dev/null"
 
 elif [[ $BCM_CLI_VERB == "get" ]]; then
+
+	if [[ -z $BCM_PASS_NAME ]]; then
+		echo "BCM_PASS_NAME cannot be empty. Use '--name=<password_name>'"
+		cat ./help.txt
+		exit
+	fi
+
 	# How we reference the password.
 	docker run -it --name pass --rm \
 		-v "$BCM_CERTS_DIR":/root/.gnupg \
@@ -44,5 +58,25 @@ elif [[ $BCM_CLI_VERB == "get" ]]; then
 		-e DISPLAY=1 \
 		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
 		--device="$BCM_TREZOR_USB_PATH" \
-		bcm-trezor:latest pass $BCM_PASS_NAME
+		bcm-trezor:latest pass "$BCM_PASS_NAME"
+elif [[ $BCM_CLI_VERB == "list" ]]; then
+	# How we reference the password.
+	docker run -it --name pass --rm \
+		-v "$BCM_CERTS_DIR":/root/.gnupg \
+		-v "$BCM_PASSWORDS_DIR":/root/.password-store \
+		-v /tmp/.X11-unix:/tmp/.X11-unix \
+		-e DISPLAY=1 \
+		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
+		--device="$BCM_TREZOR_USB_PATH" \
+		bcm-trezor:latest pass
+elif [[ $BCM_CLI_VERB == "rm" ]]; then
+	# How we reference the password.
+	docker run -it --name pass --rm \
+		-v "$BCM_CERTS_DIR":/root/.gnupg \
+		-v "$BCM_PASSWORDS_DIR":/root/.password-store \
+		-v /tmp/.X11-unix:/tmp/.X11-unix \
+		-e DISPLAY=1 \
+		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
+		--device="$BCM_TREZOR_USB_PATH" \
+		bcm-trezor:latest pass rm "$BCM_PASS_NAME"
 fi

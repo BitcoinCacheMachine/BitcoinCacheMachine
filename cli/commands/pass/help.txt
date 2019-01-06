@@ -2,5 +2,9 @@ Description:
   Use Trezor back-end to manage a password store. All commands for 'bcm pass'
   are passed to the 'pass' utility.
 
+Commands:
+  new       Creates a new Trezor-backed password protected by your GPG certificate.
+  get       Returns a password protected by your Trezor.
+
 Usage:
   bcm pass [command]

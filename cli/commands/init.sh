@@ -56,8 +56,6 @@ fi
 # shellcheck disable=SC2153
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_CERT_DIR"
 
-bash -c "$BCM_GIT_DIR/controller/build.sh"
-
 bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
     --cert-dir='$BCM_CERT_DIR' \
     --cert-name='$BCM_CERT_NAME' \

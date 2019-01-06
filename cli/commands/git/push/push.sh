@@ -6,8 +6,6 @@ if [[ -z $BCM_GIT_REPO_DIR ]]; then
 	exit
 fi
 
-bash -c "$BCM_GIT_DIR/controller/build.sh"
-
 if docker ps -a | grep -q "bcm-trezor-gitter"; then
 	docker system prune -f
 fi
