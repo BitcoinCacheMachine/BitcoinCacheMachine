@@ -21,8 +21,12 @@ if [[ -d $BCM_RUNTIME_DIR/.gnupg ]]; then
 	sudo rm -Rf "$BCM_RUNTIME_DIR/.gnupg"
 fi
 
-if [[ -d $BCM_PASSWORDS_DIR ]]; then
-	sudo rm -Rf "$BCM_PASSWORDS_DIR"
+if [[ $PASSWORD_STORE_DIR == "$HOME/.gnupg" ]]; then
+	echo "WARNING: You're attempting to delete your $HOME/.gnupg directory. This step was skipped because it was likely unintentional."
+else
+	if [[ -d $PASSWORD_STORE_DIR ]]; then
+		sudo rm -Rf "$PASSWORD_STORE_DIR"
+	fi
 fi
 
 sudo lxd init --auto

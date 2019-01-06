@@ -3,8 +3,6 @@
 cd "$(dirname "$0")"
 set -Eeuo pipefail
 
-echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/.env"
 
@@ -68,12 +66,3 @@ bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=bcm_default"
 if lxc storage list | grep -q "bcm_btrfs"; then
 	lxc storage delete bcm_btrfs
 fi
-
-# source $BCM_CERTS_DIR/.env
-# bcm git commit \
-#     --cert-dir="$BCM_CERTS_DIR" \
-#     --git-repo-dir="$BCM_CLUSTERS_DIR" \
-#     --git-commit-message="Destroyed cluster $BCM_CLUSTER_NAME and all associated files." \
-#     --git-username="$BCM_CERT_USERNAME" \
-#     --email-address="$BCM_CERT_USERNAME@$BCM_CERT_FQDN" \
-#     --gpg-signing-key-id="$BCM_DEFAULT_KEY_ID"

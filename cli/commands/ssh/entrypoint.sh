@@ -1,12 +1,11 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # BCM_CLI_VERB=$2
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
-BCM_SSH_SCRIPT=
 
 for i in "$@"; do
 	case $i in
@@ -18,10 +17,6 @@ for i in "$@"; do
 		BCM_SSH_HOSTNAME="${i#*=}"
 		shift # past argument=value
 		;;
-	--ssh-script=*)
-		BCM_SSH_SCRIPT="${i#*=}"
-		shift # past argument=value
-		;;
 	*)
 		# unknown option
 		;;
@@ -30,6 +25,16 @@ done
 
 if [[ -z $BCM_SSH_DIR ]]; then
 	echo "BCM_SSH_DIR is empty. Setting to $HOME/.ssh"
+	exit
+fi
+
+if [[ -z $BCM_SSH_HOSTNAME ]]; then
+	echo "BCM_SSH_HOSTNAME is empty."
+	exit
+fi
+
+if [[ -z $BCM_SSH_USERNAME ]]; then
+	echo "BCM_SSH_USERNAME is empty."
 	exit
 fi
 

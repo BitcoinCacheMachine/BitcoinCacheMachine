@@ -22,8 +22,7 @@ if [ ! -d "$BCM_DIR" ]; then
 	git config user.name "bcm"
 	git config user.email "bcm@$(hostname)"
 	touch debug.log
+	echo "Created $BCM_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." >"$BCM_DIR/debug.log"
 	git add "*"
 	git commit -m "Initialized git repo."
-
-	echo "Created $BCM_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." >"$BCM_DIR/debug.log"
 fi

@@ -7,15 +7,14 @@ echo "git entrypoint.sh"
 BCM_CLI_VERB=$2
 BCM_HELP_FLAG=0
 BCM_GIT_REPO_DIR=
-BCM_CERT_DIR=
 BCM_GIT_COMMIT_MESSAGE=
 BCM_GIT_CLIENT_USERNAME=
 BCM_GPG_SIGNING_KEY_ID=
 
 for i in "$@"; do
 	case $i in
-	--cert-dir=*)
-		BCM_CERT_DIR="${i#*=}"
+	--cert-dir*)
+		GNUPGHOME="${i#*=}"
 		shift # past argument=value
 		;;
 	--git-repo-dir=*)
@@ -44,11 +43,10 @@ for i in "$@"; do
 	esac
 done
 
-if [[ ! -d $BCM_CERT_DIR ]]; then
-	echo "BCM_CERT_DIR '$BCM_CERT_DIR' doesn't exist."
+if [[ ! -d $GNUPGHOME ]]; then
+	echo "GNUPGHOME '$GNUPGHOME' doesn't exist."
 	exit
 fi
-export BCM_CERT_DIR=$BCM_CERT_DIR
 
 if [[ ! -d $BCM_GIT_REPO_DIR ]]; then
 	echo "BCM_GIT_REPO_DIR '$BCM_GIT_REPO_DIR' doesn't exist."
@@ -90,7 +88,7 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
 	fi
 
 	if [[ $BCM_DEBUG == 1 ]]; then
-		echo "BCM_CERT_DIR: $BCM_CERT_DIR"
+		echo "GNUPGHOME: $GNUPGHOME"
 		echo "BCM_GIT_COMMIT_MESSAGE: $BCM_GIT_COMMIT_MESSAGE"
 		echo "BCM_GIT_REPO_DIR: $BCM_GIT_REPO_DIR"
 		echo "BCM_GIT_CLIENT_USERNAME: $BCM_GIT_CLIENT_USERNAME"
@@ -102,7 +100,7 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
 		# shellcheck disable=SC1090
 		source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 		docker run -d --name gitter \
-			-v $BCM_CERT_DIR:/root/.gnupg \
+			-v "$GNUPGHOME":/root/.gnupg \
 			-v $BCM_GIT_REPO_DIR:/gitrepo \
 			--device="$BCM_TREZOR_USB_PATH" \
 			-e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
@@ -116,14 +114,17 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
 
 	if docker ps | grep -q "gitter"; then
 		docker exec -it gitter /bcm/commit_sign_git_repo.sh
-		docker kill gitter >/dev/null
-		docker system prune -f >/dev/null
-	else
-		echo "Error. Docker container 'gitter' was not running."
 	fi
 
 elif [[ $BCM_CLI_VERB == "push" ]]; then
 	echo "git push TODO"
 else
 	cat ./git/help.txt
+fi
+
+if docker ps | grep -q "gitter"; then
+	docker kill gitter >/dev/null
+	docker system prune -f >/dev/null
+else
+	echo "Error. Docker container 'gitter' was not running."
 fi

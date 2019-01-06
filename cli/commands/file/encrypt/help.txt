@@ -2,7 +2,7 @@ Description:
   Use BCM trezor integration to encrypt a file using PGP.
 
 Usage:
-  bcm file encrypt --file-path=<BCM_FILE_PATH> -u=<BCM_CERT_DIR>
+  bcm file encrypt --file-path=<BCM_FILE_PATH> -u=<GNUPGHOME>
 
 Required Flags:
       -u (--user-name)          The username to be used on the certificate data, e.g., testing/stagging/production.

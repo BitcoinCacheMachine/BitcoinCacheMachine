@@ -62,10 +62,14 @@ if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
 
 	SSH_KEY_FILE="$BCM_ENDPOINT_DIR/id_rsa"
 
+	# this key is for temporary use and used only during initial provisioning.
 	ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_FILE" -N ""
 	chmod 400 "$SSH_KEY_FILE.pub"
-
 	ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+
+	# generate Trezor-backed SSH keys for interactively login.
+	bcm ssh newkey --ssh-hostname="$BCM_SSH_HOSTNAME" --ssh-username="$BCM_SSH_USERNAME"
+	ssh-copy-id -f -i "$BCM_SSH_DIR/$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 
 	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" ip link show
 

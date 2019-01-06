@@ -9,7 +9,7 @@ Usage:
 Options:
   --cert-name=<BCM_CERT_NAME>           Required. The name that will appear in the PGP certificate.
   --cert-username=<BCM_CERT_USERNAME>   Required. The username that will appear in the GPG certificate.
-  --cert-username=<BCM_CERT_FQDN>       Required. The FQDN that will appear in the GPG certificate.
-  --cert-dir=<BCM_CERT_DIR>             Optional. Directory where public key material will be emitted.
+  --cert-username=<BCM_CERT_HOSTNAME>       Required. The FQDN that will appear in the GPG certificate.
+  --cert-dir=<GNUPGHOME>             Optional. Directory where public key material will be emitted.
                                         The default directory is $BCM_RUNTIME_DIR/certs. Use this feature to create
                                         arbitrary Trezor-backed GPG certificates for your own purposes.

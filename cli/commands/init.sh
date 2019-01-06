@@ -3,36 +3,6 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC2153
-BCM_CERT_DIR="$BCM_CERTS_DIR"
-BCM_CERT_NAME=
-BCM_CERT_USERNAME=
-BCM_CERT_FQDN=
-
-for i in "$@"; do
-	case $i in
-	--cert-dir=*)
-		BCM_CERT_DIR="${i#*=}"
-		shift # past argument=value
-		;;
-	--cert-name=*)
-		BCM_CERT_NAME="${i#*=}"
-		shift # past argument=value
-		;;
-	--cert-username=*)
-		BCM_CERT_USERNAME="${i#*=}"
-		shift # past argument=value
-		;;
-	--cert-fqdn=*)
-		BCM_CERT_FQDN="${i#*=}"
-		shift # past argument=value
-		;;
-	*)
-		# unknown option
-		;;
-	esac
-done
-
 if [[ $BCM_HELP_FLAG == 1 ]]; then
 	cat ./init-help.txt
 	exit
@@ -48,19 +18,19 @@ if [[ -z $BCM_CERT_USERNAME ]]; then
 	exit
 fi
 
-if [[ -z $BCM_CERT_FQDN ]]; then
-	echo "BCM_CERT_FQDN not set."
+if [[ -z $BCM_CERT_HOSTNAME ]]; then
+	echo "BCM_CERT_HOSTNAME not set."
 	exit
 fi
 
 # shellcheck disable=SC2153
-bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_CERT_DIR"
+bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $GNUPGHOME"
 
 bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
-    --cert-dir='$BCM_CERT_DIR' \
+    --cert-dir='$GNUPGHOME' \
     --cert-name='$BCM_CERT_NAME' \
     --cert-username='$BCM_CERT_USERNAME' \
---cert-hostname='$BCM_CERT_FQDN'"
+--cert-hostname='$BCM_CERT_HOSTNAME'"
 
 # now let's initialize the password repository with the GPG key
 bash -c "$BCM_GIT_DIR/controller/gpg_pass_init.sh"

@@ -36,8 +36,8 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
 
 	# How we reference the password.
 	docker run -it --name pass --rm \
-		-v "$BCM_CERTS_DIR":/root/.gnupg \
-		-v "$BCM_PASSWORDS_DIR":/root/.password-store \
+		-v "$GNUPGHOME":/root/.gnupg \
+		-v "$PASSWORD_STORE_DIR":/root/.password-store \
 		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
 		--device="$BCM_TREZOR_USB_PATH" \
 		bcm-trezor:latest bash -c "pass generate $BCM_PASS_NAME 32 >>/dev/null"
@@ -52,31 +52,32 @@ elif [[ $BCM_CLI_VERB == "get" ]]; then
 
 	# How we reference the password.
 	docker run -it --name pass --rm \
-		-v "$BCM_CERTS_DIR":/root/.gnupg \
-		-v "$BCM_PASSWORDS_DIR":/root/.password-store \
-		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e DISPLAY=1 \
+		-v "$GNUPGHOME":/root/.gnupg \
+		-v "$PASSWORD_STORE_DIR":/root/.password-store \
 		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
 		--device="$BCM_TREZOR_USB_PATH" \
 		bcm-trezor:latest pass "$BCM_PASS_NAME"
 elif [[ $BCM_CLI_VERB == "list" ]]; then
 	# How we reference the password.
 	docker run -it --name pass --rm \
-		-v "$BCM_CERTS_DIR":/root/.gnupg \
-		-v "$BCM_PASSWORDS_DIR":/root/.password-store \
-		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e DISPLAY=1 \
-		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
+		-v "$GNUPGHOME":/root/.gnupg \
+		-v "$PASSWORD_STORE_DIR":/root/.password-store \
 		--device="$BCM_TREZOR_USB_PATH" \
-		bcm-trezor:latest pass
+		bcm-trezor:latest pass ls
 elif [[ $BCM_CLI_VERB == "rm" ]]; then
 	# How we reference the password.
 	docker run -it --name pass --rm \
-		-v "$BCM_CERTS_DIR":/root/.gnupg \
-		-v "$BCM_PASSWORDS_DIR":/root/.password-store \
-		-v /tmp/.X11-unix:/tmp/.X11-unix \
-		-e DISPLAY=1 \
+		-v "$GNUPGHOME":/root/.gnupg \
+		-v "$PASSWORD_STORE_DIR":/root/.password-store \
 		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
 		--device="$BCM_TREZOR_USB_PATH" \
 		bcm-trezor:latest pass rm "$BCM_PASS_NAME"
+elif [[ $BCM_CLI_VERB == "insert" ]]; then
+	# How we reference the password.
+	docker run -it --name pass --rm \
+		-v "$GNUPGHOME":/root/.gnupg \
+		-v "$PASSWORD_STORE_DIR":/root/.password-store \
+		-e BCM_PASS_NAME="$BCM_PASS_NAME" \
+		--device="$BCM_TREZOR_USB_PATH" \
+		bcm-trezor:latest pass insert "$BCM_PASS_NAME"
 fi

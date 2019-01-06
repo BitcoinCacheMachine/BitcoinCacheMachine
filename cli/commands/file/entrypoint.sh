@@ -4,17 +4,12 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_FILE_PATH=
-BCM_CERT_DIR=
 BCM_HELP_FLAG=0
 
 for i in "$@"; do
 	case $i in
 	--file-path=*)
 		BCM_FILE_PATH="${i#*=}"
-		shift # past argument=value
-		;;
-	--cert-dir=*)
-		BCM_CERT_DIR="${i#*=}"
 		shift # past argument=value
 		;;
 	--help)
@@ -45,13 +40,13 @@ if [[ ! -f $BCM_FILE_PATH ]]; then
 fi
 
 if [[ -z $BCM_FILE_PATH ]]; then
-	echo "BCM_CERT_DIR not set."
+	echo "BCM_FILE_PATH not set."
 	cat ./help.txt
 	exit
 fi
 
-if [[ ! -d $BCM_CERT_DIR ]]; then
-	echo "$BCM_CERT_DIR doesn't exist. Exiting."
+if [[ ! -d $GNUPGHOME ]]; then
+	echo "$GNUPGHOME doesn't exist. Exiting."
 	cat ./help.txt
 	exit
 fi

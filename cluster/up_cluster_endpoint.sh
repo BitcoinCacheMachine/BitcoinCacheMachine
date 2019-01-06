@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
@@ -37,7 +37,6 @@ for i in "$@"; do
 	esac
 done
 
-echo "up_cluster_endpoint.sh"
 echo "IS_MASTER: $IS_MASTER"
 echo "BCM_CLUSTER_ENDPOINT_NAME: $BCM_CLUSTER_ENDPOINT_NAME"
 echo "BCM_PROVIDER_NAME: $BCM_PROVIDER_NAME"

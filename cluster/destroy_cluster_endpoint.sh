@@ -29,7 +29,7 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
 fi
 
 # Ensure the endpoint name is in our env.
-if env | grep -q "$BCM_ENDPOINT_NAME"; then
+if [[ -e $BCM_ENDPOINT_NAME ]]; then
 	echo "BCM_ENDPOINT_NAME variable not set."
 	exit
 fi
