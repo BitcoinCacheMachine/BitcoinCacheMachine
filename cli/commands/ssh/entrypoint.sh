@@ -3,18 +3,31 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# BCM_CLI_VERB=$2
+VALUE=${2:-}
+if [ ! -z ${VALUE} ]; then
+	BCM_CLI_VERB="$2"
+else
+	echo "Please provide a SSH command."
+	cat ./help.txt
+	exit
+fi
+
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
+BCM_SSH_PUSH=0
 
 for i in "$@"; do
 	case $i in
-	--ssh-username=*)
+	--username=*)
 		BCM_SSH_USERNAME="${i#*=}"
 		shift # past argument=value
 		;;
-	--ssh-hostname=*)
+	--hostname=*)
 		BCM_SSH_HOSTNAME="${i#*=}"
+		shift # past argument=value
+		;;
+	--push)
+		BCM_SSH_PUSH=1
 		shift # past argument=value
 		;;
 	*)
@@ -28,22 +41,18 @@ if [[ -z $BCM_SSH_DIR ]]; then
 	exit
 fi
 
-if [[ -z $BCM_SSH_HOSTNAME ]]; then
-	echo "BCM_SSH_HOSTNAME is empty."
-	exit
-fi
-
-if [[ -z $BCM_SSH_USERNAME ]]; then
-	echo "BCM_SSH_USERNAME is empty."
-	exit
-fi
-
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
-echo "BCM_TREZOR_USB_PATH: $BCM_TREZOR_USB_PATH"
-echo "BCM_SSH_DIR: $BCM_SSH_DIR"
-echo "BCM_SSH_USERNAME: $BCM_SSH_USERNAME"
-echo "BCM_SSH_HOSTNAME: $BCM_SSH_HOSTNAME"
+
+USER_HOSTNAME=${3:-}
+if [ ! -z ${USER_HOSTNAME} ]; then
+	BCM_SSH_USERNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f1)
+	BCM_SSH_HOSTNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f2)
+else
+	echo "Provide the username & hostname:  user@host"
+	cat ./help.txt
+	exit
+fi
 
 export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
 export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
@@ -51,6 +60,19 @@ export BCM_SSH_DIR="$BCM_SSH_DIR"
 
 if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 	if [[ $BCM_CLI_VERB == "newkey" ]]; then
+
+		if [[ -z $BCM_SSH_HOSTNAME ]]; then
+			echo "BCM_SSH_HOSTNAME is empty."
+			cat ./newkey/help.txt
+			exit
+		fi
+
+		if [[ -z $BCM_SSH_USERNAME ]]; then
+			echo "BCM_SSH_USERNAME is empty."
+			cat ./newkey/help.txt
+			exit
+		fi
+
 		docker run -t --rm \
 			-v "$BCM_SSH_DIR":/root/.ssh \
 			-e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
@@ -61,10 +83,27 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 		PUB_KEY="$BCM_SSH_DIR/$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub"
 		if [[ -f "$PUB_KEY" ]]; then
 			echo "Congratulations! Your new SSH public key can be found at '$PUB_KEY'"
+
+			# Push to desintion if specified.
+			if [[ $BCM_SSH_PUSH == 1 ]]; then
+				ssh-copy-id -f -i "$PUB_KEY" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+			fi
 		else
 			echo "ERROR: SSH Key did not generate successfully!"
 		fi
 	elif [[ $BCM_CLI_VERB == "connect" ]]; then
+		if [[ -z $BCM_SSH_HOSTNAME ]]; then
+			echo "BCM_SSH_HOSTNAME is empty."
+			cat ./newkey/help.txt
+			exit
+		fi
+
+		if [[ -z $BCM_SSH_USERNAME ]]; then
+			echo "BCM_SSH_USERNAME is empty."
+			cat ./newkey/help.txt
+			exit
+		fi
+
 		docker run -it --rm --add-host="$BCM_SSH_HOSTNAME:$(dig +short "$BCM_SSH_HOSTNAME")" \
 			-v "$BCM_SSH_DIR":/root/.ssh \
 			-e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \

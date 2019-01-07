@@ -4,10 +4,8 @@ Description:
   command.
 
 Usage:
-  bcm ssh connect --ssh-username=<BCM_SSH_USERNAME> \
-                  --ssh-hostname=<BCM_SSH_HOSTNAME>
+  bcm ssh connect --username=<BCM_SSH_USERNAME> --hostname=<BCM_SSH_HOSTNAME>
 
 Required Parameters:
-  --ssh-username=<BCM_SSH_USERNAME>  Required. The username to use in the SSH key.
-  
-  --ssh-hostname=<BCM_SSH_HOSTNAME>  Required. The hostname or domain name of the SSH key.
+  --username=<BCM_SSH_USERNAME>  Required. The username to use in the SSH key.
+  --hostname=<BCM_SSH_HOSTNAME>  Required. The hostname or domain name of the SSH key.

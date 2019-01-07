@@ -3,7 +3,15 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-BCM_CLI_VERB=$2
+VALUE=${2:-}
+if [ ! -z ${VALUE} ]; then
+	BCM_CLI_VERB="$2"
+else
+	echo "Please provide a project command."
+	cat ./help.txt
+	exit
+fi
+
 BCM_PROJECT_NAME=
 BCM_CLUSTER_NAME=
 BCM_DEPLOYMENTS_FLAG=0

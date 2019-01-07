@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeo pipefail
+set -o nounset
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1090
@@ -9,8 +9,13 @@ source "$BCM_GIT_DIR/.env"
 BCM_CLI_VERB=
 BCM_PASS_NAME=
 
-if [[ ! -z $2 ]]; then
-	BCM_CLI_VERB=$2
+VALUE=${2:-}
+if [ ! -z ${VALUE} ]; then
+	BCM_CLI_VERB="$2"
+else
+	echo "Please provide a password operation."
+	cat ./help.txt
+	exit
 fi
 
 for i in "$@"; do
@@ -58,6 +63,8 @@ elif [[ $BCM_CLI_VERB == "get" ]]; then
 		--device="$BCM_TREZOR_USB_PATH" \
 		bcm-trezor:latest pass "$BCM_PASS_NAME"
 elif [[ $BCM_CLI_VERB == "list" ]]; then
+	echo "GNUPGHOME: $GNUPGHOME"
+	echo "PASSWORD_STORE_DIR: $PASSWORD_STORE_DIR"
 	# How we reference the password.
 	docker run -it --name pass --rm \
 		-v "$GNUPGHOME":/root/.gnupg \

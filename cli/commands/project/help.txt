@@ -4,7 +4,7 @@ Description:
 Usage:
   bcm project [command]
 
-Available Commands:
+Commands:
   create        Create BCM project.
   destroy       Destroy BCM project (deletes $BCM_RUNTIME_DIR/projects/<projectname>).
   list          List all bcm projects.

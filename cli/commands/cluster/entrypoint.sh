@@ -1,14 +1,19 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -o nounset
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
-if [[ -z $2 ]]; then
-	BCM_HELP_FLAG=1
+
+VALUE=${2:-}
+if [ ! -z ${VALUE} ]; then
+	BCM_CLI_VERB="$2"
+else
+	echo "Please provide a cluster command."
+	cat ./help.txt
+	exit
 fi
 
-BCM_CLI_VERB=$2
 BCM_CLUSTER_NAME=
 BCM_PROVIDER_NAME=
 BCM_NODE_COUNT=

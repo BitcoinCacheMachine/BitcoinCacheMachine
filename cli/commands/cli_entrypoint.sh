@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#
 cd "$(dirname "$0")"
 
 export BCM_CLI_COMMAND=$1
@@ -68,7 +68,7 @@ elif [[ $BCM_CLI_COMMAND == "pass" ]]; then
 elif [[ $BCM_CLI_COMMAND == "info" ]]; then
 	./info.sh "$@"
 elif [[ $BCM_CLI_COMMAND == "show" ]]; then
-	bash -c "$BCM_GIT_DIR/project/show_lxd.sh"
+	./show.sh
 else
 	cat ./help.txt
 fi

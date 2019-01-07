@@ -2,15 +2,13 @@ Description:
   Generate a new SSH username@hostname keypair backed by your Trezor.
 
 Usage:
-  bcm ssh newkey --ssh-username=<BCM_SSH_USERNAME> \
-                 --ssh-hostname=<BCM_SSH_HOSTNAME> \
-                 --ssh-key-dir=<BCM_SSH_KEY_DIR>
+  bcm ssh newkey --username=<BCM_SSH_USERNAME> --hostname=<BCM_SSH_HOSTNAME> --push
 
 Required Parameters:
-  --ssh-username=<BCM_SSH_USERNAME>   The username to use in the SSH username/hostname identifier.
+  --username   The username to use in the SSH username/hostname identifier.
 
-  --ssh-hostname=<BCM_SSH_HOSTNAME>   The fully qualified DNS-resolveable name of the host the key is meant for.
+  --hostname   The fully qualified DNS-resolveable name of the host the key is meant for.
                                       (A UNIQUE SSH key MUST be generated for each username/hostname pair)
 
-  --ssh-key-dir=<BCM_SSH_KEY_DIR>     The directory on the host that will store the resulting public portion of 
-                                      your new SSH key (aka, .pub). Optional. Defaults to $HOME/.ssh
+Optional:
+  --push           If specified, the new SSH public key will be pushed to the destination via 'ssh-copy-id'.
