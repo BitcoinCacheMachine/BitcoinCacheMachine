@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then
@@ -33,7 +33,7 @@ bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
 --cert-hostname='$BCM_CERT_HOSTNAME'"
 
 # now let's initialize the password repository with the GPG key
-bash -c "$BCM_GIT_DIR/controller/gpg_pass_init.sh"
+bcm pass init --cert-name="$BCM_CERT_NAME" --cert-username="$BCM_CERT_USERNAME" --cert-hostname="$BCM_CERT_HOSTNAME"
 
 # ok great, now we have it initialized. Let's create a new GPG-encrypted password
 # file for the encfs mount on our controller machine. This allows us to encrypt the
@@ -53,4 +53,4 @@ echo "Created $BCM_RUNTIME_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." >"$BCM_R
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_PROJECTS_DIR"
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_CLUSTERS_DIR"
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_DEPLOYMENTS_DIR"
-bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $BCM_SSH_DIR"
+bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $SSH_DIR"

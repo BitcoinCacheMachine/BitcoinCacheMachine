@@ -84,4 +84,9 @@ bash -c "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh"
 
 sudo apt-get install -y wait-for-it
 
+# let's ensure directories exist for bcm cli commands OUTSIDE of ~/.bcm
+mkdir -p "$HOME/.gnupg"
+mkdir -p "$HOME/.password_store"
+mkdir -p "$HOME/.ssh"
+
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Open a new terminal then type 'bcm --help'."

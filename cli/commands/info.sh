@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "GNUPGHOME: $GNUPGHOME"
+echo "PASSWORD_STORE_DIR: $PASSWORD_STORE_DIR"
+echo "SSH_DIR: $SSH_DIR"
+echo "BCM_ACTIVE: $BCM_ACTIVE"
+echo ""

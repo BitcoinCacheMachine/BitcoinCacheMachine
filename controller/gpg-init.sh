@@ -42,12 +42,13 @@ echo "BCM_CERT_HOSTNAME: $BCM_CERT_HOSTNAME"
 
 # get the locatio of the trezor
 source ./export_usb_path.sh
-BCM_TREZOR_USB_PATH="$(echo $BCM_TREZOR_USB_PATH | xargs)"
-BCM_CERT_NAME="$(echo $BCM_CERT_NAME | xargs)"
-BCM_CERT_HOSTNAME="$(echo $BCM_CERT_HOSTNAME | xargs)"
+BCM_TREZOR_USB_PATH="$(echo "$BCM_TREZOR_USB_PATH" | xargs)"
+BCM_CERT_NAME="$(echo "$BCM_CERT_NAME" | xargs)"
+BCM_CERT_HOSTNAME="$(echo "$BCM_CERT_HOSTNAME" | xargs)"
 
 if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 	# run the container.
+	echo "!!!!!!!!!!!!!!NUPGHOME: $GNUPGHOME"
 	docker run -it --name trezorgpg --rm \
 		-v "$GNUPGHOME":/root/.gnupg \
 		-e BCM_CERT_NAME="$BCM_CERT_NAME" \

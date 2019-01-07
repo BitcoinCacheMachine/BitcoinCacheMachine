@@ -68,10 +68,10 @@ if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
 	ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 
 	# generate Trezor-backed SSH keys for interactively login.
-	bcm ssh newkey --hostname="$BCM_SSH_HOSTNAME" --username="$BCM_SSH_USERNAME"
-	ssh-copy-id -f -i "$BCM_SSH_DIR/$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+	SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"
+	bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push
 
-	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" ip link show
+	ssh -i "$SSH_KEY_FILE" -t "$SSH_IDENTITY" ip link show
 
 	# TODO Do some error checking on network interface selection.
 	read -rp "Enter the name of the physical network interface you want to use for the data path:  " BCM_LXD_PHYSICAL_INTERFACE
