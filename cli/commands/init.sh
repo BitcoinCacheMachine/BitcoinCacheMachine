@@ -27,13 +27,13 @@ fi
 bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $GNUPGHOME"
 
 bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
-    --cert-dir='$GNUPGHOME' \
-    --cert-name='$BCM_CERT_NAME' \
-    --cert-username='$BCM_CERT_USERNAME' \
---cert-hostname='$BCM_CERT_HOSTNAME'"
+    --dir='$GNUPGHOME' \
+    --name='$BCM_CERT_NAME' \
+    --username='$BCM_CERT_USERNAME' \
+--hostname='$BCM_CERT_HOSTNAME'"
 
 # now let's initialize the password repository with the GPG key
-bcm pass init --cert-name="$BCM_CERT_NAME" --cert-username="$BCM_CERT_USERNAME" --cert-hostname="$BCM_CERT_HOSTNAME"
+bcm pass init --name="$BCM_CERT_NAME" --username="$BCM_CERT_USERNAME" --hostname="$BCM_CERT_HOSTNAME"
 
 # ok great, now we have it initialized. Let's create a new GPG-encrypted password
 # file for the encfs mount on our controller machine. This allows us to encrypt the

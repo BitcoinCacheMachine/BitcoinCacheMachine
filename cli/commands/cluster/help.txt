@@ -1,10 +1,8 @@
 Description:
-  Manage BCM clusters. BCM components are deployed to one or more clusters. You can 
-  have one or more physical machines or virtual machines be a member of the cluster. 
-  These machine collectively represent CPU, memory, and disk space that is available to 
-  software-defined BCM components. Each member of any particular cluster SHOULD be
-  connected via high-speed LAN and have direct IP reachability. Deploy and remotely 
-  management multiple clusters.
+  Create and manage clusters (i.e., LXD cluster). A cluster is a collection of one or 
+  more LXD endpoints all connected to a private networking environment that is low latency 
+  and high bandwidth, such as a home or office LAN. BCM components (app containers like bitcoind) 
+  are deployed to BCM-managed clusters.
 
 Usage:
   bcm cluster [command]

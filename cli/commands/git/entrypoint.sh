@@ -20,7 +20,7 @@ BCM_GPG_SIGNING_KEY_ID=
 
 for i in "$@"; do
 	case $i in
-	--cert-dir*)
+	--dir*)
 		GNUPGHOME="${i#*=}"
 		shift # past argument=value
 		;;

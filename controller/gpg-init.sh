@@ -10,19 +10,19 @@ BCM_CERT_HOSTNAME=
 
 for i in "$@"; do
 	case $i in
-	--cert-dir=*)
+	--dir=*)
 		GNUPGHOME="${i#*=}"
 		shift # past argument=value
 		;;
-	--cert-name=*)
+	--name=*)
 		BCM_CERT_NAME="${i#*=}"
 		shift # past argument=value
 		;;
-	--cert-username=*)
+	--username=*)
 		BCM_CERT_USERNAME="${i#*=}"
 		shift # past argument=value
 		;;
-	--cert-hostname=*)
+	--hostname=*)
 		BCM_CERT_HOSTNAME="${i#*=}"
 		shift # past argument=value
 		;;

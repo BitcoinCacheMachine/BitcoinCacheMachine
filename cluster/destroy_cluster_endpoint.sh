@@ -67,7 +67,7 @@ else
 		rm -rf "$BCM_ENDPOINT_DIR"
 	fi
 
-	if lxc storage list | grep -q "bcm_btrfs"; then
-		lxc storage delete bcm_btrfs
-	fi
+	# if lxc storage list | grep -q "bcm_btrfs"; then
+	# 	lxc storage delete bcm_btrfs
+	# fi
 fi

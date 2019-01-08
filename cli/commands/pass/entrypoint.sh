@@ -13,7 +13,6 @@ VALUE=${2:-}
 if [ ! -z "${VALUE}" ]; then
 	BCM_CLI_VERB="$2"
 else
-	echo "Provider a password operation."
 	cat ./help.txt
 	exit
 fi
@@ -57,7 +56,7 @@ elif [[ $BCM_CLI_VERB == "init" ]]; then
 
 	# let's call bcm pass init to initialze the password store using our
 	# recently generated trezor-backed GPG certificates.
-	#shellcheck disable=SC1091
+	# shellcheck disable=SC1090
 	source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 
 	# initialize the password store
@@ -68,6 +67,7 @@ elif [[ $BCM_CLI_VERB == "init" ]]; then
 		exit
 	fi
 
+	# shellcheck disable=SC1090
 	source "$GNUPGHOME/.env"
 
 	if [[ ! -d "$PASSWORD_STORE_DIR/.git" ]]; then

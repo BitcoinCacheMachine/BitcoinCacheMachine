@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# this is the entrypoint into the 'bcm' CLI.
+
 set -e
 cd "$(dirname "$0")"
 
@@ -11,7 +13,13 @@ if [[ -z $BCM_DEBUG ]]; then
 fi
 
 if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
-	bash -c "$BCM_GIT_DIR/controller/build.sh"
+	CHOICE=
+	read -rp "The BCM docker image for the SDN Controller is unavailable. Would you like to build it now (n/y): " CHOICE
+	if [[ $CHOICE == "y" ]]; then
+		bash -c "$BCM_GIT_DIR/controller/build.sh"
+	else
+		exit
+	fi
 fi
 
 ./commands/cli_entrypoint.sh "$@"

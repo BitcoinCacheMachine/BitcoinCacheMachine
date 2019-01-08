@@ -10,10 +10,6 @@ RUN apt-get install -y python3-pip python3-dev python3-tk libusb-1.0-0-dev libud
 RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 
 # RUN pip3 install --upgrade setuptools
-# RUN apt-get install -y python3-dev python3-pip cython3 libusb-1.0-0-dev libudev-dev
-# RUN pip3 install trezor_agent[hidapi]
-
-# RUN pip3 install --upgrade setuptools
 # RUN pip3 install trezor
 # 2. Install the TREZOR agent
 RUN pip3 install Cython hidapi

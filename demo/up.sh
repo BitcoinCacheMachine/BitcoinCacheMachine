@@ -21,9 +21,9 @@ source "$BCM_GIT_DIR/.env"
 
 # run bcm init
 bcm init \
-	--cert-name="BCM" \
-	--cert-username="$BCM_CERT_USERNAME" \
-	--cert-fqdn="$BCM_CERT_HOSTNAME"
+	--name="BCM" \
+	--username="$BCM_CERT_USERNAME" \
+	--hostname="$BCM_CERT_HOSTNAME"
 
 # ## Create a basic project definition.
 bcm project create --project-name="$BCM_PROJECT_NAME"
