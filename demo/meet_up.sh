@@ -9,17 +9,17 @@ source ./meetup.env
 
 # run bcm init
 bcm init --name="BCM" \
-	--username="$BCM_CERT_USERNAME" \
-	--hostname="$BCM_CERT_HOSTNAME"
+--username="$BCM_CERT_USERNAME" \
+--hostname="$BCM_CERT_HOSTNAME"
 
 # Create a basic project definition.
 bcm project create --project-name="$BCM_PROJECT_NAME"
 
 # new cluster based on existing SSH endpoint.
-bcm cluster create --cluster-name=meetup --provider=ssh --hostname=lexx
+bcm cluster create --cluster-name=meetup --provider=ssh --ssh-hostname="$BCM_CLUSTER_SSH_ENDPOINT_NAME"
 
 # then deploy that project definition to an existing cluster.
 bcm project deploy \
-	--project-name="$BCM_PROJECT_NAME" \
-	--cluster-name="$BCM_CLUSTER_NAME" \
-	--user-name="$BCM_PROJECT_USERNAME"
+--project-name="$BCM_PROJECT_NAME" \
+--cluster-name="$BCM_CLUSTER_NAME" \
+--user-name="$BCM_PROJECT_USERNAME"

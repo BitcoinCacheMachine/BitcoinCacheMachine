@@ -11,4 +11,4 @@ Required Parameters:
                (A UNIQUE SSH key MUST be generated for each username/hostname pair)
 
 Optional:
-  --push           If specified, the new SSH public key will be pushed to the destination via 'ssh-copy-id'.
+  --push        If specified, the new SSH public key will be pushed to the destination via                       torified ssh-copy-id.

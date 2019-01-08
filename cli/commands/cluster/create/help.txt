@@ -12,11 +12,10 @@ Example:
 
 Parameters:
   --cluster-name=         The name of the new cluster. $BCM_RUNTIME_DIR/clusters/<BCM_CLUSTER_NAME> will 
-  <BCM_CLUSTER_NAME>      be populated after successful cluster creation.
-                          --cluster-name=<BCM_CLUSTER_NAME>
+                          be populated after successful cluster creation.
     
   --provider=             The provider is the mechanism by which an LXD instance will be made
-  <BCM_PROVIDER>          available. Valid option as are 'local', 'ssh', and multipass.
+                          available. Valid option as are 'local', 'ssh', and multipass.
                           
                           'local' installs LXD locally using snap and is recommended for testing 
                           and development. 
@@ -27,14 +26,5 @@ Parameters:
                           VMs on your local computer. Each VM will be cloud-init provisioned into a 
                           cluster configuration.
 
-  --node-count=           Cluster count. Number of equal-size multipass VMs you want deployed. Only
-  <BCM_NODE_COUNT>        relevant when --provider=multipass.
-
-# TODO
-#  --onion-ssh             If this flag is set, a onion service will be created that exposes the 
-#                          endpoint's SSH service as an authenticated onion service allowing your to 
-#                          remotely administer your endpoint.
-#
-#  --onion-lxd             If this flag is set, a onion service will be created that exposes the 
-#                          LXD daemon TLS endpoint as an authenticated onion service allowing your to 
-#                          remotely administer your BCM data center.
+  --node-count=           Cluster node (lxd endpoint) count. Number of equal-size multipass VMs you 
+                          want deployed. Only relevant when --provider=multipass.
