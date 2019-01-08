@@ -1,15 +1,15 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
 source ./meetup.env
 
-#bcm project undeploy --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --force || true
+bcm project undeploy --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --force || true
 
-#bcm cluster destroy --cluster-name="$BCM_CLUSTER_NAME"
+bcm cluster destroy --cluster-name="$BCM_CLUSTER_NAME"
 
 if [[ -d "$BCM_UNENCRYPTED_VIEW_DIR" ]]; then
 	fusermount -u -q "$BCM_UNENCRYPTED_VIEW_DIR" || true

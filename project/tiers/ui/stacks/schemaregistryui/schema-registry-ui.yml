@@ -2,7 +2,7 @@ version: '3.6'
 services:
   # container listens on 8000
   schema-registry-ui:
-    image: ${DOCKER_IMAGE}
+    image: ${BCM_IMAGE_NAME}
     ports:
       - "${BCM_SERVICE_PORT}:8000"
     networks:
@@ -20,4 +20,4 @@ services:
 networks:
   schemaregistrynet:
     external: true
-    name: kafkaschemaregistry_schemaregistrynet
+    name: kafkaschemareg_schemaregistrynet

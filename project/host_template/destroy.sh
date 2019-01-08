@@ -9,6 +9,8 @@ source "$BCM_GIT_DIR/.env"
 # delete dockertemplate
 if lxc list | grep -q "bcm-host-template"; then
 	echo "Deleting dockertemplate lxd host."
+
+	lxc stop bcm-host-template
 	lxc delete bcm-host-template
 fi
 

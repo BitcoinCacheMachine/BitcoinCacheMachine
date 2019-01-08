@@ -37,4 +37,4 @@ networks:
 
   schemaregistrynet:
     external: true
-    name: schemareg_schemaregistrynet
+    name: kafkaschemareg_schemaregistrynet

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ox nounset
+set -o nounset
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1090
@@ -10,7 +10,7 @@ BCM_CLI_VERB=
 BCM_PASS_NAME=
 
 VALUE=${2:-}
-if [ ! -z ${VALUE} ]; then
+if [ ! -z "${VALUE}" ]; then
 	BCM_CLI_VERB="$2"
 else
 	echo "Provider a password operation."

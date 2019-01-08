@@ -7,8 +7,5 @@ cd "$(dirname "$0")"
 source ./.env
 
 if [[ $BCM_DEPLOY_BITCOIND == 1 ]]; then
-	# shellcheck disable=1091
-	source ./stacks/bitcoind/.env
-	bash -c "$BCM_GIT_DIR/project/shared/remove_docker_stack.sh --stack-name=$BCM_STACK_NAME"
-	BCM_STACK_NAME=
+	bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(readlink -f ./stacks/bitcoind/.env)"
 fi

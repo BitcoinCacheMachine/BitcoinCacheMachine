@@ -10,18 +10,8 @@ source "$BCM_GIT_DIR/.env"
 lxc exec "$BCM_BCMNETINST_RSYNC_BUILDER_NAME" -- docker build -t bcm-rsync:latest /apps/rsyncd
 lxc exec "$BCM_BCMNETINST_RSYNC_BUILDER_NAME" -- docker push bcm-rsync:latest
 
-# lxc delete --force $BCM_BCMNETINST_RSYNC_BUILDER_NAME
-# lxc storage delete $BCM_BCMNETINST_RSYNC_BUILDER_NAME-dockervol
-
-
-
-
-
 # let's get a fresh LXC host that's configured to push/pull to gateway registreis
 #bash -c "$BCM_GIT_DIR/project/bcmnet/delete_instance.sh bcm-rsync-builder"
-
-
-
 
 # if [[ ! -f $BCM_RUNTIME_DIR/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key.pub ]]; then
 #     echo "Generating SSH keys for rsync authentication. Storing at $BCM_RUNTIME_DIR/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key.pub"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # This script is written for demo purposes.
@@ -8,8 +8,7 @@ source "$BCM_GIT_DIR/.env"
 source ./meetup.env
 
 # run bcm init
-bcm init \
-	--cert-name="BCM" \
+bcm init --cert-name="BCM" \
 	--cert-username="$BCM_CERT_USERNAME" \
 	--cert-fqdn="$BCM_CERT_HOSTNAME"
 

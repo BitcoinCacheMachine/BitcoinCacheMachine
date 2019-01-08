@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1090
@@ -40,3 +40,5 @@ PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
 if lxc profile list | grep -q "$PROFILE_NAME"; then
 	lxc profile delete "$PROFILE_NAME"
 fi
+
+lxc exec bcm-gateway-01 -- rm -Rf "/root/stacks/$BCM_TIER_NAME"

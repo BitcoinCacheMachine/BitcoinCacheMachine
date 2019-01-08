@@ -94,9 +94,10 @@ if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
 
 	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" mkdir -p "$REMOTE_MOUNTPOINT"
 	scp -i "$SSH_KEY_FILE" "$BCM_ENDPOINT_DIR/lxd_preseed.yml" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
+	scp -i "$SSH_KEY_FILE" "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/provision.sh"
 
 	# run the snap_install script on the remote host.
-	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "sudo eval $(cat "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh")"
+	ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- sudo bash -c "$REMOTE_MOUNTPOINT/provision.sh"
 fi
 
 # if it's the cluster master add the LXC remote so we can manage it.

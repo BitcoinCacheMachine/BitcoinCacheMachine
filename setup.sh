@@ -3,23 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-BCM_RUNTIME_DIR=
-
-for i in "$@"; do
-	case $i in
-	--runtime-dir=*)
-		BCM_RUNTIME_DIR="${i#*=}"
-		shift # past argument=value
-		;;
-	*)
-		# unknown option
-		;;
-	esac
-done
-
-if [[ -z $BCM_RUNTIME_DIR ]]; then
-	BCM_RUNTIME_DIR="$HOME/.bcm"
-fi
+# shellcheck disable=SC1091
+source ./.env
 
 # let's set the local git client user and email settings to prevent error messages.
 if [[ -z $(git config --get --global user.name) ]]; then
@@ -58,10 +43,9 @@ else
 	{
 		echo "$BCM_BASHRC_START_FLAG"
 		echo "export BCM_GIT_DIR=$BCM_GIT_DIR"
-		echo "export BCM_RUNTIME_DIR=$BCM_RUNTIME_DIR"
-
 		# shellcheck disable=SC2016
 		echo "export PATH="'$PATH:'""'$BCM_GIT_DIR/cli'""
+		echo "export BCM_ACTIVE=1"
 		echo "$BCM_BASHRC_END_FLAG"
 	} >>"$BASHRC_FILE"
 fi

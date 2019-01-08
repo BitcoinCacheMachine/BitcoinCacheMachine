@@ -34,8 +34,10 @@ RUN mkdir "$BITCOIN_DATA" \
 	&& chown -h bitcoin:bitcoin /home/bitcoin/.bitcoin
 VOLUME /data
 
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
+
+WORKDIR /root/.bitcoin
 
 EXPOSE 8332 8333 18332 18333 18443 18444
 CMD ["bitcoind"]

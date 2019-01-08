@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
@@ -53,7 +53,7 @@ for endpoint in $(bcm cluster list --endpoints); do
 	if [[ $BCM_TIER_TYPE == 2 ]]; then
 		# if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
 		# shellcheck disable=1090
-		source "$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME/endpoints/$endpoint/.env"
+		source "$BCM_CLUSTERS_DIR/$(lxc remote get-default)/endpoints/$endpoint/.env"
 		lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$BCM_LXD_PHYSICAL_INTERFACE"
 	fi
 

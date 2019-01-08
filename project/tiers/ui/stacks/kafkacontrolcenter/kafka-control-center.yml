@@ -3,7 +3,7 @@ services:
 
   #listens on 9021
   control-center:
-    image: ${DOCKER_IMAGE}
+    image: ${BCM_IMAGE_NAME}
     ports:
       - "${BCM_SERVICE_PORT}:9021"
     networks:

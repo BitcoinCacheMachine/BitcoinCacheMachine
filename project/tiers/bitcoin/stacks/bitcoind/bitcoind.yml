@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   bitcoind:
-    image: ${DOCKER_IMAGE}
+    image: ${BCM_IMAGE_NAME}
     hostname: bitcoind
     volumes:
       - bitcoin_data:/bitcoindata
