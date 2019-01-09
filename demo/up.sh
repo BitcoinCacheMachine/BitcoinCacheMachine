@@ -9,14 +9,6 @@ cd "$(dirname "$0")"
 # Second, a new BCM project is defined. The first and second steps require
 # Trezor.
 
-# Next, a 3 node cluster is created using multipass. Running BCM using multipass
-# is for development and DOES NOT PROVIDE fault tolerance.
-# Next, a default project created with 'bcm project create'.
-# Finally, we deploy the project definition to the cluster we created.
-
-# let's get our default environment variables.
-# shellcheck disable=SC1090
-
 source "$BCM_GIT_DIR/.env"
 
 # run bcm init
@@ -32,6 +24,9 @@ bcm project create --project-name="$BCM_PROJECT_NAME"
 bcm cluster create \
 	--cluster-name="$BCM_CLUSTER_NAME" \
 	--provider="local"
+
+bcm cluster create --cluster-name=meetup \
+	--provider=local
 
 # then deploy that project definition to an existing cluster.
 bcm project deploy \

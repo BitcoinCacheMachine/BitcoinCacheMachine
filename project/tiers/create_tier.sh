@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
@@ -19,6 +19,8 @@ for i in "$@"; do
 		;;
 	esac
 done
+
+export BCM_TIER_NAME="$BCM_TIER_NAME"
 
 # first, create the profile that represents the tier.
 bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$BCM_TIER_NAME --yaml-path=$(readlink -f ./$BCM_TIER_NAME/tier_profile.yml)"

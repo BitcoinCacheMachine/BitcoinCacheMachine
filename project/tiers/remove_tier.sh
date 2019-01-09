@@ -25,6 +25,8 @@ if [[ -z $BCM_TIER_NAME ]]; then
 	exit
 fi
 
+export "BCM_TIER_NAME=$BCM_TIER_NAME"
+
 bash -c "./$BCM_TIER_NAME/destroy.sh"
 
 # iterate over endpoints and delete actual LXC hosts.

@@ -7,7 +7,7 @@ sudo apt-get autoremove -y
 
 # remove any legacy lxd software and install install lxd via snap
 if ! snap list | grep -q lxd; then
-	sudo snap install lxd --stable
+	sudo snap install lxd --candidate
 	sleep 10
 fi
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # The certs uid displays as:  "$BCM_CERT_NAME <BCM_CERT_USERNAME@BCM_CERT_HOSTNAME>"
@@ -48,7 +48,6 @@ BCM_CERT_HOSTNAME="$(echo "$BCM_CERT_HOSTNAME" | xargs)"
 
 if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 	# run the container.
-	echo "!!!!!!!!!!!!!!NUPGHOME: $GNUPGHOME"
 	docker run -it --name trezorgpg --rm \
 		-v "$GNUPGHOME":/root/.gnupg \
 		-e BCM_CERT_NAME="$BCM_CERT_NAME" \

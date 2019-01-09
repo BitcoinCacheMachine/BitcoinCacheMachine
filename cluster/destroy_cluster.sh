@@ -36,8 +36,6 @@ if [[ $BCM_DEBUG == 1 ]]; then
 	echo "BCM_CLUSTER_NAME: $BCM_CLUSTER_NAME"
 fi
 
-echo "Destroying BCM Cluster '$BCM_CLUSTER_NAME'"
-
 # shellcheck disable=SC2153
 export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"

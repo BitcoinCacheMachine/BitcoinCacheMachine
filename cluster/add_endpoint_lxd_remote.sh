@@ -50,18 +50,18 @@ if [[ $BCM_PROVIDER_NAME == "local" ]]; then
 fi
 
 if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
-	BCM_ENDPOINT_VM_IP="$BCM_SSH_HOSTNAME"
+	BCM_LXD_HOSTNAME="$BCM_LXD_HOSTNAME"
 fi
 
-if [[ -z $BCM_ENDPOINT_VM_IP ]]; then
-	echo "BCM_ENDPOINT_VM_IP not set. Exiting"
+if [[ -z $BCM_LXD_HOSTNAME ]]; then
+	echo "BCM_LXD_HOSTNAME not set. Exiting"
 	exit
 fi
 
 echo "Waiting for the remote lxd daemon to become available at $BCM_ENDPOINT_VM_IP."
-wait-for-it -t 0 "$BCM_ENDPOINT_VM_IP:8443"
+wait-for-it -t 0 "$BCM_LXD_HOSTNAME:8443"
 
-echo "Adding a lxd remote for $BCM_CLUSTER_ENDPOINT_NAME at $BCM_ENDPOINT_VM_IP:8443."
-lxc remote add $BCM_CLUSTER_NAME "$BCM_ENDPOINT_VM_IP:8443" --accept-certificate --password="$BCM_LXD_SECRET"
+echo "Adding a lxd remote for $BCM_CLUSTER_ENDPOINT_NAME at $BCM_LXD_HOSTNAME:8443."
+lxc remote add $BCM_CLUSTER_NAME "$BCM_LXD_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
 lxc remote switch $BCM_CLUSTER_NAME
 echo "Current lxd remote default is $BCM_CLUSTER_NAME."

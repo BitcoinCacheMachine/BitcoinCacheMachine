@@ -20,7 +20,7 @@ write_files:
       apt-get remove lxd lxd-client -y
       
       echo "Installing LXD via snap."
-      snap install lxd --stable
+      snap install lxd --candidate
 
       export BCM_LXD_CORE_HTTPS_ADDRESS="$(ip addr show $BCM_LISTEN_INTERFACE | grep "inet\b" | awk '{print $2}' | cut -d/ -f1):8443"
 
