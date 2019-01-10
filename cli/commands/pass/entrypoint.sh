@@ -59,9 +59,6 @@ elif [[ $BCM_CLI_VERB == "init" ]]; then
 	# shellcheck disable=SC1090
 	source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 
-	# initialize the password store
-	bcm info
-
 	if [[ ! -f $GNUPGHOME/.env ]]; then
 		echo "$GNUPGHOME/.env does not exist. Exiting"
 		exit

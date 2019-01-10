@@ -66,7 +66,7 @@ source "~/.bashrc"
 
 Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_GIT_DIR' variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
 
-Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. You're effectively running BCM data center workloads on your local dev machine instead of deploying your app to a dedicated set of machines. The BCM CLI automatically installs all software for you.
+Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. Be sure to `source demo.env` before you run ./demo/up.sh. You're effectively running BCM data center workloads on your local dev machine instead of deploying your app to a dedicated set of machines. The BCM CLI automatically installs all software for you.
 
 The demo BCM Project is called `BCMBase`. which deploy criticial BCM data center componnets such as a TOR proxy, a comprehensive [Kafka stack](https://kafka.apache.org/), docker registries, and TOR-enabled DNS, bitcoind, etc., exposes the c-lightning RPC interface as a v3 onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
 

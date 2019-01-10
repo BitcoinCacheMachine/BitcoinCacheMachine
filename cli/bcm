@@ -9,6 +9,7 @@ if [[ -z $BCM_ACTIVE ]]; then
 	BCM_ACTIVE=1
 fi
 
+
 if [[ -z $BCM_CLUSTER_NAME ]]; then
 	echo "BCM_CLUSTER_NAME has not been set. Do you need to source a .env?"
 	exit

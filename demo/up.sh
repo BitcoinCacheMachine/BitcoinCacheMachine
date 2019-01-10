@@ -6,11 +6,6 @@ cd "$(dirname "$0")"
 # This script is written for demo purposes.
 source "$BCM_GIT_DIR/.env"
 
-if bcm info | grep -q "source a .env"; then
-	bcm info
-	exit
-fi
-
 # run bcm init
 bcm init --name="$BCM_CERT_NAME" \
 	--username="$BCM_CERT_USERNAME" \
@@ -20,7 +15,7 @@ bcm init --name="$BCM_CERT_NAME" \
 bcm project create --project-name="$BCM_PROJECT_NAME"
 
 # new cluster based on existing SSH endpoint.
-bcm cluster create --cluster-name=meetup \
+bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" \
 	--provider=ssh \
 	--ssh-hostname="$BCM_CLUSTER_SSH_ENDPOINT_NAME" \
 	--lxd-hostname="$BCM_CLUSTER_LXD_ENDPOINT_NAME"
