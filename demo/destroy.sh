@@ -5,7 +5,6 @@ cd "$(dirname "$0")"
 
 # shellcheck disable=SC1090
 source "$BCM_GIT_DIR/.env"
-source ./meetup.env
 
 bcm project undeploy --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --force || true
 

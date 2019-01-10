@@ -7,7 +7,7 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable. It is in a proof-of-concept stage. Don't put real bitcoin on it. Stable builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!! 
+**IMPORTANT!** BCM is brand new and unstable. It is in a proof-of-concept stage and deploys to bitcoin TESTNET mode only. Not all features are implemented. Don't put real bitcoin on it. Stable builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!
 
 ## Why Bitcoin Cache Machine Exists
 
@@ -68,7 +68,7 @@ Feel free to change the directory in which you store the BCM repository on your 
 
 Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. You're effectively running BCM data center workloads on your local dev machine instead of deploying your app to a dedicated set of machines. The BCM CLI automatically installs all software for you.
 
-The demo BCM Project is called `BCMSparkStack` which, which aside from deploying criticial data center componnets such as a TOR proxy, a comprehensive kafka stack, docker registries, TOR-enabled DNS, bitcoind, etc., exposes the c-lightning RPC interface as a v3 onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
+The demo BCM Project is called `BCMBase`. which deploy criticial BCM data center componnets such as a TOR proxy, a comprehensive [Kafka stack](https://kafka.apache.org/), docker registries, and TOR-enabled DNS, bitcoind, etc., exposes the c-lightning RPC interface as a v3 onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
 
 ## Deploying your own BCM Infrastructure
 
@@ -76,9 +76,9 @@ In general, the steps you take to deploy your own infrastructure is as follows:
 
 1) Download BCM from github and run setup to configure your environment (done above).
 2) Run `bcm init`, which initializes your management host (i.e., [SDN Controller](https://www.sdxcentral.com/sdn/definitions/sdn-controllers/)). This command downloads and installs BCM software dependencies including `docker-ce`. `bcm init` builds the relevant docker images used at the management computer including those required for Trezor integration.
-3) Create a cluster by running `bcm cluster create`. A BCM cluster is defined as one or more LXD endpoints with a private networking environment that is low latency and high bandwidth, such as a home or office LAN. Each endpoint MUST have direct IP reachability with other endpoints in the cluster. BCM workloads are deployed to the cluster of LXD endpoints.
+3) Create a cluster by running `bcm cluster create`. A BCM cluster is defined as one or more LXD endpoints with a private networking environment that is low latency and high bandwidth, such as a home or office LAN. Each endpoint MUST have direct IP reachability with other endpoints in the cluster. BCM workloads (app-level containers) are deployed to LXD endpoints.
 4) Create one or more BCM Projects using `bcm project create`. A BCM Project represents the containerized software stack that can be independently deployed to one or more clusters. You can use the BCM cli to customize deployment stacks to suit your particular needs.
-5) Deploy a BCM Project to a BCM Cluster using `bcm project deploy`. Deployment-specific GPG certificates are created in this step. You can deploy multiple instances of a project to the same cluster. The BCM SDN Controller intelligently deploys components across failure domains to achieve local high-availability.
+5) Deploy a BCM Project to a BCM Cluster using `bcm project deploy`. Deployment-specific GPG certificates are created in this step. You can deploy multiple instances of a project to the same cluster (cluster [multi-tenancy](https://en.wikipedia.org/wiki/Multitenancy)). The BCM SDN Controller intelligently deploys components across failure domains to achieve local high-availability.
 
 ## How to contribute
 

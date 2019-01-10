@@ -31,13 +31,6 @@ for i in "$@"; do
 	esac
 done
 
-if [[ $BCM_DEBUG == 1 ]]; then
-	echo "Running up_cluster.sh with the following parameters."
-	echo "BCM_CLUSTER_NODE_COUNT: '$BCM_CLUSTER_NODE_COUNT'"
-	echo "BCM_CLUSTER_NAME: '$BCM_CLUSTER_NAME'"
-	echo "BCM_PROVIDER_NAME: '$BCM_PROVIDER_NAME'"
-fi
-
 # see if the directory exists already; if so we exit
 # shellcheck disable=2153
 export BCM_CLUSTER_DIR=$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME

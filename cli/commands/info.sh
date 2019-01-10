@@ -14,19 +14,19 @@ echo "  LXD_CLUSTER:            $(lxc remote get-default)"
 echo "  LXD_SERVER:             $(lxc info | grep "server_name:" | awk 'NF>1{print $NF}')"
 
 if [[ -d $GNUPGHOME ]]; then
-	echo "  GNUPGHOME: $GNUPGHOME"
+	echo "  GNUPGHOME:              $GNUPGHOME"
 else
-	echo "  GNUPGHOME:              Error. Directory does not exist. You may need to run 'bcm init'"
+	echo "  GNUPGHOME:          Error. Directory does not exist. You may need to run 'bcm init'"
 fi
 
 if [[ -d $PASSWORD_STORE_DIR ]]; then
-	echo "  PASSWORD_STORE_DIR: $PASSWORD_STORE_DIR"
+	echo "  PASSWORD_STORE_DIR:     $PASSWORD_STORE_DIR"
 else
 	echo "  PASSWORD_STORE_DIR:     Error. Directory does not exist. You may need to run 'bcm init'"
 fi
 
 if [[ -d $SSH_DIR ]]; then
-	echo "  SSH_DIR: $SSH_DIR"
+	echo "  SSH_DIR:                $SSH_DIR"
 else
 	echo "  SSH_DIR:                Error. Directory does not exist. You may need to run 'bcm init'"
 fi

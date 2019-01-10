@@ -11,20 +11,9 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
 	exit
 fi
 
-if [[ $BCM_DEBUG == 1 ]]; then
-	echo "Running destroy_cluster.sh with the following parameters:"
-	echo "BCM_CLUSTER_NAME: $BCM_CLUSTER_NAME"
-	echo "BCM_CLUSTER_NAME: $BCM_CLUSTER_NAME"
-fi
-
 # shellcheck disable=SC2153
 export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
-
-if [[ $BCM_DEBUG == 1 ]]; then
-	echo "BCM_CLUSTER_DIR: $BCM_CLUSTER_DIR"
-	echo "ENDPOINTS_DIR: $ENDPOINTS_DIR"
-fi
 
 for endpoint in $(bcm cluster list --endpoints); do
 	./destroy_cluster_endpoint.sh --cluster-name="$BCM_CLUSTER_NAME" --endpoint-name="$endpoint"

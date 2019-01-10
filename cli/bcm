@@ -11,10 +11,12 @@ fi
 
 if [[ -z $BCM_CLUSTER_NAME ]]; then
 	echo "BCM_CLUSTER_NAME has not been set. Do you need to source a .env?"
+	exit
 fi
 
 if [[ -z $BCM_PROJECT_NAME ]]; then
 	echo "BCM_PROJECT_NAME has not been set. Do you need to source a .env?"
+	exit
 fi
 
 # shellcheck disable=1090
