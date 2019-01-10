@@ -1,20 +1,17 @@
 FROM ubuntu:cosmic
+
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 RUN apt-get install -y apt-utils git pass
-# so scripts won't ask for interactive input.
-ENV DEBIAN_FRONTEND=noninteractive
 
-# Currently using https://github.com/romanz/trezor-agent
-# https://github.com/romanz/trezor-agent/blob/master/doc/INSTALL.md
+# Currently using https://github.com/romanz/trezor-agent https://github.com/romanz/trezor-agent/blob/master/doc/INSTALL.md
 RUN apt-get install -y python3-pip python3-dev python3-tk libusb-1.0-0-dev libudev-dev --fix-missing
 RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 
-# RUN pip3 install --upgrade setuptools
-# RUN pip3 install trezor
 # 2. Install the TREZOR agent
 RUN pip3 install Cython hidapi
 RUN pip3 install trezor_agent
-#RUN pip3 install git+https://github.com/romanz/trezor-agent.git@latest-trezorlib
+
 RUN mkdir /tmp/trezor
 RUN git clone https://github.com/romanz/trezor-agent /tmp/trezor
 WORKDIR /tmp/trezor

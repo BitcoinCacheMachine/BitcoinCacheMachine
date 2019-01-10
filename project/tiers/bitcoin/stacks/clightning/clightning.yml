@@ -1,0 +1,48 @@
+version: '3.6'
+services:
+  # c-lightning https://github.com/ElementsProject/lightning
+  clightning:
+    image: ${BCM_IMAGE_NAME}
+    command: /entrypoint.sh
+    networks:
+      bitcoindrpcnet:
+      clightningrpcnet:
+        aliases:
+          - clightningrpc
+    volumes:
+      - clightning-data:/root/.lightning
+      - clightning-log-data:/var/logs/clightning
+      - bitcoin_data:/etc/bitcoin
+    secrets:
+      - source: clightning_conf
+        target: /root/.lightning/config
+        uid: '0'
+        gid: '0'
+        mode: 0444
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+volumes:
+  clightning-data:
+  clightning-log-data:
+
+  bitcoin_data:
+    external: true
+    name: bitcoind_bitcoin_data
+
+networks:
+  clightningrpcnet:
+    attachable: true
+    
+  bitcoindrpcnet:
+    external: true
+    name: bitcoind_bitcoindrpcnet
+  
+
+secrets:
+  clightning_conf:
+    file: clightning.conf

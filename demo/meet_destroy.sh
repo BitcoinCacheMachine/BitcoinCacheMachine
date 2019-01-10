@@ -42,9 +42,3 @@ fi
 if [[ -f "$BCM_RUNTIME_DIR/.env" ]]; then
 	rm "$BCM_RUNTIME_DIR/.env"
 fi
-
-sudo lxd init --auto
-
-# bcm info
-
-# bcm show

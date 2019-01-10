@@ -52,6 +52,15 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 
 	if [[ $BCM_CLI_VERB == "newkey" ]]; then
 
+		USER_HOSTNAME=${3:-}
+		if [ ! -z ${USER_HOSTNAME} ]; then
+			BCM_SSH_USERNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f1)
+			BCM_SSH_HOSTNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f2)
+		else
+			echo "Provide the username & hostname:  user@host"
+			cat ./help.txt
+			exit
+		fi
 		if [[ -z $BCM_SSH_HOSTNAME ]]; then
 			echo "BCM_SSH_HOSTNAME is empty."
 			cat ./newkey/help.txt

@@ -6,25 +6,6 @@ set -Eeuo pipefail
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/.env"
 
-BCM_CLUSTER_NAME=
-BCM_DEBUG=0
-
-for i in "$@"; do
-	case $i in
-	--cluster-name=*)
-		BCM_CLUSTER_NAME="${i#*=}"
-		shift # past argument=value
-		;;
-	--debug)
-		BCM_DEBUG=1
-		shift # past argument=value
-		;;
-	*) ;;
-
-	esac
-
-done
-
 if [[ -z $BCM_CLUSTER_NAME ]]; then
 	echo "BCM_CLUSTER_NAME not set. Exiting."
 	exit
@@ -64,3 +45,5 @@ bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=bcm_default"
 if lxc storage list | grep -q "bcm_btrfs"; then
 	lxc storage delete bcm_btrfs
 fi
+
+sudo lxd init --auto

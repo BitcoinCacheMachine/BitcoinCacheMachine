@@ -8,5 +8,7 @@ if [[ -f /secrets/bitcoin.conf ]]; then
 	chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin
 fi
 
+echo "BITCOIND_CHAIN: $BITCOIND_CHAIN"
+
 echo "Starting bitcoind with 'bitcoind -conf=/home/bitcoin/bitcoin.conf -datadir=/data'"
 bitcoind -conf=/home/bitcoin/bitcoin.conf -datadir=/data
