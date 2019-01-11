@@ -14,7 +14,6 @@ fi
 
 if groups "$USER" | grep -q docker; then
 	sudo gpasswd -a "$USER" docker
-	#newgrp docker -
-	sudo cp ./daemon.json /var/snap/docker/current/config/daemon.json
+	sudo cp ./overlay_daemon.json /var/snap/docker/current/config/daemon.json
 	sudo snap restart docker
 fi

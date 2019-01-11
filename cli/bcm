@@ -9,7 +9,6 @@ if [[ -z $BCM_ACTIVE ]]; then
 	BCM_ACTIVE=1
 fi
 
-
 if [[ -z $BCM_CLUSTER_NAME ]]; then
 	echo "BCM_CLUSTER_NAME has not been set. Do you need to source a .env?"
 	exit
@@ -23,13 +22,15 @@ fi
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/.env"
 
-if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
-	CHOICE=
-	read -rp "The BCM docker image for the SDN Controller is unavailable. Would you like to build it now (n/y): " CHOICE
-	if [[ $CHOICE == "y" ]]; then
-		bash -c "$BCM_GIT_DIR/controller/build.sh"
-	else
-		exit
+if snap list | grep -q docker; then
+	if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
+		CHOICE=
+		read -rp "The BCM docker image for the SDN Controller is unavailable. Would you like to build it now (n/y): " CHOICE
+		if [[ $CHOICE == "y" ]]; then
+			bash -c "$BCM_GIT_DIR/controller/build.sh"
+		else
+			exit
+		fi
 	fi
 fi
 

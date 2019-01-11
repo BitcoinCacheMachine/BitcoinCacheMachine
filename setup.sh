@@ -54,7 +54,7 @@ else
 fi
 
 # make sure docker is installed. Doing it here makes sure we don't have to do it anywhere else.
-bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker-ce.sh"
+bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
 
 if ! dpkg-query -s encfs | grep -q "Status: install ok installed"; then
 	echo "Installing encfs which encrypts data at rest."
@@ -66,10 +66,12 @@ if ! dpkg-query -s encfs | grep -q "Status: install ok installed"; then
 	fi
 fi
 
-# TODO move this into the mgmtplan container rather than installing on host.
+# TODO move this into the mgmt plane container rather than installing on host.
 bash -c "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh"
 
-sudo apt-get install -y wait-for-it
+sudo apt-get install -y wait-for-it openssh-server
+echo "ListenAddress 127.0.0.1" | sudo tee -a /etc/ssh/sshd_config
+sudo service ssh restart
 
 # let's ensure directories exist for bcm cli commands OUTSIDE of ~/.bcm
 mkdir -p "$HOME/.gnupg"

@@ -97,11 +97,15 @@ if [[ $BCM_PROVIDER_NAME == "ssh" ]]; then
 		torify ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" mkdir -p "$REMOTE_MOUNTPOINT"
 		torify scp -i "$SSH_KEY_FILE" "$BCM_ENDPOINT_DIR/lxd_preseed.yml" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
 		torify scp -i "$SSH_KEY_FILE" "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/provision.sh"
+		torify ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "cat $HOME/bcm/lxd_preseed.yml | sudo lxd init --preseed"
+		torify ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo rm -rf "$HOME/bcm/"
 		torify ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- sudo bash -c "$REMOTE_MOUNTPOINT/provision.sh"
 	else
 		ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" mkdir -p "$REMOTE_MOUNTPOINT"
 		scp -i "$SSH_KEY_FILE" "$BCM_ENDPOINT_DIR/lxd_preseed.yml" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
 		scp -i "$SSH_KEY_FILE" "$BCM_GIT_DIR/cli/commands/install/snap_lxd_install.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/provision.sh"
+		ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "cat $HOME/bcm/lxd_preseed.yml | sudo lxd init --preseed"
+		ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo rm -rf "$HOME/bcm/"
 		ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- sudo bash -c "$REMOTE_MOUNTPOINT/provision.sh"
 	fi
 fi
