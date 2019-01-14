@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# sets your SDN controller (laptop/desktop) environment up for BCM
+
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
