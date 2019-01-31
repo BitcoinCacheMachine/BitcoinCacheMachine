@@ -1,4 +1,5 @@
-FROM debian:stretch-slim
+FROM bcm-docker-base
+#debian:stretch-slim
 
 # this was taken from https://github.com/NicolasDorier/docker-bitcoin/tree/master/core
 

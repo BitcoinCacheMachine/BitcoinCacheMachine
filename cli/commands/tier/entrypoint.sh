@@ -3,34 +3,37 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-VALUE=${2:-}
-if [ ! -z ${VALUE} ]; then
-    BCM_CLI_VERB="$2"
-else
+BCM_CLI_VERB=${2:-}
+if [ -z ${BCM_CLI_VERB} ]; then
     echo "Please provide a SSH command."
     cat ./help.txt
     exit
 fi
 
-BCM_SSH_USERNAME=
-BCM_SSH_HOSTNAME=
-BCM_SSH_PUSH=0
-
-for i in "$@"; do
-    case $i in
-        --username=*)
-            BCM_SSH_USERNAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
-done
-
+if [[ $BCM_CLI_VERB == "list" ]]; then
+    echo "Actively deployed BCM tiers:"
+    
+    LXC_LIST_OUTPUT=$(lxc list --format csv)
+    if echo $LXC_LIST_OUTPUT | grep -q "bcm-gateway"; then
+        echo "bcm-gateway"
+    fi
+    
+    if echo $LXC_LIST_OUTPUT | grep -q "bcm-kafka"; then
+        echo "bcm-kafka"
+    fi
+    
+    if echo $LXC_LIST_OUTPUT | grep -q "bcm-bitcoin"; then
+        echo "bcm-bitcoin"
+    fi
+    
+    if echo $LXC_LIST_OUTPUT | grep -q "bcm-ui"; then
+        echo "bcm-ui"
+    fi
+    exit
+fi
 
 TIER_NAME=${3:-}
-if [[ -z ${TIER_NAME} ]]; then
+if [ -z ${TIER_NAME} ]; then
     echo "Please specify a BCM tier."
     cat ./help.txt
     exit

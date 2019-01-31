@@ -16,9 +16,10 @@ for i in "$@"; do
     esac
 done
 
+
 # remove swarm services related to kafka
-if lxc list --format csv -c n state=RUNNING | grep -q "bcm-gateway-01"; then
-    NODES=$(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format "{{.ID}}")
+if lxc list --format csv| grep "RUNNING" | grep -q "bcm-gateway-01"; then
+    NODES=$(lxc exec bcm-gateway-01 -- docker node list --filter name="$NODE_NAME" --format "{{.ID}}")
     
     # if we got something back, let's remove them.
     if [[ ! -z $NODES ]]; then
