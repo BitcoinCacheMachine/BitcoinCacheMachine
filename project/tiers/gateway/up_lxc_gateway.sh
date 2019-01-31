@@ -1,31 +1,28 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
+
+# shellcheck disable=SC1091
+source ./env
 
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/env"
 
-# iterate over endpoints and delete relevant resources
-for endpoint in $(bcm cluster list --endpoints); do
-    #echo $endpoint
-    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
-    
-    # remove swarm services related to kafka
-    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
-done
-
-if lxc list | grep -q "bcm-gateway-01"; then
-    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
-        lxc exec bcm-gateway-01 -- docker network remove kafkanet
-    fi
+# first let's check to see if we have any gateways
+# if so, we quit unless the user has told us to override.
+export HOSTNAME="bcm-$BCM_TIER_NAME-01"
+if lxc list --format csv -c n | grep -q "$HOSTNAME"; then
+    echo "lxc host '$HOSTNAME' exists."
+    exit
 fi
 
 # first, create the profile that represents the tier.
-bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name="$BCM_TIER_NAME" --yaml-path=$(readlink -f ./$BCM_TIER_NAME/tier_profile.yml)"
+bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$BCM_TIER_NAME --yaml-path=$(readlink -f ./tier_profile.yml)"
+
 
 bash -c "./create_lxc_gateway_networks.sh"
+
 
 # get all the bcm-gateway-xx containers deployed to the cluster.
 bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=gateway"
@@ -54,7 +51,13 @@ bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTN
 
 # TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
-lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST="$HOSTNAME" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror
+REGISTRY_PROXY_REMOTEURL="ttps://registry-1.docker.io"
+if [[ ! -z $BCM_CACHESTACK ]]; then
+    REGISTRY_PROXY_REMOTEURL="http://$BCM_CACHESTACK:5000"
+fi
+
+## TODO REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL"
+lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST="$HOSTNAME"  docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror
 lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST="$HOSTNAME" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/privreg.yml" privreg
 
 lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$HOSTNAME:5000"

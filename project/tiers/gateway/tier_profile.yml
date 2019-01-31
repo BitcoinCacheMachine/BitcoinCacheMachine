@@ -15,11 +15,7 @@ config:
           - type: dhcp
             ipv4: true
             control: auto
-          # - type: static
-          #   ipv4: true
-          #   address: 192.168.4.253
-          #   netmask: 255.255.255.0
-          #   control: auto
+            
 devices:
   eth0:
     nictype: bridged

@@ -10,5 +10,5 @@ source "$BCM_GIT_DIR/env"
 source ./env
 
 if [[ $BCM_DEPLOY_BITCOIND == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/bitcoind/.env)"
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/bitcoind/env)"
 fi

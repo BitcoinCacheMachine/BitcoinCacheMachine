@@ -92,8 +92,10 @@ SSH_ONION_TEXT="Host *.onion"
 if grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
     echo "$HOME/.ssh/config already configured correctly."
 else
-    echo "$SSH_ONION_TEXT" >> $SSH_LOCAL_CONF
-    echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p" >> $SSH_LOCAL_CONF
+    echo "$SSH_ONION_TEXT" >> "$SSH_LOCAL_CONF"
+    echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p" >> "$SSH_LOCAL_CONF"
 fi
+
+echo $SSH_LOCAL_CONF
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Open a new terminal then type 'bcm --help'."
