@@ -8,6 +8,7 @@ source "$BCM_GIT_DIR/env"
 
 BCM_PROJECT_NAME=bcmbase
 BCM_DEPLOY_TIERS=1
+BCM_REBUILD_TEMPLATE=0
 
 for i in "$@"; do
     case $i in
@@ -56,10 +57,6 @@ else
     echo "LXC project '$BCM_PROJECT_NAME' already exists."
 fi
 
-
-echo "Starting 'up_lxc_host_template.sh'."
-
-BCM_REBUILD_TEMPLATE=0
 # first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
 # if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
 # it (being the lxc image 'bcm-template') will be rebuilt.
@@ -67,8 +64,7 @@ if lxc image list --format csv | grep -q "bcm-template"; then
     if [ $BCM_REBUILD_TEMPLATE = 1 ]; then
         echo "TODO: implement rebuild logic"
     else
-        echo "LXC image bcm-template exists and BCM_REBUILD_TEMPLATE was not set. The existing image will not be modified."
-        exit
+        echo "LXC image bcm-template exists and BCM_REBUILD_TEMPLATE was not set. The existing image will be used."
     fi
 fi
 
@@ -89,19 +85,19 @@ if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
     exit
 fi
 
-
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
 if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
-    IMAGE_REMOTE="$(lxc remote get-default):"
+    IMAGE_REMOTE="images"
     if [[ ! -z $BCM_CACHESTACK ]]; then
-        IMAGE_REMOTE="$BCM_CACHESTACK:"
+        IMAGE_REMOTE="$BCM_CACHESTACK"
+        if ! lxc remote list | grep -q "$IMAGE_REMOTE"; then
+            lxc remote add $IMAGE_REMOTE "$IMAGE_REMOTE:8443"
+        fi
     fi
     
-    
-    
-    echo "Copying the ubuntu/cosmic lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-lxc-base'"
-    lxc image copy images:ubuntu/18.04 "$IMAGE_REMOTE" --alias bcm-lxc-base --auto-update
+    echo "Copying the ubuntu/18.04 lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-lxc-base'"
+    lxc image copy "$IMAGE_REMOTE:ubuntu/18.04" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
 fi
 
 
@@ -124,7 +120,7 @@ if lxc network list | grep bcmbr0 | grep -q PENDING; then
     lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
 fi
 
-echo "Creating host 'bcm-host-template' which is what ALL BCM LXC system containers are based on."
+echo "Creating host 'bcm-host-template'."
 lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
 
 lxc start bcm-host-template
@@ -138,10 +134,10 @@ lxc exec bcm-host-template -- apt-get update
 
 # docker.io is the only package that seems to work seamlessly with
 # storage backends. Using BTRFS since docker recognizes underlying file system
-lxc exec bcm-host-template -- apt-get install docker.io wait-for-it ifmetric -qq
+lxc exec bcm-host-template -- apt-get install -y docker.io wait-for-it ifmetric
 
 if [[ $BCM_DEBUG == 1 ]]; then
-    lxc exec bcm-host-template -- apt-get install jq nmap curl slurm tcptrack dnsutils tcpdump -qq
+    lxc exec bcm-host-template -- apt-get install -y jq nmap curl slurm tcptrack dnsutils tcpdump
 fi
 
 ## checking if this alleviates docker swarm troubles in lxc.
@@ -169,11 +165,9 @@ lxc network detach bcmbr0 bcm-host-template
 # echo "Creating a snapshot of the lxd host 'dockertemplate' called 'bcmHostSnapshot'."
 lxc snapshot bcm-host-template bcmHostSnapshot
 
-# if instructed, serve the newly created snapshot to trusted LXD hosts.
-if lxc list | grep -q "bcm-host-template"; then
-    echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
-    lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
-fi
+# publish the resulting image
+echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
+lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
 
 if [[ $BCM_DEPLOY_TIERS == 1 ]]; then
     # All tiers require that the bcm-template image be available.

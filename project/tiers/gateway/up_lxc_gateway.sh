@@ -21,7 +21,9 @@ if lxc list | grep -q "bcm-gateway-01"; then
         lxc exec bcm-gateway-01 -- docker network remove kafkanet
     fi
 fi
-ame=$BCM_TIER_NAME --yaml-path=$(readlink -f ./tier_profile.yml)"
+
+# first, create the profile that represents the tier.
+bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name="$BCM_TIER_NAME" --yaml-path=$(readlink -f ./$BCM_TIER_NAME/tier_profile.yml)"
 
 bash -c "./create_lxc_gateway_networks.sh"
 

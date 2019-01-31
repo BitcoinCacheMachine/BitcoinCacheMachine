@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1090
@@ -20,7 +20,4 @@ if lxc list | grep -q "bcm-gateway-01"; then
     if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
         lxc exec bcm-gateway-01 -- docker network remove kafkanet
     fi
-fi
-fkanet
-	fi
 fi

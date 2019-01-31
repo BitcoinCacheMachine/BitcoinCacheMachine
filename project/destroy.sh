@@ -4,11 +4,11 @@ set -Eeo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1091
-source ./.env
 source "$BCM_GIT_DIR/env"
 
 BCM_DELETE_BCM_IMAGE=0
 BCM_DELETE_LXC_BASE=0
+BCM_DEPLOY_TIERS=1
 
 for i in "$@"; do
     case $i in
