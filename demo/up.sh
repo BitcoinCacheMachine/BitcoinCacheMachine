@@ -3,10 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source "$BCM_GIT_DIR/demo/demo.env"
-
 # This script is written for demo purposes.
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
 # run bcm init
 bcm init --name="$BCM_CERT_NAME" \
