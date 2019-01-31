@@ -11,13 +11,13 @@ if [[ $BCM_DEPLOY_GATEWAY == 1 ]]; then
 fi
 
 if [[ $BCM_DEPLOY_TIER_KAFKA == 1 ]]; then
-    bash -c "./create_tier.sh --tier-name=kafka"
+    bcm tier create kafka
 fi
 
 if [[ $BCM_DEPLOY_TIER_UI == 1 ]]; then
-    bash -c "./create_tier.sh --tier-name=ui"
+    bcm tier create ui
 fi
 
 if [[ $BCM_DEPLOY_TIER_BITCOIN == 1 ]]; then
-    bash -c "./create_tier.sh --tier-name=bitcoin"
+    bcm tier create bitcoin
 fi

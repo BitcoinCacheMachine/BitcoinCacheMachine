@@ -3,9 +3,9 @@
 set -x
 echo "Got into start script."
 if [[ -f /secrets/bitcoin.conf ]]; then
-	echo "Copying /secrets/bitcoin.conf to /home/bitcoin/.bitcoin/bitcoin.conf"
-	cp /secrets/bitcoin.conf /home/bitcoin/.bitcoin/bitcoin.conf
-	chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin
+    echo "Copying /secrets/bitcoin.conf to /home/bitcoin/.bitcoin/bitcoin.conf"
+    cp /secrets/bitcoin.conf /home/bitcoin/.bitcoin/bitcoin.conf
+    chown -R bitcoin:bitcoin /home/bitcoin/.bitcoin
 fi
 
 echo "BITCOIND_CHAIN: $BITCOIND_CHAIN"
