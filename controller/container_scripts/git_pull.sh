@@ -3,8 +3,8 @@
 echo "We're going to pull the remote repo over TOR."
 
 if [[ -z $BCM_REMOTE_REPO ]]; then
-	echo "BCM_REMOTE_REPO was not set."
-	exit
+    echo "BCM_REMOTE_REPO was not set."
+    exit
 fi
 
 echo "Starting tor in the background."

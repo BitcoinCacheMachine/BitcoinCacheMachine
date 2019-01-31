@@ -4,23 +4,26 @@ set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
-# shellcheck disable=1091
-source ./.env
+# iterate over endpoints and delete relevant resources
+for endpoint in $(bcm cluster list --endpoints); do
+    #echo $endpoint
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
+done
 
-if [[ $BCM_DEPLOY_STACK_CONNECTUI == 1 ]]; then
-	bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/connectui/.env)"
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
 fi
-
-if [[ $BCM_DEPLOY_STACK_SCHEMAREGUI == 1 ]]; then
-	bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/schemaregistryui/.env)"
-fi
-
-if [[ $BCM_DEPLOY_STACK_KAFKATOPICSUI == 1 ]]; then
-	bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/kafkatopicsui/.env)"
+ile-path=$(readlink -f ./stacks/kafkatopicsui/env)"
 fi
 
 if [[ $BCM_DEPLOY_STACK_KAFKACONTROLCENTER == 1 ]]; then
-	bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/kafkacontrolcenter/.env)"
+	bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/kafkacontrolcenter/env)"
 fi

@@ -13,18 +13,6 @@ Example:
 Parameters:
   --cluster-name=         The name of the new cluster. $BCM_RUNTIME_DIR/clusters/<BCM_CLUSTER_NAME> will 
                           be populated after successful cluster creation.
-    
-  --provider=             The provider is the mechanism by which an LXD instance will be made
-                          available. Valid option as are 'local', 'ssh', and multipass.
-                          
-                          'local' installs LXD locally using snap and is recommended for testing 
-                          and development. 
-
-                          'ssh' creates a new cluster on a remote SSH endpoint.
-                          
-                          'multipass' install multipass as a snap and creates one or more QEMU-based
-                          VMs on your local computer. Each VM will be cloud-init provisioned into a 
-                          cluster configuration.
 
   --node-count=           Cluster node (lxd endpoint) count. Number of equal-size multipass VMs you 
-                          want deployed. Only relevant when --provider=multipass.
+                          want deployed..

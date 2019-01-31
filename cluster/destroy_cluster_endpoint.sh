@@ -1,67 +1,38 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
-BCM_CLUSTER_NAME=
-BCM_ENDPOINT_NAME=
+# iterate over endpoints and delete relevant resources
+for endpoint in $(bcm cluster list --endpoints); do
+    #echo $endpoint
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
+done
 
-for i in "$@"; do
-	case $i in
-	--cluster-name=*)
-		BCM_CLUSTER_NAME="${i#*=}"
-		shift # past argument=value
-		;;
-	--endpoint-name=*)
-		BCM_ENDPOINT_NAME="${i#*=}"
-		shift # past argument=value
-		;;
-	*) ;;
-	esac
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
+fi
+
+        *) ;;
+    esac
 done
 
 if [[ -z $BCM_CLUSTER_NAME ]]; then
-	echo "BCM_CLUSTER_NAME not set. Exiting."
-	exit
+    echo "BCM_CLUSTER_NAME not set. Exiting."
+    exit
 fi
 
 # Ensure the endpoint name is in our env.
 if [[ -e $BCM_ENDPOINT_NAME ]]; then
-	echo "BCM_ENDPOINT_NAME variable not set."
-	exit
-fi
-
-# shellcheck disable=2153
-BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
-ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
-BCM_ENDPOINT_DIR="$ENDPOINTS_DIR/$BCM_ENDPOINT_NAME"
-
-if [[ ! -f "$BCM_ENDPOINT_DIR/.env" ]]; then
-	echo "WARNING: No $BCM_ENDPOINT_DIR/.env file exists to source."
-else
-	# shellcheck disable=1090
-	source "$BCM_ENDPOINT_DIR/.env"
-
-	if [[ $BCM_PROVIDER_NAME == "multipass" ]]; then
-		# Stopping multipass vm $MULTIPASS_VM_NAME
-		if multipass list | grep -q "$BCM_ENDPOINT_NAME"; then
-			echo "Stopping multipass vm $BCM_ENDPOINT_NAME"
-			sudo multipass stop $BCM_ENDPOINT_NAME
-			sudo multipass delete $BCM_ENDPOINT_NAME
-			sudo multipass purge
-		else
-			echo "$BCM_ENDPOINT_NAME doesn't exist."
-		fi
-	fi
-
-	if [[ -d $BCM_ENDPOINT_DIR ]]; then
-		rm -rf "$BCM_ENDPOINT_DIR"
-	fi
-
-	# if lxc storage list | grep -q "bcm_btrfs"; then
-	# 	lxc storage delete bcm_btrfs
-	# fi
+    echo "BCM_ENDPOINT_NAME variable not set."
+    exit
 fi

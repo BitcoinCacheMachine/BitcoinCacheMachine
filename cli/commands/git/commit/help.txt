@@ -28,5 +28,5 @@ Parameters:
 
   --default                       If this flag is specified, the following values will be used:
                                   BCM_GIT_REPO_DIR:  $BCM_RUNTIME_DIR
-                                  BCM_GIT_CLIENT_USERNAME: sourced from $BCM_RUNTIME_DIR/certs/.env
-                                  BCM_EMAIL_ADDRESS: sourced from $BCM_RUNTIME_DIR/certs/.env
+                                  BCM_GIT_CLIENT_USERNAME
+                                  BCM_EMAIL_ADDRESS

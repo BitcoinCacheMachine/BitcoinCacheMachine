@@ -1,5 +1,5 @@
 config:
-  core.https_address: "$BCM_LXD_CORE_HTTPS_ADDRESS"
+  core.https_address: "0.0.0.0:8443"
   core.trust_password: $BCM_LXD_SECRET
 storage_pools:
 - config:
@@ -18,7 +18,7 @@ profiles:
   name: bcm_default
 cluster:
   enabled: true
-  server_name: $BCM_CLUSTER_ENDPOINT_NAME
+  server_name: $BCM_ENDPOINT_NAME
   cluster_address: $BCM_CLUSTER_MASTER_ENDPOINT_IP:8443
   cluster_certificate: "$BCM_LXD_CLUSTER_CERTIFICATE
 "

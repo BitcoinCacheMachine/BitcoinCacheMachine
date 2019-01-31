@@ -1,23 +1,26 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
-# build the rsync image. We don't need to put it in a private registry I don't think.
-lxc exec "$BCM_BCMNETINST_RSYNC_BUILDER_NAME" -- docker build -t bcm-rsync:latest /apps/rsyncd
-lxc exec "$BCM_BCMNETINST_RSYNC_BUILDER_NAME" -- docker push bcm-rsync:latest
+# iterate over endpoints and delete relevant resources
+for endpoint in $(bcm cluster list --endpoints); do
+    #echo $endpoint
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
+done
 
-# let's get a fresh LXC host that's configured to push/pull to gateway registreis
-#bash -c "$BCM_GIT_DIR/project/bcmnet/delete_instance.sh bcm-rsync-builder"
-
-# if [[ ! -f $BCM_RUNTIME_DIR/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key.pub ]]; then
-#     echo "Generating SSH keys for rsync authentication. Storing at $BCM_RUNTIME_DIR/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key.pub"
-#     mkdir -p $BCM_RUNTIME_DIR/endpoints/"$(lxc remote get-default)"/.ssh
-#     ssh-keygen -t rsa -b 2048 -f $BCM_RUNTIME_DIR/endpoints/"$(lxc remote get-default)"/.ssh/cachestack-rsync-key
-# fi
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
+fi
 
 # echo "Deploying rsyncd to 'cachestack'."
 # lxc exec cachestack -- mkdir -p /apps/rsyncd

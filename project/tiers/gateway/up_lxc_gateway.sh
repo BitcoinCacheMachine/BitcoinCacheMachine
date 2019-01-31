@@ -1,24 +1,27 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1091
-source ./.env
-
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
-# first let's check to see if we have any gateways
-# if so, we quit unless the user has told us to override.
-export HOSTNAME="bcm-$BCM_TIER_NAME-01"
-if lxc list --format csv -c n | grep -q "$HOSTNAME"; then
-    echo "lxc host '$HOSTNAME' exists."
-    exit
+# iterate over endpoints and delete relevant resources
+for endpoint in $(bcm cluster list --endpoints); do
+    #echo $endpoint
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
+done
+
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
 fi
-
-# first, create the profile that represents the tier.
-bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$BCM_TIER_NAME --yaml-path=$(readlink -f ./tier_profile.yml)"
+ame=$BCM_TIER_NAME --yaml-path=$(readlink -f ./tier_profile.yml)"
 
 bash -c "./create_lxc_gateway_networks.sh"
 

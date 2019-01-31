@@ -1,24 +1,27 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
-# shellcheck disable=1091
-source ./.env
-
+# iterate over endpoints and delete relevant resources
 for endpoint in $(bcm cluster list --endpoints); do
+    #echo $endpoint
     HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-    LXC_HOST="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
-    bash -c "$BCM_LXD_OPS/delete_lxc_container.sh --container-name=$LXC_HOST"
-    bash -c "$BCM_LXD_OPS/delete_cluster_dockerdisk.sh --container-name=$LXC_HOST --endpoint=$endpoint"
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
 done
 
-bash -c "$BCM_LXD_OPS/delete_lxc_network.sh --network-name=bcmbrGWNat"
-
-bash -c "$BCM_LXD_OPS/delete_lxc_network.sh --network-name=bcmNet"
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
+fi
+-name=bcmNet"
 
 bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-gateway-template"
 

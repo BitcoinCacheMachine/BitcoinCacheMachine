@@ -1,38 +1,33 @@
 #!/bin/bash
 
+set -Eeuox pipefail
 cd "$(dirname "$0")"
-set -Eeuo pipefail
 
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
-if [[ -z $BCM_CLUSTER_NAME ]]; then
-	echo "BCM_CLUSTER_NAME not set. Exiting."
-	exit
-fi
-
-# shellcheck disable=SC2153
-export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
-export ENDPOINTS_DIR="$BCM_CLUSTER_DIR/endpoints"
-
+# iterate over endpoints and delete relevant resources
 for endpoint in $(bcm cluster list --endpoints); do
-	./destroy_cluster_endpoint.sh --cluster-name="$BCM_CLUSTER_NAME" --endpoint-name="$endpoint"
+    #echo $endpoint
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
 done
 
-if lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
-	lxc remote switch local
-	lxc remote remove "$BCM_CLUSTER_NAME"
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
 fi
 
-if [[ -d "$BCM_CLUSTER_DIR" ]]; then
-	rm -rf "$BCM_CLUSTER_DIR"
-fi
 
 # delete profile 'docker-privileged'
 bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=bcm_default"
 
 if lxc storage list | grep -q "bcm_btrfs"; then
-	lxc storage delete bcm_btrfs
+    lxc storage delete bcm_btrfs
 fi
 
 sudo lxd init --auto

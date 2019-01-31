@@ -1,37 +1,74 @@
 #!/bin/bash
 
+set -Eeuo pipefail
+
 echo "TARGET_VARIABLES"
-echo "  BCM_CLUSTER_NAME:       $BCM_CLUSTER_NAME"
-echo "  BCM_CERT_NAME:          $BCM_CERT_NAME"
-echo "  BCM_CERT_USERNAME:      $BCM_CERT_USERNAME"
-echo "  BCM_CERT_HOSTNAME:      $BCM_CERT_HOSTNAME"
-echo "  BCM_PROJECT_NAME:       $BCM_PROJECT_NAME"
-echo "  BCM_PROJECT_USERNAME:   $BCM_PROJECT_USERNAME"
-echo "  BCM_SSH_HOSTNAME: 	  $BCM_CLUSTER_SSH_ENDPOINT_NAME"
+
+if [ -z ${BCM_CACHESTACK+x} ]; then
+    echo "  BCM_CACHESTACK:           N/A";
+else
+    echo "  BCM_CACHESTACK:             $BCM_CACHESTACK";
+fi
+
+if [ -z ${BCM_CLUSTER_NAME+x} ]; then
+    echo "  BCM_CLUSTER_NAME:           N/A";
+else
+    echo "  BCM_CLUSTER_NAME:           $BCM_CLUSTER_NAME";
+fi
+
+if [ -z ${BCM_CERT_NAME+x} ]; then
+    echo "  BCM_CERT_NAME:              N/A";
+else
+    echo "  BCM_CERT_NAME:              $BCM_CERT_NAME";
+fi
+
+if [ -z ${BCM_CERT_USERNAME+x} ]; then
+    echo "  BCM_CERT_USERNAME:          N/A";
+else
+    echo "  BCM_CERT_USERNAME:          $BCM_CERT_USERNAME";
+fi
+
+if [ -z ${BCM_CERT_HOSTNAME+x} ]; then
+    echo "  BCM_CERT_HOSTNAME:          N/A";
+else
+    echo "  BCM_CERT_HOSTNAME:          $BCM_CERT_HOSTNAME";
+fi
+
+if [ -z ${BCM_PROJECT_NAME+x} ]; then
+    echo "  BCM_PROJECT_NAME:           N/A";
+else
+    echo "  BCM_PROJECT_NAME:           $BCM_PROJECT_NAME";
+fi
+
+
+if [ -z ${BCM_SSH_HOSTNAME+x} ]; then
+    echo "  BCM_SSH_HOSTNAME:           N/A";
+else
+    echo "  BCM_SSH_HOSTNAME:           $BCM_SSH_HOSTNAME";
+fi
+
 echo ""
 
 echo "ACTIVE_ENVIRONMENT"
-echo "  LXD_CLUSTER:            $(lxc remote get-default)"
-echo "  LXD_SERVER:             $(lxc info | grep "server_name:" | awk 'NF>1{print $NF}')"
-
 if [[ -d $GNUPGHOME ]]; then
-	echo "  GNUPGHOME:              $GNUPGHOME"
+    echo "  GNUPGHOME:                  $GNUPGHOME"
 else
-	echo "  GNUPGHOME:          Error. Directory does not exist. You may need to run 'bcm init'"
+    echo "  GNUPGHOME:                  N/A"
 fi
 
 if [[ -d $PASSWORD_STORE_DIR ]]; then
-	echo "  PASSWORD_STORE_DIR:     $PASSWORD_STORE_DIR"
+    echo "  PASSWORD_STORE_DIR:         $PASSWORD_STORE_DIR"
 else
-	echo "  PASSWORD_STORE_DIR:     Error. Directory does not exist. You may need to run 'bcm init'"
+    echo "  PASSWORD_STORE_DIR:         N/A"
 fi
 
-if [[ -d $SSH_DIR ]]; then
-	echo "  SSH_DIR:                $SSH_DIR"
+echo "  BCM_ACTIVE:                 $BCM_ACTIVE"
+echo "  BCM_DEBUG:                  $BCM_DEBUG"
+# remove any legacy lxd software and install install lxd via snap
+if snap list | grep -q lxd; then
+    echo "  LXD_CLUSTER:                $(lxc remote get-default)"
+    echo "  LXD_SERVER:                 $(lxc info | grep "server_name:" | awk 'NF>1{print $NF}')"
 else
-	echo "  SSH_DIR:                Error. Directory does not exist. You may need to run 'bcm init'"
+    echo ""
+    echo "WARNING: LXD not installed locally."
 fi
-
-echo "  BCM_ACTIVE:             $BCM_ACTIVE"
-echo "  BCM_DEBUG:              $BCM_DEBUG"
-echo ""

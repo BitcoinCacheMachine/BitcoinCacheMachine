@@ -15,7 +15,7 @@ If you're involved with Bitcoin or care about your privacy, you will undoubtedly
 
 There are many areas where your privacy can be compromised if you're not careful. BCM is meant to handle many of these concerns by creating a software-defined data center at your home or office that's pre-configured to protect your overall privacy. BCM is a distributed system, so it gets faster and more reliable as you add independent commodity hardware. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest. Bitcoin Cache Machine dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure.
 
-For more information about the motivations behind Bitcoin Cache Machine, visit the [public website](https://bitcoincachemachine.org/2018/09/23/introducing-bitcoin-cache-machine-a-bitcoin-focused-software-defined-network/).
+For more information about the motivations behind Bitcoin Cache Machine, visit the [public website](https://www.bitcoincachemachine.org/2018/11/27/introducing-bitcoin-cache-machine/).
 
 ## Development Goals
 
@@ -56,7 +56,7 @@ git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
 You can now clone the BCM repository to your machine over TOR and run setup.
 
 ```bash
-BCM_GIT_DIR="$HOME/git/github/bcm"
+export BCM_GIT_DIR="$HOME/git/github/bcm"
 mkdir -p "$BCM_GIT_DIR"
 git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 cd "$BCM_GIT_DIR"

@@ -1,24 +1,27 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
-# delete dockertemplate
-if lxc list | grep -q "bcm-host-template"; then
-	echo "Deleting dockertemplate lxd host."
+# iterate over endpoints and delete relevant resources
+for endpoint in $(bcm cluster list --endpoints); do
+    #echo $endpoint
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
+done
 
-	lxc stop bcm-host-template
-	lxc delete bcm-host-template
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
 fi
 
-export BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE=1
-if [[ $BCM_HOSTTEMPLATE_IMAGE_BCM_TEMPLATE_DELETE == 1 ]]; then
-	# remove image bcm-template
-	bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-template"
-fi
 
 # remove image bcm-lxc-base
 export BCM_HOSTTEMPLATE_IMAGE_BCM_BASE_DELETE=1

@@ -3,22 +3,25 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1090
-source "$BCM_GIT_DIR/.env"
+# shellcheck disable=1090
+source "$BCM_GIT_DIR/env"
 
-BCM_ENV_FILE_PATH=
-DOCKERHUB_IMAGE=
-BCM_IMAGE_NAME=
-BCM_TIER_NAME=
-BCM_STACK_NAME=
-BCM_SERVICE_NAME=
-BCM_BUILD_FLAG=0
+# iterate over endpoints and delete relevant resources
+for endpoint in $(bcm cluster list --endpoints); do
+    #echo $endpoint
+    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
+    
+    # remove swarm services related to kafka
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
+done
 
-for i in "$@"; do
-	case $i in
-	--env-file-path=*)
-		BCM_ENV_FILE_PATH="${i#*=}"
-		shift # past argument=value
+if lxc list | grep -q "bcm-gateway-01"; then
+    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
+        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+    fi
+fi
+
 		;;
 	*)
 		# unknown option
@@ -75,4 +78,4 @@ lxc file push -p -r "$BCM_STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_
 
 CONTAINER_STACK_DIR="/root/stacks/$BCM_TIER_NAME/$BCM_STACK_NAME"
 
-lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/.env && env BCM_IMAGE_NAME=$BCM_PRIVATE_REGISTRY/$BCM_IMAGE_NAME docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"
+lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/env && env BCM_IMAGE_NAME=$BCM_PRIVATE_REGISTRY/$BCM_IMAGE_NAME docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"
