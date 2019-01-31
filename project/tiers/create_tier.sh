@@ -1,27 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+BCM_TIER_NAME=
+
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/env"
 
-# iterate over endpoints and delete relevant resources
-for endpoint in $(bcm cluster list --endpoints); do
-    #echo $endpoint
-    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
-    BROKER_STACK_NAME="broker-$(printf %02d "$HOST_ENDING")"
-    
-    # remove swarm services related to kafka
-    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
+for i in "$@"; do
+    case $i in
+        --tier-name=*)
+            BCM_TIER_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
 done
-
-if lxc list | grep -q "bcm-gateway-01"; then
-    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
-        lxc exec bcm-gateway-01 -- docker network remove kafkanet
-    fi
-fi
-
 
 export BCM_TIER_NAME="$BCM_TIER_NAME"
 
@@ -56,9 +53,14 @@ for endpoint in $(bcm cluster list --endpoints); do
     # TIER_TYPE of value 2 means one interface (eth1) in container is
     # using MACVLAN to expose services to the physical network underlay
     if [[ $BCM_TIER_TYPE == 2 ]]; then
-        # if this tier is of type 2, then we need to source the endpoint tier env then wire up the MACVLAN interface.
+        # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
         # shellcheck disable=1090
-        source "$BCM_CLUSTERS_DIR/$(lxc remote get-default)/endpoints/$endpoint/env"
+        
+        lxc network list --format csv | grep physical | cut -d, -f1
+        
+        # TODO Do some error checking on network interface selection.
+        read -rp "Please enter the physical network interface that you want to expose network services on (i.e., data path):  " BCM_LXD_PHYSICAL_INTERFACE
+        
         lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$BCM_LXD_PHYSICAL_INTERFACE"
     fi
     

@@ -43,7 +43,7 @@ if ! bcm project list | grep -q "$BCM_PROJECT_NAME"; then
 fi
 
 if [[ $(lxc remote get-default) != "$BCM_CLUSTER_NAME" ]]; then
-    if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
+    if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
         echo "Changing the default LXD client remote to BCM cluster '$BCM_CLUSTER_NAME'."
         lxc remote switch "$BCM_CLUSTER_NAME"
     fi
@@ -88,11 +88,12 @@ fi
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
 if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
+    # 'images' is the publicly avaialb e image server. Used whenever there's no LXD image cache specified.
     IMAGE_REMOTE="images"
     if [[ ! -z $BCM_CACHESTACK ]]; then
         IMAGE_REMOTE="$BCM_CACHESTACK"
-        if ! lxc remote list | grep -q "$IMAGE_REMOTE"; then
-            lxc remote add $IMAGE_REMOTE "$IMAGE_REMOTE:8443"
+        if ! lxc remote list --format csv | grep -q "$IMAGE_REMOTE"; then
+            lxc remote add "$IMAGE_REMOTE" "$IMAGE_REMOTE:8443"
         fi
     fi
     

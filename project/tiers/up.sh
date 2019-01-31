@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 source ./params.sh "$@"
 
 if [[ $BCM_DEPLOY_GATEWAY == 1 ]]; then
-    bash -c "./gateway/up_lxc_gateway.sh"
+    bash -c "./gateway/up_lxc_gateway.sh --tier-name=gateway"
 fi
 
 if [[ $BCM_DEPLOY_TIER_KAFKA == 1 ]]; then

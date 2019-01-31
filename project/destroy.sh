@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-set -Eeo pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1091
 source "$BCM_GIT_DIR/env"
 
+BCM_PROJECT_NAME=bcmbase
 BCM_DELETE_BCM_IMAGE=0
 BCM_DELETE_LXC_BASE=0
 BCM_DEPLOY_TIERS=1
@@ -17,6 +18,11 @@ for i in "$@"; do
             shift # past argument=value
         ;;
         --del-lxcbase)
+            BCM_DELETE_LXC_BASE=1
+            shift # past argument=value
+        ;;
+        --all)
+            BCM_DELETE_BCM_IMAGE=1
             BCM_DELETE_LXC_BASE=1
             shift # past argument=value
         ;;

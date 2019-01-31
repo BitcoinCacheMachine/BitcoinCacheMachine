@@ -68,7 +68,7 @@ lxc exec "$HOSTNAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
 # now let's build some custom images that we're going run on each bcm-gateway
 # namely TOR
-export BCM_DOCKER_BASE_IMAGE="ubuntu:cosmic"
+export BCM_DOCKER_BASE_IMAGE="ubuntu:bionic"
 
 lxc exec "$HOSTNAME" -- docker pull $BCM_DOCKER_BASE_IMAGE
 lxc exec "$HOSTNAME" -- docker tag $BCM_DOCKER_BASE_IMAGE "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
