@@ -3,14 +3,34 @@
 set -Eeo pipefail
 cd "$(dirname "$0")"
 
+# shellcheck disable=1091
+source ./.env
+source "$BCM_GIT_DIR/env"
+
+BCM_DELETE_BCM_IMAGE=0
+BCM_DELETE_LXC_BASE=0
+
+for i in "$@"; do
+    case $i in
+        --del-template)
+            BCM_DELETE_BCM_IMAGE=1
+            shift # past argument=value
+        ;;
+        --del-lxcbase)
+            BCM_DELETE_LXC_BASE=1
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
 # quit if there are no BCM environment variables
 if ! env | grep -q 'BCM_'; then
     echo "BCM variables not set. Please source BCM environment variables."
     exit
 fi
-
-# if the BCM_PROJECT_NAME is not set, we assume it's the one
-# that our current LXD client is defaulted to.
 
 # we assume that the user wants to delete the current project
 # TODO add warning messages before executing this script.
@@ -19,15 +39,41 @@ if [[ -z $BCM_PROJECT_NAME ]]; then
 fi
 
 export BCM_PROJECT_NAME=$BCM_PROJECT_NAME
-BCM_DEPLOY_TIERS=1
 if [[ $BCM_DEPLOY_TIERS == 1 ]]; then
     ./tiers/destroy.sh --all
 fi
 
-BCM_DEPLOY_HOST_TEMPLATE=1
-if [[ $BCM_DEPLOY_HOST_TEMPLATE == 1 ]]; then
-    ./host_template/destroy.sh
+# stop dockertemplate
+if lxc list --format csv | grep "bcm-host-template" | grep -q "RUNNING"; then
+    lxc stop bcm-host-template
 fi
+
+# delete dockertemplate
+if lxc list --format csv | grep -q "bcm-host-template"; then
+    echo "Deleting dockertemplate lxd host."
+    lxc delete bcm-host-template
+fi
+
+if [[ $BCM_DELETE_BCM_IMAGE == 1 ]]; then
+    # remove image bcm-template
+    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-template"
+fi
+
+# remove image bcm-lxc-base
+if [[ $BCM_DELETE_LXC_BASE == 1 ]]; then
+    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-lxc-base"
+fi
+
+# delete profile 'docker-privileged'
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_privileged"
+
+# delete profile 'docker-unprivileged'
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_unprivileged"
+
+if lxc network list --format csv | grep -q "bcmbr0"; then
+    lxc network delete bcmbr0
+fi
+
 
 # ensure we have an LXD project defined for this deployment
 # you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)

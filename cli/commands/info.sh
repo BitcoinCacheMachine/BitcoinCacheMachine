@@ -4,12 +4,6 @@ set -Eeuo pipefail
 
 echo "TARGET_VARIABLES"
 
-if [ -z ${BCM_CACHESTACK+x} ]; then
-    echo "  BCM_CACHESTACK:           N/A";
-else
-    echo "  BCM_CACHESTACK:             $BCM_CACHESTACK";
-fi
-
 if [ -z ${BCM_CLUSTER_NAME+x} ]; then
     echo "  BCM_CLUSTER_NAME:           N/A";
 else
@@ -64,6 +58,14 @@ fi
 
 echo "  BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "  BCM_DEBUG:                  $BCM_DEBUG"
+
+if [ -z ${BCM_CACHESTACK+x} ]; then
+    echo "  BCM_CACHESTACK:             Not set.";
+else
+    echo "  BCM_CACHESTACK:             $BCM_CACHESTACK";
+fi
+
+
 # remove any legacy lxd software and install install lxd via snap
 if snap list | grep -q lxd; then
     echo "  LXD_CLUSTER:                $(lxc remote get-default)"

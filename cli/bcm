@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# this is the entrypoint into the 'bcm' CLI.
-
 set -e
 cd "$(dirname "$0")"
 
@@ -9,21 +7,11 @@ if [[ -z $BCM_ACTIVE ]]; then
     BCM_ACTIVE=1
 fi
 
-if [[ -z $BCM_CLUSTER_NAME ]]; then
-    echo "BCM_CLUSTER_NAME has not been set. Do you need to source an env file?"
-    exit
-fi
-
-if [[ -z $BCM_PROJECT_NAME ]]; then
-    echo "BCM_PROJECT_NAME has not been set. Do you need to source an env file?"
-    exit
-fi
-
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/env"
 
 if snap list | grep -q docker; then
-    if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
+    if ! sudo docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
         CHOICE=
         read -rp "The BCM docker image for the SDN Controller is unavailable. Would you like to build it now (n/y): " CHOICE
         if [[ $CHOICE == "y" ]]; then

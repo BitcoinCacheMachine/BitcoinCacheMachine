@@ -4,7 +4,7 @@ set -o nounset
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1090
-source "$BCM_GIT_DIR/.env"
+source "$BCM_GIT_DIR/env"
 
 BCM_CLI_VERB=
 BCM_PASS_NAME=
@@ -59,13 +59,13 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
     
-    if [[ ! -f $GNUPGHOME/.env ]]; then
-        echo "$GNUPGHOME/.env does not exist. Exiting"
+    if [[ ! -f $GNUPGHOME/env ]]; then
+        echo "$GNUPGHOME/env does not exist. Exiting"
         exit
     fi
     
     # shellcheck disable=SC1090
-    source "$GNUPGHOME/.env"
+    source "$GNUPGHOME/env"
     
     if [[ ! -d "$PASSWORD_STORE_DIR/.git" ]]; then
         cd "$PASSWORD_STORE_DIR"

@@ -54,9 +54,9 @@ else
     ssh -i "$SSH_KEY_FILE" -t "$SSH_IDENTITY" ip link show
 fi
 # TODO Do some error checking on network interface selection.
-read -rp "Enter the name of the physical network interface you want to use for the management:  " BCM_LXD_PHYSICAL_INTERFACE
+read -rp "Enter the physical network interface name to use for the management plane:  " BCM_MGMT_PLANE_INTERFACE
 
-export BCM_LXD_PHYSICAL_INTERFACE="$BCM_LXD_PHYSICAL_INTERFACE"
+export BCM_LXD_PHYSICAL_INTERFACE="$BCM_MGMT_PLANE_INTERFACE"
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
 if [ $IS_MASTER -eq 1 ]; then

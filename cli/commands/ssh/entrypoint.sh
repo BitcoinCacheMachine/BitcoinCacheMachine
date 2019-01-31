@@ -36,7 +36,8 @@ for i in "$@"; do
     esac
 done
 
-mkdir -p /tmp/bcm/ssh
+SSH_DIR=/tmp/bcm/ssh
+mkdir -p "$SSH_DIR"
 
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
@@ -79,23 +80,25 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
             fi
         fi
         
+        KEY_NAME="$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub"
         sudo docker run -it --rm \
-        -v /tmp/bcm/ssh:/root/.ssh \
+        -v $SSH_DIR:/root/.ssh \
         -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
         -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
+        -e KEY_NAME="$KEY_NAME" \
         --device="$BCM_TREZOR_USB_PATH" \
-        bcm-trezor:latest bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME -v > /root/.ssh/$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub"
+        bcm-trezor:latest bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME -v > /root/.ssh/$KEY_NAME"
         
-        PUB_KEY="/tmp/bcm/ssh/$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub"
-        if [[ -f "$PUB_KEY" ]]; then
-            echo "Congratulations! Your new SSH public key can be found at '$PUB_KEY'"
+        PUB_KEY_PATH="$SSH_DIR/$KEY_NAME"
+        if [[ -f "$PUB_KEY_PATH" ]]; then
+            echo "Congratulations! Your new SSH public key can be found at '$PUB_KEY_PATH'"
             
             # Push to desintion if specified.
             if [[ $BCM_SSH_PUSH == 1 ]]; then
                 if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
-                    torify ssh-copy-id -f -i "$PUB_KEY" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+                    torify ssh-copy-id -f -i "$PUB_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
                 else
-                    ssh-copy-id -f -i "$PUB_KEY" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+                    ssh-copy-id -f -i "$PUB_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
                 fi
             fi
         else
