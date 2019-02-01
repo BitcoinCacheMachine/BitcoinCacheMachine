@@ -1,2 +1,5 @@
-Help for bcm tier.
+Description:
+  Create (deploy) or destroy a BCM tier.
 
+Usage:
+  bcm deploy create|destroy TIER_NAME

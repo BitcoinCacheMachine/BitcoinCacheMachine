@@ -52,7 +52,7 @@ if [[ -f $BCM_ENV_FILE_PATH ]]; then
         if [[ "$(lxc exec bcm-gateway-01 -- docker info --format '{{.Swarm.LocalNodeState}}')" == "active" ]]; then
             if lxc exec bcm-gateway-01 -- docker stack ls --format "{{.Name}}" | grep -q "$BCM_STACK_NAME"; then
                 lxc exec bcm-gateway-01 -- docker stack rm "$BCM_STACK_NAME"
-                sleep 10
+                sleep 5
             fi
         fi
         

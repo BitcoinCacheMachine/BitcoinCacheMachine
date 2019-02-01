@@ -3,9 +3,6 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1090
-source "$BCM_GIT_DIR/env"
-
 LXC_HOST=
 DOCKER_HUB_IMAGE=
 IMAGE_NAME=
@@ -62,6 +59,17 @@ if [[ -z $PRIVATE_REGISTRY ]]; then
     exit
 fi
 
+# if DOCKER_HUB_IMAGE was passed, we assume that we are simply downloading it and pushing it to our private registry.
+# no operations will be performed otherwise.
+if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
+    lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
+    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    exit
+fi
+
+
+
 if [[ ! -z $BUILD_CONTEXT ]]; then
     if [[ ! -d $BUILD_CONTEXT ]]; then
         echo "The build context was not passed properly."
@@ -77,21 +85,14 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
     exit
 fi
 
-# if DOCKER_HUB_IMAGE was passed, we assume that we are simply downloading it and pushing it to our private registry.
-# no operations will be performed otherwise.
-if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
-    lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
-    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
-    lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
-    exit
-fi
-
-# if the user has asked us to build an image, we will do so
-#lxc exec bcm-gateway-01 -- curl http://127.0.0.1:5010/v2/bcm-bitcoin-core/manifests/17.1
-
+# # if the user has asked us to build an image, we will do so, but ONLY if the image DOESN"T exist in the private registry already.
+# IMAGE_EXISTS=$(lxc exec bcm-gateway-01 -- curl --silent -f -lSL http://127.0.0.1:5010/v2/$IMAGE_NAME/manifests/$IMAGE_TAG | grep -q "$IMAGE_NAME")
+# echo "$IMAGE_EXISTS"
 
 # first, we check to see if the image already exists in our private registry. If it does, we won't do anything.
-if [[ $IMAGE_EXISTS == 0 ]]; then
+#! lxc exec bcm-gateway-01 -- curl --silent -f -lSL http://127.0.0.1:5010/v2/$IMAGE_NAME/manifests/$IMAGE_TAG | grep -q "$IMAGE_NAME"
+REBUILD=1
+if [[ $REBUILD == 1 ]]; then
     # let's make sure there's a dockerfile
     if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then
         echo "There was no Dockerfile found in the build context."

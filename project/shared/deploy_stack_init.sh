@@ -63,8 +63,7 @@ if [[ -z $BCM_IMAGE_TAG ]]; then
 fi
 
 CONTAINER_NAME="bcm-$BCM_TIER_NAME-01"
-
-bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --image-name=$BCM_IMAGE_NAME --image-tag=$BCM_IMAGE_TAG"
+bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --docker-hub-image-name=$DOCKERHUB_IMAGE --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --image-name=$BCM_IMAGE_NAME --image-tag=$BCM_IMAGE_TAG"
 
 BCM_STACK_FILE_DIRNAME=$(dirname $BCM_ENV_FILE_PATH)
 
@@ -75,4 +74,4 @@ lxc file push -p -r "$BCM_STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_
 
 CONTAINER_STACK_DIR="/root/stacks/$BCM_TIER_NAME/$BCM_STACK_NAME"
 
-lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/env && env BCM_IMAGE_NAME=$BCM_PRIVATE_REGISTRY/$BCM_IMAGE_NAME docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"
+lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/env && env BCM_IMAGE_NAME=$BCM_PRIVATE_REGISTRY/$BCM_IMAGE_NAME:$BCM_IMAGE_TAG BCM_LXC_HOST=$CONTAINER_NAME docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"

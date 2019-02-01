@@ -1,5 +1,6 @@
 export DOCKERHUB_IMAGE="landoop/schema-registry-ui:0.9.5"
-export BCM_IMAGE_NAME="bcm-schema-registry-ui:latest"
+export BCM_IMAGE_NAME="bcm-schema-registry-ui"
+export BCM_IMAGE_TAG="0.9.5"
 export BCM_TIER_NAME="ui"
 export BCM_STACK_FILE="schema-registry-ui.yml"
 export BCM_STACK_NAME="schemaregistryui"
