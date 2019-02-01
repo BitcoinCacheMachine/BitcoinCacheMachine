@@ -12,7 +12,7 @@ BCM_IMAGE_NAME=
 BCM_TIER_NAME=
 BCM_STACK_NAME=
 BCM_SERVICE_NAME=
-BCM_BUILD_FLAG=0
+BCM_IMAGE_TAG=latest
 
 for i in "$@"; do
     case $i in
@@ -57,14 +57,14 @@ if [[ -z $BCM_SERVICE_NAME ]]; then
     exit
 fi
 
-CONTAINER_NAME="bcm-$BCM_TIER_NAME-01"
-if [[ $BCM_BUILD_FLAG == 1 ]]; then
-    bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --build --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --priv-image-name=$BCM_IMAGE_NAME"
+if [[ -z $BCM_IMAGE_TAG ]]; then
+    echo "BCM_IMAGE_TAG not set. Exiting."
+    exit
 fi
 
-if [[ $BCM_BUILD_FLAG == 0 ]]; then
-    bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --container-name=$CONTAINER_NAME --image-name=$DOCKERHUB_IMAGE --priv-image-name=$BCM_IMAGE_NAME"
-fi
+CONTAINER_NAME="bcm-$BCM_TIER_NAME-01"
+
+bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --image-name=$BCM_IMAGE_NAME --image-tag=$BCM_IMAGE_TAG"
 
 BCM_STACK_FILE_DIRNAME=$(dirname $BCM_ENV_FILE_PATH)
 

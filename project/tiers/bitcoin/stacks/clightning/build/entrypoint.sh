@@ -1,6 +1,13 @@
 #!/bin/bash
 
-set -ex
+set -Eeuox
 
-echo "Starting clightning configuration"
-lightningd --conf=/root/.lightning/config --bind-addr="127.0.0.1:9735" --proxy="$GATEWAY_IP:9050" --addr="autotor:$GATEWAY_IP:9051" --log-level=debug
+if [[ $BITCOIND_CHAIN == "testnet" ]]; then
+    echo "Starting clightning testnet node."
+    /root/lightning/lightningd/lightningd --conf=/root/.lightning/config -testnet
+    
+    elif [[ $BITCOIND_CHAIN == "mainnet" ]]; then
+    
+    echo "Starting clightning mainnet node."
+    /root/lightning/lightningd/lightningd --conf=/root/.lightning/config
+fi

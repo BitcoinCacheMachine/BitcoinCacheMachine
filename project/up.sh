@@ -174,10 +174,7 @@ if [[ $BCM_DEPLOY_TIERS == 1 ]]; then
     # All tiers require that the bcm-template image be available.
     # let's look for it before we even attempt anything.
     if lxc image list --format csv | grep -q "bcm-template"; then
-        bash -c "./gateway/up_lxc_gateway.sh --tier-name=gateway"
-        bash -c "./create_tier.sh --tier-name=kafka"
-        bash -c "./create_tier.sh --tier-name=ui"
-        bash -c "./create_tier.sh --tier-name=bitcoin"
+        bash -c "./tiers/up.sh --all"
     else
         echo "LXC image 'bcm-template' doesn't exist. Can't deploy BCM tiers."
     fi

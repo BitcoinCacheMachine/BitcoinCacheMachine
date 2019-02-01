@@ -1,18 +1,19 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
-
-LXC_HOST=
-DOCKER_HUB_IMAGE=
-BCM_IMAGE_NAME=
-BCM_HELP_FLAG=0
-BUILD_CONTEXT=
-IMAGE_TAGGED_FLAG=0
-BCM_PRIVATE_REGISTY="bcm-gateway-01:5010"
 
 # shellcheck disable=SC1090
 source "$BCM_GIT_DIR/env"
+
+LXC_HOST=
+DOCKER_HUB_IMAGE=
+IMAGE_NAME=
+IMAGE_TAG=latest
+BUILD_CONTEXT=
+IMAGE_TAGGED_FLAG=0
+IMAGE_EXISTS=0
+PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY"
 
 for i in "$@"; do
     case $i in
@@ -20,20 +21,20 @@ for i in "$@"; do
             LXC_HOST="${i#*=}"
             shift # past argument=value
         ;;
-        --image-name=*)
+        --docker-hub-image-name=*)
             DOCKER_HUB_IMAGE="${i#*=}"
             shift # past argument=value
         ;;
         --registry=*)
-            BCM_PRIVATE_REGISTY="${i#*=}"
+            PRIVATE_REGISTY="${i#*=}"
             shift # past argument=value
         ;;
-        --priv-image-name=*)
-            BCM_IMAGE_NAME="${i#*=}"
+        --image-name=*)
+            IMAGE_NAME="${i#*=}"
             shift # past argument=value
         ;;
-        --build)
-            BCM_HELP_FLAG=1
+        --image-tag=*)
+            IMAGE_TAG="${i#*=}"
             shift # past argument=value
         ;;
         --build-context=*)
@@ -51,53 +52,58 @@ if [[ -z $LXC_HOST ]]; then
     exit
 fi
 
-if [[ -z $BCM_IMAGE_NAME ]]; then
-    echo "BCM_IMAGE_NAME is empty. Exiting"
+if [[ -z $IMAGE_NAME ]]; then
+    echo "IMAGE_NAME is empty. Exiting"
     exit
 fi
 
-if [[ -z $BCM_PRIVATE_REGISTY ]]; then
-    echo "BCM_PRIVATE_REGISTY is empty. Exiting"
+if [[ -z $PRIVATE_REGISTRY ]]; then
+    echo "PRIVATE_REGISTRY is empty. Exiting"
     exit
 fi
 
-FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTY/$BCM_IMAGE_NAME"
+if [[ ! -z $BUILD_CONTEXT ]]; then
+    if [[ ! -d $BUILD_CONTEXT ]]; then
+        echo "The build context was not passed properly."
+        exit
+    fi
+else
+    echo "The build context was empty."
+    exit
+fi
 
 if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
     echo "LXC host '$LXC_HOST' doesn't exist. Exiting"
     exit
 fi
 
+# if DOCKER_HUB_IMAGE was passed, we assume that we are simply downloading it and pushing it to our private registry.
+# no operations will be performed otherwise.
 if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
     lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
+    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    exit
 fi
 
 # if the user has asked us to build an image, we will do so
-if [[ $BCM_HELP_FLAG == 1 ]]; then
-    # make sure they have passed a build context directory.
-    if [[ -d $BUILD_CONTEXT ]]; then
-        # let's make sure there's a dockerfile
-        if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then
-            echo "There was no Dockerfile found in the build context."
-            exit
-        fi
-        
-        if [[ ! -z $FULLY_QUALIFIED_IMAGE_NAME ]]; then
-            echo "Pushing contents of the build context to LXC host '$LXC_HOST'."
-            lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
-            lxc exec "$LXC_HOST" -- docker build -t "$FULLY_QUALIFIED_IMAGE_NAME" /root/build/
-            IMAGE_TAGGED_FLAG=1
-        else
-            echo "BCM_IMAGE_NAME was empty."
-            exit
-        fi
+#lxc exec bcm-gateway-01 -- curl http://127.0.0.1:5010/v2/bcm-bitcoin-core/manifests/17.1
+
+
+# first, we check to see if the image already exists in our private registry. If it does, we won't do anything.
+if [[ $IMAGE_EXISTS == 0 ]]; then
+    # let's make sure there's a dockerfile
+    if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then
+        echo "There was no Dockerfile found in the build context."
+        exit
     else
-        echo "The build context '$BUILD_CONTEXT' directory does not exist."
+        echo "Pushing contents of the build context to LXC host '$LXC_HOST'."
+        lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
     fi
+    
+    # let's build the image and push it to our private registry.
+    lxc exec "$LXC_HOST" -- docker build -t "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" /root/build/
+    lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+else
+    echo "The image already exists in the private registry. It will not be re-built."
 fi
-
-if [[ $IMAGE_TAGGED_FLAG == 0 ]]; then
-    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$FULLY_QUALIFIED_IMAGE_NAME"
-fi
-
-lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"

@@ -9,6 +9,8 @@ services:
       clightningrpcnet:
         aliases:
           - clightningrpc
+    environment:
+      BITCOIND_CHAIN: ${BCM_BITCOIN_CHAIN:-testnet}
     volumes:
       - clightning-data:/root/.lightning
       - clightning-log-data:/var/logs/clightning

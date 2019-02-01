@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
@@ -49,26 +49,27 @@ lxc file push "./$HOSTNAME.daemon.json" "$HOSTNAME/etc/docker/daemon.json"
 lxc restart "$HOSTNAME"
 bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
 
+
 # TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
-REGISTRY_PROXY_REMOTEURL="ttps://registry-1.docker.io"
+REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
 if [[ ! -z $BCM_CACHESTACK ]]; then
     REGISTRY_PROXY_REMOTEURL="http://$BCM_CACHESTACK:5000"
 fi
 
-## TODO REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL"
-lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST="$HOSTNAME"  docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror
-lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST="$HOSTNAME" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/privreg.yml" privreg
-
+lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/regmirror.yml" regmirror
 lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$HOSTNAME:5000"
+
+lxc exec "$HOSTNAME" -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST="$HOSTNAME" docker stack deploy -c "/root/stacks/$BCM_TIER_NAME/registry/privreg.yml" privreg
 lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$HOSTNAME:5010"
 
+# tag and push the registry image to our local private registry.
 lxc exec "$HOSTNAME" -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 lxc exec "$HOSTNAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
 # now let's build some custom images that we're going run on each bcm-gateway
 # namely TOR
-export BCM_DOCKER_BASE_IMAGE="ubuntu:bionic"
+export BCM_DOCKER_BASE_IMAGE="ubuntu:latest"
 
 lxc exec "$HOSTNAME" -- docker pull $BCM_DOCKER_BASE_IMAGE
 lxc exec "$HOSTNAME" -- docker tag $BCM_DOCKER_BASE_IMAGE "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
