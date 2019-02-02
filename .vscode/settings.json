@@ -3,8 +3,5 @@
     "editor.cursorBlinking": "phase",
     "editor.cursorWidth": 3,
     "editor.formatOnSave": true,
-    "shellcheck.enable": true,
-    "shellcheck.executablePath": "shellcheck",
     "shellcheck.useWSL": false,
-    "shellcheck.run": "onType",
 }

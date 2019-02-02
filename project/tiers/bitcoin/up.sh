@@ -3,6 +3,8 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+source "$BCM_GIT_DIR/env"
+
 # shellcheck disable=SC1091
 source ./env
 if [[ $BCM_DEPLOY_BITCOIND == 1 ]]; then
@@ -43,7 +45,9 @@ if [[ $BCM_DEPLOY_BITCOIND == 1 ]]; then
         fi
     fi
     
-    
+    # cd $BCM_GIT_DIR/project/tiers/bitcoin
+    # source "$BCM_GIT_DIR/env"
+    # CHAIN=testnet
     source ./stacks/bitcoind/env
     BCM_STACK_FILE_DIRNAME=$(dirname ./stacks/bitcoind/env)
     bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --build-context=$(pwd)/stacks/bitcoind/build --container-name=bcm-bitcoin-01 --image-name=$BCM_IMAGE_NAME --image-tag=$BCM_IMAGE_TAG"

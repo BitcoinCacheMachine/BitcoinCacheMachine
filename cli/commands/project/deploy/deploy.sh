@@ -22,13 +22,13 @@ for i in "$@"; do
     esac
 done
 
-if ! bcm project list | grep -q "$BCM_PROJECT_NAME"; then
-    echo "BCM_PROJECT_NAME not specified. Provisioning base BCM stack."
-fi
-
 if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     echo "BCM cluster '$BCM_CLUSTER_NAME' not found. Can't deploy project to it."
     exit
 fi
 
-"$BCM_GIT_DIR/project/up.sh" --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME"
+if [[ -z "$BCM_PROJECT_NAME" ]]; then
+    "$BCM_GIT_DIR/project/up.sh" --project-name="bcmbase" --cluster-name="$BCM_CLUSTER_NAME"
+else
+    "$BCM_GIT_DIR/project/up.sh" --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME"
+fi

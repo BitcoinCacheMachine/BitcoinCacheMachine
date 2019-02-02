@@ -11,12 +11,12 @@ services:
       bitcoindrpcnet:
         aliases:
           - bitcoindrpc
-    # secrets:
-    #   - source: bitcoin_config
-    #     target: /secrets/bitcoin.conf
-    #     uid: '0'
-    #     gid: '0'
-    #     mode: 0400
+    secrets:
+      - source: bitcoin_config
+        target: /root/.bitcoin/bitcoin.conf
+        uid: '0'
+        gid: '0'
+        mode: 0400
     deploy:
       mode: replicated
       replicas: 1
@@ -24,9 +24,9 @@ services:
         constraints:
           - engine.labels.bcm-bitcoin == true
 
-# secrets:
-#   bitcoin_config:
-#     file: "build/bitcoin.conf"
+secrets:
+  bitcoin_config:
+    file: "bitcoin.conf"
 
 volumes:
   bitcoin_data:

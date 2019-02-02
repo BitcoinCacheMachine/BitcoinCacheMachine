@@ -1,7 +1,9 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
+
+source "$BCM_GIT_DIR/env"
 
 LXC_HOST=
 DOCKER_HUB_IMAGE=
@@ -68,8 +70,6 @@ if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
     exit
 fi
 
-
-
 if [[ ! -z $BUILD_CONTEXT ]]; then
     if [[ ! -d $BUILD_CONTEXT ]]; then
         echo "The build context was not passed properly."
@@ -85,13 +85,12 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
     exit
 fi
 
-# # if the user has asked us to build an image, we will do so, but ONLY if the image DOESN"T exist in the private registry already.
-# IMAGE_EXISTS=$(lxc exec bcm-gateway-01 -- curl --silent -f -lSL http://127.0.0.1:5010/v2/$IMAGE_NAME/manifests/$IMAGE_TAG | grep -q "$IMAGE_NAME")
-# echo "$IMAGE_EXISTS"
+REBUILD=0
+read -rp "Do you want to rebuild the image $IMAGE_NAME:$IMAGE_TAG (y/n)?: " CHOICE
+if [[ $CHOICE == "y" ]]; then
+    REBUILD=1
+fi
 
-# first, we check to see if the image already exists in our private registry. If it does, we won't do anything.
-#! lxc exec bcm-gateway-01 -- curl --silent -f -lSL http://127.0.0.1:5010/v2/$IMAGE_NAME/manifests/$IMAGE_TAG | grep -q "$IMAGE_NAME"
-REBUILD=1
 if [[ $REBUILD == 1 ]]; then
     # let's make sure there's a dockerfile
     if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then

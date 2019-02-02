@@ -1,8 +1,5 @@
 FROM bcm-gateway-01:5010/bcm-docker-base:latest
-
-# this was taken from https://github.com/NicolasDorier/docker-bitcoin/tree/master/core
-
-# RUN groupadd -r bitcoin && useradd -r -m -g bitcoin bitcoin
+# this was based on https://github.com/NicolasDorier/docker-bitcoin/tree/master/core
 
 RUN set -ex \
 	&& apt-get update \
@@ -32,15 +29,12 @@ RUN mkdir "$BITCOIN_DATA" \
 	&& ln -sfn "$BITCOIN_DATA" /root/.bitcoin
 
 VOLUME /data
-# && chown -R bitcoin:bitcoin "$BITCOIN_DATA" \
-#	&& ln -sfn "$BITCOIN_DATA" /home/bitcoin/.bitcoin \
-#&& chown -h bitcoin:bitcoin /home/bitcoin/.bitcoin
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 WORKDIR /root/.bitcoin
-COPY bitcoin.conf /root/.bitcoin/bitcoin.conf
 
 EXPOSE 8332 8333 18332 18333 18443 18444
 CMD ["bitcoind"]

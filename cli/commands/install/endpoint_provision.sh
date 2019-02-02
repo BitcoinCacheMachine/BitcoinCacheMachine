@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo
+set -Eeu
 
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y

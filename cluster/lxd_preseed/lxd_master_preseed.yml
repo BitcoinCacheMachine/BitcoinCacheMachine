@@ -3,7 +3,7 @@ config:
   core.trust_password: $BCM_LXD_SECRET
 storage_pools:
 - config:
-    size: 60GB
+    size: 250GB
   description: "BTRFS storage backend for BCM system containers."
   name: bcm_btrfs
   driver: btrfs

@@ -69,6 +69,7 @@ fi
 
 if [ $IS_MASTER -eq 1 ]; then
     envsubst <./lxd_preseed/lxd_master_preseed.yml >"$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd_preseed.yml"
+    #bcm pass insert --name="$BCM_CLUSTER_NAME/$BCM_ENDPOINT_NAME/lxd_preseed.yml"
     elif [ $IS_MASTER -ne 1 ]; then
     envsubst <./lxd_preseed/lxd_member_preseed.yml >"$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd_preseed.yml"
 else
