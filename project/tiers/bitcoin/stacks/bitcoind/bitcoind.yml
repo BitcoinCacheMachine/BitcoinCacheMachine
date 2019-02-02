@@ -7,7 +7,6 @@ services:
       - bitcoin_data:/data
     environment:
       BITCOIND_CHAIN: ${BCM_BITCOIN_CHAIN:-testnet}
-      LXC_HOST: ${BCM_LXC_HOST:}
     networks:
       bitcoindrpcnet:
         aliases:

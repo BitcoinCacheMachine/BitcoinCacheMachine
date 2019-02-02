@@ -4,6 +4,7 @@ services:
     image: ${DOCKER_IMAGE}
     ports:
       - "9050:9050/tcp"
+      - "9051:9051/tcp"
       - "9053:9053/udp"
     configs:
       - source: tor_config

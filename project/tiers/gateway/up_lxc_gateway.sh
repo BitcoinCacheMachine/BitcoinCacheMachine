@@ -53,7 +53,8 @@ bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTN
 # TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
 REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
-if [[ ! -z $BCM_CACHESTACK ]]; then
+
+if [[ ! -z ${BCM_CACHESTACK+x} ]]; then
     REGISTRY_PROXY_REMOTEURL="http://$BCM_CACHESTACK:5000"
 fi
 
@@ -69,13 +70,10 @@ lxc exec "$HOSTNAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
 # now let's build some custom images that we're going run on each bcm-gateway
 # namely TOR
-export BCM_DOCKER_BASE_IMAGE="ubuntu:latest"
-
-lxc exec "$HOSTNAME" -- docker pull $BCM_DOCKER_BASE_IMAGE
-lxc exec "$HOSTNAME" -- docker tag $BCM_DOCKER_BASE_IMAGE "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
-lxc exec "$HOSTNAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
+lxc exec "$HOSTNAME" -- docker pull ubuntu:latest
 lxc file push ./bcm-docker-base.Dockerfile "$HOSTNAME/root/Dockerfile"
 lxc exec "$HOSTNAME" -- docker build -t "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest" .
+lxc exec "$HOSTNAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
 
 lxc file push ./tor/ "$HOSTNAME/root/stacks/$BCM_TIER_NAME/" -p -r
 
