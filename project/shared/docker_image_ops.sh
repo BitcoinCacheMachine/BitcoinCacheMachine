@@ -91,7 +91,7 @@ fi
 
 # first, we check to see if the image already exists in our private registry. If it does, we won't do anything.
 #! lxc exec bcm-gateway-01 -- curl --silent -f -lSL http://127.0.0.1:5010/v2/$IMAGE_NAME/manifests/$IMAGE_TAG | grep -q "$IMAGE_NAME"
-REBUILD=1
+REBUILD=0
 if [[ $REBUILD == 1 ]]; then
     # let's make sure there's a dockerfile
     if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then

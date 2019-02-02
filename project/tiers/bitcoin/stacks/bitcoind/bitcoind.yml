@@ -30,7 +30,7 @@ services:
 
 volumes:
   bitcoin_data:
-
+      
 networks:
   bitcoindrpcnet:
     driver: overlay

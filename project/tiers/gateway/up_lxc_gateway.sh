@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
@@ -20,9 +20,8 @@ fi
 # first, create the profile that represents the tier.
 bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$BCM_TIER_NAME --yaml-path=$(readlink -f ./tier_profile.yml)"
 
-
+# create the networks for the gateway tier.
 bash -c "./create_lxc_gateway_networks.sh"
-
 
 # get all the bcm-gateway-xx containers deployed to the cluster.
 bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=gateway"
@@ -30,6 +29,7 @@ bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=gateway"
 # let's start the LXD container on the LXD cluster master.
 lxc file push ./dhcpd_conf.yml "$HOSTNAME/etc/netplan/10-lxc.yaml"
 
+# start bcm-gateway-01
 lxc start "$HOSTNAME"
 
 # let's configure the bcm-gateway-01 first since it is the first member
