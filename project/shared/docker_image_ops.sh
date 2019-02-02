@@ -91,7 +91,7 @@ fi
 
 # first, we check to see if the image already exists in our private registry. If it does, we won't do anything.
 #! lxc exec bcm-gateway-01 -- curl --silent -f -lSL http://127.0.0.1:5010/v2/$IMAGE_NAME/manifests/$IMAGE_TAG | grep -q "$IMAGE_NAME"
-REBUILD=0
+REBUILD=1
 if [[ $REBUILD == 1 ]]; then
     # let's make sure there's a dockerfile
     if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then
@@ -103,8 +103,9 @@ if [[ $REBUILD == 1 ]]; then
     fi
     
     # let's build the image and push it to our private registry.
-    lxc exec "$LXC_HOST" -- docker build -t "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" /root/build/
-    lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    IMAGE_FQDN="$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    lxc exec "$LXC_HOST" -- docker build -t "$IMAGE_FQDN" /root/build/
+    lxc exec "$LXC_HOST" -- docker push "$IMAGE_FQDN"
 else
     echo "The image already exists in the private registry. It will not be re-built."
 fi

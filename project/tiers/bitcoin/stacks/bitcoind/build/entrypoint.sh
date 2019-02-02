@@ -10,16 +10,26 @@ TOR_CONTROL_HOST="bcm-gateway-$HOST_ENDING:9051"
 wait-for-it -t 10 "$PROXY"
 wait-for-it -t 10 "$TOR_CONTROL_HOST"
 
-# we are going to wait for /data/gogogo to appear before starting bitcoind.
-# this allows the management plane to upload the blocks directory and/or chainstate.
-while [ ! -f /data/gogogo ]
+GOGO_FILE=
+if [[ $BITCOIND_CHAIN == "testnet" ]]; then
+    GOGO_FILE=/data/testnet3/gogogo
+    elif [[ $BITCOIND_CHAIN == "mainnet" ]]; then
+    GOGO_FILE=/data/gogogo
+else
+    echo "Error: BITCOIND_CHAIN must be either 'testnet' or 'mainnet'."
+    exit
+fi
+
+# we are going to wait for GOGO_FILE to appear before starting bitcoind.
+# this allows the management plane to upload the blocks and/or chainstate.
+while [ ! -f "$GOGO_FILE" ]
 do
     sleep 2
     echo "."
 done
 
 if [[ $BITCOIND_CHAIN == "testnet" ]]; then
-    bitcoind -testnet -conf=/home/bitcoin/bitcoin.conf -datadir=/data -proxy="$PROXY" -torcontrol="$TOR_CONTROL_HOST"
+    bitcoind -testnet -conf=/root/.bitcoin/bitcoin.conf -datadir=/data -proxy="$PROXY" -torcontrol="$TOR_CONTROL_HOST"
     elif [[ $BITCOIND_CHAIN == "mainnet" ]]; then
-    bitcoind -conf=/home/bitcoin/bitcoin.conf -datadir=/data -proxy="$PROXY" -torcontrol="$TOR_CONTROL_HOST"
+    bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/data -proxy="$PROXY" -torcontrol="$TOR_CONTROL_HOST"
 fi
