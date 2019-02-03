@@ -9,6 +9,5 @@ source "$BCM_GIT_DIR/env"
 # shellcheck disable=SC1091
 source ./env
 
-if [[ $BCM_DEPLOY_BITCOIND == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --env-file-path=$(readlink -f ./stacks/bitcoind/env)"
-fi
+bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=bitcoind-testnet"
+bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=bitcoind-mainnet"

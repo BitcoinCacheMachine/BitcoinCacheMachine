@@ -10,8 +10,6 @@ DOCKER_HUB_IMAGE=
 IMAGE_NAME=
 IMAGE_TAG=latest
 BUILD_CONTEXT=
-IMAGE_TAGGED_FLAG=0
-IMAGE_EXISTS=0
 PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY"
 
 for i in "$@"; do
@@ -22,10 +20,6 @@ for i in "$@"; do
         ;;
         --docker-hub-image-name=*)
             DOCKER_HUB_IMAGE="${i#*=}"
-            shift # past argument=value
-        ;;
-        --registry=*)
-            PRIVATE_REGISTY="${i#*=}"
             shift # past argument=value
         ;;
         --image-name=*)
@@ -85,10 +79,13 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
     exit
 fi
 
-REBUILD=0
-read -rp "Do you want to rebuild the image $IMAGE_NAME:$IMAGE_TAG (y/n)?: " CHOICE
-if [[ $CHOICE == "y" ]]; then
-    REBUILD=1
+REBUILD=1
+if [[ $BCM_DEBUG == 1 ]]; then
+    REBUILD=0
+    read -rp "Do you want to rebuild the image $IMAGE_NAME:$IMAGE_TAG (y/n)?: " CHOICE
+    if [[ $CHOICE == "y" ]]; then
+        REBUILD=1
+    fi
 fi
 
 if [[ $REBUILD == 1 ]]; then

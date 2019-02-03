@@ -1,22 +1,22 @@
 version: '3.6'
 services:
   bitcoind:
-    image: ${BCM_IMAGE_NAME}
+    image: ${DOCKER_IMAGE}
     hostname: bitcoind
     volumes:
       - bitcoin_data:/data
     environment:
-      BITCOIND_CHAIN: ${BCM_BITCOIN_CHAIN:-testnet}
+      CHAIN: ${CHAIN:-testnet}
     networks:
       bitcoindrpcnet:
         aliases:
           - bitcoindrpc
-    secrets:
+    configs:
       - source: bitcoin_config
         target: /root/.bitcoin/bitcoin.conf
-        uid: '0'
-        gid: '0'
-        mode: 0400
+        # uid: '0'
+        # gid: '0'
+        # mode: 0400
     deploy:
       mode: replicated
       replicas: 1
@@ -24,9 +24,9 @@ services:
         constraints:
           - engine.labels.bcm-bitcoin == true
 
-secrets:
+configs:
   bitcoin_config:
-    file: "bitcoin.conf"
+    file: bitcoin.conf
 
 volumes:
   bitcoin_data:

@@ -2,21 +2,27 @@
 
 set -Eeux
 
-echo "BITCOIND_CHAIN: $BITCOIND_CHAIN"
-HOST_ENDING="01"
-PROXY="bcm-gateway-$HOST_ENDING:9050"
-TOR_CONTROL_HOST="bcm-gateway-$HOST_ENDING:9051"
+echo "CHAIN: $CHAIN"
+DEFAULT_GATEWAY="$(ip route | grep "default via" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')"
+DEFAULT_GATEWAY_HOSTNAME="$(host "$DEFAULT_GATEWAY" | tail -n 1 | sed -e "s/^.* //;s/[[:punct:]]*$//")"
+HOST_ENDING="$(echo "$DEFAULT_GATEWAY_HOSTNAME" | grep -Eo '[0-9]{1,2}')"
 
-wait-for-it -t 10 "$PROXY"
+LOCAL_GW_LXC_HOST="bcm-gateway-$HOST_ENDING"
+LOCAL_GW_LXD_HOST_IP="$(getent hosts "$LOCAL_GW_LXC_HOST" | awk '{ print $1 }')"
+
+TOR_PROXY="$LOCAL_GW_LXD_HOST_IP:9050"
+TOR_CONTROL_HOST="$LOCAL_GW_LXD_HOST_IP:9051"
+
+wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL_HOST"
 
 GOGO_FILE=
-if [[ $BITCOIND_CHAIN == "testnet" ]]; then
+if [[ $CHAIN == "testnet" ]]; then
     GOGO_FILE=/data/testnet3/gogogo
-    elif [[ $BITCOIND_CHAIN == "mainnet" ]]; then
+    elif [[ $CHAIN == "mainnet" ]]; then
     GOGO_FILE=/data/gogogo
 else
-    echo "Error: BITCOIND_CHAIN must be either 'testnet' or 'mainnet'."
+    echo "Error: CHAIN must be either 'testnet' or 'mainnet'."
     exit
 fi
 
@@ -28,8 +34,8 @@ do
     echo "."
 done
 
-if [[ $BITCOIND_CHAIN == "testnet" ]]; then
-    bitcoind -testnet -conf=/root/.bitcoin/bitcoin.conf -datadir=/data -proxy="$PROXY" -torcontrol="$TOR_CONTROL_HOST"
-    elif [[ $BITCOIND_CHAIN == "mainnet" ]]; then
-    bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/data -proxy="$PROXY" -torcontrol="$TOR_CONTROL_HOST"
+if [[ $CHAIN == "testnet" ]]; then
+    bitcoind -testnet -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST"
+    elif [[ $CHAIN == "mainnet" ]]; then
+    bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST"
 fi
