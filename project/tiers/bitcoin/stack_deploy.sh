@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 source "$BCM_GIT_DIR/env"
@@ -17,6 +17,11 @@ for i in "$@"; do
         ;;
     esac
 done
+
+if [[ -z $CHAIN ]]; then
+    echo "CHAIN not specified. Exiting"
+    exit
+fi
 
 # get the env from bitcoind
 source "$(pwd)/stacks/bitcoind/env"

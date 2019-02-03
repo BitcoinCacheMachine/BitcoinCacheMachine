@@ -9,5 +9,31 @@ source "$BCM_GIT_DIR/env"
 # shellcheck disable=SC1091
 source ./env
 
-bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=bitcoind-testnet"
-bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=bitcoind-mainnet"
+
+source "$BCM_GIT_DIR/env"
+
+CHAIN=
+for i in "$@"; do
+    case $i in
+        --chain=*)
+            CHAIN="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
+if [[ -z $CHAIN ]]; then
+    echo "CHAIN not specified. Exiting"
+    exit
+fi
+
+# validate the chain
+if [[ "$CHAIN" != testnet && "$CHAIN" != mainnet ]]; then
+    echo "Error: --chain must be either 'testnet' or 'mainnet'."
+    exit
+fi
+
+bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=bitcoind-$CHAIN"

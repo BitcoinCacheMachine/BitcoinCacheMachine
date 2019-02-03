@@ -2,7 +2,7 @@ version: '3.6'
 services:
   bitcoind:
     image: ${DOCKER_IMAGE}
-    hostname: bitcoind
+    hostname: bitcoind-${CHAIN}
     volumes:
       - bitcoin_data:/data
     environment:
@@ -14,9 +14,6 @@ services:
     configs:
       - source: bitcoin_config
         target: /root/.bitcoin/bitcoin.conf
-        # uid: '0'
-        # gid: '0'
-        # mode: 0400
     deploy:
       mode: replicated
       replicas: 1

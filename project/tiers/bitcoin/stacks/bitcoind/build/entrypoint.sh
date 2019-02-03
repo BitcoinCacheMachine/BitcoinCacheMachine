@@ -13,6 +13,10 @@ LOCAL_GW_LXD_HOST_IP="$(getent hosts "$LOCAL_GW_LXC_HOST" | awk '{ print $1 }')"
 TOR_PROXY="$LOCAL_GW_LXD_HOST_IP:9050"
 TOR_CONTROL_HOST="$LOCAL_GW_LXD_HOST_IP:9051"
 
+# TODO make this cleaner.
+OVERLAY_NETWORK_IP=$(ip addr | grep "172.16.238." | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+
+
 wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL_HOST"
 
@@ -35,7 +39,7 @@ do
 done
 
 if [[ $CHAIN == "testnet" ]]; then
-    bitcoind -testnet -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST"
+    bitcoind -testnet -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST" -rpcbind="$OVERLAY_NETWORK_IP" -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332" -debug=tor
     elif [[ $CHAIN == "mainnet" ]]; then
-    bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST"
+    bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST" -rpcbind="$OVERLAY_NETWORK_IP" -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332" -debug=tor
 fi
