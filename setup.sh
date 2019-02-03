@@ -96,6 +96,6 @@ else
     echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p" >> "$SSH_LOCAL_CONF"
 fi
 
-echo $SSH_LOCAL_CONF
+echo "$SSH_LOCAL_CONF"
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Open a new terminal then type 'bcm --help'."

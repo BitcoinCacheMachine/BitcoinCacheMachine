@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
-if [ ! -z ${VALUE} ]; then
+if [ ! -z "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     echo "Please provide a SSH command."
@@ -50,7 +50,7 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
     if [[ $BCM_CLI_VERB == "newkey" ]]; then
         
         USER_HOSTNAME=${3:-}
-        if [ ! -z ${USER_HOSTNAME} ]; then
+        if [ ! -z "${USER_HOSTNAME}" ]; then
             BCM_SSH_USERNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f1)
             BCM_SSH_HOSTNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f2)
         fi
@@ -70,7 +70,7 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
         # if they're both empty, let's check to see if they used the 'user@hostname' format instead.
         if [[ -z $BCM_SSH_USERNAME && -z $BCM_SSH_HOSTNAME ]]; then
             USER_HOSTNAME=${3:-}
-            if [ ! -z ${USER_HOSTNAME} ]; then
+            if [ ! -z "${USER_HOSTNAME}" ]; then
                 BCM_SSH_USERNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f1)
                 BCM_SSH_HOSTNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f2)
             else
@@ -107,7 +107,7 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
         elif [[ $BCM_CLI_VERB == "connect" ]]; then
         
         USER_HOSTNAME=${3:-}
-        if [ ! -z ${USER_HOSTNAME} ]; then
+        if [ ! -z "${USER_HOSTNAME}" ]; then
             BCM_SSH_USERNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f1)
             BCM_SSH_HOSTNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f2)
         else

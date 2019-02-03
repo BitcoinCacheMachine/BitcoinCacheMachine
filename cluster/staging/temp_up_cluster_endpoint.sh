@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # prepare the cloud-init file
 if [[ $BCM_PROVIDER_NAME != "local" ]]; then
@@ -11,7 +12,7 @@ if [[ $BCM_PROVIDER_NAME != "local" ]]; then
         fi
         
         export BCM_LISTEN_INTERFACE=$BCM_LISTEN_INTERFACE
-        envsubst <./cloud_init_template.yml >$BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml
+        envsubst <./cloud_init_template.yml >"$BCM_CLUSTER_ENDPOINT_DIR/cloud-init.yml"
     fi
 fi
 

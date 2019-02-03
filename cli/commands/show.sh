@@ -13,9 +13,9 @@ echo "LXD storage pools:"
 lxc storage list
 
 if lxc storage list | grep -q bcm_btrfs; then
-	echo ""
-	echo "LXD storage bcm_btrfs volumes:"
-	lxc storage volume list bcm_btrfs
+    echo ""
+    echo "LXD storage bcm_btrfs volumes:"
+    lxc storage volume list bcm_btrfs
 fi
 
 echo ""
@@ -31,9 +31,9 @@ echo "LXD images:"
 lxc image list
 
 if lxc info | grep -q "server_clustered: true"; then
-	echo ""
-	echo "LXD cluster:"
-	lxc cluster list
+    echo ""
+    echo "LXD cluster:"
+    lxc cluster list
 fi
 
 echo ""

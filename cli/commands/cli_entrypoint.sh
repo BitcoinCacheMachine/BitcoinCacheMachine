@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 export BCM_CLI_COMMAND=$1

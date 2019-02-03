@@ -60,16 +60,21 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
 fi
 
 LINE=$(sudo GNUPGHOME="$GNUPGHOME" su -p root -c 'gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/'')
-echo $LINE
+echo "$LINE"
 LINE="${LINE#*/}"
-echo $LINE
+echo "$LINE"
 LINE="$(echo "$LINE" | grep -o '^\S*')"
 LINE="$(echo "$LINE" | xargs)"
 
 {
     echo '#!/bin/bash'
     echo "export BCM_DEFAULT_KEY_ID="'"'"$LINE"'"'
+    # shellcheck disable=SC2086
     echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"'
+    
+    # shellcheck disable=SC2086
     echo "export BCM_CERT_USERNAME="'"'$BCM_CERT_USERNAME'"'
+    
+    # shellcheck disable=SC2086
     echo "export BCM_CERT_HOSTNAME="'"'$BCM_CERT_HOSTNAME'"'
 } >>"$GNUPGHOME/env"

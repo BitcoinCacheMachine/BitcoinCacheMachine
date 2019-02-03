@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:5.0.1-1"
+PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:5.1.0"
 BROKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-broker:latest"
 
 # if it's the first instance, let's download the kafka image from
