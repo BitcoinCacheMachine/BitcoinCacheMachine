@@ -1,0 +1,4 @@
+export TEMP_DIR="/tmp/bcm/$BCM_CLUSTER_NAME"
+export REMOTE_MOUNTPOINT="/tmp/bcm/provisioning"
+export BCM_ENDPOINT_NAME="$BCM_CLUSTER_NAME-01"
+export ENV_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/env"

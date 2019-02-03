@@ -90,7 +90,8 @@ fi
 if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
     # 'images' is the publicly avaialb e image server. Used whenever there's no LXD image cache specified.
     IMAGE_REMOTE="images"
-    if [[ ! -z $BCM_CACHESTACK ]]; then
+    
+    if [ ! -z ${BCM_CACHESTACK+x} ]; then
         IMAGE_REMOTE="$BCM_CACHESTACK"
         if ! lxc remote list --format csv | grep -q "$IMAGE_REMOTE"; then
             lxc remote add "$IMAGE_REMOTE" "$IMAGE_REMOTE:8443"

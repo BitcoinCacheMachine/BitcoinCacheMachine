@@ -3,22 +3,22 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-IS_MASTER=0
-BCM_ENDPOINT_NAME=
-BCM_ENDPOINT_VM_IP=
+BCM_CLUSTER_NAME=
+BCM_SSH_USERNAME=
+BCM_SSH_HOSTNAME=
 
 for i in "$@"; do
     case $i in
-        --master)
-            IS_MASTER=1
-            shift # past argument=value
-        ;;
         --cluster-name=*)
             BCM_CLUSTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
-        --endpoint-name=*)
-            BCM_ENDPOINT_NAME="${i#*=}"
+        --ssh-username=*)
+            BCM_SSH_USERNAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --ssh-hostname=*)
+            BCM_SSH_HOSTNAME="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -27,13 +27,22 @@ for i in "$@"; do
     esac
 done
 
-echo "IS_MASTER: $IS_MASTER"
-echo "BCM_ENDPOINT_NAME: $BCM_ENDPOINT_NAME"
-echo "BCM_SSH_HOSTNAME: $BCM_SSH_HOSTNAME"
-echo "BCM_SSH_USERNAME: $BCM_SSH_USERNAME"
+source ./env
+mkdir -p "$TEMP_DIR"
+
+./stub_env.sh --endpoint-name="$BCM_ENDPOINT_NAME" --master --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME"
+
+# since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
+LXD_CERT_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd.cert"
+
+# makre sure we're on the correct LXC remote
+if [[ $(lxc remote get-default) == "$BCM_CLUSTER_NAME" ]]; then
+    # get the cluster master certificate using LXC.
+    touch "$LXD_CERT_FILE"
+    lxc info | awk '/    -----BEGIN CERTIFICATE-----/{p=1}p' | sed '1,/    -----END CERTIFICATE-----/!d' | sed "s/^[ \\t]*//" >>"$LXD_CERT_FILE"
+fi
 
 # let's mount the directory via sshfs. This contains the lxd seed file.
-REMOTE_MOUNTPOINT="/tmp/bcm/provisioning"
 SSH_KEY_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/id_rsa"
 #LXD_TOR_HOSTNAME_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd_tor_hostname"
 LXD_PRESEED_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd_preseed.yml"
@@ -53,18 +62,14 @@ else
     ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/lxd_install.sh"
     ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/lxd_install.sh"
     wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
-    
-    # ssh -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" cat /tmp/lxd_tor_hostname > "$LXD_TOR_HOSTNAME_FILE"
-    # ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo rm /tmp/lxd_tor_hostname
-    
-    # cat "$LXD_TOR_HOSTNAME_FILE"
 fi
 
+
 # if it's the cluster master add the LXC remote so we can manage it.
-if [[ $IS_MASTER == 1 ]]; then
+if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     source "$ENV_FILE"
     
-    echo "Waiting for the remote lxd daemon to become available at $BCM_ENDPOINT_VM_IP."
+    echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
     wait-for-it -t 0 "$BCM_SSH_HOSTNAME:8443"
     
     echo "Adding a lxd remote for cluster '$BCM_CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."

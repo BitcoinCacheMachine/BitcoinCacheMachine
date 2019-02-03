@@ -23,7 +23,7 @@ for i in "$@"; do
 done
 
 if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
-    echo "BCM cluster '$BCM_CLUSTER_NAME' not found. Can't deploy project to it."
+    echo "BCM cluster '$BCM_CLUSTER_NAME' not found. Can't deploy1 project to it."
     exit
 fi
 

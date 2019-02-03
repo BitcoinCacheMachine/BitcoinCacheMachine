@@ -10,6 +10,18 @@ else
     echo "  BCM_CLUSTER_NAME:           $BCM_CLUSTER_NAME";
 fi
 
+if [ -z ${BCM_SSH_USERNAME+x} ]; then
+    echo "  BCM_SSH_USERNAME:           N/A";
+else
+    echo "  BCM_SSH_USERNAME:           $BCM_SSH_USERNAME";
+fi
+
+if [ -z ${BCM_SSH_HOSTNAME+x} ]; then
+    echo "  BCM_SSH_HOSTNAME:           N/A";
+else
+    echo "  BCM_SSH_HOSTNAME:           $BCM_SSH_HOSTNAME";
+fi
+
 if [ -z ${BCM_CERT_NAME+x} ]; then
     echo "  BCM_CERT_NAME:              N/A";
 else
@@ -34,26 +46,27 @@ else
     echo "  BCM_PROJECT_NAME:           $BCM_PROJECT_NAME";
 fi
 
-
-if [ -z ${BCM_SSH_HOSTNAME+x} ]; then
-    echo "  BCM_SSH_HOSTNAME:           N/A";
-else
-    echo "  BCM_SSH_HOSTNAME:           $BCM_SSH_HOSTNAME";
-fi
-
 echo ""
 
 echo "ACTIVE_ENVIRONMENT"
-if [[ -d $GNUPGHOME ]]; then
-    echo "  GNUPGHOME:                  $GNUPGHOME"
+if [ -z ${GNUPGHOME+x} ]; then
+    echo "  GNUPGHOME:           N/A";
 else
-    echo "  GNUPGHOME:                  N/A"
+    if [[ -d $GNUPGHOME ]]; then
+        echo "  GNUPGHOME:                  $GNUPGHOME"
+    else
+        echo "  GNUPGHOME:                  N/A"
+    fi
 fi
 
-if [[ -d $PASSWORD_STORE_DIR ]]; then
-    echo "  PASSWORD_STORE_DIR:         $PASSWORD_STORE_DIR"
+if [ -z ${PASSWORD_STORE_DIR+x} ]; then
+    echo "  PASSWORD_STORE_DIR:           N/A";
 else
-    echo "  PASSWORD_STORE_DIR:         N/A"
+    if [[ -d $PASSWORD_STORE_DIR ]]; then
+        echo "  PASSWORD_STORE_DIR:         $PASSWORD_STORE_DIR"
+    else
+        echo "  PASSWORD_STORE_DIR:         N/A"
+    fi
 fi
 
 echo "  BCM_ACTIVE:                 $BCM_ACTIVE"

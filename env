@@ -6,8 +6,8 @@ export BCM_LXD_OPS="$BCM_GIT_DIR/project/shared"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 export BCM_PRIVATE_REGISTRY="bcm-gateway-01:5010"
 
-GNUPGHOME="$BCM_RUNTIME_DIR/.gnupg"
-PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/.password_store"
+GNUPGHOME="$BCM_RUNTIME_DIR/gnupg"
+PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/password_store"
 
 # when the user sets this to 1, we will use their ~/.gnupg and ~/.ssh and ~/.password_store directories
 # instead of the BCM defaults under BCM_RUNTIME_DIR

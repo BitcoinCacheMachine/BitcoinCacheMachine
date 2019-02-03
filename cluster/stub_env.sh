@@ -1,19 +1,24 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-BCM_ENDPOINT_NAME=
 IS_MASTER=0
+BCM_SSH_USERNAME=
+BCM_SSH_HOSTNAME=
 
 for i in "$@"; do
     case $i in
-        --endpoint-name=*)
-            BCM_ENDPOINT_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
         --master)
             IS_MASTER=1
+            shift # past argument=value
+        ;;
+        --ssh-username=*)
+            BCM_SSH_USERNAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --ssh-hostname=*)
+            BCM_SSH_HOSTNAME="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -21,6 +26,16 @@ for i in "$@"; do
         ;;
     esac
 done
+
+if [[ -z "$BCM_SSH_USERNAME" ]]; then
+    echo "ERROR: BCM_SSH_USERNAME not passed correctly."
+    exit
+fi
+
+if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
+    echo "ERROR: BCM_SSH_HOSTNAME not passed correctly."
+    exit
+fi
 
 ENDPOINT_DIR="$TEMP_DIR/$BCM_ENDPOINT_NAME"
 mkdir -p "$ENDPOINT_DIR"
@@ -34,9 +49,11 @@ wait-for-it -t 60 "$BCM_SSH_HOSTNAME:22"
 
 SSH_KEY_FILE="$ENDPOINT_DIR/id_rsa"
 
-# this key is for temporary use and used only during initial provisioning.
-ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_FILE" -N ""
-chmod 400 "$SSH_KEY_FILE.pub"
+if [[ ! -f $SSH_KEY_FILE ]]; then
+    # this key is for temporary use and used only during initial provisioning.
+    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_FILE" -N ""
+    chmod 400 "$SSH_KEY_FILE.pub"
+fi
 
 if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
     torify ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
@@ -46,13 +63,14 @@ fi
 
 # generate Trezor-backed SSH keys for interactively login.
 SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"
-bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push
+#bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push
 
 if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
     torify ssh -i "$SSH_KEY_FILE" -t "$SSH_IDENTITY" ip link show
 else
     ssh -i "$SSH_KEY_FILE" -t "$SSH_IDENTITY" ip link show
 fi
+
 # TODO Do some error checking on network interface selection.
 read -rp "Enter the physical network interface name to use for the management plane:  " BCM_MGMT_PLANE_INTERFACE
 
@@ -60,9 +78,9 @@ export BCM_LXD_PHYSICAL_INTERFACE="$BCM_MGMT_PLANE_INTERFACE"
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
 if [ $IS_MASTER -eq 1 ]; then
-    envsubst <./env/master_defaults.env >$ENV_FILE
+    envsubst <./envtemplates/master_defaults.env >"$ENV_FILE"
     elif [ $IS_MASTER -ne 1 ]; then
-    envsubst <./env/member_defaults.env >$ENV_FILE
+    envsubst <./envtemplates/member_defaults.env >"$ENV_FILE"
 else
     echo "Incorrect usage. Please specify whether $BCM_ENDPOINT_NAME is an LXD cluster master or member."
 fi

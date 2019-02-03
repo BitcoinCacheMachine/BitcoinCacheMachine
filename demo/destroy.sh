@@ -20,5 +20,8 @@ if [[ -d $PASSWORD_STORE_DIR ]]; then
     fi
 fi
 
+bcm cluster destroy --cluster-name="$BCM_CLUSTER_NAME" \
+    --ssh-username="$BCM_SSH_USERNAME" \
+    --ssh-hostname="$BCM_SSH_HOSTNAME" --remove-lxd
+
 bash -c "$BCM_GIT_DIR/cli/tmp_down.sh"
-sudo snap remove lxd

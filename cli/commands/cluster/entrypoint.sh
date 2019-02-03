@@ -18,8 +18,7 @@ BCM_CLUSTER_NAME=
 BCM_NODE_COUNT=
 BCM_ENDPOINTS_FLAG=0
 BCM_SSH_HOSTNAME=
-BCM_SSH_USERNAME="$(whoami)"
-BCM_LXD_HOSTNAME=
+BCM_SSH_USERNAME=
 
 for i in "$@"; do
     case $i in
@@ -31,7 +30,7 @@ for i in "$@"; do
             BCM_SSH_HOSTNAME="${i#*=}"
             shift # past argument=value
         ;;
-        --username=*)
+        --ssh-username=*)
             BCM_SSH_USERNAME="${i#*=}"
             shift # past argument=value
         ;;
@@ -58,16 +57,11 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
-    export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
-    
-    bash -c "$BCM_GIT_DIR/cluster/up_cluster.sh --cluster-name=$BCM_CLUSTER_NAME --node-count=$BCM_NODE_COUNT"
-    
+    bash -c "$BCM_GIT_DIR/cluster/up_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
     elif [[ $BCM_CLI_VERB == "destroy" ]]; then
-    export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-    bash -c "$BCM_GIT_DIR/cluster/destroy_cluster.sh --cluster-name=$BCM_CLUSTER_NAME"
+    export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
+    bash -c "$BCM_GIT_DIR/cluster/destroy_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME  --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
     elif [[ $BCM_CLI_VERB == "list" ]]; then
-    
     export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
     
     # shellcheck disable=SC2153
