@@ -90,14 +90,19 @@ fi
 # for any SSH host that has a ".onion" address. We use SSH tunneling to expose the remove onion
 # server's LXD API and access it on the controller via a locally expose port (after SSH tunneling)
 SSH_LOCAL_CONF="$HOME/.ssh/config"
-SSH_ONION_TEXT="Host *.onion"
-if grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
-    echo "$HOME/.ssh/config already configured correctly."
-else
-    echo "$SSH_ONION_TEXT" >> "$SSH_LOCAL_CONF"
-    echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p" >> "$SSH_LOCAL_CONF"
+if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
+    mkdir -p "$HOME/.ssh"
+    touch "$SSH_LOCAL_CONF"
 fi
 
-echo "$SSH_LOCAL_CONF"
+if [[ -f "$SSH_LOCAL_CONF" ]]; then
+    SSH_ONION_TEXT="Host *.onion"
+    if grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
+        echo "$HOME/.ssh/config already configured correctly."
+    else
+        echo "$SSH_ONION_TEXT" >> "$SSH_LOCAL_CONF"
+        echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p" >> "$SSH_LOCAL_CONF"
+    fi
+fi
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Open a new terminal then type 'bcm --help'."
