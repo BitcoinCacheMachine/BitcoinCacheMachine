@@ -80,7 +80,7 @@ sudo apt-get install -y wait-for-it openssh-server lxc-utils netcat
 SSH_CONFIG_TEXT="ListenAddress 0.0.0.0"
 SSH_CONFIG=/etc/ssh/sshd_config
 if grep -Fxq "$SSH_CONFIG_TEXT" "$SSH_CONFIG"; then
-    echo "SSH already configured correctly."
+    echo "SSH is configured correctly for BCM operation."
 else
     echo "$SSH_CONFIG_TEXT" | sudo tee -a SSH_CONFIG
     sudo systemctl restart ssh
