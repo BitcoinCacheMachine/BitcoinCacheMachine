@@ -55,8 +55,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     bash -c "$BCM_GIT_DIR/cluster/up_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
     elif [[ $BCM_CLI_VERB == "destroy" ]]; then
     
-    bcm project 
-    
     # if the user didn't pass the cluster name, then we assume the user wants to delete the active cluster.
     CHOICE=n
     if [[ -z "$BCM_CLUSTER_NAME" ]]; then

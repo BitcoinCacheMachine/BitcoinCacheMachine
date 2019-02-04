@@ -3,9 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-VALUE=${2:-}
-if [ ! -z ${VALUE} ]; then
-    BCM_CLI_VERB="$2"
+COMMAND=${2:-}
+if [ ! -z "${COMMAND}" ]; then
+    BCM_CLI_VERB="$COMMAND"
 else
     echo "Please provide a project command."
     cat ./help.txt

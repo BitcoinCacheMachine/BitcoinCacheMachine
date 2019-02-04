@@ -19,28 +19,32 @@ if [[ -z $(git config --get --global user.email) ]]; then
     git config --global user.email "bcm@$(hostname)"
 fi
 
+# let's install all necessary software at the SDN controller.
+sudo apt-get install -y wait-for-it openssh-server lxc-utils netcat encfs
+bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
+bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+
 # let's make sure the local git client is using TOR for git pull operations.
-# this should have been configured on a global level already, but we'll set the local
-# settings as well.
+# this should have been configured on a global level already when the user initially
+# downloaded BCM from github
 BCM_TOR_PROXY="socks5://localhost:9050"
 if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
     echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
     git config --local http.proxy "$BCM_TOR_PROXY"
 fi
 
-# get the current directory where this script is so we can set ENVs
+# get the current directory where this script is so we can set ENVs in ~/.bashrc
 echo "Setting BCM_GIT_DIR environment variable in current shell to '$(pwd)'"
 BCM_GIT_DIR=$(pwd)
 export BCM_GIT_DIR="$BCM_GIT_DIR"
 export BCM_RUNTIME_DIR="$BCM_RUNTIME_DIR"
 
 # commands in ~/.bashrc are delimited by these literals.
+BASHRC_FILE="$HOME/.bashrc"
 BCM_BASHRC_START_FLAG='###START_BCM###'
 BCM_BASHRC_END_FLAG='###END_BCM###'
-BASHRC_FILE="$HOME/.bashrc"
 
 if grep -Fxq "$BCM_BASHRC_START_FLAG" "$BASHRC_FILE"; then
-    # code if found
     echo "BCM flag discovered in '$BASHRC_FILE'. Please inspect your '$BASHRC_FILE' to clear any BCM-related content, if appropriate."
 else
     echo "Writing commands to '$BASHRC_FILE' to enable the BCM CLI."
@@ -55,15 +59,8 @@ else
     } >>"$BASHRC_FILE"
 fi
 
-# make sure docker is installed. Doing it here makes sure we don't have to do it anywhere else.
-bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
-
-bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
-
+# configure encfs/FUSE mount settings.
 if ! dpkg-query -s encfs | grep -q "Status: install ok installed"; then
-    echo "Installing encfs which encrypts data at rest."
-    sudo apt-get install -y encfs
-    
     if grep -q "#user_allow_other" </etc/fuse.conf; then
         # update /etc/fuse.conf to allow non-root users to specify the allow_root mount option
         sudo sed -i -e 's/#user_allow_other/user_allow_other/g' /etc/fuse.conf
@@ -75,26 +72,31 @@ mkdir -p "$HOME/.gnupg"
 mkdir -p "$HOME/.password_store"
 mkdir -p "$HOME/.ssh"
 
-sudo apt-get install -y wait-for-it openssh-server lxc-utils netcat
-
-SSH_CONFIG_TEXT="ListenAddress 0.0.0.0"
+# configure SSH on the SDN controller.
+SSH_CONFIG_TEXT="ListenAddress 127.0.0.1"
 SSH_CONFIG=/etc/ssh/sshd_config
-if grep -Fxq "$SSH_CONFIG_TEXT" "$SSH_CONFIG"; then
-    echo "SSH is configured correctly for BCM operation."
-else
-    echo "$SSH_CONFIG_TEXT" | sudo tee -a SSH_CONFIG
-    sudo systemctl restart ssh
+if [[ -f "$SSH_CONFIG" ]]; then
+    if grep -Fxq "$SSH_CONFIG_TEXT" "$SSH_CONFIG"; then
+        echo "SSH is configured correctly for BCM operation."
+    else
+        echo "$SSH_CONFIG_TEXT" | sudo tee -a SSH_CONFIG
+        sudo systemctl restart ssh
+    fi
 fi
 
 # this section configured the local SSH client on the Controller so it uses the local SOCKS5 proxy
-# for any SSH host that has a ".onion" address. We use SSH tunneling to expose the remove onion
+# for any SSH host that has a ".onion" address. We use SSH tunneling to expose the remote onion
 # server's LXD API and access it on the controller via a locally expose port (after SSH tunneling)
 SSH_LOCAL_CONF="$HOME/.ssh/config"
+
+# if the .ssh/config file doesn't exist, create it.
 if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
     mkdir -p "$HOME/.ssh"
     touch "$SSH_LOCAL_CONF"
 fi
 
+# Next, paste in the necessary .ssh/config settings for accessing remote LXD servers over TOR hidden
+# services.
 if [[ -f "$SSH_LOCAL_CONF" ]]; then
     SSH_ONION_TEXT="Host *.onion"
     if grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
