@@ -12,8 +12,8 @@ else
     exit
 fi
 
-BCM_PROJECT_NAME=
-BCM_CLUSTER_NAME=
+BCM_PROJECT_NAME=BCMBase
+BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_DEPLOYMENTS_FLAG=0
 
 for i in "$@"; do
@@ -42,22 +42,19 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
 fi
 
 if [[ -z $BCM_PROJECT_NAME ]]; then
-    echo "BCM_PROJECT_NAME was empty.  Deploying to default BCM stack."
+    echo "WARNING: BCM_PROJECT_NAME was not specified."
 fi
 
-export BCM_PROJECT_NAME=$BCM_PROJECT_NAME
+export BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
 
 # call the appropriate sciprt.
 if [[ $BCM_CLI_VERB == "create" ]]; then
     ./create/create.sh "$@"
-    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
-    ./destroy/destroy.sh "$@"
 fi
 
-export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-
+export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
     ./deploy/deploy.sh "$@"
-    elif [[ $BCM_CLI_VERB == "undeploy" ]]; then
-    ./undeploy/undeploy.sh "$@"
+    elif [[ $BCM_CLI_VERB == "remove" ]]; then
+    bash -c "$BCM_GIT_DIR/project/destroy.sh" "$@"
 fi
