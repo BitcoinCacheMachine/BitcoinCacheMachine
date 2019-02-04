@@ -3,8 +3,16 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-export BCM_CLI_COMMAND=$1
-export BCM_CLI_VERB=$2
+BCM_CLI_COMMAND=
+
+if [[ ! -z ${1+x} ]]; then
+    BCM_CLI_COMMAND="$1"
+else
+    cat ./help.txt
+    exit
+fi
+
+export BCM_CLI_COMMAND="$BCM_CLI_COMMAND"
 
 shopt -s expand_aliases
 
@@ -30,25 +38,27 @@ done
 export BCM_HELP_FLAG=$BCM_HELP_FLAG
 export BCM_FORCE_FLAG=$BCM_FORCE_FLAG
 
-if [[ $BCM_CLI_COMMAND == "init" ]]; then
+if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
     ./init.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "project" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "project" ]]; then
     ./project/entrypoint.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "cluster" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
     ./cluster/entrypoint.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "git" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "git" ]]; then
     ./git/entrypoint.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "file" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "file" ]]; then
     ./file/entrypoint.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "ssh" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "ssh" ]]; then
     ./ssh/entrypoint.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "tier" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "pass" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "pass" ]]; then
     ./pass/entrypoint.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "info" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "info" ]]; then
     ./info.sh "$@"
-    elif [[ $BCM_CLI_COMMAND == "show" ]]; then
+    elif [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
+    ./reset.sh "$@"
+    elif [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     ./show.sh
 else
     cat ./help.txt

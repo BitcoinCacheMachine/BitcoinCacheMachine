@@ -22,4 +22,10 @@ if snap list | grep -q docker; then
     fi
 fi
 
-./commands/cli_entrypoint.sh "$@"
+# Only run commands if we have local LXD installed.
+if snap list | grep -q lxd; then
+    ./commands/cli_entrypoint.sh "$@"
+else
+    echo "ERROR: The LXD snap is not installed locally."
+    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+fi

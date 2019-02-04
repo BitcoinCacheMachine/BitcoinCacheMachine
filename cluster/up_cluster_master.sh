@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_NAME=
@@ -26,6 +26,15 @@ for i in "$@"; do
         ;;
     esac
 done
+
+if [[ -z "$BCM_SSH_USERNAME" ]]; then
+    echo "ERROR: BCM_SSH_USERNAME not specified."
+fi
+
+if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
+    echo "ERROR: BCM_SSH_HOSTNAME not specified."
+fi
+
 
 source ./env
 mkdir -p "$TEMP_DIR"

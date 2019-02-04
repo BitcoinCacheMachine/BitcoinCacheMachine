@@ -3,18 +3,19 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# This script is written for demo purposes.
-source "$BCM_GIT_DIR/env"
+export BCM_DEBUG=1
+export BCM_CACHESTACK="192.168.1.123" # must be a DNS or IP address -- not avahi name
 
-#run bcm init
-bcm init --name="$BCM_CERT_NAME" \
---username="$BCM_CERT_USERNAME" \
---hostname="$BCM_CERT_HOSTNAME"
+# Init your SDN controller; create a new GPG certificate 'Satoshi Nakamoto satoshi@bitcoin.org'
+bcm init --cert-name="Satoshi Nakamoto" \
+--username="satoshi" \
+--hostname="bitcoin.org"
 
-# new cluster based on existing SSH endpoint.
-bcm cluster create --cluster-name="$BCM_CLUSTER_NAME" \
---ssh-username="$BCM_SSH_USERNAME" \
---ssh-hostname="$BCM_SSH_HOSTNAME"
+# Create a new BCM cluster master on your localhost.
+bcm cluster create --cluster-name="LocalCluster" \
+--ssh-username="$(whoami)" \
+--ssh-hostname="$(hostname)"
 
 # then deploy that project definition to an existing cluster.
-bcm project deploy --cluster-name="$BCM_CLUSTER_NAME"
+# The default BCM project BCMBase is deployed when --project-name is left unspecified.
+#bcm project deploy --cluster-name="LocalCluster"

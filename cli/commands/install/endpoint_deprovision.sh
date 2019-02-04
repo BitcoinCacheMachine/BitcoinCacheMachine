@@ -22,8 +22,3 @@ fi
 if snap list | grep -q lxd; then
     sudo lxd init --auto
 fi
-
-# # remove any legacy lxd software and install install lxd via snap
-# if snap list | grep -q lxd; then
-#     sudo snap remove lxd
-# fi

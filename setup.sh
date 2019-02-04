@@ -58,6 +58,8 @@ fi
 # make sure docker is installed. Doing it here makes sure we don't have to do it anywhere else.
 bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
 
+bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+
 if ! dpkg-query -s encfs | grep -q "Status: install ok installed"; then
     echo "Installing encfs which encrypts data at rest."
     sudo apt-get install -y encfs

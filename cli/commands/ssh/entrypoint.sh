@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -35,6 +35,14 @@ for i in "$@"; do
         ;;
     esac
 done
+
+if [[ -z "$BCM_SSH_USERNAME" ]]; then
+    echo "Error:  BCM_SSH_USERNAME not set."
+fi
+
+if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
+    echo "Error:  BCM_SSH_HOSTNAME not set."
+fi
 
 SSH_DIR=/tmp/bcm/ssh
 mkdir -p "$SSH_DIR"

@@ -30,6 +30,15 @@ for i in "$@"; do
     esac
 done
 
+
+if [[ -z "$BCM_SSH_USERNAME" ]]; then
+    echo "ERROR: BCM_SSH_USERNAME not specified."
+fi
+
+if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
+    echo "ERROR: BCM_SSH_HOSTNAME not specified."
+fi
+
 source ./env
 
 # if it's the cluster master add the LXC remote so we can manage it.
@@ -46,7 +55,7 @@ REMOTE_MOUNTPOINT="/tmp/bcm/provisioning"
 SSH_KEY_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/id_rsa"
 
 # provision the machine by uploading the preseed and running the install script.
-if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
+if [[ "$BCM_SSH_HOSTNAME" == *.onion ]]; then
     echo "TODO"
 else
     if [[ -f "$SSH_KEY_FILE" ]]; then

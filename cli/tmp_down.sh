@@ -2,8 +2,7 @@
 
 set -Eeuo pipefail
 
-
-encfs -u /tmp/bcm
+encfs -u /tmp/bcm>>/dev/null
 
 if [[ -d /tmp/bcm ]]; then
     rm -rf /tmp/bcm

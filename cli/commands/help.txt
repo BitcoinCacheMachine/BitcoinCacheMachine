@@ -3,15 +3,14 @@ Description:
   be driven through the various commands below. If you just pulled BCM to 
   your local machine and want to get started consider the following steps:
   
-  1) Initialize your management plane by running 'bcm init'.
-  1) Creating a new cluster with 'bcm cluster create'.
-  2) Define one or more BCM projects with 'bcm project create'.
-  3) Deploy a BCM project to an active cluster with:
-        bcm project deploy --project-name=<BCM_PROJECT_NAME> \
-                            --cluster-name=<BCM_CLUSTER_NAME>
+    1) Initialize your management plane and create new GPG certificates
+       using 'bcm init'.
+    2) Create a new cluster master using 'bcm cluster create'.
+    3) Define one or more BCM projects using 'bcm project create'.
+    4) Deploy a BCM project to a cluster using 'bcm project deploy'.
 
 Usage:
-  bcm [command]
+  bcm [command] --help
 
 Available Commands:
   init       Initialize your management plane.
@@ -23,8 +22,10 @@ Available Commands:
              with your Trezor.
   ssh        Use your Trezor to issue SSH keys and perform SSH authentication.
   pass       Create and manage GPG-encrypted passwords protected by your Trezor.
-  info       Display current environment variables related to BCM operation.
+  info       Display current and target environment variables related to BCM 
+             operations.
   show       Show detailed LXC-related information for your active LXD endpoint.
 
 Help
   Use "bcm [command] --help" to get help for that command.
+

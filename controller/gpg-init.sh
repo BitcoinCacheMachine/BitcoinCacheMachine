@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # The certs uid displays as:  "$BCM_CERT_NAME <BCM_CERT_USERNAME@BCM_CERT_HOSTNAME>"
@@ -59,16 +59,12 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
     echo "Your public key and public keyring material can be found at '$GNUPGHOME/trezor'."
 fi
 
-LINE=$(sudo GNUPGHOME="$GNUPGHOME" su -p root -c 'gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/'')
-echo "$LINE"
-LINE="${LINE#*/}"
-echo "$LINE"
-LINE="$(echo "$LINE" | grep -o '^\S*')"
-LINE="$(echo "$LINE" | xargs)"
+BCM_DEFAULT_KEY_ID=$(sudo docker run -it --name trezorgpg --rm -v "$GNUPGHOME":/root/.gnupg bcm-trezor:latest gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
+BCM_DEFAULT_KEY_ID="${BCM_DEFAULT_KEY_ID#*/}"
+BCM_DEFAULT_KEY_ID="$(echo "$BCM_DEFAULT_KEY_ID" | awk '{print $1}')"
 
 {
-    echo '#!/bin/bash'
-    echo "export BCM_DEFAULT_KEY_ID="'"'"$LINE"'"'
+    echo "export BCM_DEFAULT_KEY_ID="'"'"$BCM_DEFAULT_KEY_ID"'"'
     # shellcheck disable=SC2086
     echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"'
     
