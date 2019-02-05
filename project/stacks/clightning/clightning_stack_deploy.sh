@@ -24,8 +24,8 @@ if [[ -z $CHAIN ]]; then
 fi
 
 # get the env from bitcoind
-STACK_FILE_DIRNAME="$BCM_STACKS_DIR/bitcoind"
-source "$STACK_FILE_DIRNAME/env"
+source "$(pwd)/stacks/bitcoind/env"
+STACK_FILE_DIRNAME="$(pwd)/stacks/bitcoind"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \

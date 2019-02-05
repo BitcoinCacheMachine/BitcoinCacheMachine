@@ -40,10 +40,14 @@ if [ -z "${TIER_NAME}" ]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    bash -c "$BCM_GIT_DIR/project/tiers/up.sh --$TIER_NAME"
+    if ! bcm tier list | grep -q "$TIER_NAME"; then
+        bash -c "$BCM_GIT_DIR/project/tiers/up.sh --$TIER_NAME"
+    else
+        echo "BCM tier already exists. That's OK, we'll run the script anyway because idempotency."
+    fi
     
-    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
-    bash -c "$BCM_GIT_DIR/project/tiers/destroy.sh --$TIER_NAME"
+    elif [[ $BCM_CLI_VERB == "destroy" ]]; then    
+    bash -c "$BCM_GIT_DIR/project/tiers/destroy.sh --$TIER_NAME"    
 else
     cat ./help.txt
 fi

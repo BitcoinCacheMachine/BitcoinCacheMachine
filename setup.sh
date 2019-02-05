@@ -79,7 +79,7 @@ if [[ -f "$SSH_CONFIG" ]]; then
     if grep -Fxq "$SSH_CONFIG_TEXT" "$SSH_CONFIG"; then
         echo "SSH is configured correctly for BCM operation."
     else
-        echo "$SSH_CONFIG_TEXT" | sudo tee -a SSH_CONFIG
+        echo "$SSH_CONFIG_TEXT" | sudo tee -a "$SSH_CONFIG"
         sudo systemctl restart ssh
     fi
 fi
