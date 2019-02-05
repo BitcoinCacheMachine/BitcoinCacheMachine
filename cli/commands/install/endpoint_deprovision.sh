@@ -18,7 +18,3 @@ fi
 if lxc storage list | grep -q "bcm_btrfs"; then
     lxc storage delete bcm_btrfs
 fi
-
-if snap list | grep -q lxd; then
-    sudo lxd init --auto
-fi

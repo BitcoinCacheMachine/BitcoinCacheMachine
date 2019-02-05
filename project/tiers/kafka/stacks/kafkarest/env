@@ -4,5 +4,5 @@ export BCM_IMAGE_TAG="5.1.0"
 export BCM_TIER_NAME="kafka"
 export BCM_STACK_FILE="kafka-rest.yml"
 export BCM_STACK_NAME="kafkarest"
-export BCM_SERVICE_NAME="kafka-rest"
-export BCM_MAX_INSTANCES=2
+export SERVICE_NAME="kafka-rest"
+export MAX_INSTANCES=2

@@ -3,21 +3,20 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1090
-source "$BCM_GIT_DIR/env"
-
-BCM_ENV_FILE_PATH=
-DOCKERHUB_IMAGE=
-BCM_IMAGE_NAME=
-BCM_TIER_NAME=
-BCM_STACK_NAME=
-BCM_SERVICE_NAME=
-BCM_IMAGE_TAG=latest
+MAX_INSTANCES=1
 
 for i in "$@"; do
     case $i in
         --env-file-path=*)
-            BCM_ENV_FILE_PATH="${i#*=}"
+            MAX_INSTANCES="${i#*=}"
+            shift # past argument=value
+        ;;
+        --stack-name=*)
+            BCM_STACK_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --service-name=*)
+            SERVICE_NAME="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -26,34 +25,35 @@ for i in "$@"; do
     esac
 done
 
-if [ ! -f $BCM_ENV_FILE_PATH ]; then
-    echo "BCM_ENV_FILE_PATH not set. Exiting."
-    exit
-else
-    echo "BCM_ENV_FILE_PATH: $BCM_ENV_FILE_PATH"
-fi
-
-# shellcheck disable=SC1090
-source "$BCM_ENV_FILE_PATH"
-DIR_NAME="$(dirname $BCM_ENV_FILE_PATH)"
-
-if [[ -z $BCM_IMAGE_NAME ]]; then
-    echo "BCM_IMAGE_NAME not set. Exiting."
-    exit
-fi
-
-if [[ -z $BCM_TIER_NAME ]]; then
-    echo "BCM_TIER_NAME not set. Exiting."
-    exit
-fi
-
 if [[ -z $BCM_STACK_NAME ]]; then
-    echo "BCM_STACK_NAME not set. Exiting."
+    echo "BCM_STACK_NAME cannot be empty."
     exit
 fi
 
-if [[ -z $BCM_SERVICE_NAME ]]; then
-    echo "BCM_SERVICE_NAME not set. Exiting."
+if [[ -z $SERVICE_NAME ]]; then
+    echo "SERVICE_NAME cannot be empty."
+    exit
+fi
+
+# let's scale the schema registry count to UP TO 3.
+CLUSTER_NODE_COUNT=$(bcm cluster list --endpoints | wc -l)
+if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
+    REPLICAS=$CLUSTER_NODE_COUNT
+    
+    if [[ $CLUSTER_NODE_COUNT -ge $MAX_INSTANCES ]]; then
+        REPLICAS=$MAX_INSTANCES
+    fi
+    
+    SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$BCM_STACK_NAME")
+    if [[ $SERVICE_MODE == "replicated" ]]; then
+        lxc exec bcm-gateway-01 -- docker service scale "$BCM_STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
+    fi
+fi
+    exit
+fi
+
+if [[ -z $SERVICE_NAME ]]; then
+    echo "SERVICE_NAME not set. Exiting."
     exit
 fi
 

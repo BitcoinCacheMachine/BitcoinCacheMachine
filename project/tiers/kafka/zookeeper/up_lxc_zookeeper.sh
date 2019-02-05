@@ -3,9 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-ZOOKEEPER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-zookeeper:3.5"
+ZOOKEEPER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-zookeeper:3.4.13"
 KAFKA_HOSTNAME="bcm-kafka-01"
-SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.5"
+SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.4.13"
 
 if [[ $KAFKA_HOSTNAME == "bcm-kafka-01" ]]; then
     lxc exec $KAFKA_HOSTNAME -- docker pull $SOURCE_ZOOKEEPER_IMAGE

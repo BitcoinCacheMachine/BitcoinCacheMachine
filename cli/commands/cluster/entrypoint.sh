@@ -67,17 +67,8 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
     
     # let's not delete the locally installed LXD instance.
-    if [[ $BCM_CLUSTER_NAME != "local" ]]; then
+    if [[ "$BCM_CLUSTER_NAME" != "local" ]]; then
         bash -c "$BCM_GIT_DIR/cluster/destroy_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME  --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
-    else
-        # delete the items associated with the lxd_preseed.yml
-        if sudo lxc profile list | grep -q "bcm_default"; then
-            sudo lxc profile delete bcm_default
-        fi
-        
-        if sudo lxc storage list | grep -q "bcm_btrfs"; then
-            sudo lxc storage delete bcm_btrfs
-        fi
     fi
     
     elif [[ $BCM_CLI_VERB == "list" ]]; then

@@ -26,6 +26,6 @@ fi
 if snap list | grep -q lxd; then
     ./commands/cli_entrypoint.sh "$@"
 else
-    echo "ERROR: The LXD snap is not installed locally."
+    echo "WARNING: The LXD snap is not installed locally. Initiating installation..."
     bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
 fi
