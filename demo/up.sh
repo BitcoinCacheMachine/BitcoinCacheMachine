@@ -10,10 +10,11 @@ export BCM_CACHESTACK="192.168.1.123" # must be a DNS or IP address -- not avahi
 bcm init --cert-name="Satoshi Nakamoto" --username="satoshi" --hostname="bitcoin.org"
 
 # Create a new BCM cluster master on your localhost.
-bcm cluster create --cluster-name="LocalCluster" --ssh-username="$(whoami)" --ssh-hostname="$(hostname)"
+bcm cluster create --cluster-name="AntsleCluster" --ssh-username="ubuntu" --ssh-hostname="antsle"
 
 # Create a new BCM project specification
 #bcm project create --project-name="name"
 
-#  The default BCM project BCMBase is deployed when --project-name is left unspecified.
-bcm project deploy --cluster-name="LocalCluster"
+# The default BCM project BCMBase is deployed when --project-name is left unspecified.
+# all project deployments are applied to the active BCM cluster unless specified otherwise.
+bcm project deploy

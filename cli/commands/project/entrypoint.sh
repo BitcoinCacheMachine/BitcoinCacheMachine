@@ -12,7 +12,7 @@ else
     exit
 fi
 
-BCM_PROJECT_NAME=BCMBase
+BCM_PROJECT_NAME="BCMBase"
 BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_DEPLOYMENTS_FLAG=0
 
@@ -35,13 +35,13 @@ for i in "$@"; do
     esac
 done
 
-if [[ $BCM_CLI_VERB == "list" ]]; then
+if [[ "$BCM_CLI_VERB" == "list" ]]; then
     export BCM_DEPLOYMENTS_FLAG=$BCM_DEPLOYMENTS_FLAG
     ./list/list.sh "$@"
     exit
 fi
 
-if [[ -z $BCM_PROJECT_NAME ]]; then
+if [[ -z "$BCM_PROJECT_NAME" ]]; then
     echo "WARNING: BCM_PROJECT_NAME was not specified."
 fi
 
@@ -52,9 +52,18 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     ./create/create.sh "$@"
 fi
 
-export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
-    ./deploy/deploy.sh "$@"
+    if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
+        echo "BCM cluster '$BCM_CLUSTER_NAME' not found. Can't deploy project to it."
+        exit
+    fi
+    
+    if [[ -z "$BCM_PROJECT_NAME" ]]; then
+        "$BCM_GIT_DIR/project/up.sh" --project-name="bcmbase" --cluster-name="$BCM_CLUSTER_NAME"
+    else
+        "$BCM_GIT_DIR/project/up.sh" --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME"
+    fi
+    
     elif [[ $BCM_CLI_VERB == "remove" ]]; then
     bash -c "$BCM_GIT_DIR/project/destroy.sh" "$@"
 fi

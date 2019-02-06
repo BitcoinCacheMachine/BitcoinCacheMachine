@@ -1,6 +1,21 @@
 #!/bin/bash
 
-set -Eeuo
+set -Eeuox
+
+GOGO_FILE=
+
+for i in "$@"; do
+    case $i in
+        --gogofile=*)
+            GOGO_FILE="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
 
 if [[ ! -z "$GOGO_FILE" ]]; then
     # we are going to wait for GOGO_FILE to appear before starting bitcoind.

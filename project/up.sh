@@ -9,6 +9,7 @@ source "$BCM_GIT_DIR/env"
 BCM_PROJECT_NAME=bcmbase
 BCM_DEPLOY_TIERS=1
 BCM_REBUILD_TEMPLATE=0
+BCM_CLUSTER_NAME=
 
 for i in "$@"; do
     case $i in
@@ -27,7 +28,7 @@ for i in "$@"; do
 done
 
 # let's make sure the cluster name is set.
-if [[ -z $BCM_CLUSTER_NAME ]]; then
+if [[ -z "$BCM_CLUSTER_NAME" ]]; then
     echo "BCM_CLUSTER_NAME not set."
     exit
 fi
