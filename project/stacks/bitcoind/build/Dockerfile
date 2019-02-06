@@ -34,11 +34,6 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-# help scripts
-RUN mkdir /bcm
-ADD ../../shared/proxy_ip_determinant.sh /bcm/runtime_helper.sh
-RUN chmod +x /bcm/runtime_helper.sh
-
 WORKDIR /root/.bitcoin
 
 EXPOSE 8332 8333 18332 18333 18443 18444

@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 #shellcheck disable=SC1090
@@ -71,13 +71,13 @@ fi
 # create the docker_unprivileged profile
 if ! lxc profile list | grep -q "docker_unprivileged"; then
     lxc profile create docker_unprivileged
-    cat "./lxd_profiles/docker_unprivileged.yml" | lxc profile edit docker_unprivileged
+    cat ./lxd_profiles/docker_unprivileged.yml | lxc profile edit docker_unprivileged
 fi
 
 # create the docker_privileged profile
 if ! lxc profile list | grep -q "docker_privileged"; then
     lxc profile create docker_privileged
-    cat "./lxd_profiles/docker_privileged.yml" | lxc profile edit docker_privileged
+    cat ./lxd_profiles/docker_privileged.yml | lxc profile edit docker_privileged
 fi
 
 if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
@@ -111,8 +111,10 @@ if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
         lxc network create --target "$ENDPOINT" bcmbr0
     done
 else
-    # but if it's just one node, we just create the network.
-    lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
+    if ! lxc network list --format csv | grep -q bcmbr0; then
+        # but if it's just one node, we just create the network.
+        lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
+    fi
 fi
 
 # If there was more than one node, this is the last command we need
@@ -122,47 +124,51 @@ if lxc network list | grep bcmbr0 | grep -q PENDING; then
     lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
 fi
 
-echo "Creating host 'bcm-host-template'."
-lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
-
-lxc start bcm-host-template
-
-sleep 5
-#lxc-wait -n "bcm-host-template" -s RUNNING
-
-# TODO provide configuration item to route these requests over local TOR proxy
-echo "Installing required software on LXC host 'bcm-host-template'."
-lxc exec bcm-host-template -- apt-get update
-
-# docker.io is the only package that seems to work seamlessly with
-# storage backends. Using BTRFS since docker recognizes underlying file system
-lxc exec bcm-host-template -- apt-get install -y docker.io wait-for-it ifmetric
-
-if [[ $BCM_DEBUG == 1 ]]; then
-    lxc exec bcm-host-template -- apt-get install -y jq nmap curl slurm tcptrack dnsutils tcpdump
+if ! lxc list --format csv | grep -q bcm-host-template; then
+    echo "Creating host 'bcm-host-template'."
+    lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
 fi
 
-## checking if this alleviates docker swarm troubles in lxc.
-#https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
-lxc exec bcm-host-template -- touch /.dockerenv
-lxc exec bcm-host-template -- mkdir -p /etc/docker
-
-# this helps suppress some warning messages.  TODO
-lxc file push ./sysctl.conf bcm-host-template/etc/sysctl.conf
-lxc exec bcm-host-template -- chmod 0644 /etc/sysctl.conf
-
-# clean up the image before publication
-lxc exec bcm-host-template -- apt-get autoremove -qq
-lxc exec bcm-host-template -- apt-get clean -qq
-lxc exec bcm-host-template -- rm -rf /tmp/*
-
-lxc exec bcm-host-template -- systemctl stop docker
-lxc exec bcm-host-template -- systemctl enable docker
-
-#stop the template since we don't need it running anymore.
-lxc stop bcm-host-template
-lxc profile remove bcm-host-template docker_privileged
-lxc network detach bcmbr0 bcm-host-template
+if lxc list --format csv -c=ns | grep bcm-host-template | grep -q STOPPED; then
+    lxc start bcm-host-template
+    
+    sleep 5
+    
+    # TODO provide configuration item to route these requests over local TOR proxy
+    echo "Installing required software on LXC host 'bcm-host-template'."
+    lxc exec bcm-host-template -- apt-get update
+    
+    # docker.io is the only package that seems to work seamlessly with
+    # storage backends. Using BTRFS since docker recognizes underlying file system
+    lxc exec bcm-host-template -- apt-get install -y docker.io wait-for-it ifmetric
+    
+    if [[ $BCM_DEBUG == 1 ]]; then
+        lxc exec bcm-host-template -- apt-get install -y jq nmap curl slurm tcptrack dnsutils tcpdump
+    fi
+    
+    ## checking if this alleviates docker swarm troubles in lxc.
+    #https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
+    lxc exec bcm-host-template -- touch /.dockerenv
+    lxc exec bcm-host-template -- mkdir -p /etc/docker
+    
+    # this helps suppress some warning messages.  TODO
+    lxc file push ./sysctl.conf bcm-host-template/etc/sysctl.conf
+    lxc exec bcm-host-template -- chmod 0644 /etc/sysctl.conf
+    
+    # clean up the image before publication
+    lxc exec bcm-host-template -- apt-get autoremove -qq
+    lxc exec bcm-host-template -- apt-get clean -qq
+    lxc exec bcm-host-template -- rm -rf /tmp/*
+    
+    lxc exec bcm-host-template -- systemctl stop docker
+    lxc exec bcm-host-template -- systemctl enable docker
+    
+    #stop the template since we don't need it running anymore.
+    lxc stop bcm-host-template
+    
+    lxc profile remove bcm-host-template docker_privileged
+    lxc network detach bcmbr0 bcm-host-template
+fi
 
 # echo "Creating a snapshot of the lxd host 'dockertemplate' called 'bcmHostSnapshot'."
 lxc snapshot bcm-host-template bcmHostSnapshot

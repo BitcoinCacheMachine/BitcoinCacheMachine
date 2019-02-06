@@ -1,8 +1,8 @@
 export DOCKERHUB_IMAGE="confluentinc/cp-kafka-rest:5.1.0"
-export BCM_IMAGE_NAME="bcm-kafka-rest"
-export BCM_IMAGE_TAG="5.1.0"
+export IMAGE_NAME="bcm-kafka-rest"
+export IMAGE_TAG="5.1.0"
 export BCM_TIER_NAME="kafka"
-export BCM_STACK_FILE="kafka-rest.yml"
-export BCM_STACK_NAME="kafkarest"
+export STACK_FILE="kafka-rest.yml"
+export STACK_NAME="kafkarest"
 export SERVICE_NAME="kafka-rest"
 export MAX_INSTANCES=2

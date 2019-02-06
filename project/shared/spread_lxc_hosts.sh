@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
 BCM_TIER_NAME=
 
@@ -23,31 +23,38 @@ fi
 
 # let's get a bcm-gateway LXC instance on each cluster endpoint.
 MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
-for endpoint in $(bcm cluster list --endpoints); do
-    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+for ENDPOINT in $(bcm cluster list --endpoints); do
+    HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     LXC_HOSTNAME="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
     LXC_DOCKERVOL="$LXC_HOSTNAME-dockerdisk"
     
     # only create the new storage volume if it doesn't already exist
     if ! lxc storage volume list bcm_btrfs | grep -q "$LXC_DOCKERVOL"; then
         # then this is normal behavior. Let's create the storage volume
-        if [ "$endpoint" != "$MASTER_NODE" ]; then
-            echo "Creating volume '$LXC_DOCKERVOL' on storage pool bcm_btrfs on cluster member '$endpoint'."
-            lxc storage volume create bcm_btrfs "$LXC_DOCKERVOL" block.filesystem=ext4 --target "$endpoint"
+        if [ "$ENDPOINT" != "$MASTER_NODE" ]; then
+            echo "Creating volume '$LXC_DOCKERVOL' on storage pool bcm_btrfs on cluster member '$ENDPOINT'."
+            lxc storage volume create bcm_btrfs "$LXC_DOCKERVOL" block.filesystem=ext4 --target "$ENDPOINT"
         else
             lxc storage volume create bcm_btrfs "$LXC_DOCKERVOL" block.filesystem=ext4
         fi
     else
-        # but if it does exist, emit a WARNING that one already exists and will
-        # be used
+        # but if it does exist, emit a WARNING that one already exists and will be used
         echo "WARNING: LXC storage volume '$LXC_DOCKERVOL' in bcm_btrfs storage pool already exists."
     fi
     
     # create the LXC host with the attached profiles.
     # TODO allow options of unprivileged.
-    PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
-    lxc init --target "$endpoint" bcm-template "$LXC_HOSTNAME" --profile=bcm_default --profile=docker_privileged --profile="$PROFILE_NAME"
+    if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
+        PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
+        lxc init --target "$ENDPOINT" bcm-template "$LXC_HOSTNAME" --profile=bcm_default --profile=docker_privileged --profile="$PROFILE_NAME"
+    else
+        echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
+    fi
     
-    # attach the lxc storage volume 'dockervol' to the new LXC host for the docker backing.
-    lxc storage volume attach bcm_btrfs "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker
+    if ! lxc storage volume show bcm_btrfs bcm-gateway-01-dockerdisk | grep -q "location: $ENDPOINT"; then
+        # attach the lxc storage volume 'dockervol' to the new LXC host for the docker backing.
+        lxc storage volume attach bcm_btrfs "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker
+    else
+        echo "WARNING: lxc storage volume '$LXC_DOCKERVOL' is already attached to '$LXC_HOSTNAME'."
+    fi
 done

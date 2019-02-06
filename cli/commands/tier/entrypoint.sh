@@ -15,20 +15,21 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
     
     LXC_LIST_OUTPUT=$(lxc list --format csv)
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-gateway"; then
-        echo "bcm-gateway"
+        echo "  - gateway"
     fi
     
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-kafka"; then
-        echo "bcm-kafka"
+        echo "  - kafka"
+    fi
+    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-ui"; then
+        echo "  - ui"
     fi
     
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-bitcoin"; then
-        echo "bcm-bitcoin"
+        echo "  - bitcoin"
     fi
     
-    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-ui"; then
-        echo "bcm-ui"
-    fi
+    
     exit
 fi
 
@@ -41,13 +42,12 @@ fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
     if ! bcm tier list | grep -q "$TIER_NAME"; then
-        bash -c "$BCM_GIT_DIR/project/tiers/up.sh --$TIER_NAME"
-    else
         echo "BCM tier already exists. That's OK, we'll run the script anyway because idempotency."
     fi
+    bash -c "$BCM_GIT_DIR/project/tiers/up.sh --$TIER_NAME"
     
-    elif [[ $BCM_CLI_VERB == "destroy" ]]; then    
-    bash -c "$BCM_GIT_DIR/project/tiers/destroy.sh --$TIER_NAME"    
+    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
+    bash -c "$BCM_GIT_DIR/project/tiers/destroy.sh --$TIER_NAME"
 else
     cat ./help.txt
 fi

@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
@@ -27,8 +27,7 @@ PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
 if ! lxc profile list | grep -q "$PROFILE_NAME"; then
     lxc profile create "$PROFILE_NAME"
     
-    if [[ -f $BCM_YAML_PATH ]]; then
-        # apply the default kafka.yml
+    if [[ -f "$BCM_YAML_PATH" ]]; then
         cat "$BCM_YAML_PATH" | lxc profile edit "$PROFILE_NAME"
     fi
 else

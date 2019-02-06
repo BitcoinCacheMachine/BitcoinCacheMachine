@@ -1,6 +1,7 @@
 FROM ubuntu:latest
-RUN apt-get update
-RUN apt-get install -y wait-for-it iproute2 curl dnsutils wait-for-it iputils-ping iproute2
+RUN apt-get update && \
+    apt-get install -y wait-for-it iproute2 curl dnsutils wait-for-it iputils-ping iproute2 && \
+    && rm -rf /var/lib/apt/lists/*
 
 # help scripts
 RUN mkdir /bcm

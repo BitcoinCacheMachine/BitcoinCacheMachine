@@ -2,7 +2,7 @@ version: '3.6'
 services:
   # container listens on 8000
   schema-registry-ui:
-    image: ${BCM_IMAGE_NAME}
+    image: ${IMAGE_FQDN}
     ports:
       - "${BCM_SERVICE_PORT}:8000"
     networks:

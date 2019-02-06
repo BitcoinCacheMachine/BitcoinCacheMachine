@@ -1,22 +1,14 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-MAX_INSTANCES=1
+ENV_FILE=
 
 for i in "$@"; do
     case $i in
         --env-file-path=*)
-            MAX_INSTANCES="${i#*=}"
-            shift # past argument=value
-        ;;
-        --stack-name=*)
-            BCM_STACK_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --service-name=*)
-            SERVICE_NAME="${i#*=}"
+            ENV_FILE="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -25,53 +17,36 @@ for i in "$@"; do
     esac
 done
 
-if [[ -z $BCM_STACK_NAME ]]; then
-    echo "BCM_STACK_NAME cannot be empty."
+if [[ ! -f "$ENV_FILE" ]]; then
+    echo "ERROR: '$ENV_FILE' does not exist."
     exit
 fi
 
-if [[ -z $SERVICE_NAME ]]; then
-    echo "SERVICE_NAME cannot be empty."
+source "$ENV_FILE"
+
+if [[ -z "$STACK_NAME" ]]; then
+    echo "STACK_NAME cannot be empty."
     exit
 fi
 
-# let's scale the schema registry count to UP TO 3.
-CLUSTER_NODE_COUNT=$(bcm cluster list --endpoints | wc -l)
-if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
-    REPLICAS=$CLUSTER_NODE_COUNT
-    
-    if [[ $CLUSTER_NODE_COUNT -ge $MAX_INSTANCES ]]; then
-        REPLICAS=$MAX_INSTANCES
-    fi
-    
-    SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$BCM_STACK_NAME")
-    if [[ $SERVICE_MODE == "replicated" ]]; then
-        lxc exec bcm-gateway-01 -- docker service scale "$BCM_STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
-    fi
-fi
-    exit
-fi
-
-if [[ -z $SERVICE_NAME ]]; then
+if [[ -z "$SERVICE_NAME" ]]; then
     echo "SERVICE_NAME not set. Exiting."
     exit
 fi
 
-if [[ -z $BCM_IMAGE_TAG ]]; then
-    echo "BCM_IMAGE_TAG not set. Exiting."
+if [[ -z "$IMAGE_TAG" ]]; then
+    echo "IMAGE_TAG not set. Exiting."
     exit
 fi
 
 CONTAINER_NAME="bcm-$BCM_TIER_NAME-01"
-bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --docker-hub-image-name=$DOCKERHUB_IMAGE --build-context=$DIR_NAME/build --container-name=$CONTAINER_NAME --image-name=$BCM_IMAGE_NAME --image-tag=$BCM_IMAGE_TAG"
+STACK_FILE_DIRNAME="$(dirname "$ENV_FILE")"
 
-BCM_STACK_FILE_DIRNAME=$(dirname $BCM_ENV_FILE_PATH)
+bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --docker-hub-image-name=$DOCKERHUB_IMAGE --build-context=$STACK_FILE_DIRNAME/build --container-name=$CONTAINER_NAME --image-name=$IMAGE_NAME --image-tag=$IMAGE_TAG"
 
 # push the stack file.
-lxc file push -p -r "$BCM_STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_TIER_NAME/"
+lxc file push -p -r "$STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/$BCM_TIER_NAME/"
 
 # run the stack by passing in the ENV vars.
-
-CONTAINER_STACK_DIR="/root/stacks/$BCM_TIER_NAME/$BCM_STACK_NAME"
-
-lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/env && env BCM_IMAGE_NAME=$BCM_PRIVATE_REGISTRY/$BCM_IMAGE_NAME:$BCM_IMAGE_TAG BCM_LXC_HOST=$CONTAINER_NAME docker stack deploy -c $CONTAINER_STACK_DIR/$BCM_STACK_FILE $BCM_STACK_NAME"
+CONTAINER_STACK_DIR="/root/stacks/$BCM_TIER_NAME/$STACK_NAME"
+lxc exec bcm-gateway-01 -- bash -c "source $CONTAINER_STACK_DIR/env && env IMAGE_FQDN=$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG BCM_LXC_HOST=$CONTAINER_NAME docker stack deploy -c $CONTAINER_STACK_DIR/$STACK_FILE $STACK_NAME"

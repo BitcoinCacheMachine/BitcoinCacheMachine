@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"
@@ -56,12 +56,22 @@ for endpoint in $(bcm cluster list --endpoints); do
         # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
         # shellcheck disable=1090
         
-        lxc network list --format csv | grep physical | cut -d, -f1
-        
-        # TODO Do some error checking on network interface selection.
-        read -rp "Please enter the physical network interface that you want to expose network services on (i.e., data path):  " BCM_LXD_PHYSICAL_INTERFACE
-        
-        lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$BCM_LXD_PHYSICAL_INTERFACE"
+        VALID=0
+        while [[ "$VALID" == 0 ]]
+        do
+            BCM_LXD_PHYSICAL_INTERFACE=
+            lxc network list --format csv | grep physical | cut -d, -f1
+            
+            # TODO Do some error checking on network interface selection.
+            read -rp "Please enter the physical network interface that you want to expose network services on (i.e., data path):  " BCM_LXD_PHYSICAL_INTERFACE
+            
+            if lxc network list --format csv | grep physical | grep -q "$BCM_LXD_PHYSICAL_INTERFACE"; then
+                lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$BCM_LXD_PHYSICAL_INTERFACE"
+                VALID=1
+            else
+                echo "Invalid entry. Please try again."
+            fi
+        done
     fi
     
     # let's bring up the host then wait for dockerd to start.

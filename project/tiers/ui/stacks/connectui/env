@@ -1,9 +1,9 @@
 export DOCKERHUB_IMAGE="landoop/kafka-connect-ui:0.9.6"
-export BCM_IMAGE_NAME="bcm-kafka-connect-ui"
-export BCM_IMAGE_TAG="0.9.6"
+export IMAGE_NAME="bcm-kafka-connect-ui"
+export IMAGE_TAG="0.9.6"
 export BCM_TIER_NAME="ui"
-export BCM_STACK_FILE="kafka-connect-ui.yml"
-export BCM_STACK_NAME="connectui"
+export STACK_FILE="kafka-connect-ui.yml"
+export STACK_NAME="connectui"
 export SERVICE_NAME="kafka-connect-ui"
 export BCM_SERVICE_PORT=8002
 export MAX_INSTANCES=2

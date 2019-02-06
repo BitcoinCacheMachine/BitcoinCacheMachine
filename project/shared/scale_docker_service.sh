@@ -12,7 +12,7 @@ for i in "$@"; do
             shift # past argument=value
         ;;
         --stack-name=*)
-            BCM_STACK_NAME="${i#*=}"
+            STACK_NAME="${i#*=}"
             shift # past argument=value
         ;;
         --service-name=*)
@@ -25,8 +25,8 @@ for i in "$@"; do
     esac
 done
 
-if [[ -z $BCM_STACK_NAME ]]; then
-    echo "BCM_STACK_NAME cannot be empty."
+if [[ -z $STACK_NAME ]]; then
+    echo "STACK_NAME cannot be empty."
     exit
 fi
 
@@ -44,8 +44,23 @@ if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
         REPLICAS=$MAX_INSTANCES
     fi
     
-    SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$BCM_STACK_NAME")
+    SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$STACK_NAME")
     if [[ $SERVICE_MODE == "replicated" ]]; then
-        lxc exec bcm-gateway-01 -- docker service scale "$BCM_STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
+        lxc exec bcm-gateway-01 -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
     fi
 fi
+
+# # let's scale the schema registry count to UP TO 3.
+# CLUSTER_NODE_COUNT=$(bcm cluster list --endpoints | wc -l)
+# if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
+#     REPLICAS=$CLUSTER_NODE_COUNT
+
+#     if [[ $CLUSTER_NODE_COUNT -ge $MAX_INSTANCES ]]; then
+#         REPLICAS=$MAX_INSTANCES
+#     fi
+
+#     SERVICE_MODE=$(lxc exec bcm-gateway-01 -- docker service list --format "{{.Mode}}" --filter name="$STACK_NAME")
+#     if [[ $SERVICE_MODE == "replicated" ]]; then
+#         lxc exec bcm-gateway-01 -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
+#     fi
+# fi

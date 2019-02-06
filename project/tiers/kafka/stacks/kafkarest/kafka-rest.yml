@@ -1,7 +1,7 @@
 version: '3.6'
 services:
   kafka-rest:
-    image: ${BCM_IMAGE_NAME}
+    image: ${IMAGE_FQDN}
     networks:
       kafkanet:
       zookeepernet:

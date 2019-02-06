@@ -11,14 +11,12 @@ source "$BCM_GIT_DIR/env"
 
 # first let's check to see if we have any gateways
 # if so, we quit unless the user has told us to override.
-export HOSTNAME="bcm-gateway-01"
 if lxc list --format csv -c n | grep -q "bcm-gateway-01"; then
-    echo "lxc host 'bcm-gateway-01' exists."
-    exit
+    echo "WARNING: LXC host 'bcm-gateway-01' exists."
 fi
 
 # first, create the profile that represents the tier.
-bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=gateway --yaml-path=$(readlink -f ./tier_profile.yml)"
+bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=gateway --yaml-path=$(pwd)/tier_profile.yml"
 
 # create the networks for the gateway tier.
 bash -c "./create_lxc_gateway_networks.sh"
@@ -29,34 +27,33 @@ bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=gateway"
 # let's start the LXD container on the LXD cluster master.
 lxc file push ./dhcpd_conf.yml bcm-gateway-01/etc/netplan/10-lxc.yaml
 
-# start bcm-gateway-01
-lxc start bcm-gateway-01
-
-# let's configure the bcm-gateway-01 first since it is the first member
-# of the docker swarm.
-bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
-
-lxc exec bcm-gateway-01 -- ifmetric eth0 50
-lxc exec bcm-gateway-01 -- docker pull registry:latest
-lxc exec bcm-gateway-01 -- docker tag registry:latest bcm-registry:latest
-
-lxc file push  -p -r ./stacks/ bcm-gateway-01/root/gateway/
-
-lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >>/dev/null
-
-lxc file push ./bcm-gateway-01.daemon.json bcm-gateway-01/etc/docker/daemon.json
-
-lxc restart bcm-gateway-01
-bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
-
+if lxc list --format csv -c=ns | grep bcm-gateway-01 | grep -q STOPPED; then
+    # start the LXC host and wait for dockerd
+    lxc start bcm-gateway-01
+    bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
+    
+    # prepare the host.
+    lxc exec bcm-gateway-01 -- ifmetric eth0 50
+    lxc exec bcm-gateway-01 -- docker pull registry:latest
+    lxc exec bcm-gateway-01 -- docker tag registry:latest bcm-registry:latest
+    
+    lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >>/dev/null
+    lxc file push ./bcm-gateway-01.daemon.json bcm-gateway-01/etc/docker/daemon.json
+    
+    # restart the host so it runs with new dockerd daemon config.
+    lxc restart bcm-gateway-01
+    bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
+fi
 
 # TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
 REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
-
 if [[ ! -z ${BCM_CACHESTACK+x} ]]; then
     REGISTRY_PROXY_REMOTEURL="http://$BCM_CACHESTACK:5000"
 fi
+
+# push the stack files up tthere.
+lxc file push  -p -r ./stacks/ bcm-gateway-01/root/gateway/
 
 lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL" docker stack deploy -c "/root/$BCM_TIER_NAME/stacks/registry/regmirror.yml" regmirror
 lxc exec bcm-gateway-01 -- wait-for-it -t 0 "bcm-gateway-01:5000"
@@ -88,6 +85,7 @@ lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c 
 source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
+HOSTNAME=
 for endpoint in $(bcm cluster list --endpoints); do
     if [[ $endpoint != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$endpoint" | tail -c 2)

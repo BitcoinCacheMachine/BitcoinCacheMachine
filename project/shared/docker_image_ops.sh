@@ -79,12 +79,18 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
     exit
 fi
 
+function docker_tag_exists() {
+    lxc exec bcm-gateway-01 -- curl -s -f -lSL "http://127.0.0.1:5010/v2/repositories/$1/tags/$2" > /dev/null
+}
+
 REBUILD=1
 if [[ $BCM_DEBUG == 1 ]]; then
-    REBUILD=0
-    read -rp "Do you want to rebuild the image $IMAGE_NAME:$IMAGE_TAG (y/n)?: " CHOICE
-    if [[ $CHOICE == "y" ]]; then
-        REBUILD=1
+    if docker_tag_exists bcm-bitcoin-core 17.1; then
+        REBUILD=0
+        read -rp "Do you want to rebuild the image $IMAGE_NAME:$IMAGE_TAG (y/n)?: " CHOICE
+        if [[ $CHOICE == "y" ]]; then
+            REBUILD=1
+        fi
     fi
 fi
 

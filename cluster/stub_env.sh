@@ -65,16 +65,6 @@ fi
 SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"
 bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push
 
-if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
-    torify ssh -i "$SSH_KEY_FILE" -t "$SSH_IDENTITY" ip link show
-else
-    ssh -i "$SSH_KEY_FILE" -t "$SSH_IDENTITY" ip link show
-fi
-
-# TODO Do some error checking on network interface selection.
-read -rp "Enter the physical network interface name to use for the management plane:  " BCM_MGMT_PLANE_INTERFACE
-
-export BCM_LXD_PHYSICAL_INTERFACE="$BCM_MGMT_PLANE_INTERFACE"
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
 export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"

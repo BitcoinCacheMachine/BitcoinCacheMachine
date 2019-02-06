@@ -2,14 +2,14 @@
 
 set -Eeuo
 
-export GOGO_FILE=
-if [[ "$CHAIN" == "testnet" ]]; then
-    GOGO_FILE=/data/testnet3/gogogo
-    elif [[ $CHAIN == "mainnet" ]]; then
-    GOGO_FILE=/data/gogogo
+if [[ ! -z "$GOGO_FILE" ]]; then
+    # we are going to wait for GOGO_FILE to appear before starting bitcoind.
+    # this allows the management plane to upload the blocks and/or chainstate.
+    while [ ! -f "$GOGO_FILE" ]
+    do
+        sleep .5
+        printf '.'
+    done
 else
-    echo "Error: CHAIN must be either 'testnet' or 'mainnet'."
-    exit
+    echo "ERROR: GOGO_FILE not specified."
 fi
-
-export GOGO_FILE="$GOGO_FILE"

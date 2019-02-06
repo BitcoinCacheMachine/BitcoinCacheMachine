@@ -15,11 +15,15 @@ if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
 fi
 
 function createBCMBRGW() {
-    lxc network create bcmbrGWNat ipv4.nat=true ipv6.nat=false ipv6.address=none
+    if ! lxc network list --format csv | grep -q bcmbrGWNat; then
+        lxc network create bcmbrGWNat ipv4.nat=true ipv6.nat=false ipv6.address=none
+    fi
 }
 
 function createBCMNet() {
-    lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
+    if ! lxc network list --format csv | grep -q bcmNet; then
+        lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
+    fi
 }
 
 # we only run this block if we have a cluster of size 2 or more.
