@@ -50,7 +50,11 @@ fi
 
 # remove any legacy lxd software and install install lxd via snap
 if snap list | grep -q lxd; then
-    echo "  --LXD_CLUSTER:                $(lxc remote get-default)"
+    if [[ $(lxc remote get-default) != "local" ]]; then
+        echo "  --LXD_CLUSTER:                $(lxc remote get-default)"
+    else
+        echo "  --LXD_CLUSTER:                Not set."
+    fi
 else
     echo ""
     echo "WARNING: LXD not installed locally."

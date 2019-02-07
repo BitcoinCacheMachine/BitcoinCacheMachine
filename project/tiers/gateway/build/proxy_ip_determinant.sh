@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox
+set -Eeuo
 
 DEFAULT_GATEWAY_IP=
 DEFAULT_GATEWAY_HOSTNAME=

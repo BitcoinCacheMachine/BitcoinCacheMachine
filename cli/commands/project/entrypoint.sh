@@ -15,6 +15,8 @@ fi
 BCM_PROJECT_NAME="BCMBase"
 BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_DEPLOYMENTS_FLAG=0
+BCM_DELETE_BCM_IMAGE=0
+BCM_DELETE_LXC_BASE=0
 
 for i in "$@"; do
     case $i in
@@ -24,6 +26,14 @@ for i in "$@"; do
         ;;
         --cluster-name=*)
             BCM_CLUSTER_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --del-template)
+            BCM_DELETE_BCM_IMAGE=1
+            shift # past argument=value
+        ;;
+        --del-lxcbase)
+            BCM_DELETE_LXC_BASE=1
             shift # past argument=value
         ;;
         --deployments)
@@ -58,12 +68,10 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
         exit
     fi
     
-    if [[ -z "$BCM_PROJECT_NAME" ]]; then
-        "$BCM_GIT_DIR/project/up.sh" --project-name="bcmbase" --cluster-name="$BCM_CLUSTER_NAME"
-    else
+    if [[ ! -z "$BCM_PROJECT_NAME" ]]; then
         "$BCM_GIT_DIR/project/up.sh" --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME"
     fi
     
     elif [[ $BCM_CLI_VERB == "remove" ]]; then
-    bash -c "$BCM_GIT_DIR/project/destroy.sh" "$@"
+    bash -c "$BCM_GIT_DIR/project/destroy.sh --project-name=$BCM_PROJECT_NAME --del-template=$BCM_DELETE_BCM_IMAGE --del-lxcbase=$BCM_DELETE_LXC_BASE"
 fi

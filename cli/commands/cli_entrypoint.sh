@@ -73,6 +73,11 @@ if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
     exit
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
+    ./cluster/entrypoint.sh "$@"
+    exit
+fi
+
 # all the command below REQUIRE a HTTPS LXD endpoint. Stop here if the local LXD client doesn't have one configured.
 # this also applies to locally installed LXD instances; we ALWAYS deploy against HTTPS (no unix socket).
 if [[ "$(lxc remote get-default)" == "local" ]]; then
@@ -82,8 +87,7 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "project" ]]; then
     ./project/entrypoint.sh "$@"
-    elif [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
-    ./cluster/entrypoint.sh "$@"
+    
     elif [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"
     

@@ -6,19 +6,23 @@ cd "$(dirname "$0")"
 # shellcheck disable=1091
 source "$BCM_GIT_DIR/env"
 
-BCM_PROJECT_NAME=bcmbase
+BCM_PROJECT_NAME=
 BCM_DELETE_BCM_IMAGE=0
 BCM_DELETE_LXC_BASE=0
 BCM_DEPLOY_TIERS=1
 
 for i in "$@"; do
     case $i in
-        --del-template)
-            BCM_DELETE_BCM_IMAGE=1
+        --project-name=*)
+            BCM_PROJECT_NAME="${i#*=}"
             shift # past argument=value
         ;;
-        --del-lxcbase)
-            BCM_DELETE_LXC_BASE=1
+        --del-template=*)
+            BCM_DELETE_BCM_IMAGE="${i#*=}"
+            shift # past argument=value
+        ;;
+        --del-lxcbase=*)
+            BCM_DELETE_LXC_BASE="${i#*=}"
             shift # past argument=value
         ;;
         --all)
@@ -38,13 +42,7 @@ if ! env | grep -q 'BCM_'; then
     exit
 fi
 
-# we assume that the user wants to delete the current project
-# TODO add warning messages before executing this script.
-if [[ -z $BCM_PROJECT_NAME ]]; then
-    BCM_PROJECT_NAME=$(lxc project list | grep "(current)" | awk '{print $2}')
-fi
-
-export BCM_PROJECT_NAME=$BCM_PROJECT_NAME
+export BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
 if [[ $BCM_DEPLOY_TIERS == 1 ]]; then
     ./tiers/destroy.sh --all
 fi
@@ -85,8 +83,5 @@ fi
 # you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)
 if lxc project list | grep -q "$BCM_PROJECT_NAME"; then
     lxc project switch default
-    
-    if [[ $BCM_PROJECT_NAME != "default" ]]; then
-        lxc project delete "$BCM_PROJECT_NAME"
-    fi
+    lxc project delete "$BCM_PROJECT_NAME"
 fi

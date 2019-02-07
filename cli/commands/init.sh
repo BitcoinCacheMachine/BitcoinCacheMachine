@@ -6,7 +6,6 @@ cd "$(dirname "$0")"
 BCM_CERT_NAME=
 BCM_CERT_USERNAME=
 BCM_CERT_HOSTNAME=
-BCM_CERT_DIR=
 
 for i in "$@"; do
     case $i in
@@ -20,10 +19,6 @@ for i in "$@"; do
         ;;
         --hostname=*)
             BCM_CERT_HOSTNAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --cert-dir=*)
-            BCM_CERT_DIR="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -52,16 +47,26 @@ if [[ -z "$BCM_CERT_HOSTNAME" ]]; then
     exit
 fi
 
-# shellcheck disable=SC2153
-bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $GNUPGHOME"
-
-bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
+if [[ ! -d "$GNUPGHOME" ]]; then
+    # shellcheck disable=SC2153
+    bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $GNUPGHOME"
+    
+    bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
     --dir='$GNUPGHOME' \
     --name='$BCM_CERT_NAME' \
     --username='$BCM_CERT_USERNAME' \
---hostname='$BCM_CERT_HOSTNAME'"
+    --hostname='$BCM_CERT_HOSTNAME'"
+else
+    echo "ERROR: '$GNUPGHOME' already exists."
+    exit
+fi
 
-# now let's initialize the password repository with the GPG key
-bcm pass init --name="$BCM_CERT_NAME" --username="$BCM_CERT_USERNAME" --hostname="$BCM_CERT_HOSTNAME"
-
-echo "Your GPG keys and password store have successfully initialized. Be sure to back it up!"
+if [[ ! -d "$PASSWORD_STORE_DIR" ]]; then
+    # now let's initialize the password repository with the GPG key
+    bcm pass init --name="$BCM_CERT_NAME" --username="$BCM_CERT_USERNAME" --hostname="$BCM_CERT_HOSTNAME"
+    
+    echo "Your GPG keys and password store have successfully initialized. Be sure to back it up!"
+else
+    echo "ERROR: $PASSWORD_STORE_DIR already exists."
+    exit
+fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux
+set -Eeuo pipefail
 
 source /bcm/runtime_helper.sh
 

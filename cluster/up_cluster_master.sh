@@ -83,7 +83,7 @@ if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     
     echo "Adding a lxd remote for cluster '$BCM_CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."
     lxc remote add "$BCM_CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
-    
-    echo "Setting BCM default LXD remote to '$BCM_CLUSTER_NAME'"
     lxc remote switch "$BCM_CLUSTER_NAME"
 fi
+
+echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster. Consider adding hosts to your new cluster with 'bcm cluster add'"

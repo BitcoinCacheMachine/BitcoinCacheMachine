@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux
+set -Eeuo pipefail
 
 
 # if the lxd groups doesn't exist, create it.

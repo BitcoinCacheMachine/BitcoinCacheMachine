@@ -52,7 +52,15 @@ if [[ -z $BCM_CLUSTER_NAME ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    bash -c "$BCM_GIT_DIR/cluster/up_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
+    
+    # first check to ensure that the cluster doesn't already exist.
+    if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
+        bash -c "$BCM_GIT_DIR/cluster/up_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
+    else
+        echo "ERROR: BCM Cluster with name 'BCM_CLUSTER_NAME' already exists!"
+        exit
+    fi
+    
     elif [[ $BCM_CLI_VERB == "destroy" ]]; then
     
     # if the user didn't pass the cluster name, then we assume the user wants to delete the active cluster.
@@ -66,10 +74,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     
     export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
     
-    # let's not delete the locally installed LXD instance.
-    if [[ "$BCM_CLUSTER_NAME" != "local" ]]; then
-        bash -c "$BCM_GIT_DIR/cluster/destroy_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME  --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
-    fi
+    bash -c "$BCM_GIT_DIR/cluster/destroy_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME  --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
     
     elif [[ "$BCM_CLI_VERB" == "list" ]]; then
     export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
@@ -78,6 +83,8 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         if lxc info | grep -q "server_clustered: true"; then
             lxc cluster list | grep "$BCM_CLUSTER_NAME" | awk '{print $2}'
         fi
+    else
+        echo
     fi
 else
     cat ./help.txt
