@@ -19,3 +19,4 @@ profiles:
 cluster:
   server_name: $BCM_ENDPOINT_NAME
   enabled: true
+

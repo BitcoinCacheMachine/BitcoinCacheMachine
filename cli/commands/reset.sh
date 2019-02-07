@@ -44,4 +44,15 @@ else
     echo "WARNING: PASSWORD_STORE_DIR directory '$PASSWORD_STORE_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
+if [[ -d "$BCM_SSH_DIR" ]]; then
+    if [[ "$CHOICE" == 'y' ]]; then
+        if [ "$BCM_SSH_DIR" != "$HOME/.ssh" ]; then
+            echo "Deleting $BCM_SSH_DIR."
+            sudo rm -Rf "$BCM_SSH_DIR"
+        fi
+    fi
+else
+    echo "WARNING: BCM_SSH_DIR directory '$BCM_SSH_DIR' does not exist. You may need to run 'bcm init'."
+fi
+
 bash -c "$BCM_GIT_DIR/cli/tmp_down.sh"

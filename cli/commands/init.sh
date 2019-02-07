@@ -57,7 +57,7 @@ if [[ ! -d "$GNUPGHOME" ]]; then
     --username='$BCM_CERT_USERNAME' \
     --hostname='$BCM_CERT_HOSTNAME'"
 else
-    echo "ERROR: '$GNUPGHOME' already exists."
+    echo "ERROR: '$GNUPGHOME' already exists. You can delete your certificate store by running 'bcm reset'"
     exit
 fi
 

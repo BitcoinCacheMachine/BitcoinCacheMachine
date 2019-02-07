@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o nounset
+set -Eeuo nounset
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1090

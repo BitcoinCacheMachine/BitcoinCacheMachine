@@ -63,11 +63,6 @@ if [[ "$BCM_CLI_COMMAND" == "file" ]]; then
     exit
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "ssh" ]]; then
-    ./ssh/entrypoint.sh "$@"
-    exit
-fi
-
 if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
     ./info.sh "$@"
     exit
@@ -75,6 +70,11 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
     ./cluster/entrypoint.sh "$@"
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "ssh" ]]; then
+    ./ssh/entrypoint.sh "$@"
     exit
 fi
 
@@ -87,12 +87,12 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "project" ]]; then
     ./project/entrypoint.sh "$@"
-    
-    elif [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"
-    
-    elif [[ "$BCM_CLI_COMMAND" == "show" ]]; then
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     ./show.sh
-else
-    cat ./help.txt
 fi

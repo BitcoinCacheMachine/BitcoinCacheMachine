@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -Eeu
+cd "$(dirname "$0")"
 
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
@@ -24,6 +25,6 @@ fi
 sudo snap restart lxd
 
 # run lxd init using the prepared preseed.
-cat "$BCM_TEMP_DIR/provisioning/lxd_preseed.yml" | sudo lxd init --preseed
+cat "./lxd_preseed.yml" | sudo lxd init --preseed
 
-wait-for-it -t 30 localhost:8443
+wait-for-it -t 30 127.0.0.1:8443
