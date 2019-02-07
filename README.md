@@ -76,9 +76,9 @@ In general, the steps you take to deploy your own infrastructure is as follows:
 
 1) Download BCM from github and run setup to configure your environment (done above).
 2) Run `bcm init`, which initializes your management host (i.e., [SDN Controller](https://www.sdxcentral.com/sdn/definitions/sdn-controllers/)). This command downloads and installs BCM software dependencies including `docker-ce`. `bcm init` builds the relevant docker images used at the management computer including those required for Trezor integration.
-3) Create a cluster by running `bcm cluster create`. A BCM cluster is defined as one or more LXD endpoints with a private networking environment that is low latency and high bandwidth, such as a home or office LAN. Each endpoint MUST have direct IP reachability with other endpoints in the cluster. BCM workloads (app-level containers) are deployed to LXD endpoints.
-4) Create one or more BCM Projects using `bcm project create`. A BCM Project represents the containerized software stack that can be independently deployed to one or more clusters. You can use the BCM cli to customize deployment stacks to suit your particular needs.
-5) Deploy a BCM Project to a BCM Cluster using `bcm project deploy`. Deployment-specific GPG certificates are created in this step. You can deploy multiple instances of a project to the same cluster (cluster [multi-tenancy](https://en.wikipedia.org/wiki/Multitenancy)). The BCM SDN Controller intelligently deploys components across failure domains to achieve local high-availability.
+3) Create a cluster by running `bcm cluster create`. A BCM cluster is defined as one or more LXD endpoints (computers) with a private networking environment that is low latency and high bandwidth, such as a home or office LAN.
+4) Deploy the base BCM software stack using `bcm project deploy`. The BCM SDN Controller intelligently deploys components across failure domains to achieve local high-availability.
+5) TODO: using `bcm stack deploy` to add supported software to your BCM data center. Planned software includes lnd & eclair, open-timestamps server, various wallet interfaces and/or RPC interfaces (e.g., for desktop application integration), [esplora block explorer from Blockstream](https://github.com/Blockstream/esplora), [lightning-charge](https://github.com/ElementsProject/lightning-charge), etc..
 
 ## How to contribute
 
