@@ -25,6 +25,8 @@ if [[ ! -z "$GOGO_FILE" ]]; then
         sleep .5
         printf '.'
     done
+    
+    echo ""
 else
     echo "ERROR: GOGO_FILE not specified."
 fi

@@ -1,0 +1,13 @@
+Description:
+
+  Deploy a BCM stack to a cluster.
+
+Usage:
+
+  bcm stack deploy --stack-name=STACK_NAME --opt= --opt=
+
+Required Parameters:
+
+  --stack-name          Required. The name of the stack you want deployed.
+  --opt                 Each stack has one or more required or optional parameters 
+                        that can be set.

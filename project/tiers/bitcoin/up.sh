@@ -18,3 +18,5 @@ if [[ $DEPLOY_MAINNET == 1 ]]; then
     ./bitcoind_stack_deploy.sh --chain=mainnet
     ./file_upload.sh --chain=mainnet --blocks="$UPLOAD_MAINNET_BLOCKS" --chainstate="$UPLOAD_MAINNET_CHAINSTATE"
 fi
+
+source ./env

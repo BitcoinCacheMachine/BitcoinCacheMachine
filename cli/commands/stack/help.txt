@@ -1,0 +1,10 @@
+Description:
+  Deploy a BCM stack to your active cluster.
+
+Usage:
+  bcm stack [COMMAND]
+
+COMMANDS:
+  deploy    Deploy a BCM stack to the existing cluster.
+  remove    Remove a deployed stack from a cluster.
+

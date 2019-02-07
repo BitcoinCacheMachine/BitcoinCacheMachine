@@ -93,6 +93,10 @@ if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
+    ./stack/entrypoint.sh "$@"
+fi
+
 if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     ./show.sh
 fi

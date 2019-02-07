@@ -1,2 +1,5 @@
 export BCM_TIER_TYPE=1
 export SRC_DIR="$HOME/.bitcoin"
+export DEPLOY_LIGHTNINGD=1
+export DEPLOY_LND=0
+export DEPLOY_ECLAIR=0

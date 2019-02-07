@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux
+set -Eeu
 
 DEFAULT_GATEWAY_IP=
 DEFAULT_GATEWAY_HOSTNAME=
