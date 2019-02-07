@@ -1,8 +1,0 @@
-{
-    "proxies": {
-        "default": {
-            "httpsProxy": "http://squid:3128",
-            "httpProxy": "http://squid:3128"
-        }
-    }
-}

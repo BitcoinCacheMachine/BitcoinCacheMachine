@@ -1,4 +1,0 @@
-# see https://www.home-assistant.io/docs/ecosystem/tor/
-#HiddenServiceDir /var/lib/tor/homeassistant/
-#HiddenServicePort 80 127.0.0.1:8123
-#HiddenServiceAuthorizeClient stealth haremote1
