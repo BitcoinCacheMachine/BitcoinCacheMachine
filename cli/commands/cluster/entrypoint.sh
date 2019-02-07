@@ -14,7 +14,7 @@ else
     exit
 fi
 
-BCM_CLUSTER_NAME=
+BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_ENDPOINTS_FLAG=0
 BCM_SSH_HOSTNAME=
 BCM_SSH_USERNAME=
@@ -47,8 +47,9 @@ if [[ $BCM_HELP_FLAG == 1 ]]; then
     exit
 fi
 
-if [[ -z $BCM_CLUSTER_NAME ]]; then
-    BCM_CLUSTER_NAME=$(lxc remote get-default)
+if [[ $BCM_CLUSTER_NAME == "local" ]]; then
+    echo "ERROR: BCM_CLUSTER_NAME is set to local. Consider explicitly setting the cluster name with '--cluster-name='"
+    exit
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
@@ -62,6 +63,12 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     elif [[ $BCM_CLI_VERB == "destroy" ]]; then
+    # if the LXC remote for the cluster doesn't exist, then we'll state as such and quit.
+    # if it's the cluster master add the LXC remote so we can manage it.
+    if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
+        echo "WARNING: Cluster '$BCM_CLUSTER_NAME' doesn't exist. Can't delete."
+        exit
+    fi
     
     # if the user didn't pass the cluster name, then we assume the user wants to delete the active cluster.
     CHOICE=n

@@ -7,6 +7,7 @@ services:
       - bitcoin_data:/data
     environment:
       CHAIN: ${CHAIN:-testnet}
+      HOST_ENDING: ${HOST_ENDING:-01}
     networks:
       bitcoindrpcnet:
         aliases:

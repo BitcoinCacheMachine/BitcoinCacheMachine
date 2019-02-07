@@ -4,10 +4,10 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # removes the current project from the active cluster.
-bcm project remove 
+bcm project remove
 #--del-template --del-lxcbase
 
-# destroys the active cluster
+# destroys the active cluster unless --cluster-name is specified.
 bcm cluster destroy --ssh-username="$(whoami)" --ssh-hostname="$(hostname)"
 
 # deletes certificates

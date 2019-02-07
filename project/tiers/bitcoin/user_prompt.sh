@@ -35,7 +35,9 @@ if [[ $CHOICE == "y" ]]; then
             UPLOAD_TESTNET_CHAINSTATE=1
         fi
     else
-        echo "Note: You can push the chainstate when the $SRC_DIR/chainstate directory exists. Note also that this is not secure."
+        if [[ "$UPLOAD_TESTNET_BLOCKS" == 1 ]]; then
+            echo "Note: You can push the chainstate when the $SRC_DIR/chainstate directory exists. Note also that this is not secure."
+        fi
     fi
 fi
 

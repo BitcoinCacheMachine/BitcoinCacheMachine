@@ -61,10 +61,6 @@ else
     ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
-# generate Trezor-backed SSH keys for interactively login.
-SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"
-bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push
-
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
 export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"

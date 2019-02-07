@@ -48,4 +48,5 @@ if [[ "$UPLOAD_CHAINSTATE" == 1 ]]; then
     lxc file push -r -p "$SRC_DIR/chainstate" "bcm-bitcoin-01/$DEST_DIR"
 fi
 
+lxc exec bcm-bitcoin-01 -- mkdir -p "$DEST_DIR"
 lxc exec bcm-bitcoin-01 -- touch "$DEST_DIR/gogogo"

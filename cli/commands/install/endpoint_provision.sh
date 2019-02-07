@@ -24,6 +24,6 @@ fi
 sudo snap restart lxd
 
 # run lxd init using the prepared preseed.
-cat /tmp/bcm/provisioning/lxd_preseed.yml | sudo lxd init --preseed
+cat "$BCM_TEMP_DIR/provisioning/lxd_preseed.yml" | sudo lxd init --preseed
 
 wait-for-it -t 30 localhost:8443

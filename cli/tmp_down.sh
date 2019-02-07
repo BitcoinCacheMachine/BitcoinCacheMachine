@@ -2,12 +2,14 @@
 
 set -Eeuo pipefail
 
-encfs -u /tmp/bcm>>/dev/null
+source "$BCM_GIT_DIR/env"
 
-if [[ -d /tmp/bcm ]]; then
-    rm -rf /tmp/bcm
+encfs -u "$BCM_TEMP_DIR">>/dev/null
+
+if [[ -d "$BCM_TEMP_DIR" ]]; then
+    rm -rf "$BCM_TEMP_DIR"
 fi
 
-if [[ -d /tmp/bcm_enc ]]; then
-    rm -rf /tmp/bcm_enc
+if [[ -d "$BCM_TEMP_DIR""_enc" ]]; then
+    rm -rf "$BCM_TEMP_DIR""_enc"
 fi

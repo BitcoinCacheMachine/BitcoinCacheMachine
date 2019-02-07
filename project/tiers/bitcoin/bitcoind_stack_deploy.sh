@@ -23,6 +23,9 @@ if [[ -z $CHAIN ]]; then
     exit
 fi
 
+# this is the LXC host that the docker container is going to be provisioned to.
+HOST_ENDING="01"
+
 # get the env from bitcoind
 STACK_FILE_DIRNAME="$BCM_STACKS_DIR/bitcoind"
 source "$STACK_FILE_DIRNAME/env"
@@ -30,11 +33,11 @@ source "$STACK_FILE_DIRNAME/env"
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
 --build-context="$STACK_FILE_DIRNAME/build" \
---container-name=bcm-bitcoin-01 \
+--container-name="bcm-bitcoin-$HOST_ENDING" \
 --image-name="$IMAGE_NAME" \
 --image-tag="$IMAGE_TAG"
 
 # push the stack and build files
 lxc file push -p -r "$STACK_FILE_DIRNAME/" "bcm-gateway-01/root/stacks/bitcoin/"
 
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" CHAIN="$CHAIN" docker stack deploy -c "/root/stacks/bitcoin/bitcoind/$STACK_FILE" "$STACK_NAME-$CHAIN"
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" CHAIN="$CHAIN" HOST_ENDING="$HOST_ENDING" docker stack deploy -c "/root/stacks/bitcoin/bitcoind/$STACK_FILE" "$STACK_NAME-$CHAIN"

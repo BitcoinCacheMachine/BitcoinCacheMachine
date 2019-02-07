@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -15,15 +15,17 @@ fi
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
 BCM_SSH_PUSH=0
+BCM_CLUSTER_NAME=
+BCM_ENDPOINT_NAME=
 
 for i in "$@"; do
     case $i in
-        --username=*)
-            BCM_SSH_USERNAME="${i#*=}"
+        --endpoint-name=*)
+            BCM_ENDPOINT_NAME="${i#*=}"
             shift # past argument=value
         ;;
-        --hostname=*)
-            BCM_SSH_HOSTNAME="${i#*=}"
+        --cluster-name=*)
+            BCM_CLUSTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
         --push)
@@ -36,6 +38,24 @@ for i in "$@"; do
     esac
 done
 
+# if the cluster name wasn't passed, we assume the user@hostname is a member to the active LXD cluster.
+if [[ -z $BCM_CLUSTER_NAME ]]; then
+    BCM_CLUSTER_NAME=$(lxc remote get-default)
+fi
+
+export TEMP_DIR="$BCM_TEMP_DIR/$BCM_CLUSTER_NAME/$BCM_ENDPOINT_NAME"
+if [[ ! -d "$TEMP_DIR" ]]; then
+    echo "ERROR: '$TEMP_DIR' doesn't exist."
+    exit
+fi
+
+if [[ ! -f "$TEMP_DIR/env" ]]; then
+    echo "ERROR: '$TEMP_DIR/env' doesn't exist."
+    exit
+fi
+
+source "$TEMP_DIR/env"
+
 if [[ -z "$BCM_SSH_USERNAME" ]]; then
     echo "Error:  BCM_SSH_USERNAME not set."
 fi
@@ -44,24 +64,16 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     echo "Error:  BCM_SSH_HOSTNAME not set."
 fi
 
-SSH_DIR=/tmp/bcm/ssh
-mkdir -p "$SSH_DIR"
-
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 
 export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
 export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
 
-if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
+if [[ ! -z "$BCM_TREZOR_USB_PATH" ]]; then
     
     if [[ $BCM_CLI_VERB == "newkey" ]]; then
         
-        USER_HOSTNAME=${3:-}
-        if [ ! -z "${USER_HOSTNAME}" ]; then
-            BCM_SSH_USERNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f1)
-            BCM_SSH_HOSTNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f2)
-        fi
         
         if [[ -z $BCM_SSH_HOSTNAME ]]; then
             echo "BCM_SSH_HOSTNAME is empty."
@@ -89,15 +101,27 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
         fi
         
         KEY_NAME="$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub"
+        PUB_KEY_PATH="$TEMP_DIR/$KEY_NAME"
+        
         sudo docker run -it --rm \
-        -v $SSH_DIR:/root/.ssh \
+        -v "$TEMP_DIR":/root/.ssh \
         -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
         -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
         -e KEY_NAME="$KEY_NAME" \
         --device="$BCM_TREZOR_USB_PATH" \
-        bcm-trezor:latest bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME -v > /root/.ssh/$KEY_NAME"
+        bcm-trezor:latest bash -c "trezor-agent -vv $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME > /root/.ssh/$KEY_NAME && sleep 60"
+        # PUB_KEY=$(sudo docker run -it --rm \
+        #     -v "$TEMP_DIR":/root/.ssh \
+        #     -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
+        #     -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
+        #     -e KEY_NAME="$KEY_NAME" \
+        #     --device="$BCM_TREZOR_USB_PATH" \
+        # bcm-trezor:latest bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME")
+        # echo "$PUB_KEY" >> "$TEMP_DIR/temp.pub"
+        # grep "ecdsa-sha2-nistp256" "$TEMP_DIR/temp.pub" >> "$PUB_KEY_PATH"
+        # rm "$TEMP_DIR/temp.pub"
         
-        PUB_KEY_PATH="$SSH_DIR/$KEY_NAME"
+        
         if [[ -f "$PUB_KEY_PATH" ]]; then
             echo "Congratulations! Your new SSH public key can be found at '$PUB_KEY_PATH'"
             
@@ -112,17 +136,17 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
         else
             echo "ERROR: SSH Key did not generate successfully!"
         fi
+        
         elif [[ $BCM_CLI_VERB == "connect" ]]; then
         
-        USER_HOSTNAME=${3:-}
-        if [ ! -z "${USER_HOSTNAME}" ]; then
-            BCM_SSH_USERNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f1)
-            BCM_SSH_HOSTNAME=$(echo "$USER_HOSTNAME" | cut -d@ -f2)
-        else
-            echo "Provide the username & hostname:  user@host"
-            cat ./help.txt
+        if [[ ! -f "$TEMP_DIR/env" ]]; then
+            echo "ERROR: $TEMP_DIR/env does not exist."
             exit
         fi
+        
+        
+        source "$TEMP_DIR/env"
+        
         if [[ -z $BCM_SSH_HOSTNAME ]]; then
             echo "BCM_SSH_HOSTNAME is empty."
             cat ./newkey/help.txt
@@ -136,7 +160,7 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
         fi
         
         sudo docker run -it --rm --add-host="$BCM_SSH_HOSTNAME:$(dig +short "$BCM_SSH_HOSTNAME")" \
-        -v "$/tmp/bcm/ssh":/root/.ssh \
+        -v "$TEMP_DIR":/root/.ssh \
         -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
         -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
         --device="$BCM_TREZOR_USB_PATH" \

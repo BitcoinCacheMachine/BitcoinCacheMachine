@@ -3,6 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+source "$BCM_GIT_DIR/env"
+
 BCM_CLUSTER_NAME=
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
@@ -41,6 +43,11 @@ mkdir -p "$TEMP_DIR"
 
 ./stub_env.sh --endpoint-name="$BCM_ENDPOINT_NAME" --master --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME"
 
+# generate Trezor-backed SSH keys for interactively login.
+#SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"
+bcm ssh newkey --endpoint-name="$BCM_ENDPOINT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --push
+
+
 # since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
 LXD_CERT_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd.cert"
 
@@ -62,14 +69,14 @@ if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
     torify scp -i "$SSH_KEY_FILE" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
     torify scp -i "$SSH_KEY_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_install.sh"
     torify ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/lxd_install.sh"
-    torify ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "env BCM_LXD_INIT=1 $REMOTE_MOUNTPOINT/lxd_install.sh"
+    torify ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "env BCM_TEMP_DIR=$BCM_TEMP_DIR $REMOTE_MOUNTPOINT/lxd_install.sh"
     torify wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
 else
     ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" mkdir -p "$REMOTE_MOUNTPOINT"
     scp -i "$SSH_KEY_FILE" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
     scp -i "$SSH_KEY_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_install.sh"
     ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/lxd_install.sh"
-    ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/lxd_install.sh"
+    ssh -i "$SSH_KEY_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "env BCM_TEMP_DIR=$BCM_TEMP_DIR $REMOTE_MOUNTPOINT/lxd_install.sh"
     wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
 fi
 
@@ -86,4 +93,5 @@ if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     lxc remote switch "$BCM_CLUSTER_NAME"
 fi
 
-echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster. Consider adding hosts to your new cluster with 'bcm cluster add'"
+echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster."
+echo "Consider adding hosts to your new cluster with 'bcm cluster add'. This helps achieve local high-availability."
