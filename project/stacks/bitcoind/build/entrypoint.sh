@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
-cd "$(dirname "$0")"
+set -Eeu
 
 source /bcm/proxy_ip_determinant.sh
 

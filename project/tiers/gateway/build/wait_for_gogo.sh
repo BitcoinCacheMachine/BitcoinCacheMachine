@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo
+set -Eeu
 
 GOGO_FILE=
 
