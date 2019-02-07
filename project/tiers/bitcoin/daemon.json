@@ -8,6 +8,9 @@
         "bcm-gateway-01:5010",
         "bcm-gateway-02:5011"
     ],
+    "dns": [
+        "8.8.8.8"
+    ],
     "labels": [
         "bcm-bitcoin=true"
     ]

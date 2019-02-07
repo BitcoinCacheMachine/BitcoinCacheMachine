@@ -63,3 +63,5 @@ bash -c "$BCM_GIT_DIR/controller/gpg-init.sh \
 
 # now let's initialize the password repository with the GPG key
 bcm pass init --name="$BCM_CERT_NAME" --username="$BCM_CERT_USERNAME" --hostname="$BCM_CERT_HOSTNAME"
+
+echo "Your GPG keys and password store have successfully initialized. Be sure to back it up!"

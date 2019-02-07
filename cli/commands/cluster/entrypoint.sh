@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -o nounset
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
 
 VALUE=${2:-}
-if [ ! -z ${VALUE} ]; then
+if [ ! -z "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     echo "Please provide a cluster command."
@@ -71,14 +71,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         bash -c "$BCM_GIT_DIR/cluster/destroy_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME  --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
     fi
     
-    elif [[ $BCM_CLI_VERB == "list" ]]; then
-    export BCM_CLUSTER_NAME=$BCM_CLUSTER_NAME
-    
-    # shellcheck disable=SC2153
-    export BCM_ENDPOINTS_FLAG=$BCM_ENDPOINTS_FLAG
+    elif [[ "$BCM_CLI_VERB" == "list" ]]; then
+    export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
     
     if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
-        
         if lxc info | grep -q "server_clustered: true"; then
             lxc cluster list | grep "$BCM_CLUSTER_NAME" | awk '{print $2}'
         fi

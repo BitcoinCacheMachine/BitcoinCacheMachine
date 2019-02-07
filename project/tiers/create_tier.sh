@@ -42,7 +42,7 @@ for endpoint in $(bcm cluster list --endpoints); do
     
     # each tier can have a specific dhcp conf file, but it's optional due to default behavior.
     DHCPD_CONF_FILE="./$BCM_TIER_NAME/dhcp_conf.yml"
-    if [[ -f $DHCPD_CONF_FILE ]]; then
+    if [[ -f "$DHCPD_CONF_FILE" ]]; then
         lxc file push "$DHCPD_CONF_FILE" "$HOSTNAME/etc/netplan/10-lxc.yaml"
     fi
     

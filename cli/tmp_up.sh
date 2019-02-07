@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 mkdir -p /tmp/bcm_enc
 mkdir -p /tmp/bcm
