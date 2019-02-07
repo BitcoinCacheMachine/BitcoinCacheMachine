@@ -66,9 +66,9 @@ source ~/.bashrc
 
 Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_GIT_DIR' variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
 
-Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. The options used in the BCM cli run default BCM data center workloads on your localhost instead of deploying your app to a remote set (one or more) of machines. The BCM CLI automatically installs all software for you.
+Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. The options used in the BCM cli run default BCM data center workloads on your localhost instead of deploying your app to a remote set (one or more) of machines. Of course, you can always modify the arguments to provision BCM workloads against a remote server. The BCM CLI automatically installs all software for you.
 
-The demo BCM Project is called `BCMBase`. which deploy criticial BCM data center componnets such as a TOR proxy, a comprehensive [Kafka stack](https://kafka.apache.org/), docker registries, and TOR-enabled DNS, bitcoind, etc., exposes the c-lightning RPC interface as a v3 onion service so you can use an application like [Spark](https://github.com/shesek/spark-wallet) from your TOR-capable smartphone. You can override the default BCM deployment parameters by creating and customizing a BCM Project.
+BCM deploys a base workload containing criticial BCM data center components such as a SOCKS5 TOR proxy, TOR-enabled DNS, docker registries, a comprehensive [Kafka stack](https://kafka.apache.org/), [bitcoind](https://github.com/bitcoin/bitcoin), [c-lightning](https://github.com/ElementsProject/lightning), and the [Spark Lightning Wallet web interface](https://github.com/shesek/spark-wallet#browser-support). All web interfaces are exposed on your network using MACVLAN.
 
 ## Deploying your own BCM Infrastructure
 
