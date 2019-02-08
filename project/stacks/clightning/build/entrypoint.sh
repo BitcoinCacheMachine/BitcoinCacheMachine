@@ -1,22 +1,25 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
-source /bcm/runtime_helper.sh
+source /bcm/proxy_ip_determinant.sh
+
+echo "BCM /entrypoint.sh for clightning"
 
 wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL_HOST"
 
-# we are going to wait for GOGO_FILE to appear before starting bitcoind.
-# this allows the management plane to upload the blocks and/or chainstate.
-while [ ! -f "$GOGO_FILE" ]
-do
-    sleep .5
-    printf '.'
-done
+# wait for the managementt plane.
+bash -c "/bcm/wait_for_gogo.sh --gogofile=/root/gogo"
 
-if [[ $CHAIN == "testnet" ]]; then
-    /root/lightning/lightningd/lightningd --conf=/root/.lightning/config -testnet
-    elif [[ $CHAIN == "mainnet" ]]; then
-    /root/lightning/lightningd/lightningd --conf=/root/.lightning/config
+if [[ ! -z "$CHAIN" ]]; then
+    if [[ $CHAIN == "testnet" ]]; then
+        #--bind-addr="127.0.0.1:9735"
+        #-proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST" -rpcbind="$OVERLAY_NETWORK_IP" -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332"
+        /root/lightning/lightningd/lightningd --conf=/root/.lightning/config --proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL_HOST" --tor-service-password=password --log-level=debug -testnet
+        elif [[ $CHAIN == "mainnet" ]]; then
+        /root/lightning/lightningd/lightningd --conf=/root/.lightning/config --proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL_HOST" --tor-service-password=password --log-level=debug
+    fi
+else
+    echo "Error: CHAIN not set."
 fi

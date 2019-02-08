@@ -1,0 +1,51 @@
+A bitcoin lightning daemon (default values shown for network: testnet).
+--help|-h                            Print this message.
+--bitcoin-datadir <arg>              -datadir arg for bitcoin-cli
+--rgb <arg>                          RRGGBB hex color for node
+--alias <arg>                        Up to 32-byte alias for node
+--bitcoin-cli <arg>                  bitcoin-cli pathname
+--bitcoin-rpcuser <arg>              bitcoind RPC username
+--bitcoin-rpcpassword <arg>          bitcoind RPC password
+--bitcoin-rpcconnect <arg>           bitcoind RPC host to connect to
+--bitcoin-rpcport <arg>              bitcoind RPC port
+--pid-file=<file>                    Specify pid file (default: "lightningd-testnet.pid")
+--log-level <arg>                    log level (io, debug, info, unusual, broken) (default: INFO)
+--log-prefix <arg>                   log prefix (default: lightningd(175):)
+--log-file=<file>                    log to file instead of stdout
+--version|-V                         Print version and exit
+--lightning-dir=<dir>                Set working directory. All other files are relative to this (default: "/root/.lightning")
+--rpc-file <arg>                     Set JSON-RPC socket (or /dev/tty) (default: "lightning-rpc")
+--conf=<file>                        Specify configuration file. Relative paths will be prefixed by lightning-dir location. (default: config)
+--plugin <arg>                       Add a plugin to be run (can be used multiple times)
+--plugin-dir <arg>                   Add a directory to load plugins from (can be used multiple times)
+--clear-plugins                      Remove all plugins added before this option
+--disable-plugin <arg>               Disable a particular plugin by filename/name
+--daemon                             Run in the background, suppress stdout/stderr
+--ignore-fee-limits <arg>            (DANGEROUS) allow peer to set any feerate (default: true)
+--watchtime-blocks <arg>             Blocks before peer can unilaterally spend funds (default: 6)
+--max-locktime-blocks <arg>          Maximum blocks funds may be locked for (default: 2016)
+--funding-confirms <arg>             Confirmations required for funding transaction (default: 1)
+--commit-fee-min=<percent>           Minimum percentage of fee to accept for commitment (default: 0)
+--commit-fee-max=<percent>           Maximum percentage of fee to accept for commitment (0 for unlimited) (default: 0)
+--commit-fee=<percent>               Percentage of fee to request for their commitment (default: 500)
+--cltv-delta <arg>                   Number of blocks for cltv_expiry_delta (default: 6)
+--cltv-final <arg>                   Number of blocks for final cltv_expiry (default: 10)
+--commit-time=<millseconds>          Time after changes before sending out COMMIT (default: 10)
+--fee-base <arg>                     Millisatoshi minimum to charge for HTLC (default: 1)
+--rescan <arg>                       Number of blocks to rescan from the current head, or absolute blockheight if negative (default: 30)
+--fee-per-satoshi <arg>              Microsatoshi fee for every satoshi in HTLC (default: 10)
+--addr <arg>                         Set an IP address (v4 or v6) to listen on and announce to the network for incoming connections
+--bind-addr <arg>                    Set an IP address (v4 or v6) to listen on, but not announce
+--announce-addr <arg>                Set an IP address (v4 or v6) or .onion v2/v3 to announce, but not listen on
+--offline                            Start in offline-mode (do not automatically reconnect and do not accept incoming connections)
+--autolisten <arg>                   If true, listen on default port and announce if it seems to be a public interface (default: true)
+--network <arg>                      Select the network parameters (bitcoin, testnet, regtest, litecoin or litecoin-testnet) (default: testnet)
+--testnet                            Alias for --network=testnet
+--mainnet                            Alias for --network=bitcoin
+--allow-deprecated-apis <arg>        Enable deprecated options, JSONRPC commands, fields, etc. (default: true)
+--autocleaninvoice-cycle <arg>       Perform cleanup of expired invoices every given seconds, or do not autoclean if 0 (default: 0)
+--autocleaninvoice-expired-by <arg>  If expired invoice autoclean enabled, invoices that have expired for at least this given seconds are cleaned (default: 86400)
+--proxy <arg>                        Set a socks v5 proxy IP address and port
+--tor-service-password <arg>         Set a Tor hidden service password
+--always-use-proxy <arg>             Use the proxy always (default: false)
+--disable-dns                        Disable DNS lookups of peers

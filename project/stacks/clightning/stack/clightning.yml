@@ -1,20 +1,20 @@
 version: '3.6'
 services:
-  # c-lightning https://github.com/ElementsProject/lightning
   clightning:
     image: ${IMAGE_NAME}
-    command: /entrypoint.sh
+    hostname: clightning-${CHAIN:-testnet}
+    volumes:
+      - clightning-data:/root/.lightning
+      - clightning-log-data:/var/log/clightning
+      - bitcoin_data:/data/bitcoin
+    environment:
+      CHAIN: ${CHAIN:-testnet}
+      HOST_ENDING: ${HOST_ENDING:-01}
     networks:
       bitcoindrpcnet:
       clightningrpcnet:
         aliases:
           - clightningrpc
-    environment:
-      BITCOIND_CHAIN: ${BCM_BITCOIN_CHAIN:-testnet}
-    volumes:
-      - clightning-data:/root/.lightning
-      - clightning-log-data:/var/logs/clightning
-      - bitcoin_data:/etc/bitcoin
     secrets:
       - source: clightning_conf
         target: /root/.lightning/config
@@ -34,17 +34,21 @@ volumes:
 
   bitcoin_data:
     external: true
-    name: bitcoind_bitcoin_data
+    name: bitcoind-${CHAIN:-testnet}_bitcoin_data
 
 networks:
   clightningrpcnet:
+    driver: overlay
     attachable: true
-    
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.239.0/24
+
   bitcoindrpcnet:
     external: true
-    name: bitcoind_bitcoindrpcnet
+    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
   
-
 secrets:
   clightning_conf:
     file: clightning.conf

@@ -8,13 +8,13 @@ if [[ -z "$TOR_PROXY" ]]; then
     echo "ERROR:  TOR_PROXY could not be determined."
     exi
 fi
-#wait-for-it -t 10 "$TOR_PROXY"
+wait-for-it -t 10 "$TOR_PROXY"
 
 if [[ -z "$TOR_CONTROL_HOST" ]]; then
     echo "ERROR:  TOR_CONTROL_HOST could not be determined."
     exit
 fi
-#wait-for-it -t 10 "$TOR_CONTROL_HOST"
+wait-for-it -t 10 "$TOR_CONTROL_HOST"
 
 if [[ ! -z "$CHAIN" ]]; then
     GOGO_FILE=

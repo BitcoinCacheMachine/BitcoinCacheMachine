@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 # shellcheck disable=1090
 source "$BCM_GIT_DIR/env"
 
+CHAIN=
 
 for i in "$@"; do
     case $i in
@@ -19,6 +20,10 @@ for i in "$@"; do
     esac
 done
 
+if [[ -z $CHAIN ]]; then
+    echo "CHAIN cannot be empty."
+    exit
+fi
 
 # shellcheck disable=SC1091
 source ./env
