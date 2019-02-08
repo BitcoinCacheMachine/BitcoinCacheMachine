@@ -85,8 +85,10 @@ if [[ "$(lxc remote get-default)" == "local" ]]; then
     exit
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "project" ]]; then
-    ./project/entrypoint.sh "$@"
+# provision and deprovision deploy and undeploy BCMBase which are critical data center components
+# common to ALL BCM deployments. This includes bitcoind.
+if [[ "$BCM_CLI_COMMAND" == "provision" || "$BCM_CLI_COMMAND" == "deprovision" ]]; then
+    ./provision/entrypoint.sh "$@"
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then

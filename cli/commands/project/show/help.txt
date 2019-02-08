@@ -1,8 +1,0 @@
-Description:
-  Shows the details of the BCM project stack.
-
-Usage:
-  bcm project get-default -d
-
-Options:
-  -d        If specified, the BCM project directory of the active project will be returned.      

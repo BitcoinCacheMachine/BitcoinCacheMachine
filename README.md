@@ -7,7 +7,7 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable. It is in a proof-of-concept stage and deploys to bitcoin TESTNET mode only. Not all features are implemented. Don't put real bitcoin on it. Stable builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!
+**IMPORTANT!** BCM is brand new and unstable. It is in a proof-of-concept stage and deploys to bitcoin TESTNET mode only. Not all features are implemented. Don't put real bitcoin on it. Builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!
 
 ## Why Bitcoin Cache Machine Exists
 
@@ -77,8 +77,10 @@ In general, the steps you take to deploy your own infrastructure is as follows:
 1) Download BCM from github and run setup to configure your environment (done above).
 2) Run `bcm init`, which initializes your management host (i.e., [SDN Controller](https://www.sdxcentral.com/sdn/definitions/sdn-controllers/)). This command downloads and installs BCM software dependencies including `docker-ce`. `bcm init` builds the relevant docker images used at the management computer including those required for Trezor integration.
 3) Create a cluster by running `bcm cluster create`. A BCM cluster is defined as one or more LXD endpoints (computers) with a private networking environment that is low latency and high bandwidth, such as a home or office LAN.
-4) Deploy the base BCM software stack using `bcm project deploy`. The BCM SDN Controller intelligently deploys components across failure domains to achieve local high-availability.
-5) TODO: Run `bcm stack deploy` to add supported software to your BCM data center workloads. Planned software includes [lnd](https://github.com/lightningnetwork/lnd) & [eclair](https://github.com/ACINQ/eclair) lightning daemons, [OpenTimestamps Server](https://github.com/opentimestamps/), various wallet interfaces and/or RPC interfaces (e.g., for desktop application integration), [esplora block explorer from Blockstream](https://github.com/Blockstream/esplora), [lightning-charge](https://github.com/ElementsProject/lightning-charge), etc..
+4) Deploy essential BCM data center components by running `bcm provision`. The components deployed by `bcm provision` are common to ALL BCM deployments and include TOR services (SOCKS5 proxy, TOR-enabled DNS, & TOR Control), docker registries, a kafka logging stack, and bitcoind. The BCM SDN Controller intelligently deploys components across failure domains (i.e., individual x86_64) to achieve local high-availability.
+5) TODO: Use `bcm stack deploy` to deploy supported software to your BCM data center workloads. Planned software includes [clightning](https://github.com/ElementsProject/lightning), [lnd](https://github.com/lightningnetwork/lnd) & [eclair](https://github.com/ACINQ/eclair) lightning daemons, [OpenTimestamps Server](https://github.com/opentimestamps/), various wallet interfaces and/or RPC interfaces (e.g., for desktop application integration), [esplora block explorer from Blockstream](https://github.com/Blockstream/esplora), [lightning-charge](https://github.com/ElementsProject/lightning-charge), etc..
+
+Each of the commands listed above has a negative command, e.g., `bcm stack undeploy`, `bcm deprovision`, `bcm cluster destroy`, and `bcm reset`. Consider running `bcm info` to determine your active environment variables.
 
 ## How to contribute
 
