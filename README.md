@@ -80,7 +80,7 @@ In general, the steps you take to deploy your own infrastructure is as follows:
 4) Deploy essential BCM data center components by running `bcm provision`. The components deployed by `bcm provision` are common to ALL BCM deployments and include TOR services (SOCKS5 proxy, TOR-enabled DNS, & TOR Control), docker registries, a kafka logging stack, and bitcoind. The BCM SDN Controller intelligently deploys components across failure domains (i.e., individual x86_64) to achieve local high-availability.
 5) TODO: Use `bcm stack deploy` to deploy supported software to your BCM data center workloads. Planned software includes [clightning](https://github.com/ElementsProject/lightning), [lnd](https://github.com/lightningnetwork/lnd) & [eclair](https://github.com/ACINQ/eclair) lightning daemons, [OpenTimestamps Server](https://github.com/opentimestamps/), various wallet interfaces and/or RPC interfaces (e.g., for desktop application integration), [esplora block explorer from Blockstream](https://github.com/Blockstream/esplora), [lightning-charge](https://github.com/ElementsProject/lightning-charge), etc..
 
-Each of the commands listed above has a negative command, e.g., `bcm stack undeploy`, `bcm deprovision`, `bcm cluster destroy`, and `bcm reset`, respectively. Consider running `bcm info` to determine your active environment variables and `bcm show` shows an overview of your current LXC deployment.
+Each of the commands listed above has a negative command, e.g., `bcm stack undeploy` (5), `bcm deprovision` (4), `bcm cluster destroy` (3), and `bcm reset` (2). Consider running `bcm info` to determine your active environment variables. `bcm show` provides an overview of your LXC containers, storage volumes, networks, images, etc..
 
 ## How to contribute
 
