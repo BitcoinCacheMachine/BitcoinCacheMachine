@@ -44,11 +44,6 @@ if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     exit
 fi
 
-# Exit if the project already exists.
-if ! bcm project list | grep -q "$BCM_PROJECT_NAME"; then
-    echo "WARNING: LXC project '$BCM_PROJECT_NAME' already exists."
-fi
-
 if [[ $(lxc remote get-default) != "$BCM_CLUSTER_NAME" ]]; then
     if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
         echo "Changing the default LXD client remote to BCM cluster '$BCM_CLUSTER_NAME'."

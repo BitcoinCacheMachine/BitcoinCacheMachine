@@ -2,7 +2,7 @@ Description:
   Create and manage BCM projects, or deploy existing BCM projects to an existing cluster.
 
 Usage:
-  bcm project [command]
+  bcm provision [command]
 
 Commands:
   create        Create BCM project.
