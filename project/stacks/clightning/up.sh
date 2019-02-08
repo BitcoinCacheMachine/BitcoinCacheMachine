@@ -20,3 +20,7 @@ for i in "$@"; do
     esac
 done
 
+#!/bin/bash
+echo "clightning/up.sh "
+echo "passed arguments:  '" "$@" "'"
+echo "$CHAIN"

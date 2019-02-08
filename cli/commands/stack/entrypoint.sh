@@ -10,15 +10,82 @@ if [ -z "${BCM_CLI_VERB}" ]; then
     exit
 fi
 
+STACK_NAME=${3:-}
+
+# Regardless of components, you must specify whether you want to deploy it against testnet or mainnet.
+CHAIN=
+for i in "$@"; do
+    case $i in
+        --chain=*)
+            CHAIN="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
+
+function validateParams() {
+    if [[ -z "$CHAIN" ]]; then
+        echo "ERROR: A CHAIN MUST be specified.  Use --chain=<testnet|mainnet>"
+        exit
+    fi
+    
+    if [[ "$CHAIN" != "testnet" &&  "$CHAIN" != "mainnet" ]]; then
+        echo "ERROR: CHAIN MUST be either 'testnet' or 'mainnet'."
+        exit
+    fi
+}
+
+function validateStackParam(){
+    if [ -z "${STACK_NAME}" ]; then
+        echo "Please provide a BCM stack name."
+        cat "./$1/help.txt"
+        exit
+    fi
+}
+
+function validateChainExists(){
+    # ok, so we've verified which chain they're after.  Let's make sure it's actually deployed.
+    DEPLOYED_STACKS=$(lxc exec bcm-gateway-01 -- docker stack list)
+    if ! echo "$DEPLOYED_STACKS" | grep -q "bitcoind-$CHAIN"; then
+        echo "ERROR: It appears as though the required bitcoind chain has NOT been deployed. Consider running 'bcm provision'."
+        exit
+    fi
+}
+
 # this is a list of stacks that we can deploy
 # corresponds to directories in $BCM_STACK_DIR
-STACKS=(clightning spark eclair esplora lightning-charge lnd opentimestamps spark)
+declare -A STACKS
+STACKS[clightning]=1
+STACKS[lnd]=1
+STACKS[eclair]=1
+STACKS[esplora]=1
+STACKS[lightning-charge]=1
+STACKS[opentimestamps]=1
+STACKS[spark]=1
 
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
-    echo "deploy"
+    validateStackParam "$BCM_CLI_VERB";
+    validateParams;
+    validateChainExists;
     
-    elif [[ $BCM_CLI_VERB == "remove" ]]; then
-    echo "test"
+    #echo "Deploying '$STACK_NAME' to bitcoind '$CHAIN'."
+    UP_FILE="$BCM_STACKS_DIR/$STACK_NAME/up.sh"
+    if [[ -f "$UP_FILE" ]]; then
+        $UP_FILE "$@"
+    else
+        echo "ERROR: Could not find '$UP_FILE'."
+    fi
+    
+    elif [[ $BCM_CLI_VERB == "undeploy" ]]; then
+    validateStackParam "$BCM_CLI_VERB";
+    validateParams;
+    validateChainExists;
+    #echo "Undeploying '$STACK_NAME' from bitcoind chain '$CHAIN'."
+    
     elif [[ $BCM_CLI_VERB == "list" ]]; then
     echo "Supported BCM Stacks:"
     for STACK in ${STACKS[*]}

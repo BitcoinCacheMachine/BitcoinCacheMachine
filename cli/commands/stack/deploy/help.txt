@@ -1,13 +1,14 @@
 Description:
 
-  Deploy a BCM stack to a cluster.
+  Deploy a BCM stack to a cluster. View available stacks with 'bcm stack list'.
 
 Usage:
 
-  bcm stack deploy --stack-name=STACK_NAME --opt= --opt=
+  bcm stack deploy --stack-name=STACK_NAME --chain=<testnet|mainnet> --opt= --opt=
 
 Required Parameters:
 
   --stack-name          Required. The name of the stack you want deployed.
+  --chain               Required. Either testnet or mainnet.
   --opt                 Each stack has one or more required or optional parameters 
                         that can be set.
