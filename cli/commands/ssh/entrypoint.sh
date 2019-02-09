@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -81,11 +81,11 @@ if [[ ! -z "$BCM_TREZOR_USB_PATH" ]]; then
         fi
         
         KEY_NAME="$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME.pub"
-        PUB_KEY_PATH="$BCM_SSH_DIR/$KEY_NAME"
-        mkdir -p "$BCM_SSH_DIR"
+        PUB_KEY_PATH="$SSH_DIR/$KEY_NAME"
+        mkdir -p "$SSH_DIR"
         
         sudo docker run -t --rm \
-        -v "$BCM_SSH_DIR":/root/.ssh \
+        -v "$SSH_DIR":/root/.ssh \
         -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
         -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
         --device="$BCM_TREZOR_USB_PATH" \
@@ -104,7 +104,7 @@ if [[ ! -z "$BCM_TREZOR_USB_PATH" ]]; then
             fi
             
             # save the pubkey in our password store.
-            bcm file encrypt --input-file-path="$PUB_KEY_PATH" --output-dir="$BCM_SSH_DIR"
+            bcm file encrypt --input-file-path="$PUB_KEY_PATH" --output-dir="$SSH_DIR"
         else
             echo "ERROR: SSH Key did not generate successfully!"
         fi

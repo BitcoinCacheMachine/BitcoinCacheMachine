@@ -6,7 +6,6 @@
     "insecure-registries": [
         "http://127.0.0.1:5010"
     ],
-    "dns": [ "8.8.8.8" ],
     "labels": [
         "bcm-gateway=true"
     ]
