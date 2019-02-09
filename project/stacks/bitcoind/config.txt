@@ -2,25 +2,26 @@ main.uacomment=bitcoin-mainnet
 test.uacomment=bitcoin-testnet
 regtest.uacomment=regtest
 
-[main]
-printtoconsole=1
-mempoolsize=300
-maxuploadtarget=10
-txindex=1
-server=1
-rest=1
+# [main]
+# printtoconsole=1
+# mempoolsize=300
+# maxuploadtarget=10
+# txindex=1
+# server=1
+# rest=1
 
-# this is so the CLI works locally.
-rpcbind=127.0.0.1
-rpcallowip=127.0.0.1
+# # this is so the CLI works locally.
+# rpcbind=127.0.0.1
+# rpcallowip=127.0.0.1
+# rpccookiefile=/bitcoin/cookie/cookie
 
-# this allows remote clients who connect to the bitcoinrpc overlay network to connect
-rpcallowip=172.16.238.0/24
-rpcport=8332
-torpassword=password
-listen=1
-upnp=0
-discover=0
+# # this allows remote clients who connect to the bitcoinrpc overlay network to connect
+# rpcallowip=172.16.238.0/24
+# rpcport=8332
+# torpassword=password
+# listen=1
+# upnp=0
+# discover=0
 
 [test]
 printtoconsole=1
@@ -30,9 +31,13 @@ txindex=1
 server=1
 rest=1
 
+#rpcuser=bitcoind
+#rpcpassword=password
+
 # allows bitcoin-cli commands from localhost
 rpcbind=127.0.0.1
 rpcallowip=127.0.0.1
+#rpccookiefile=/bitcoin/cookie/cookie
 
 # the corresponding rpcbind occurs at the command line
 rpcallowip=172.16.238.0/24
@@ -46,8 +51,6 @@ listen=1
 # explicitly disable upnp and external IP address discovery (since using TOR)
 upnp=0
 discover=0
-
-
 
 
 

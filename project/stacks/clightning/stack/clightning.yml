@@ -6,7 +6,8 @@ services:
     volumes:
       - clightning-data:/root/.lightning
       - clightning-log-data:/var/log/clightning
-      - bitcoin_data:/data/bitcoin
+      - bitcoin_data:/bitcoin/data
+      - bitcoin_cli:/usr/local/bin
     environment:
       CHAIN: ${CHAIN:-testnet}
       HOST_ENDING: ${HOST_ENDING:-01}
@@ -35,6 +36,10 @@ volumes:
   bitcoin_data:
     external: true
     name: bitcoind-${CHAIN:-testnet}_bitcoin_data
+
+  bitcoin_cli:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoin_cli
 
 networks:
   clightningrpcnet:

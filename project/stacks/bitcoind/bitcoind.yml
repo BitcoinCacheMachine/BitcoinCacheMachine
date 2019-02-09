@@ -4,14 +4,17 @@ services:
     image: ${DOCKER_IMAGE}
     hostname: bitcoind-${CHAIN}
     volumes:
-      - bitcoin_data:/data
+      - bitcoin_data:/bitcoin/data
+    #  - bitcoin_cookie:/bitcoin/cookie
+      - bitcoin_cli:/usr/local/bin
     environment:
       CHAIN: ${CHAIN:-testnet}
       HOST_ENDING: ${HOST_ENDING:-01}
+      AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:-}
     networks:
       bitcoindrpcnet:
         aliases:
-          - bitcoindrpc
+          - bitcoindrpc-${CHAIN}
     configs:
       - source: bitcoin_config
         target: /root/.bitcoin/bitcoin.conf
@@ -28,7 +31,10 @@ configs:
 
 volumes:
   bitcoin_data:
-      
+  #bitcoin_cookie:  
+  bitcoin_cli:
+ 
+
 networks:
   bitcoindrpcnet:
     driver: overlay

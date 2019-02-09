@@ -120,7 +120,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     else
         echo "ERROR: bcm password store not set."
     fi
-    elif [[ $BCM_CLI_VERB == "rm" ]]; then
+    elif [[ $BCM_CLI_VERB == "rm" || $BCM_CLI_VERB == "remove" ]]; then
     # How we reference the password.
     sudo docker run -it --name pass --rm \
     -v "$GNUPGHOME":/root/.gnupg:rw \

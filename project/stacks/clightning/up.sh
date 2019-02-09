@@ -39,3 +39,6 @@ source ./env
 lxc file push -p -r "$(pwd)/stack/" "bcm-gateway-01/root/stacks/$TIER_NAME/$STACK_NAME"
 
 lxc exec bcm-gateway-01 -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" CHAIN="$CHAIN" HOST_ENDING="01" docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$CHAIN"
+
+DEST_DIR="/var/lib/docker/volumes/clightning-""$CHAIN""_clightning-data/_data"
+lxc exec bcm-bitcoin-01 -- touch "$DEST_DIR/gogo"

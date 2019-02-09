@@ -19,9 +19,9 @@ wait-for-it -t 10 "$TOR_CONTROL_HOST"
 if [[ ! -z "$CHAIN" ]]; then
     GOGO_FILE=
     if [[ "$CHAIN" == "testnet" ]]; then
-        GOGO_FILE=/data/testnet3/gogogo
+        GOGO_FILE=/root/.bitcoin/testnet3/gogogo
         elif [[ "$CHAIN" == "mainnet" ]]; then
-        GOGO_FILE=/data/gogogo
+        GOGO_FILE=/root/.bitcoin/gogogo
     else
         echo "Error: CHAIN must be either 'testnet' or 'mainnet'."
         exit

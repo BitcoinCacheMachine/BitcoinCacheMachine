@@ -6,5 +6,5 @@ Usage:
 
 COMMANDS:
   deploy    Deploy a BCM stack to the existing cluster.
-  remove    Remove a deployed stack from a cluster.
+  undeploy  Remove a deployed stack from a cluster.
 

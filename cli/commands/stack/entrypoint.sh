@@ -47,14 +47,6 @@ function validateStackParam(){
     fi
 }
 
-function validateChainExists(){
-    # ok, so we've verified which chain they're after.  Let's make sure it's actually deployed.
-    DEPLOYED_STACKS=$(lxc exec bcm-gateway-01 -- docker stack list)
-    if ! echo "$DEPLOYED_STACKS" | grep -q "bitcoind-$CHAIN"; then
-        echo "ERROR: It appears as though the required bitcoind chain has NOT been deployed. Consider running 'bcm provision'."
-        exit
-    fi
-}
 
 # this is a list of stacks that we can deploy
 # corresponds to directories in $BCM_STACK_DIR
@@ -66,11 +58,11 @@ STACKS[esplora]=1
 STACKS[lightning-charge]=1
 STACKS[opentimestamps]=1
 STACKS[spark]=1
+STACKS[bitcoind]=1
 
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
     validateStackParam "$BCM_CLI_VERB";
     validateParams;
-    validateChainExists;
     
     #echo "Deploying '$STACK_NAME' to bitcoind '$CHAIN'."
     UP_FILE="$BCM_STACKS_DIR/$STACK_NAME/up.sh"
@@ -80,11 +72,17 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
         echo "ERROR: Could not find '$UP_FILE'."
     fi
     
-    elif [[ $BCM_CLI_VERB == "undeploy" ]]; then
+    elif [[ $BCM_CLI_VERB == "rm" || $BCM_CLI_VERB == "remove"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
     validateParams;
-    validateChainExists;
-    #echo "Undeploying '$STACK_NAME' from bitcoind chain '$CHAIN'."
+    
+    #echo "Deploying '$STACK_NAME' to bitcoind '$CHAIN'."
+    DESTROY_FILE="$BCM_STACKS_DIR/$STACK_NAME/destroy.sh"
+    if [[ -f "$DESTROY_FILE" ]]; then
+        $DESTROY_FILE "$@"
+    else
+        echo "ERROR: Could not find '$DESTROY_FILE'."
+    fi
     
     elif [[ $BCM_CLI_VERB == "list" ]]; then
     echo "Supported BCM Stacks:"

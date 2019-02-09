@@ -24,11 +24,11 @@ RUN set -ex \
 	&& rm -rf /tmp/*
 
 # create data directory
-ENV BITCOIN_DATA /data
-RUN mkdir "$BITCOIN_DATA" \
+ENV BITCOIN_DATA /bitcoin/data
+RUN mkdir -p "$BITCOIN_DATA" \
 	&& ln -sfn "$BITCOIN_DATA" /root/.bitcoin
 
-VOLUME /data
+VOLUME /bitcoin/data
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

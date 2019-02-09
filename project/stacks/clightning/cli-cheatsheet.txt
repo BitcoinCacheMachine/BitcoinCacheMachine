@@ -1,0 +1,8 @@
+lightning/cli/lightning-cli listnodes
+lightning/cli/lightning-cli listchannels
+lightning/cli/lightning-cli listinvoices
+lightning/cli/lightning-cli listconfigs
+lightning/cli/lightning-cli getinfo
+
+lightning/cli/lightning-cli newaddr
+lightning/cli/lightning-cli listfunds
