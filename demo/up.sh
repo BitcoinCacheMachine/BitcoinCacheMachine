@@ -14,3 +14,7 @@ bcm cluster create --cluster-name="AntsleCluster" --ssh-username="ubuntu" --ssh-
 
 # provisions critical BCM datacenter workloads. Required before running 'bcm stack deploy'.
 bcm provision
+
+
+bcm stack deploy bitcoind --chain=testnet
+bcm stack deploy clightning --chain=testnet
