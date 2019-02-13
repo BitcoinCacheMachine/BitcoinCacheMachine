@@ -81,7 +81,8 @@ fi
 # all the command below REQUIRE a HTTPS LXD endpoint. Stop here if the local LXD client doesn't have one configured.
 # this also applies to locally installed LXD instances; we ALWAYS deploy against HTTPS (no unix socket).
 if [[ "$(lxc remote get-default)" == "local" ]]; then
-    echo "ERROR: LXC remote is set to local. ALL BCM activities are performed over HTTPS (even for local/standalone installs). Perhaps you need to run 'bcm cluster create'?"
+    echo "ERROR: LXC remote is set to local. ALL BCM activities are performed over HTTPS (even for local/standalone installs)."
+    echo "   --- Consider creating a BCM cluster using 'bcm cluster create'."
     exit
 fi
 

@@ -32,11 +32,11 @@ done
 
 
 if [[ -z "$BCM_SSH_USERNAME" ]]; then
-    echo "ERROR: BCM_SSH_USERNAME not specified."
+    echo "ERROR: BCM_SSH_USERNAME not specified. Use --ssh-username="
 fi
 
 if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
-    echo "ERROR: BCM_SSH_HOSTNAME not specified."
+    echo "ERROR: BCM_SSH_HOSTNAME not specified. Use --ssh-hostname="
 fi
 
 

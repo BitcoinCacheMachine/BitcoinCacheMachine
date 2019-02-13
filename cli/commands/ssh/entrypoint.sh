@@ -64,11 +64,13 @@ fi
 source "$TEMP_DIR/env"
 
 if [[ -z "$BCM_SSH_USERNAME" ]]; then
-    echo "Error:  BCM_SSH_USERNAME not set."
+    echo "Error:  BCM_SSH_USERNAME not set"
+    exit
 fi
 
 if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     echo "Error:  BCM_SSH_HOSTNAME not set."
+    exit
 fi
 
 # shellcheck disable=1090

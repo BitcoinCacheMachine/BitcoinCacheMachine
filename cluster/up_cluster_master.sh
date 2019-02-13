@@ -28,11 +28,13 @@ for i in "$@"; do
 done
 
 if [[ -z "$BCM_SSH_USERNAME" ]]; then
-    echo "ERROR: BCM_SSH_USERNAME not specified."
+    echo "ERROR: BCM_SSH_USERNAME was not specified. Use --ssh-username="
+    exit
 fi
 
 if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
-    echo "ERROR: BCM_SSH_HOSTNAME not specified."
+    echo "ERROR: BCM_SSH_HOSTNAME was not specified. Use --ssh-hostname="
+    exit
 fi
 
 # shellcheck disable=SC1091

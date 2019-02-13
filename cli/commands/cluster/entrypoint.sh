@@ -48,7 +48,7 @@ if [[ $BCM_HELP_FLAG == 1 ]]; then
 fi
 
 if [[ $BCM_CLUSTER_NAME == "local" ]]; then
-    echo "ERROR: BCM_CLUSTER_NAME is set to local. Consider explicitly setting the cluster name with '--cluster-name='"
+    echo "ERROR: BCM_CLUSTER_NAME was not defined. Set the cluster name with '--cluster-name='"
     exit
 fi
 

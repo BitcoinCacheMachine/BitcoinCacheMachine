@@ -10,7 +10,7 @@ cd "$(dirname "$0")"
 bcm deprovision --del-template --del-lxcbase
 
 # destroys the active cluster unless --cluster-name is specified.
-bcm cluster destroy --ssh-username="ubuntu" --ssh-hostname="antsle"
+bcm cluster destroy --ssh-username="derek" --ssh-hostname="$(hostname)"
 
 # deletes certificates
 bcm reset
