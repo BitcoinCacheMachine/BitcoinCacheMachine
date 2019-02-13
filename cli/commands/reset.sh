@@ -3,11 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1090
-source "$BCM_GIT_DIR/env"
-
-
-
 CONTINUE=0
 if [[ -d "$GNUPGHOME" ]]; then
     while [[ "$CONTINUE" == 0 ]]

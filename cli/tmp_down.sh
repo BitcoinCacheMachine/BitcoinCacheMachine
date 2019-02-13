@@ -2,8 +2,6 @@
 
 set -Eeuo pipefail
 
-source "$BCM_GIT_DIR/env"
-
 encfs -u "$BCM_TEMP_DIR">>/dev/null
 
 if [[ -d "$BCM_TEMP_DIR" ]]; then

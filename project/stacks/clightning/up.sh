@@ -3,8 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=1091
-source "$BCM_GIT_DIR/env"
+# shellcheck disable=SC1091
+source ./env
 
 CHAIN=
 
@@ -25,8 +25,7 @@ if [[ -z $CHAIN ]]; then
     exit
 fi
 
-# get the env
-source ./env
+
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \

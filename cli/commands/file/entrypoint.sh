@@ -72,6 +72,7 @@ fi
 INPUT_DIR=$(dirname $INPUT_FILE_PATH)
 INPUT_FILE_NAME=$(basename $INPUT_FILE_PATH)
 
+# shellcheck disable=SC1090
 source "$GNUPGHOME/env"
 
 if [[ $BCM_CLI_VERB == "encrypt" ]]; then

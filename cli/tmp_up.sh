@@ -2,8 +2,6 @@
 
 set -Eeuo pipefail
 
-source "$BCM_GIT_DIR/env"
-
 mkdir -p "$BCM_TEMP_DIR""_enc"
 mkdir -p "$BCM_TEMP_DIR"
 

@@ -3,8 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=1090
-source "$BCM_GIT_DIR/env"
+# shellcheck disable=SC1091
+source ./env
 
 BCM_CLUSTER_NAME=
 BCM_SSH_USERNAME=
@@ -39,7 +39,6 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     echo "ERROR: BCM_SSH_HOSTNAME not specified."
 fi
 
-source ./env
 
 # if it's the cluster master add the LXC remote so we can manage it.
 if lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then

@@ -3,9 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-#shellcheck disable=SC1090
-source "$BCM_GIT_DIR/env"
-
 BCM_PROJECT_NAME=
 BCM_DEPLOY_TIERS=1
 BCM_REBUILD_TEMPLATE=0

@@ -73,16 +73,14 @@ mkdir -p "$HOME/.password_store"
 mkdir -p "$HOME/.ssh"
 
 # configure sshd on the SDN controller. This allows you to install and 
-# provision LXD on your localhost for testing.
-SSH_CONFIG_TEXT="ListenAddress 127.0.0.1"
+# provision LXD on your localhost for testing or if you want BCM running
+# on your laptop/desktop.
+BCM_SSHD_START_FLAG='###START_BCM###'
 SSH_CONFIG=/etc/ssh/sshd_config
 if [[ -f "$SSH_CONFIG" ]]; then
-    if grep -Fxq "$SSH_CONFIG_TEXT" "$SSH_CONFIG"; then
-        echo "SSH is configured correctly for BCM operation."
-    else
-        echo "$SSH_CONFIG_TEXT" | sudo tee -a "$SSH_CONFIG"
-        
-        # this is usually the localhost address associated with the device's hostname.
+    if ! grep -Fxq "$BCM_SSHD_START_FLAG" "$SSH_CONFIG"; then
+        echo "$BCM_SSHD_START_FLAG" | sudo tee -a "$SSH_CONFIG"
+        echo "ListenAddress 127.0.0.1" | sudo tee -a "$SSH_CONFIG"
         echo "ListenAddress 127.0.1.1" | sudo tee -a "$SSH_CONFIG"
         sudo systemctl restart ssh
     fi

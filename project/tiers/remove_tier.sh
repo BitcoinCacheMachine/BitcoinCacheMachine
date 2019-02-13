@@ -3,9 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=1090
-source "$BCM_GIT_DIR/env"
-
 BCM_TIER_NAME=
 
 for i in "$@"; do
@@ -27,7 +24,10 @@ fi
 
 export "BCM_TIER_NAME=$BCM_TIER_NAME"
 
-bash -c "./$BCM_TIER_NAME/destroy.sh"
+# Call the tier specific destroy script, if any.
+if [[ -f "./$BCM_TIER_NAME/destroy.sh" ]]; then
+    bash -c "./$BCM_TIER_NAME/destroy.sh"
+fi
 
 # iterate over endpoints and delete actual LXC hosts.
 for LXD_ENDPOINT in $(bcm cluster list --endpoints); do

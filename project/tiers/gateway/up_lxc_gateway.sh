@@ -6,9 +6,6 @@ cd "$(dirname "$0")"
 # shellcheck disable=SC1091
 source ./env
 
-# shellcheck disable=1090
-source "$BCM_GIT_DIR/env"
-
 # first let's check to see if we have any gateways
 # if so, we quit unless the user has told us to override.
 if lxc list --format csv -c n | grep -q "bcm-gateway-01"; then

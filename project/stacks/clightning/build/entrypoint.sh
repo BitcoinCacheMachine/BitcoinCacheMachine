@@ -2,6 +2,7 @@
 
 set -Eeuo pipefail
 
+# shellcheck disable=SC1091
 source /bcm/proxy_ip_determinant.sh
 
 echo "BCM /entrypoint.sh for clightning"

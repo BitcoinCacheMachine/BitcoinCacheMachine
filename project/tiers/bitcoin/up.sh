@@ -3,10 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=1091
-source "$BCM_GIT_DIR/env"
 
-# shellcheck source=user_prompt.sh
+# shellcheck disable=SC1091
 source ./user_prompt.sh
 
 if [[ $DEPLOY_TESTNET == 1 ]]; then

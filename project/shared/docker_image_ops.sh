@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source "$BCM_GIT_DIR/env"
-
 LXC_HOST=
 DOCKER_HUB_IMAGE=
 IMAGE_NAME=

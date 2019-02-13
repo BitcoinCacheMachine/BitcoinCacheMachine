@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source "$BCM_GIT_DIR/env"
+# shellcheck disable=SC1091
 source ./env
 
 CHAIN=

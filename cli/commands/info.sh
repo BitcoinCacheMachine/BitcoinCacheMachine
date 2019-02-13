@@ -15,6 +15,7 @@ else
         echo "  --GNUPGHOME:                  $GNUPGHOME"
         
         if [[ -f "$GNUPGHOME/env" ]]; then
+            # shellcheck disable=SC1090
             source "$GNUPGHOME/env"
             BCM_CERT_NAME="$BCM_CERT_NAME"
             BCM_CERT_USERNAME="$BCM_CERT_USERNAME"

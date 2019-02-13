@@ -5,9 +5,6 @@ cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
 
-# shellcheck disable=1090
-source "$BCM_GIT_DIR/env"
-
 for i in "$@"; do
     case $i in
         --tier-name=*)

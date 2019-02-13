@@ -3,9 +3,6 @@
 set -Eeuo nounset
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1090
-source "$BCM_GIT_DIR/env"
-
 BCM_CLI_VERB=
 BCM_PASS_NAME=
 
@@ -66,17 +63,18 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     
     # shellcheck disable=SC1090
     source "$GNUPGHOME/env"
-    
+
     if [[ ! -d "$PASSWORD_STORE_DIR/.git" ]]; then
-        cd "$PASSWORD_STORE_DIR"
-        git init
-        git config --local user.name "$BCM_CERT_USERNAME"
-        git config --local user.email "$(whoami)@$BCM_CERT_HOSTNAME"
-        touch debug.log
-        echo "Created $PASSWORD_STORE_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." >"$PASSWORD_STORE_DIR/debug.log"
-        git add "*"
-        git commit -m "Initialized git repo."
-        cd -
+        (
+            cd "$PASSWORD_STORE_DIR" || exit
+            git init
+            git config --local user.name "$BCM_CERT_USERNAME"
+            git config --local user.email "$(whoami)@$BCM_CERT_HOSTNAME"
+            touch debug.log
+            echo "Created $PASSWORD_STORE_DIR/ on $(date -u "+%Y-%m-%dT%H:%M:%S %Z")." >"$PASSWORD_STORE_DIR/debug.log"
+            git add "*"
+            git commit -m "Initialized git repo."
+        )
     fi
     
     # only run this if we don't have a .gpg-id file, which indicates it's

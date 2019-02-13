@@ -5,7 +5,6 @@ cd "$(dirname "$0")"
 
 # shellcheck disable=1091
 source ./params.sh "$@"
-source "$BCM_GIT_DIR/env"
 
 if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY == 1 ]]; then
     # shellcheck disable=1091

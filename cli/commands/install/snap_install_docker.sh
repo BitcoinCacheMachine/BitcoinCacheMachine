@@ -13,7 +13,7 @@ if ! grep -q docker /etc/group; then
 fi
 
 if groups "$USER" | grep -q docker; then
-    sudo usermod -aG docker $USER
+    sudo usermod -aG docker "$USER"
     sudo cp ./overlay_daemon.json /var/snap/docker/current/config/daemon.json
     sudo snap restart docker
 fi

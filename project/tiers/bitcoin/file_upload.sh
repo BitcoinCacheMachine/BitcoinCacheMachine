@@ -2,6 +2,7 @@
 
 set -Eeuo pipefail
 
+# shellcheck disable=SC1091
 source ./env
 
 CHAIN=

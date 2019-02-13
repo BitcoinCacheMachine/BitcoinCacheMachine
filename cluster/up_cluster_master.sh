@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source "$BCM_GIT_DIR/env"
-
 BCM_CLUSTER_NAME=
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
@@ -37,7 +35,7 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     echo "ERROR: BCM_SSH_HOSTNAME not specified."
 fi
 
-
+# shellcheck disable=SC1091
 source ./env
 mkdir -p "$TEMP_DIR"
 
@@ -82,6 +80,7 @@ fi
 
 # if it's the cluster master add the LXC remote so we can manage it.
 if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
+    # shellcheck disable=SC1090
     source "$ENV_FILE"
     
     echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."

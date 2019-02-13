@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-source "$BCM_GIT_DIR/env"
+# shellcheck disable=SC1091
 source ./env
 
 CHOICE=

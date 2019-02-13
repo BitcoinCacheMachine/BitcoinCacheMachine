@@ -3,9 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=1091
-source "$BCM_GIT_DIR/env"
-
 BCM_PROJECT_NAME=
 BCM_DELETE_BCM_IMAGE=0
 BCM_DELETE_LXC_BASE=0

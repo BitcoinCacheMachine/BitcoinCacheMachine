@@ -29,4 +29,4 @@ lxc file push ./lnd-testnet.conf manager1/apps/lnd/lnd-testnet.conf
 lxc file push ./lnd.yml manager1/apps/lnd/lnd.yml
 
 
-lxc exec manager1 -- env BCM_BITCOIN_LND_DOCKER_IMAGE=$BCM_BITCOIN_LND_DOCKER_IMAGE BCM_BITCOIN_BITCOIND_CHAIN="testnet" docker stack deploy -c /apps/lnd/lnd.yml lnd
+lxc exec manager1 -- env BCM_BITCOIN_LND_DOCKER_IMAGE="$BCM_BITCOIN_LND_DOCKER_IMAGE" BCM_BITCOIN_BITCOIND_CHAIN="testnet" docker stack deploy -c /apps/lnd/lnd.yml lnd

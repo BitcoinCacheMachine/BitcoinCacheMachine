@@ -60,6 +60,7 @@ if [[ ! -f "$TEMP_DIR/env" ]]; then
     exit
 fi
 
+# shellcheck disable=SC1090
 source "$TEMP_DIR/env"
 
 if [[ -z "$BCM_SSH_USERNAME" ]]; then
@@ -115,8 +116,8 @@ if [[ ! -z "$BCM_TREZOR_USB_PATH" ]]; then
             echo "ERROR: $TEMP_DIR/env does not exist."
             exit
         fi
-        
-        
+                
+        # shellcheck disable=SC1090
         source "$TEMP_DIR/env"
         
         if [[ -z $BCM_SSH_HOSTNAME ]]; then

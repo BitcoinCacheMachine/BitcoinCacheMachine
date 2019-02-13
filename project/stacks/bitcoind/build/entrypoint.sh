@@ -2,6 +2,7 @@
 
 set -Eeu
 
+# shellcheck disable=SC1091
 source /bcm/proxy_ip_determinant.sh
 
 if [[ -z "$TOR_PROXY" ]]; then

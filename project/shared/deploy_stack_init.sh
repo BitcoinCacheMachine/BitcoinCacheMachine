@@ -22,6 +22,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
     exit
 fi
 
+# shellcheck disable=SC1090
 source "$ENV_FILE"
 
 if [[ -z "$STACK_NAME" ]]; then

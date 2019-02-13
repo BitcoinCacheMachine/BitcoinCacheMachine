@@ -3,9 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=1090
-source "$BCM_GIT_DIR/env"
-
 # shellcheck disable=1091
 source ./env
 

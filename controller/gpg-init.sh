@@ -41,7 +41,10 @@ echo "BCM_CERT_USERNAME: $BCM_CERT_USERNAME"
 echo "BCM_CERT_HOSTNAME: $BCM_CERT_HOSTNAME"
 
 # get the locatio of the trezor
+
+# shellcheck disable=SC1091
 source ./export_usb_path.sh
+
 BCM_TREZOR_USB_PATH="$(echo "$BCM_TREZOR_USB_PATH" | xargs)"
 BCM_CERT_NAME="$(echo "$BCM_CERT_NAME" | xargs)"
 BCM_CERT_HOSTNAME="$(echo "$BCM_CERT_HOSTNAME" | xargs)"

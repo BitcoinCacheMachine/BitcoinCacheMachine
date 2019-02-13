@@ -35,8 +35,8 @@ for i in "$@"; do
     esac
 done
 
-export BCM_HELP_FLAG=$BCM_HELP_FLAG
-export BCM_FORCE_FLAG=$BCM_FORCE_FLAG
+export BCM_HELP_FLAG="$BCM_HELP_FLAG"
+export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
 
 if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
     ./reset.sh "$@"
