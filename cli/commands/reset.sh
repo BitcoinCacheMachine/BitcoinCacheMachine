@@ -50,4 +50,4 @@ else
     echo "WARNING: SSH_DIR directory '$SSH_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
-bash -c "$BCM_GIT_DIR/cli/tmp_down.sh"
+./tmp_down.sh

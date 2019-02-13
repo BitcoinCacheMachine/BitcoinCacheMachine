@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 if [[ -z $BCM_ACTIVE ]]; then
@@ -8,7 +8,7 @@ if [[ -z $BCM_ACTIVE ]]; then
 fi
 
 # shellcheck disable=1090
-source "$BCM_GIT_DIR/env"
+source ./env
 
 if snap list | grep -q docker; then
     if ! sudo docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
@@ -26,6 +26,12 @@ fi
 if ! snap list | grep -q lxd; then
     echo "WARNING: The LXD snap is not installed locally. You may need to run the BCM setup script."
     exit
+fi
+
+if grep -qs "$BCM_TEMP_DIR" /proc/mounts; then
+    mkdir -p "$BCM_TEMP_DIR""_enc"
+    mkdir -p "$BCM_TEMP_DIR"
+    encfs "$BCM_TEMP_DIR""_enc" "$BCM_TEMP_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN" >> /dev/null
 fi
 
 # call the CLI entrypoint.

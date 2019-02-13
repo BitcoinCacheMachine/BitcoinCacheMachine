@@ -10,7 +10,8 @@ export BCM_ACTIVE=1
 # shellcheck disable=SC1091
 source ./env
 
-# let's set the local git client user and email settings to prevent error messages.
+# let's set the local git client user and email settings to prevent error messages
+# related to an unconfigured git client.
 if [[ -z $(git config --get --global user.name) ]]; then
     git config --global user.name "bcm"
 fi
@@ -20,7 +21,7 @@ if [[ -z $(git config --get --global user.email) ]]; then
 fi
 
 # let's install all necessary software at the SDN controller.
-sudo apt-get install -y wait-for-it openssh-server lxc-utils netcat encfs
+sudo apt-get install -y wait-for-it openssh-server netcat encfs
 bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
 bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
 
