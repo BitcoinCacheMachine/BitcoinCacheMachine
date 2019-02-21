@@ -8,12 +8,12 @@ echo "DOCKER_GNUPGHOME: '$GNUPGHOME'"
 echo "DOCKER_BCM_GIT_CLIENT_USERNAME: '$BCM_GIT_CLIENT_USERNAME'"
 echo "DOCKER_BCM_EMAIL_ADDRESS: '$BCM_EMAIL_ADDRESS'"
 echo "DOCKER_BCM_GIT_COMMIT_MESSAGE: '$BCM_GIT_COMMIT_MESSAGE'"
-echo "DOCKER_BCM_GPG_SIGNING_KEY_ID: '$BCM_GPG_SIGNING_KEY_ID'"
+echo "DOCKER_BCM_DEFAULT_KEY_ID: '$BCM_DEFAULT_KEY_ID'"
 
 gpg2 --list-keys
 git config --global commit.gpgsign 1
 git config --global gpg.program "$(command -v gpg2)"
-git config --global user.signingkey "$BCM_GPG_SIGNING_KEY_ID"
+git config --global user.signingkey "$BCM_DEFAULT_KEY_ID"
 
 echo "git config --global commit.gpgsign:  $(git config --global --get commit.gpgsign)"
 echo "git config --global gpg.program: $(git config --global --get gpg.program)"

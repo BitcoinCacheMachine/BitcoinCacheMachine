@@ -95,7 +95,9 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
         exit
     fi
     
-    sudo docker run -it --rm --add-host="$SSH_HOSTNAME:$(dig +short "$SSH_HOSTNAME")" \
+    
+    IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
+    sudo docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$SSH_DIR":/root/.ssh \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
