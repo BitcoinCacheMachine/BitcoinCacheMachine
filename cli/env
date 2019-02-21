@@ -9,7 +9,7 @@ export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 export BCM_PRIVATE_REGISTRY="bcm-gateway-01:5010"
 export SSH_DIR="$BCM_RUNTIME_DIR/ssh"
-export BCM_TEMP_DIR="/tmp/bcm"
+export BCM_TEMP_DIR="$BCM_RUNTIME_DIR/tmp"
 
 GNUPGHOME="$BCM_RUNTIME_DIR/gnupg"
 PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/password_store"

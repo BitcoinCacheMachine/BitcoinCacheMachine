@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
@@ -68,4 +68,8 @@ else
         ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
         ssh -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
     fi
+fi
+
+if [[ -d "$BCM_TEMP_DIR/$BCM_CLUSTER_NAME" ]]; then
+    rm -rf "${BCM_TEMP_DIR:?}/$BCM_CLUSTER_NAME"
 fi

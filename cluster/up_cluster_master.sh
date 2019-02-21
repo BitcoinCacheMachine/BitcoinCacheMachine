@@ -39,13 +39,12 @@ fi
 
 # shellcheck disable=SC1091
 source ./env
-mkdir -p "$TEMP_DIR"
 
 ./stub_env.sh --endpoint-name="$BCM_ENDPOINT_NAME" --master --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME"
 
 # generate Trezor-backed SSH keys for interactively login.
 #SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"
-bcm ssh newkey --endpoint-name="$BCM_ENDPOINT_NAME" --cluster-name="$BCM_CLUSTER_NAME" --push
+bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push
 
 # since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
 LXD_CERT_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd.cert"
@@ -95,3 +94,5 @@ fi
 
 echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster."
 echo "Consider adding hosts to your new cluster with 'bcm cluster add'. This helps achieve local high-availability."
+echo ""
+echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"

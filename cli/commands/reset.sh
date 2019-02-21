@@ -50,4 +50,15 @@ else
     echo "WARNING: SSH_DIR directory '$SSH_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
-./tmp_down.sh
+# now let;s unmount the temp directory and remove the folders.
+encfs -u "$BCM_TEMP_DIR">>/dev/null
+
+if [[ -d "$BCM_TEMP_DIR" ]]; then
+    echo "Removing $BCM_TEMP_DIR"
+    rm -rf "$BCM_TEMP_DIR"
+fi
+
+if [[ -d "$BCM_TEMP_DIR""_enc" ]]; then
+    echo "Removing $BCM_TEMP_DIR""_enc"
+    rm -rf "$BCM_TEMP_DIR""_enc"
+fi

@@ -2,11 +2,11 @@ Description:
   Generate a new SSH username@hostname keypair backed by your Trezor.
 
 Usage:
-  bcm ssh newkey [--cluster-name=$BCM_CLUSTER_NAME] --endpoint-name=$BCM_ENDPOINT_NAME [--push]
+  bcm ssh newkey --hostname=HOSTNAME] --username=[username] [--push]
 
 Parameters:
-  --cluster-name=   Optional. Specify the BCM cluster the endpoint is a member of.
-  --endpoint-name=  Required. The name of the endpoint. The active BCM_CLUSTER_NAME is assumed.
+  --hostname=   The DNS name of the SSH host.
+  --username=   Required. The username to be used.
 
 Optional:
   --push        If specified, the new SSH public key will be pushed to the destination via 
