@@ -17,6 +17,8 @@ GIT_REPO_DIR="$GNUPGHOME"
 BCM_GIT_COMMIT_MESSAGE=
 BCM_GIT_CLIENT_USERNAME=
 BCM_DEFAULT_KEY_ID=
+SSH_HOSTNAME=
+SSH_USERNAME=
 
 for i in "$@"; do
     case $i in
@@ -38,6 +40,14 @@ for i in "$@"; do
         ;;
         --key-id=*)
             BCM_DEFAULT_KEY_ID="${i#*=}"
+            shift # past argument=value
+        ;;
+        --hostname=*)
+            SSH_HOSTNAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --username=*)
+            SSH_USERNAME="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -67,10 +77,6 @@ if [[ -z $BCM_GIT_CLIENT_USERNAME ]]; then
     echo "Required parameter BCM_GIT_CLIENT_USERNAME not specified. The git repo config user.name will be used."
 fi
 
-if [[ -z $BCM_GIT_COMMIT_MESSAGE ]]; then
-    echo "Required parameter BCM_GIT_COMMIT_MESSAGE not specified."
-    exit
-fi
 
 if [[ -z $BCM_DEFAULT_KEY_ID ]]; then
     echo "Required parameter BCM_DEFAULT_KEY_ID not specified."
@@ -84,6 +90,11 @@ export BCM_DEFAULT_KEY_ID="$BCM_DEFAULT_KEY_ID"
 
 # now call the appropritae script.
 if [[ $BCM_CLI_VERB == "commit" ]]; then
+    if [[ -z $BCM_GIT_COMMIT_MESSAGE ]]; then
+        echo "Required parameter BCM_GIT_COMMIT_MESSAGE not specified."
+        exit
+    fi
+    
     # if BCM_PROJECT_DIR is empty, we'll check to see if someone over-rode
     # the trezor directory. If so, we'll send that in instead.
     if [[ $BCM_HELP_FLAG == 1 ]]; then
@@ -104,7 +115,7 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
         source "$BCM_GIT_DIR/controller/export_usb_path.sh"
         sudo docker run -d --name gitter \
         -v "$GNUPGHOME":/root/.gnupg \
-        -v $GIT_REPO_DIR:/gitrepo \
+        -v "$GIT_REPO_DIR":/gitrepo \
         --device="$BCM_TREZOR_USB_PATH" \
         -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
         -e BCM_EMAIL_ADDRESS="$BCM_CERT_USERNAME"'@'"$BCM_CERT_HOSTNAME" \
@@ -120,7 +131,22 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
     fi
     
     elif [[ $BCM_CLI_VERB == "push" ]]; then
-    echo "git push TODO"
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./push/help.txt
+        exit
+    fi
+    
+    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+    IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
+    sudo docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    -v "$SSH_DIR":/root/.ssh \
+    -v "$GIT_REPO_DIR":/gitrepo \
+    -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
+    -e SSH_USERNAME="$SSH_USERNAME" \
+    -e SSH_HOSTNAME="$SSH_HOSTNAME" \
+    --device="$BCM_TREZOR_USB_PATH" \
+    bcm-trezor:latest trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 0 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$BCM_GIT_CLIENT_USERNAME" && echo "$(git config --local --get http.proxy)" && git push
+    
 else
     cat ./git/help.txt
 fi
@@ -128,6 +154,4 @@ fi
 if sudo docker ps | grep -q "gitter"; then
     sudo docker kill gitter >/dev/null
     sudo docker system prune -f >/dev/null
-else
-    echo "Error. Docker container 'gitter' was not running."
 fi
