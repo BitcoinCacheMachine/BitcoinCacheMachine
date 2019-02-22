@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_PROJECT_NAME=
@@ -155,7 +155,9 @@ if lxc list --format csv -c=ns | grep bcm-host-template | grep -q STOPPED; then
     lxc exec bcm-host-template -- chmod 0644 /etc/sysctl.conf
     
     # clean up the image before publication
-    lxc exec bcm-host-template -- apt-get autoremove -qq && apt-get clean -qq && rm -rf /tmp/*
+    lxc exec bcm-host-template -- apt-get autoremove -qq
+    lxc exec bcm-host-template -- apt-get clean -qq
+    lxc exec bcm-host-template -- rm -rf /tmp/*
     
     lxc exec bcm-host-template -- systemctl stop docker
     lxc exec bcm-host-template -- systemctl enable docker

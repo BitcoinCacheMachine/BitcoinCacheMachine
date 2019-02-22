@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 export BCM_ACTIVE=1
 
 # shellcheck disable=SC1091
-source ./env
+source ./cli/env
 
 # let's set the local git client user and email settings to prevent error messages
 # related to an unconfigured git client.
@@ -73,7 +73,7 @@ mkdir -p "$HOME/.gnupg"
 mkdir -p "$HOME/.password_store"
 mkdir -p "$HOME/.ssh"
 
-# configure sshd on the SDN controller. This allows you to install and 
+# configure sshd on the SDN controller. This allows you to install and
 # provision LXD on your localhost for testing or if you want BCM running
 # on your laptop/desktop.
 BCM_SSHD_START_FLAG='###START_BCM###'

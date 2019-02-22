@@ -71,6 +71,7 @@ if [[ ! -f "$GNUPGHOME/env" ]]; then
     exit
 fi
 
+# shellcheck disable=SC1090
 source "$GNUPGHOME/env"
 
 if [[ -z $BCM_GIT_CLIENT_USERNAME ]]; then
@@ -129,14 +130,18 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
     if sudo docker ps | grep -q "gitter"; then
         sudo docker exec -it gitter /bcm/commit_sign_git_repo.sh
     fi
-    
-    elif [[ $BCM_CLI_VERB == "push" ]]; then
+fi
+
+
+if [[ $BCM_CLI_VERB == "push" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
         cat ./push/help.txt
         exit
     fi
     
+    # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+    
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
     sudo docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$SSH_DIR":/root/.ssh \
@@ -145,10 +150,7 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 0 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$BCM_GIT_CLIENT_USERNAME" && echo "$(git config --local --get http.proxy)" && git push
-    
-else
-    cat ./git/help.txt
+    bcm-trezor:latest trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 0 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$BCM_GIT_CLIENT_USERNAME" && git push
 fi
 
 if sudo docker ps | grep -q "gitter"; then

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_PROJECT_NAME=
@@ -18,7 +18,7 @@ for i in "$@"; do
             BCM_DELETE_BCM_IMAGE="${i#*=}"
             shift # past argument=value
         ;;
-        --del-lxcbase=*)
+        --del-bcmbase=*)
             BCM_DELETE_LXC_BASE="${i#*=}"
             shift # past argument=value
         ;;

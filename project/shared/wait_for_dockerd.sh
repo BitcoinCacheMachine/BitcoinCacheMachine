@@ -2,12 +2,12 @@
 
 set -Eeuox pipefail
 
-BCM_LXC_CONTAINER_NAME=
+LXC_HOST=
 
 for i in "$@"; do
     case $i in
         --container-name=*)
-            BCM_LXC_CONTAINER_NAME="${i#*=}"
+            LXC_HOST="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -16,11 +16,11 @@ for i in "$@"; do
     esac
 done
 
-echo "Waiting for dockerd to come online on LXC host '$BCM_LXC_CONTAINER_NAME'"
+echo "Waiting for dockerd to come online on LXC host '$LXC_HOST'"
 
-if lxc list | grep -q $BCM_LXC_CONTAINER_NAME; then
+if lxc list | grep -q "$LXC_HOST"; then
     while true; do
-        if [[ $(lxc exec $BCM_LXC_CONTAINER_NAME -- systemctl is-active docker) == "active" ]]; then
+        if [[ "$(lxc exec $LXC_HOST -- systemctl is-active docker)" == "active" ]]; then
             break
         fi
         

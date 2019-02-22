@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 COMMAND=${1:-}
@@ -28,7 +28,7 @@ for i in "$@"; do
             BCM_DELETE_BCM_IMAGE=1
             shift # past argument=value
         ;;
-        --del-lxcbase)
+        --del-bcmbase)
             BCM_DELETE_LXC_BASE=1
             shift # past argument=value
         ;;
@@ -48,5 +48,5 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     fi
     
     elif [[ $BCM_CLI_VERB == "deprovision" ]]; then
-    bash -c "$BCM_GIT_DIR/project/destroy.sh --project-name=$BCM_PROJECT_NAME --del-template=$BCM_DELETE_BCM_IMAGE --del-lxcbase=$BCM_DELETE_LXC_BASE"
+    bash -c "$BCM_GIT_DIR/project/destroy.sh --project-name=$BCM_PROJECT_NAME --del-template=$BCM_DELETE_BCM_IMAGE --del-bcmbase=$BCM_DELETE_LXC_BASE"
 fi
