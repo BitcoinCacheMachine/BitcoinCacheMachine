@@ -20,16 +20,13 @@ echo "Waiting for dockerd to come online on LXC host '$LXC_HOST'"
 
 if lxc list | grep -q "$LXC_HOST"; then
     while true; do
-        if [[ $(lxc exec $LXC_HOST -- systemctl is-active docker) == "active" ]]; then
+        if [[ "$(lxc exec $LXC_HOST -- systemctl is-active docker)" == "active" ]]; then
             break
         fi
         
         sleep 1
         printf "."
     done
-else
-    echo "WARNING: LXC host '$LXC_HOST' does not exist."
-    exit
 fi
 
 echo ""
