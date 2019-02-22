@@ -11,7 +11,7 @@ export BCM_ACTIVE=1
 source ./cli/env
 
 # let's set the local git client user and email settings to prevent error messages
-# related to an unconfigured git client.
+# related to an unconfigured git client. Test
 if [[ -z $(git config --get --global user.name) ]]; then
     git config --global user.name "bcm"
 fi
