@@ -17,14 +17,9 @@ for i in "$@"; do
 done
 
 
-# remove swarm services related to kafka
+# remove any nodes from the swarm that are no longer relevant.
 if lxc list --format csv| grep "RUNNING" | grep -q "bcm-gateway-01"; then
-    NODES="$(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format '{{.ID}}')"
-    
-    # if we got something back, let's remove them.
-    if [[ ! -z "$NODES" ]]; then
-        for NODE_ID in $NODES; do
-            lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
-        done
-    fi
+    for NODE_ID in $(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format '{{.ID}}'); do
+        lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
+    done
 fi

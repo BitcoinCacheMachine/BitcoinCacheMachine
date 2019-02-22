@@ -23,7 +23,7 @@ if [[ -z $STACK_NAME ]]; then
 fi
 
 if lxc list --format csv | grep -q "bcm-gateway-01"; then
-    if [[ "$(lxc exec bcm-gateway-01 -- docker info --format '{{.Swarm.LocalNodeState}}')" == "active" ]]; then
+    if [[ $(lxc exec bcm-gateway-01 -- docker info --format '{{.Swarm.LocalNodeState}}') == "active" ]]; then
         if lxc exec bcm-gateway-01 -- docker stack ls --format "{{.Name}}" | grep -q "$STACK_NAME"; then
             lxc exec bcm-gateway-01 -- docker stack rm "$STACK_NAME"
         fi
