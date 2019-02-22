@@ -39,6 +39,18 @@ else
     fi
 fi
 
+
+if [ -z ${SSH_DIR+x} ]; then
+    echo "  --SSH_DIR:                    N/A";
+else
+    if [[ -d $SSH_DIR ]]; then
+        echo "  --SSH_DIR:                    $SSH_DIR"
+    else
+        echo "  --SSH_DIR:                    N/A"
+    fi
+fi
+
+
 echo "  --BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "  --BCM_DEBUG:                  $BCM_DEBUG"
 

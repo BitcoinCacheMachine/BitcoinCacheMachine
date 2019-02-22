@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
 BCM_DEPLOY_ALL=0
 BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY=0
