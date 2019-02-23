@@ -1,24 +1,12 @@
 #cloud-config
 package_upgrade: true
 
-# install host dependencies
-packages:
-  - wait-for-it
-  - tor
+users:
+  - name: ubuntu
+    sudo: true
+    ssh_authorized_keys:
+      - $SSH_AUTHORIZED_KEY
 
-write_files:
-  - path: /entrypoint.sh
-    owner: root:root
-    permissions: '0500'
-    content: |
-      #!/bin/bash
-
-      set -Eeuo pipefail
-      cd "$(dirname "$0")"
-
-      echo "Removing existing lxd and lxd-client using apt."
-
-# Run the initialization script.
+# Run the prep script.
 runcmd:
-  - curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/ServerPrep/master/prep.sh | sudo bash
-#  - bash -c /entrypoint.sh
+  - curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/master/cluster/server_prep.sh | sudo bash

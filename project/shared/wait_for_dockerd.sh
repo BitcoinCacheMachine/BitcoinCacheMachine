@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+ pipefail
 
 LXC_HOST=
 
