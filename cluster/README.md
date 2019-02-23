@@ -1,7 +1,3 @@
-# The BCM SDN Controller
-
-This folder contains scripts related to the BCM SDN Controller. As mentioned, the SDN controller is usually a user-facing laptop or desktop running Ubuntu. The user interacts with this computer using his or her Trezor. The SDN controller manages one or more clusters. A cluster is defined as a set of one or more Ubuntu machines that are connected by high speed LAN. BCM workloads run on BCM clusters. BCM clusters are [LXD Clusters](https://lxd.readthedocs.io/en/latest/clustering/).
-
 # How Bitcoin Cache Machine uses Trezor
 
 BCM embrances the use of hardware wallets such as Trezor for all secure cryptographic functions. BCM currently support Trezor for 

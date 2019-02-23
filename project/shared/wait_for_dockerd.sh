@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
 LXC_HOST=
 
@@ -20,7 +20,7 @@ echo "Waiting for dockerd to come online on LXC host '$LXC_HOST'"
 
 if lxc list | grep -q "$LXC_HOST"; then
     while true; do
-        if lxc exec "$LXC_HOST" -- systemctl is-active docker == "active"; then
+        if lxc exec "$LXC_HOST" -- systemctl is-active docker | grep -q "active"; then
             break
         fi
         

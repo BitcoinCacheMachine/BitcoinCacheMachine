@@ -45,6 +45,7 @@ if [[ -z $SSH_USERNAME ]]; then
     exit
 fi
 
+# shellcheck disable=SC1090
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
     echo "Could not determine Trezor USB PATH."

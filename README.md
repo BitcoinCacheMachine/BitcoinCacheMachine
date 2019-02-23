@@ -53,7 +53,7 @@ BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
 ```
 
-You can now clone the BCM repository to your machine over TOR and run setup.
+You can now clone the BCM repository to your machine over TOR and run setup. You can update your local BCM git repo by running `git pull` from `$BCM_GIT_DIR`.
 
 ```bash
 export BCM_GIT_DIR="$HOME/git/github/bcm"
@@ -64,11 +64,11 @@ cd "$BCM_GIT_DIR"
 source ~/.bashrc
 ```
 
-Feel free to change the directory in which you store the BCM repository on your machine. Just update the 'BCM_GIT_DIR' variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
+Feel free to change the directory in which you store the BCM repository on your machine. Just update the `BCM_GIT_DIR` variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Try running `bcm` at the terminal. If you get a help menu, you're good to go. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
 
 Consider running the BCM demo app found [`here`](./demo/up.sh). This script uses the BCM CLI to automatically deploy BCM infrastructure to an LXD endpoint running on your localhost. The options used in the BCM cli run default BCM data center workloads on your localhost instead of deploying your app to a remote set (one or more) of machines. Of course, you can always modify the arguments to provision BCM workloads against a remote server. The BCM CLI automatically installs all software for you.
 
-BCM deploys a base workload containing criticial BCM data center components such as a SOCKS5 TOR proxy, TOR-enabled DNS, docker registries, a comprehensive [Kafka stack](https://kafka.apache.org/), [bitcoind](https://github.com/bitcoin/bitcoin), [c-lightning](https://github.com/ElementsProject/lightning), and the [Spark Lightning Wallet web interface](https://github.com/shesek/spark-wallet#browser-support). All web interfaces are exposed on your network using MACVLAN.
+BCM deploys a base workload containing criticial BCM data center components such as a SOCKS5 TOR proxy, TOR-enabled DNS, docker registries, and a comprehensive [Kafka stack](https://kafka.apache.org/). Application-level containers like [bitcoind](https://github.com/bitcoin/bitcoin), [c-lightning](https://github.com/ElementsProject/lightning), BTCPay, web wallet interfaces, etc., are deployed using `bcm stack deploy` as discussed below.
 
 ## Deploying your own BCM Infrastructure
 
@@ -78,7 +78,7 @@ In general, the steps you take to deploy your own infrastructure is as follows:
 2) Run `bcm init`, which initializes your management host (i.e., [SDN Controller](https://www.sdxcentral.com/sdn/definitions/sdn-controllers/)). This command downloads and installs BCM software dependencies including `docker-ce`. `bcm init` builds the relevant docker images used at the management computer including those required for Trezor integration.
 3) Create a cluster by running `bcm cluster create`. A BCM cluster is defined as one or more LXD endpoints (computers) with a private networking environment that is low latency and high bandwidth, such as a home or office LAN.
 4) Deploy essential BCM data center components by running `bcm provision`. The components deployed by `bcm provision` are common to ALL BCM deployments and include TOR services (SOCKS5 proxy, TOR-enabled DNS, & TOR Control), docker registries, and a kafka logging stack. The BCM SDN Controller intelligently deploys components across failure domains (i.e., individual x86_64) to achieve local high-availability.
-5) WORK IN PROGRESS:  Use `bcm stack deploy` to deploy supported software to your BCM data center workloads. Planned software includes [clightning](https://github.com/ElementsProject/lightning), [lnd](https://github.com/lightningnetwork/lnd) & [eclair](https://github.com/ACINQ/eclair) lightning daemons, [OpenTimestamps Server](https://github.com/opentimestamps/), various wallet interfaces and/or RPC interfaces (e.g., for desktop application integration), [esplora block explorer from Blockstream](https://github.com/Blockstream/esplora), [lightning-charge](https://github.com/ElementsProject/lightning-charge), etc.. Each `bcm stack deploy` command will automatically deploy dependent services. For example, if you run `bcm stack deploy esplora --testnet`, bitcoind in testnet mode will be provisioned if it doesn't already exist. Individual services (e.g., bitcoind RPC, lnd gRPC, web-based wallet interfaces, etc.) can optionally be exposed as authenticated stealth onion services, all without filddling with external firewalls.
+5) WORK IN PROGRESS:  Use `bcm stack deploy` to deploy supported software to your BCM data center workloads. Planned software includes [clightning](https://github.com/ElementsProject/lightning), [lnd](https://github.com/lightningnetwork/lnd) & [eclair](https://github.com/ACINQ/eclair) lightning daemons, [OpenTimestamps Server](https://github.com/opentimestamps/), various wallet interfaces and/or RPC interfaces (e.g., for desktop application integration), [esplora block explorer from Blockstream](https://github.com/Blockstream/esplora), [lightning-charge](https://github.com/ElementsProject/lightning-charge), etc.. Each `bcm stack deploy` command will automatically deploy dependent services. For example, if you run `bcm stack deploy esplora --testnet`, bitcoind in testnet mode will be provisioned if it doesn't already exist. Individual services (e.g., bitcoind RPC, lnd gRPC, web-based wallet interfaces, etc.) can optionally be exposed as authenticated stealth onion services allowing your TOR-enabled smartphone to securly access various interfaces from the Internet.
 
 Each of the commands listed above has a reverse command, e.g., `bcm stack undeploy` (5), `bcm deprovision` (4), `bcm cluster destroy` (3), and `bcm reset` (2). Consider running `bcm info` to determine your active environment variables. `bcm show` provides an overview of your LXC containers, storage volumes, networks, images, etc..
 
