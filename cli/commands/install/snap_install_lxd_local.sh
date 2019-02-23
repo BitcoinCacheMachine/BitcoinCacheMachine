@@ -13,7 +13,8 @@ if groups "$USER" | grep -q lxd; then
     sudo gpasswd -a "${USER}" lxd
 fi
 
-# remove any legacy lxd software and install install lxd via snap
+# remove any legacy lxd software and install install lxd via snap (we're really only using the client at this point.)
+# bcm cluster create performs the isntallation of remote servers.
 if ! snap list | grep -q lxd; then
     sudo snap install lxd --stable
 fi

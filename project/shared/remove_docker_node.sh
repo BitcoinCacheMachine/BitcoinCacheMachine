@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeux pipefail
+cd "$(dirname "$0")"
 
 NODE_NAME=
 
@@ -19,7 +20,13 @@ done
 
 # remove any nodes from the swarm that are no longer relevant.
 if lxc list --format csv| grep "RUNNING" | grep -q "bcm-gateway-01"; then
-    for NODE_ID in $(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format '{{.ID}}'); do
-        lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
-    done
+    # if this command suceeds, then we can do the more specific info one.
+    
+    if [[ "$(lxc exec bcm-gateway-01 -- docker info --format "{{ .Swarm.LocalNodeState }}")" == "active" ]]; then
+        for NODE_ID in $(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format '{{.ID}}'); do
+            lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
+        done
+    else
+        echo "skipping"
+    fi
 fi

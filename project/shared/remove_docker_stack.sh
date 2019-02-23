@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeux pipefail
 cd "$(dirname "$0")"
 
 STACK_NAME=

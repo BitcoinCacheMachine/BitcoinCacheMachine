@@ -7,6 +7,8 @@ if [[ -z $BCM_ACTIVE ]]; then
     BCM_ACTIVE=1
 fi
 
+set -e
+
 # shellcheck disable=1090
 source ./env
 
@@ -22,11 +24,11 @@ if snap list | grep -q docker; then
     fi
 fi
 
-# Only run commands if we have local LXD client installed (we just install the full lxd snap).
-if ! snap list | grep -q lxd; then
-    echo "WARNING: The LXD snap is not installed locally. You may need to run the BCM setup script."
-    exit
-fi
+# # Only run commands if we have local LXD client installed (we just install the full lxd snap).
+# if ! snap list | grep -q lxd; then
+#     echo "WARNING: The LXD snap is not installed locally. You may need to run the BCM setup script."
+#     exit
+# fi
 
 if grep -qs "$BCM_TEMP_DIR" /proc/mounts; then
     mkdir -p "$BCM_TEMP_DIR""_enc"
