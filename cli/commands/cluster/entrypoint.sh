@@ -14,6 +14,10 @@ else
     exit
 fi
 
+if ! snap list | grep -q lxd; then
+    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+fi
+
 BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_ENDPOINTS_FLAG=0
 BCM_SSH_HOSTNAME=

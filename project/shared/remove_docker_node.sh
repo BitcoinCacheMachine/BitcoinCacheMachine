@@ -22,11 +22,9 @@ done
 if lxc list --format csv| grep "RUNNING" | grep -q "bcm-gateway-01"; then
     # if this command suceeds, then we can do the more specific info one.
     
-    if lxc exec bcm-gateway-01 -- docker info --format '{{ .Swarm.LocalNodeState }}' == "active"; then
+    if [[ $(lxc exec bcm-gateway-01 -- docker info --format '{{ .Swarm.LocalNodeState }}') == "active" ]]; then
         for NODE_ID in $(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format '{{.ID}}'); do
             lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
         done
-    else
-        echo "skipping"
     fi
 fi

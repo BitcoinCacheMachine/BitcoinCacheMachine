@@ -7,8 +7,6 @@ if [[ -z $BCM_ACTIVE ]]; then
     BCM_ACTIVE=1
 fi
 
-set -e
-
 # shellcheck disable=1090
 source ./env
 

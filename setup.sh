@@ -56,6 +56,7 @@ else
         echo "export PATH="'$PATH:'""'$BCM_GIT_DIR/cli'""
         echo "export BCM_ACTIVE=1"
         echo "export BCM_DEBUG=1"
+        echo "export BCM_CACHESTACK="
         echo "$BCM_BASHRC_END_FLAG"
     } >>"$BASHRC_FILE"
 fi

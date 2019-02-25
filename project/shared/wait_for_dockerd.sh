@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeux pipefail
 
 LXC_HOST=
 
@@ -16,7 +16,7 @@ for i in "$@"; do
     esac
 done
 
-echo "Waiting for dockerd to come online on LXC host '$LXC_HOST'"
+echo "Polling for dockerd on LXC host '$LXC_HOST'."
 
 if lxc list | grep -q "$LXC_HOST"; then
     while true; do

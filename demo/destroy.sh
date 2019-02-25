@@ -10,7 +10,7 @@ bcm stack remove bitcoind --chain=testnet
 bcm deprovision --del-template --del-bcmbase
 
 # destroys the active cluster unless --cluster-name is specified.
-bcm cluster destroy --ssh-username="$(whoami)" --ssh-hostname="$(hostname)"
+bcm cluster destroy --ssh-username="$(whoami)" --ssh-hostname="$(hostname)" --cluster-name=LocalCluster
 
 # deletes certificates
 bcm reset

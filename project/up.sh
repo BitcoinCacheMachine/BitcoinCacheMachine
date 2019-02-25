@@ -169,10 +169,11 @@ if lxc list --format csv -c=ns | grep bcm-host-template | grep -q STOPPED; then
     lxc network detach bcmbr0 bcm-host-template
 fi
 
-# echo "Creating a snapshot of the lxd host 'dockertemplate' called 'bcmHostSnapshot'."
+# Let's publish a snapshot. This will be the basis of our LXD image.
 lxc snapshot bcm-host-template bcmHostSnapshot
 
-# publish the resulting image
+# publish the resulting image 
+# other members of the LXD cluster will be able to pull and run this image
 echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
 lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
 

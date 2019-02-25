@@ -1,13 +1,14 @@
 Description:
-  Command line client for Bitcoin Cache Machine. All of BCM's features can 
-  be driven through the various commands below. If you just pulled BCM to 
-  your local machine and want to get started consider the following steps:
+  Command line client for Bitcoin Cache Machine. All of BCM's features can be driven through the various 
+  commands below. If you just pulled BCM to your local machine and want to get started consider the 
+  following steps:
   
-    1) Initialize your management plane and create new GPG certificates
+    1) Initialize your SDN controller and create new Trezor-backed GPG certificates and password store 
        using 'bcm init'.
-    2) Create a new cluster master using 'bcm cluster create'.
-    3) Define one or more BCM projects using 'bcm project create'.
-    4) Deploy a BCM project to a cluster using 'bcm project deploy'.
+    2) Create a new cluster using 'bcm cluster create'. Add cluster endpoints (new computers) to the cluster 
+       by running 'bcm cluster add' (TODO).
+    3) Deploy critical BCM data center components to all cluster endpoints using the 'bcm provision' command.
+    4) TODO: Use 'bcm stack deploy <stack_name>' to deploy a Bitcoin-related software stack to the active cluster.
 
 Usage:
   bcm [command] --help
@@ -19,7 +20,7 @@ Available Commands:
   provision    Provision critical BCM data center components.
   deprovision  Remove critical BCM data center components.
   stack        Deploy and undeploy BCM software workloads (e.g., lnd, opentimestamps, etc.).
-  git          Perform typical git operations with with your Trezor.
+  git          Sign git commits and git tags using your Trezor-backed GPG certificates.
   file         Create and verify file signatures, encrypt and decrypt files with your Trezor.
   ssh          Use your Trezor to issue SSH keys and perform SSH authentication.
   pass         Create and manage GPG-encrypted passwords protected by your Trezor.

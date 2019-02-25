@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -Eeuo pipefail
-
 export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
 export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"

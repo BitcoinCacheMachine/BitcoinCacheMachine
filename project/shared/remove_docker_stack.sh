@@ -1,9 +1,7 @@
 #!/bin/bash
 
-set -Eeux pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
-
-STACK_NAME=
 
 for i in "$@"; do
     case $i in
@@ -17,7 +15,7 @@ for i in "$@"; do
     esac
 done
 
-if [[ -z $STACK_NAME ]]; then
+if [[ -z "$STACK_NAME" ]]; then
     echo "STACK_NAME not set. Exiting."
     exit
 fi
