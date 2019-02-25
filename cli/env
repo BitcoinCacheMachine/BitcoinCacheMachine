@@ -4,7 +4,7 @@ export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
 export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 
-export BCM_RUNTIME_DIR="$HOME/.bcm"
+BCM_RUNTIME_DIR="$HOME/.bcm"
 export BCM_PRIVATE_REGISTRY="bcm-gateway-01:5010"
 export SSH_DIR="$BCM_RUNTIME_DIR/ssh"
 export BCM_TEMP_DIR="$BCM_RUNTIME_DIR/tmp"
@@ -22,3 +22,4 @@ fi
 
 export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
+export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$(date +"%Y-%j")"

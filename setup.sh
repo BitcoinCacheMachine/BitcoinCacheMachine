@@ -12,12 +12,12 @@ source ./cli/env
 
 # let's set the local git client user and email settings to prevent error messages
 # related to an unconfigured git client. Test
-if [[ -z $(git config --get --global user.name) ]]; then
-    git config --global user.name "bcm"
+if [[ -z $(git config --get --local user.name) ]]; then
+    git config --local user.name "bcm"
 fi
 
-if [[ -z $(git config --get --global user.email) ]]; then
-    git config --global user.email "bcm@$(hostname)"
+if [[ -z $(git config --get --local user.email) ]]; then
+    git config --local user.email "bcm@$(hostname)"
 fi
 
 # let's install all necessary software at the SDN controller.

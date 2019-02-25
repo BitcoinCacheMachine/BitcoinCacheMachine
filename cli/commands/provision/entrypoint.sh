@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 COMMAND=${1:-}
@@ -42,11 +42,13 @@ if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     exit
 fi
 
+export BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
+
 if [[ $BCM_CLI_VERB == "provision" ]]; then
     if [[ ! -z "$BCM_PROJECT_NAME" ]]; then
-        "$BCM_GIT_DIR/project/up.sh" --project-name="$BCM_PROJECT_NAME" --cluster-name="$BCM_CLUSTER_NAME"
+        "$BCM_GIT_DIR/project/up.sh" --cluster-name="$BCM_CLUSTER_NAME"
     fi
     
     elif [[ $BCM_CLI_VERB == "deprovision" ]]; then
-    bash -c "$BCM_GIT_DIR/project/destroy.sh --project-name=$BCM_PROJECT_NAME --del-template=$BCM_DELETE_BCM_IMAGE --del-bcmbase=$BCM_DELETE_LXC_BASE"
+    bash -c "$BCM_GIT_DIR/project/destroy.sh --del-template=$BCM_DELETE_BCM_IMAGE --del-bcmbase=$BCM_DELETE_LXC_BASE"
 fi

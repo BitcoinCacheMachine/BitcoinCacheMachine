@@ -46,7 +46,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     # TODO allow options of unprivileged.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
         PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
-        lxc init --target "$ENDPOINT" bcm-template "$LXC_HOSTNAME" --profile=bcm_default --profile=docker_privileged --profile="$PROFILE_NAME"
+        lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile=bcm_default --profile=docker_privileged --profile="$PROFILE_NAME"
     else
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi

@@ -1,51 +1,15 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeux pipefail
 cd "$(dirname "$0")"
 
-BCM_PROJECT_NAME=
 BCM_DEPLOY_TIERS=1
 BCM_REBUILD_TEMPLATE=0
-BCM_CLUSTER_NAME=
-
-for i in "$@"; do
-    case $i in
-        --project-name=*)
-            BCM_PROJECT_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --cluster-name=*)
-            BCM_CLUSTER_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
-done
 
 # let's make sure the cluster name is set.
 if [[ -z "$BCM_PROJECT_NAME" ]]; then
     echo "BCM_PROJECT_NAME not set."
     exit
-fi
-
-# let's make sure the cluster name is set.
-if [[ -z "$BCM_CLUSTER_NAME" ]]; then
-    echo "BCM_CLUSTER_NAME not set."
-    exit
-fi
-
-if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
-    echo "BCM cluster '$BCM_CLUSTER_NAME' not found. Can't deploy project to it."
-    exit
-fi
-
-if [[ $(lxc remote get-default) != "$BCM_CLUSTER_NAME" ]]; then
-    if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
-        echo "Changing the default LXD client remote to BCM cluster '$BCM_CLUSTER_NAME'."
-        lxc remote switch "$BCM_CLUSTER_NAME"
-    fi
 fi
 
 # make sure we're on the right remove
@@ -59,11 +23,11 @@ fi
 # first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
 # if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
 # it (being the lxc image 'bcm-template') will be rebuilt.
-if lxc image list --format csv | grep -q "bcm-template"; then
+if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     if [ $BCM_REBUILD_TEMPLATE = 1 ]; then
         echo "TODO: implement rebuild logic"
     else
-        echo "LXC image bcm-template exists and BCM_REBUILD_TEMPLATE was not set. The existing image will be used."
+        echo "LXC image '$LXC_BCM_BASE_IMAGE_NAME' exists and BCM_REBUILD_TEMPLATE was not set. The existing image will be used."
     fi
 fi
 
@@ -172,17 +136,17 @@ fi
 # Let's publish a snapshot. This will be the basis of our LXD image.
 lxc snapshot bcm-host-template bcmHostSnapshot
 
-# publish the resulting image 
+# publish the resulting image
 # other members of the LXD cluster will be able to pull and run this image
 echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
-lxc publish bcm-host-template/bcmHostSnapshot --alias bcm-template
+lxc publish bcm-host-template/bcmHostSnapshot --alias "$LXC_BCM_BASE_IMAGE_NAME"
 
 if [[ $BCM_DEPLOY_TIERS == 1 ]]; then
     # All tiers require that the bcm-template image be available.
     # let's look for it before we even attempt anything.
-    if lxc image list --format csv | grep -q "bcm-template"; then
+    if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
         bash -c "./tiers/up.sh --all"
     else
-        echo "LXC image 'bcm-template' doesn't exist. Can't deploy BCM tiers."
+        echo "LXC image '$LXC_BCM_BASE_IMAGE_NAME' doesn't exist. Can't deploy BCM tiers."
     fi
 fi

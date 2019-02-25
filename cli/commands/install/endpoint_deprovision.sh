@@ -2,19 +2,8 @@
 
 set -Eeu
 
-# we really only want to do these two stanzas on remote machiens...
-# not for the SDN cotnroller/dev amchine.
-# if groups "$USER" | grep -q lxd; then
-#     sudo deluser "${USER}" lxd
-# fi
-
-# # if the lxd groups exists, create it.
-# if grep -q lxd /etc/group; then
-#     sudo delgroup --system lxd
-# fi
-
-if lxc image list --format csv | grep -q "bcm-template"; then
-    lxc image delete bcm-template
+if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+    lxc image delete "$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
 if lxc profile list | grep -q "bcm_default"; then

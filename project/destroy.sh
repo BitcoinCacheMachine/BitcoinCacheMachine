@@ -1,30 +1,24 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeux
 cd "$(dirname "$0")"
 
-BCM_PROJECT_NAME=
-BCM_DELETE_BCM_IMAGE=0
-BCM_DELETE_LXC_BASE=0
-BCM_DEPLOY_TIERS=1
+DELETE_BCM_IMAGE=0
+DELETE_LXC_BASE=0
 
 for i in "$@"; do
     case $i in
-        --project-name=*)
-            BCM_PROJECT_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
         --del-template=*)
-            BCM_DELETE_BCM_IMAGE="${i#*=}"
+            DELETE_BCM_IMAGE=1
             shift # past argument=value
         ;;
         --del-bcmbase=*)
-            BCM_DELETE_LXC_BASE="${i#*=}"
+            DELETE_LXC_BASE=1
             shift # past argument=value
         ;;
         --all)
-            BCM_DELETE_BCM_IMAGE=1
-            BCM_DELETE_LXC_BASE=1
+            DELETE_BCM_IMAGE=1
+            DELETE_LXC_BASE=1
             shift # past argument=value
         ;;
         *)
@@ -33,16 +27,8 @@ for i in "$@"; do
     esac
 done
 
-# quit if there are no BCM environment variables
-if ! env | grep -q 'BCM_'; then
-    echo "BCM variables not set. Please source BCM environment variables."
-    exit
-fi
-
-export BCM_PROJECT_NAME="$BCM_PROJECT_NAME"
-if [[ $BCM_DEPLOY_TIERS == 1 ]]; then
-    ./tiers/destroy.sh --all
-fi
+echo "after destroy --all"
+./tiers/destroy.sh --all
 
 # stop dockertemplate
 if lxc list --format csv | grep "bcm-host-template" | grep -q "RUNNING"; then
@@ -55,13 +41,13 @@ if lxc list --format csv | grep -q "bcm-host-template"; then
     lxc delete bcm-host-template
 fi
 
-if [[ $BCM_DELETE_BCM_IMAGE == 1 ]]; then
+if [[ $DELETE_BCM_IMAGE == 1 ]]; then
     # remove image bcm-template
-    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-template"
+    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
 # remove image bcm-lxc-base
-if [[ $BCM_DELETE_LXC_BASE == 1 ]]; then
+if [[ $DELETE_LXC_BASE == 1 ]]; then
     bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-lxc-base"
 fi
 

@@ -17,14 +17,22 @@ for i in "$@"; do
     esac
 done
 
-
 # remove any nodes from the swarm that are no longer relevant.
-if lxc list --format csv| grep "RUNNING" | grep -q "bcm-gateway-01"; then
-    # if this command suceeds, then we can do the more specific info one.
+if lxc list --format csv | grep "RUNNING" | grep -q "bcm-gateway-01"; then
+    # We check to see if the bcm-gateway-01 node is running swarm services.
+    if ! lxc exec bcm-gateway-01 -- wait-for-it -t 2 127.0.0.1:2377; then
+        exit
+    fi
     
-    if [[ $(lxc exec bcm-gateway-01 -- docker info --format '{{ .Swarm.LocalNodeState }}') == "active" ]]; then
-        for NODE_ID in $(lxc exec bcm-gateway-01 -- docker node list --filter name=$NODE_NAME --format '{{.ID}}'); do
-            lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
+    # delete the node IDs matching the NODE_NAME var.
+    RESULT="$(lxc exec bcm-gateway-01 -- docker node ls --format '{{.ID}},{{.Hostname}}' | grep $NODE_NAME)"
+    
+    if ! echo "$RESULT" | grep -q bcm-gateway-01; then
+        for NODE_ID in $RESULT; do
+            # we would only perform this step if we're not removing the last node.
+            if ! $NODE_ID | grep -q bcm-gateway-01; then
+                lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
+            fi
         done
     fi
 fi

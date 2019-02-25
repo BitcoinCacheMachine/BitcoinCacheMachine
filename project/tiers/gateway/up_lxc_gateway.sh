@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
@@ -34,7 +34,7 @@ if lxc list --format csv -c=ns | grep bcm-gateway-01 | grep -q STOPPED; then
     lxc exec bcm-gateway-01 -- docker pull registry:latest
     lxc exec bcm-gateway-01 -- docker tag registry:latest bcm-registry:latest
     
-    lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >>/dev/null
+    lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >> /dev/null
     lxc file push ./bcm-gateway-01.daemon.json bcm-gateway-01/etc/docker/daemon.json
     
     # restart the host so it runs with new dockerd daemon config.

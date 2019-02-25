@@ -3,18 +3,18 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# if $BCM_RUNTIME_DIR/certs doesn't exist, create it
+
 BCM_DIR=$1
 if [ ! -d "$BCM_DIR" ]; then
     echo "Creating git repository at $BCM_DIR"
     mkdir -p "$BCM_DIR"
     
-    if [[ -z $(git config --global --get user.name) ]]; then
-        git config --global user.name "bcm"
+    if [[ -z $(git config --local --get user.name) ]]; then
+        git config --local user.name "bcm"
     fi
     
-    if [[ -z $(git config --global --get user.email) ]]; then
-        git config --global user.name "bcm@$(hostname)"
+    if [[ -z $(git config --local --get user.email) ]]; then
+        git config --local user.name "bcm@$(hostname)"
     fi
     
     cd "$BCM_DIR"
