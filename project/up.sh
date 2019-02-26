@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_DEPLOY_TIERS=1
@@ -61,7 +61,7 @@ if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
         fi
     fi
     
-    echo "Copying the ubuntu/18.04 lxc image from the public 'image:' server to '$(lxc remote get-default):bcm-lxc-base'"
+    echo "Copying the ubuntu/18.04 lxc image from LXD image server '$IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
     lxc image copy "$IMAGE_REMOTE:ubuntu/18.04" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
 fi
 

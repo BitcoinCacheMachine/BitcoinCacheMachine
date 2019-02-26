@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 COMMAND=${1:-}
@@ -15,8 +15,8 @@ fi
 # the base project
 BCM_PROJECT_NAME="BCMBase"
 BCM_CLUSTER_NAME="$(lxc remote get-default)"
-BCM_DELETE_BCM_IMAGE=0
-BCM_DELETE_LXC_BASE=0
+BCM_DELETE_BCM_IMAGE=1
+BCM_DELETE_LXC_BASE=1
 
 for i in "$@"; do
     case $i in
@@ -24,12 +24,12 @@ for i in "$@"; do
             BCM_CLUSTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
-        --del-template)
-            BCM_DELETE_BCM_IMAGE=1
+        --keep-template)
+            BCM_DELETE_BCM_IMAGE=0
             shift # past argument=value
         ;;
-        --del-bcmbase)
-            BCM_DELETE_LXC_BASE=1
+        --keep-bcmbase)
+            BCM_DELETE_LXC_BASE=0
             shift # past argument=value
         ;;
         *) ;;
@@ -50,5 +50,5 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     fi
     
     elif [[ $BCM_CLI_VERB == "deprovision" ]]; then
-    bash -c "$BCM_GIT_DIR/project/destroy.sh --del-template=$BCM_DELETE_BCM_IMAGE --del-bcmbase=$BCM_DELETE_LXC_BASE"
+    bash -c "$BCM_GIT_DIR/project/destroy.sh --keep-template=$BCM_DELETE_BCM_IMAGE --keep-bcmbase=$BCM_DELETE_LXC_BASE"
 fi

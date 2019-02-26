@@ -1,24 +1,24 @@
 #!/bin/bash
 
-set -Eeux
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-DELETE_BCM_IMAGE=0
-DELETE_LXC_BASE=0
+DELETE_BCM_IMAGE=1
+DELETE_LXC_BASE=1
 
 for i in "$@"; do
     case $i in
-        --del-template=*)
-            DELETE_BCM_IMAGE=1
+        --keep-template=*)
+            DELETE_BCM_IMAGE=0
             shift # past argument=value
         ;;
-        --del-bcmbase=*)
-            DELETE_LXC_BASE=1
+        --keep-bcmbase=*)
+            DELETE_LXC_BASE=0
             shift # past argument=value
         ;;
-        --all)
-            DELETE_BCM_IMAGE=1
-            DELETE_LXC_BASE=1
+        ---keep-all)
+            DELETE_BCM_IMAGE=0
+            DELETE_LXC_BASE=0
             shift # past argument=value
         ;;
         *)
@@ -27,17 +27,16 @@ for i in "$@"; do
     esac
 done
 
-echo "after destroy --all"
 ./tiers/destroy.sh --all
 
-# stop dockertemplate
+# stop bcm-host-template
 if lxc list --format csv | grep "bcm-host-template" | grep -q "RUNNING"; then
     lxc stop bcm-host-template
 fi
 
-# delete dockertemplate
+# delete bcm-host-template
 if lxc list --format csv | grep -q "bcm-host-template"; then
-    echo "Deleting dockertemplate lxd host."
+    echo "Deleting bcm-host-template lxd host."
     lxc delete bcm-host-template
 fi
 

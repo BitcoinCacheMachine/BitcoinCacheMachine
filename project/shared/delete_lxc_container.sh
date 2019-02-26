@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+
 
 LXC_CONTAINER_NAME=
 

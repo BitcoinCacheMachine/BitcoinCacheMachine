@@ -3,7 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-
 # shellcheck disable=SC1091
 source ./user_prompt.sh
 
@@ -16,4 +15,3 @@ if [[ $DEPLOY_MAINNET == 1 ]]; then
     bcm stack deploy bitcoind --chain=mainnet
     ./file_upload.sh --chain=mainnet --blocks="$UPLOAD_MAINNET_BLOCKS" --chainstate="$UPLOAD_MAINNET_CHAINSTATE"
 fi
-

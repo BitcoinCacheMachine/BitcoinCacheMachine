@@ -61,3 +61,4 @@ else
     echo "WARNING: LXD not installed locally."
 fi
 
+echo "  --LXC Image Cache:                  $BCM_DEBUG"

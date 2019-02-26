@@ -21,6 +21,7 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-kafka"; then
         echo "  - kafka"
     fi
+    
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-ui"; then
         echo "  - ui"
     fi

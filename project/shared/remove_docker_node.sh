@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux pipefail
+set -Eeu pipefail
 cd "$(dirname "$0")"
 
 NODE_NAME=
@@ -25,14 +25,11 @@ if lxc list --format csv | grep "RUNNING" | grep -q "bcm-gateway-01"; then
     fi
     
     # delete the node IDs matching the NODE_NAME var.
-    RESULT="$(lxc exec bcm-gateway-01 -- docker node ls --format '{{.ID}},{{.Hostname}}' | grep $NODE_NAME)"
+    RESULT="$(lxc exec bcm-gateway-01 -- docker node ls --format '{{.ID}},{{.Hostname}}')"
+    NODE_ID=$(echo "$RESULT" | grep "$NODE_NAME"| cut -d: -f1)
     
+    # we would only perform this step if we're not removing the last node.
     if ! echo "$RESULT" | grep -q bcm-gateway-01; then
-        for NODE_ID in $RESULT; do
-            # we would only perform this step if we're not removing the last node.
-            if ! $NODE_ID | grep -q bcm-gateway-01; then
-                lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
-            fi
-        done
-    fi
+        lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
+    fi    
 fi
