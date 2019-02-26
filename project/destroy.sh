@@ -45,9 +45,9 @@ if [[ $DELETE_BCM_IMAGE == 1 ]]; then
     bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
-# remove image bcm-lxc-base
+# remove image bcm-bionic-base
 if [[ $DELETE_LXC_BASE == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-lxc-base"
+    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-bionic-base"
 fi
 
 # delete profile 'docker-privileged'

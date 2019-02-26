@@ -12,7 +12,7 @@ If the cli is configured correctly, you can `bcm info` to get an overview of you
 * PASSWORD_STORE_DIR:         Directory of your Trezor GPG-backed standard unix password manager store.
 * BCM_ACTIVE:                 [0|1] - whether the 'bcm' environment should use the ~/.bcm directory or revert to using your home directory (~/.gnupg and ~/.password_store)
 * BCM_DEBUG:                  [0|1] - Whether the 'bcm' CLI should emit detailed information.
-* BCM_CACHESTACK:             [hostname] - DNS name of LXD image cache and/or docker mirror registy. Useful for development.
+* DOCKER_IMAGE_CACHE:             [hostname] - DNS name of LXD image cache and/or docker mirror registy. Useful for development.
 * LXD_CLUSTER:                Name of the cluster your LXD client is configured to target.
 
 ## Get an overview of your LXD configuration

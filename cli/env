@@ -22,5 +22,4 @@ fi
 
 export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
-export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$(date +"%Y-%j")"
-export LXC
+export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$(date +'%Y-%j')"

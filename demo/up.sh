@@ -17,4 +17,4 @@ bcm stack deploy clightning --chain=testnet
 
 # some ENV VARS that are useful for development
 #export BCM_DEBUG=1
-#export BCM_CACHESTACK="cachestack.domainname.tld"
+#export DOCKER_IMAGE_CACHE="cachestack.domainname.tld"

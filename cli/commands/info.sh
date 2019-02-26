@@ -42,12 +42,6 @@ fi
 echo "  --BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "  --BCM_DEBUG:                  $BCM_DEBUG"
 
-if [ -z ${BCM_CACHESTACK+x} ]; then
-    echo "  --BCM_CACHESTACK:             Not set.";
-else
-    echo "  --BCM_CACHESTACK:             $BCM_CACHESTACK";
-fi
-
 
 # remove any legacy lxd software and install install lxd via snap
 if snap list | grep -q lxd; then
@@ -61,4 +55,15 @@ else
     echo "WARNING: LXD not installed locally."
 fi
 
-echo "  --LXC Image Cache:                  $BCM_DEBUG"
+
+if [ -z ${LXD_IMAGE_CACHE+x} ]; then
+    echo "  --LXD_IMAGE_CACHE:            Not set.";
+else
+    echo "  --LXD_IMAGE_CACHE:            $LXD_IMAGE_CACHE";
+fi
+
+if [ -z ${DOCKER_IMAGE_CACHE+x} ]; then
+    echo "  --DOCKER_IMAGE_CACHE:         Not set.";
+else
+    echo "  --DOCKER_IMAGE_CACHE:         $DOCKER_IMAGE_CACHE";
+fi

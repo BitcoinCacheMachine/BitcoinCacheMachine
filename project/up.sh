@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_DEPLOY_TIERS=1
@@ -43,26 +43,26 @@ if ! lxc profile list | grep -q "docker_privileged"; then
     cat ./lxd_profiles/docker_privileged.yml | lxc profile edit docker_privileged
 fi
 
-if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
-    echo "The LXD image 'bcm-lxc-base' doesn't exist. Exiting."
+if lxc list --format csv -c n | grep -q "bcm-bionic-base"; then
+    echo "The LXD image 'bcm-bionic-base' doesn't exist. Exiting."
     exit
 fi
 
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
-if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
+if ! lxc image list --format csv | grep -q "bcm-bionic-base"; then
     # 'images' is the publicly avaialb e image server. Used whenever there's no LXD image cache specified.
     IMAGE_REMOTE="images"
     
-    if [ ! -z ${BCM_CACHESTACK+x} ]; then
-        IMAGE_REMOTE="$BCM_CACHESTACK"
+    if [ ! -z ${LXD_IMAGE_CACHE+x} ]; then
+        IMAGE_REMOTE="$LXD_IMAGE_CACHE"
         if ! lxc remote list --format csv | grep -q "$IMAGE_REMOTE"; then
             lxc remote add "$IMAGE_REMOTE" "$IMAGE_REMOTE:8443"
         fi
     fi
     
-    echo "Copying the ubuntu/18.04 lxc image from LXD image server '$IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
-    lxc image copy "$IMAGE_REMOTE:ubuntu/18.04" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
+    echo "Copying the ubuntu/18.04 lxc image from LXD image server '$IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-bionic-base'"
+    lxc image copy "$IMAGE_REMOTE:ubuntu/18.04" "$(lxc remote get-default):" --alias bcm-bionic-base --auto-update
 fi
 
 
@@ -89,7 +89,7 @@ fi
 
 if ! lxc list --format csv | grep -q bcm-host-template; then
     echo "Creating host 'bcm-host-template'."
-    lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
+    lxc init bcm-bionic-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
 fi
 
 if lxc list --format csv -c=ns | grep bcm-host-template | grep -q STOPPED; then

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
@@ -45,8 +45,8 @@ fi
 # TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
 REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
-if [[ ! -z ${BCM_CACHESTACK+x} ]]; then
-    REGISTRY_PROXY_REMOTEURL="http://$BCM_CACHESTACK:5000"
+if [[ ! -z ${DOCKER_IMAGE_CACHE+x} ]]; then
+    REGISTRY_PROXY_REMOTEURL="http://$DOCKER_IMAGE_CACHE:5000"
 fi
 
 # push the stack files up tthere.

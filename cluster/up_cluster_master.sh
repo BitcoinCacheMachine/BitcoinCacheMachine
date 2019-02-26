@@ -93,6 +93,6 @@ if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
 fi
 
 echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster."
-echo "Consider adding hosts to your new cluster with 'bcm cluster add'. This helps achieve local high-availability."
+echo "Consider adding hosts to your new cluster with 'bcm cluster add' (TODO). This helps achieve local high-availability."
 echo ""
 echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"
