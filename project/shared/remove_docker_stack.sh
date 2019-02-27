@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 for i in "$@"; do
@@ -27,7 +27,7 @@ if lxc list --format csv | grep -q "bcm-gateway-01"; then
         exit
     fi
     
-    if [[ "$(lxc exec bcm-gateway-01 -- docker stack ls --format "{{.Name}}" | grep -q "$STACK_NAME")" ]]; then
+    if lxc exec bcm-gateway-01 -- docker stack ls --format "{{.Name}}" | grep -q "$STACK_NAME"; then
         lxc exec bcm-gateway-01 -- docker stack rm "$STACK_NAME"
     fi
 fi

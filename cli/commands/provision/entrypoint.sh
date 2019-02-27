@@ -52,3 +52,6 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     elif [[ $BCM_CLI_VERB == "deprovision" ]]; then
     bash -c "$BCM_GIT_DIR/project/destroy.sh --keep-template=$BCM_DELETE_BCM_IMAGE --keep-bcmbase=$BCM_DELETE_LXC_BASE"
 fi
+
+# clearn up any hanging images
+bash -c "$BCM_GIT_DIR/project/shared/clear_unlabeled_lxc_images.sh"

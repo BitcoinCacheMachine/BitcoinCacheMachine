@@ -25,7 +25,8 @@ if [[ -z $CHAIN ]]; then
     exit
 fi
 
-
+# first, let's make sure we deploy our direct dependencies.
+bcm stack deploy bitcoind --chain="$CHAIN"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
@@ -78,7 +78,7 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
 fi
 
 function docker_tag_exists() {
-    lxc exec bcm-gateway-01 -- curl -s -f -lSL "http://127.0.0.1:5010/v2/$1/tags/$2" > /dev/null
+    lxc exec bcm-gateway-01 -- curl -s -f -lSL "http://127.0.0.1:5010/v2/$1/tags/list" | grep "$1" | grep "$2"
 }
 
 REBUILD=1

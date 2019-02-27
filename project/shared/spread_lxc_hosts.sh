@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
 BCM_TIER_NAME=
 
@@ -51,10 +51,8 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi
     
-    if ! lxc storage volume show bcm_btrfs "$LXC_DOCKERVOL" | grep -q "location: $ENDPOINT"; then
+    if lxc storage volume show bcm_btrfs "$LXC_DOCKERVOL" | grep -q "location: $ENDPOINT"; then
         # attach the lxc storage volume 'dockervol' to the new LXC host for the docker backing.
         lxc storage volume attach bcm_btrfs "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker
-    else
-        echo "WARNING: lxc storage volume '$LXC_DOCKERVOL' is already attached to '$LXC_HOSTNAME'."
     fi
 done

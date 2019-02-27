@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -51,14 +51,14 @@ function validateStackParam(){
 # this is a list of stacks that we can deploy
 # corresponds to directories in $BCM_STACK_DIR
 declare -A STACKS
-STACKS[clightning]=1
-STACKS[lnd]=1
-STACKS[eclair]=1
-STACKS[esplora]=1
-STACKS[lightning-charge]=1
-STACKS[opentimestamps]=1
-STACKS[spark]=1
 STACKS[bitcoind]=1
+STACKS[clightning]=1
+STACKS[lnd]=0
+STACKS[eclair]=0
+STACKS[esplora]=0
+STACKS[lightning-charge]=0
+STACKS[opentimestamps]=0
+STACKS[spark]=0
 
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
     validateStackParam "$BCM_CLI_VERB";
@@ -85,11 +85,13 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
     fi
     
     elif [[ $BCM_CLI_VERB == "list" ]]; then
-    echo "Supported BCM Stacks:"
+    echo "Currently deployed stacks on cluster '$(lxc remote get-default)':"
+    
     for STACK in ${STACKS[*]}
     do
         echo "  - $STACK";
     done
+    
 else
     echo "ERROR: '$BCM_CLI_VERB' is not a valid command."
     cat ./help.txt
