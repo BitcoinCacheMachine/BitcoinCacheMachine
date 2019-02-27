@@ -1,10 +1,9 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_DEPLOY_TIERS=1
-BCM_REBUILD_TEMPLATE=0
 
 # let's make sure the cluster name is set.
 if [[ -z "$BCM_PROJECT_NAME" ]]; then
@@ -24,11 +23,7 @@ fi
 # if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
 # it (being the lxc image 'bcm-template') will be rebuilt.
 if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    if [ $BCM_REBUILD_TEMPLATE = 1 ]; then
-        echo "TODO: implement rebuild logic"
-    else
-        echo "LXC image '$LXC_BCM_BASE_IMAGE_NAME' exists and BCM_REBUILD_TEMPLATE was not set. The existing image will be used."
-    fi
+    echo "INFO: LXC image '$LXC_BCM_BASE_IMAGE_NAME' has already been built."
 fi
 
 # create the docker_unprivileged profile

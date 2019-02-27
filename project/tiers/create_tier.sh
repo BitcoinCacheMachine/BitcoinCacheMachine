@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
@@ -85,3 +85,7 @@ for endpoint in $(bcm cluster list --endpoints); do
         lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
     fi
 done
+
+if [[ -f "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/up.sh" ]]; then
+    bash -c "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/up.sh"
+fi

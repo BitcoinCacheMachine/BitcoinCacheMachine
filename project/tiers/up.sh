@@ -1,13 +1,13 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1091
 source ./params.sh "$@"
 
 if [[ $BCM_DEPLOY_GATEWAY == 1 ]]; then
-    bash -c "./gateway/up_lxc_gateway.sh --tier-name=gateway"
+    bash -c "./gateway/up.sh --tier-name=gateway"
 fi
 
 if [[ $BCM_DEPLOY_TIER_KAFKA == 1 ]]; then

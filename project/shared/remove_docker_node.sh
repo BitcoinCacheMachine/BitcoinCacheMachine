@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeu pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 NODE_NAME=

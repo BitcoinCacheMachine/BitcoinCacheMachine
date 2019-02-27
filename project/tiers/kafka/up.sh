@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1091
@@ -10,7 +10,7 @@ source ./params.sh "$@"
 # 5 nodes (if we have a cluster of that size). 5 should be more than enough for
 # most deployments.
 CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)
-export CLUSTER_NODE_COUNT=$CLUSTER_NODE_COUNT
+export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
 
 # shellcheck disable=SC1091
 source ./zookeeper/get_env.sh
@@ -21,7 +21,7 @@ export ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS"
 
 # shellcheck disable=SC1091
 source ./broker/get_env.sh
-export KAFKA_BOOSTRAP_SERVERS=$KAFKA_BOOSTRAP_SERVERS
+export KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS"
 bash -c "./broker/up_lxc_broker.sh"
 
 if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY == 1 ]]; then

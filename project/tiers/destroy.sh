@@ -38,7 +38,7 @@ if [[ $BCM_DEPLOY_GATEWAY == 1 ]]; then
     fi
     
     if [[ "$CAN_DELETE" == 1 ]]; then
-        bash -c "./gateway/destroy_lxc_gateway.sh"
+        bash -c "./gateway/destroy.sh"
     else
         echo "ERROR: Can't remove BCM Tier 'gateway' due to dependent tier."
     fi
