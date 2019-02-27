@@ -103,3 +103,7 @@ fi
 if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     ./show.sh
 fi
+
+if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" ]]; then
+    ./stack_cli/entrypoint.sh
+fi

@@ -82,16 +82,6 @@ function docker_tag_exists() {
 }
 
 REBUILD=1
-if [[ $BCM_DEBUG == 1 ]]; then
-    if docker_tag_exists bcm-bitcoin-core 17.1; then
-        REBUILD=0
-        read -rp "Do you want to rebuild the image $IMAGE_NAME:$IMAGE_TAG (y/n)?: " CHOICE
-        if [[ $CHOICE == "y" ]]; then
-            REBUILD=1
-        fi
-    fi
-fi
-
 if [[ $REBUILD == 1 ]]; then
     # let's make sure there's a dockerfile
     if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then

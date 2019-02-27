@@ -2,6 +2,9 @@
 
 set -Eeux
 
+# give the container a few seconds to get its shit together
+sleep 3
+
 DEFAULT_GATEWAY_IP=
 DEFAULT_GATEWAY_HOSTNAME=
 HOST_ENDING=
@@ -9,8 +12,6 @@ LOCAL_GW_LXD_HOST_IP=
 TOR_PROXY=
 TOR_CONTROL_HOST=
 OVERLAY_NETWORK_IP=
-
-sleep 600
 
 DEFAULT_GATEWAY_IP="$(ip route | grep "default via" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')"
 DEFAULT_GATEWAY_HOSTNAME="$(host "$DEFAULT_GATEWAY_IP" | tail -n 1 | sed -e "s/^.* //;s/[[:punct:]]*$//")"

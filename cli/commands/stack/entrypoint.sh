@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -50,15 +50,14 @@ function validateStackParam(){
 
 # this is a list of stacks that we can deploy
 # corresponds to directories in $BCM_STACK_DIR
-declare -A STACKS
-STACKS[bitcoind]=1
-STACKS[clightning]=1
-STACKS[lnd]=0
-STACKS[eclair]=0
-STACKS[esplora]=0
-STACKS[lightning-charge]=0
-STACKS[opentimestamps]=0
-STACKS[spark]=0
+STACKS[0]="bitcoind"
+STACKS[1]="clightning"
+# STACKS[2]="lnd"
+# STACKS[3]="eclaire"
+# STACKS[esplora]=0
+# STACKS[lightning-charge]=0
+# STACKS[opentimestamps]=0
+# STACKS[spark]=0
 
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
     validateStackParam "$BCM_CLI_VERB";
@@ -85,13 +84,13 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
     fi
     
     elif [[ $BCM_CLI_VERB == "list" ]]; then
-    echo "Currently deployed stacks on cluster '$(lxc remote get-default)':"
-    
+    DEPLOYED_STACKS="$(lxc exec bcm-gateway-01 -- docker stack list --format "{{ .Name }}")"
     for STACK in ${STACKS[*]}
     do
-        echo "  - $STACK";
+        if ! echo "$DEPLOYED_STACKS" | grep -q "$STACK"; then
+            echo "$STACK";
+        fi
     done
-    
 else
     echo "ERROR: '$BCM_CLI_VERB' is not a valid command."
     cat ./help.txt

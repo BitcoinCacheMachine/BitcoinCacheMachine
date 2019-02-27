@@ -13,18 +13,7 @@ WORKDIR /root/.lightning
 ADD ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# RUN cp /root/lightning/cli/lightning-cli /usr/local/bin/lightning-cli
-# RUN cp /root/lightning/lightningd/lightning_channeld /usr/local/bin/lightning_channeld
-# RUN cp /root/lightning/lightningd/lightning_closingd /usr/local/bin/lightning_closingd
-# RUN cp /root/lightning/lightningd/lightning_connectd /usr/local/bin/lightning_connectd
-# RUN cp /root/lightning/lightningd/lightning_gossipd /usr/local/bin/lightning_gossipd
-# RUN cp /root/lightning/lightningd/lightning_hsmd /usr/local/bin/lightning_hsmd
-# RUN cp /root/lightning/lightningd/lightning_onchaind /usr/local/bin/lightning_onchaind
-# RUN cp /root/lightning/lightningd/lightningd /usr/local/bin/lightningd
-
-# RUN rm -rf /root/lighting
-
-# RUN apt-get install tor -y
-# ADD ./torrc /etc/tor/torrc
+# include the lightning CLI in the PATH
+ENV PATH="/root/lightning/cli:${PATH}"
 
 ENTRYPOINT [ "/entrypoint.sh" ]
