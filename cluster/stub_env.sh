@@ -42,23 +42,31 @@ mkdir -p "$ENDPOINT_DIR"
 touch "$ENV_FILE"
 
 # generate an LXD secret for the new VM lxd endpoint.
-export BCM_ENDPOINT_NAME=$BCM_ENDPOINT_NAME
+export BCM_ENDPOINT_NAME="$BCM_ENDPOINT_NAME"
 
 # first let's check on the remote SSH service.
 wait-for-it -t 60 "$BCM_SSH_HOSTNAME:22"
 
-SSH_KEY_FILE="$ENDPOINT_DIR/id_rsa"
-
-if [[ ! -f $SSH_KEY_FILE ]]; then
-    # this key is for temporary use and used only during initial provisioning.
-    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_FILE" -N ""
-    chmod 400 "$SSH_KEY_FILE.pub"
-fi
-
-if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
-    torify ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-else
-    ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+if [[ ! -f $BCM_SSH_KEY_PATH ]]; then
+    # if the user override the keypath, we will use that instead.
+    SSH_KEY_FILE="$ENDPOINT_DIR/id_rsa"
+    if [[ ! -z "$BCM_SSH_KEY_PATH" ]]; then
+        if [[ -f "$BCM_SSH_KEY_PATH" ]]; then
+            SSH_KEY_FILE="$BCM_SSH_KEY_PATH"
+        fi
+    fi
+    
+    if [[ ! -f $SSH_KEY_FILE ]]; then
+        # this key is for temporary use and used only during initial provisioning.
+        ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_FILE" -N ""
+        chmod 400 "$SSH_KEY_FILE.pub"
+    fi
+    
+    if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
+        torify ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+    else
+        ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+    fi
 fi
 
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"

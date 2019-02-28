@@ -1,11 +1,12 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLUSTER_NAME=
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
+BCM_SSH_KEY_PATH=
 
 for i in "$@"; do
     case $i in
@@ -19,6 +20,10 @@ for i in "$@"; do
         ;;
         --ssh-hostname=*)
             BCM_SSH_HOSTNAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --external-ssh-key-path=*)
+            BCM_SSH_KEY_PATH="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -46,7 +51,9 @@ fi
 # shellcheck disable=SC1091
 source ./env
 
-./stub_env.sh --endpoint-name="$BCM_ENDPOINT_NAME" --master --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME"
+
+export BCM_SSH_KEY_PATH="$BCM_SSH_KEY_PATH"
+./stub_env.sh --endpoint-name="$BCM_ENDPOINT_NAME" --master --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME" --
 
 # generate Trezor-backed SSH keys for interactively login.
 #SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"

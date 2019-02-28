@@ -21,7 +21,7 @@ if [[ -z $(git config --get --local user.email) ]]; then
 fi
 
 # let's install all necessary software at the SDN controller.
-sudo apt-get install -y wait-for-it openssh-server netcat encfs
+sudo apt-get install -y wait-for-it openssh-server netcat encfs avahi-discover
 bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
 bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
 

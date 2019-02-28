@@ -79,7 +79,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME"
         
         # update the hostname to its avahi daemon name.
-        BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME.local"
+        BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"".local"
     fi
     
     # first check to ensure that the cluster doesn't already exist.
@@ -101,8 +101,9 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         fi
         
         multipass purge
+
+        sed '/$PATTERN/d' "$HOME/.ssh/known_hosts"
     fi
-    
     
     # if the LXC remote for the cluster doesn't exist, then we'll state as such and quit.
     # if it's the cluster master add the LXC remote so we can manage it.

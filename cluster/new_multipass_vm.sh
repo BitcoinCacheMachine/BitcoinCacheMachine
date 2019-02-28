@@ -59,7 +59,7 @@ echo "CPU_COUNT: $CPU_COUNT"
 SSH_KEY_FILE="$BCM_TEMP_DIR/id_rsa_bcm_$VM_NAME"
 if [[ ! -f $SSH_KEY_FILE ]]; then
     # this key is for temporary use and used only during initial provisioning.
-    ssh-keygen -t rsa -b 4096 -C "bcm@$VM_NAME" -f "$SSH_KEY_FILE" -N ""
+    ssh-keygen -t rsa -b 4096 -C "bcm@$VM_NAME.local" -f "$SSH_KEY_FILE" -N ""
     chmod 400 "$SSH_KEY_FILE.pub"
 fi
 
@@ -68,17 +68,15 @@ SSH_AUTHORIZED_KEY=$(<"$SSH_KEY_FILE.pub")
 export SSH_AUTHORIZED_KEY="$SSH_AUTHORIZED_KEY"
 envsubst <./cloud_init_template.yml >"$BCM_TEMP_DIR/cloud-init_bcm_""$VM_NAME.yml"
 
+# get the ECDSA signature of the pubkey and add it to our
+
 multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init ./cloud_init_template.yml bionic
 
 multipass restart "$VM_NAME"
 
-IPV4_ADDRESS=$(multipass list --format csv | grep bcm-pegasus | awk -F "\"*,\"*" '{print $3}')
+wait-for-it -t 30 "$VM_NAME.local:22"
 
-if grep -Fxq "$VM_NAME" /etc/hosts; then
-    echo "REMOVING TEXT"
-    sed -i "/$VM_NAME/d" /etc/hosts
-fi
+# not let's do an ssh-keyscan so we can get the remote identity added to our ~/.ssh/known_hosts file
+ssh-keyscan -H "$VM_NAME.local" >> "$HOME/.ssh/known_hosts"
 
-echo "$IPV4_ADDRESS   $VM_NAME" | sudo tee -a /etc/hosts
-
-#rm -rf "$BCM_TEMP_DIR/cloud-init_bcm_""$VM_NAME.yml"
+rm -rf "$BCM_TEMP_DIR/cloud-init_bcm_""$VM_NAME.yml"
