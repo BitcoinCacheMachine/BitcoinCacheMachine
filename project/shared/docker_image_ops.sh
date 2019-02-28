@@ -56,6 +56,7 @@ fi
 # if DOCKER_HUB_IMAGE was passed, we assume that we are simply downloading it and pushing it to our private registry.
 # no operations will be performed otherwise.
 if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
+    echo "Pulling a public image down from the Internet."
     lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
     lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
     lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
@@ -94,6 +95,9 @@ if [[ $REBUILD == 1 ]]; then
     
     # let's build the image and push it to our private registry.
     IMAGE_FQDN="$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    
+    echo "Preparing the docker image '$IMAGE_FQDN'"
+    
     lxc exec "$LXC_HOST" -- docker build -t "$IMAGE_FQDN" /root/build/
     lxc exec "$LXC_HOST" -- docker push "$IMAGE_FQDN"
 else

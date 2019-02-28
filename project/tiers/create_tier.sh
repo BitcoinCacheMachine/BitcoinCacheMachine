@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
@@ -80,8 +80,8 @@ for endpoint in $(bcm cluster list --endpoints); do
     # all nodes from this script are workers. Manager hosts are implemented
     # outside this script (see gateway).
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
-        lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:2377
-        lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:5000
+        lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:2377
+        lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:5000
         lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
     fi
 done

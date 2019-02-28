@@ -1,9 +1,20 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-BCM_DEPLOY_TIERS=1
+# the base project
+source ./env
+
+for i in "$@"; do
+    case $i in
+        --project-name=*)
+            BCM_PROJECT_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+    esac
+done
+
 
 # let's make sure the cluster name is set.
 if [[ -z "$BCM_PROJECT_NAME" ]]; then
@@ -87,61 +98,57 @@ if ! lxc list --format csv | grep -q bcm-host-template; then
     lxc init bcm-bionic-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
 fi
 
-if lxc list --format csv -c=ns | grep bcm-host-template | grep -q STOPPED; then
-    lxc start bcm-host-template
+
+if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     
-    sleep 5
-    
-    # TODO provide configuration item to route these requests over local TOR proxy
-    echo "Installing required software on LXC host 'bcm-host-template'."
-    lxc exec bcm-host-template -- apt-get update
-    
-    # docker.io is the only package that seems to work seamlessly with
-    # storage backends. Using BTRFS since docker recognizes underlying file system
-    lxc exec bcm-host-template -- apt-get install -y docker.io wait-for-it ifmetric
-    
-    if [[ $BCM_DEBUG == 1 ]]; then
-        lxc exec bcm-host-template -- apt-get install -y jq nmap curl slurm tcptrack dnsutils tcpdump
+    if lxc list --format csv -c=ns | grep bcm-host-template | grep -q STOPPED; then
+        lxc start bcm-host-template
+        
+        sleep 5
+        
+        # TODO provide configuration item to route these requests over local TOR proxy
+        echo "Installing required software on LXC host 'bcm-host-template'."
+        lxc exec bcm-host-template -- apt-get update
+        
+        # docker.io is the only package that seems to work seamlessly with
+        # storage backends. Using BTRFS since docker recognizes underlying file system
+        lxc exec bcm-host-template -- apt-get install -y docker.io wait-for-it ifmetric
+        
+        if [[ $BCM_DEBUG == 1 ]]; then
+            lxc exec bcm-host-template -- apt-get install -y jq nmap curl slurm tcptrack dnsutils tcpdump
+        fi
+        
+        ## checking if this alleviates docker swarm troubles in lxc.
+        #https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
+        lxc exec bcm-host-template -- touch /.dockerenv
+        lxc exec bcm-host-template -- mkdir -p /etc/docker
+        
+        # this helps suppress some warning messages.  TODO
+        lxc file push ./sysctl.conf bcm-host-template/etc/sysctl.conf
+        lxc exec bcm-host-template -- chmod 0644 /etc/sysctl.conf
+        
+        # clean up the image before publication
+        lxc exec bcm-host-template -- apt-get autoremove -qq
+        lxc exec bcm-host-template -- apt-get clean -qq
+        lxc exec bcm-host-template -- rm -rf /tmp/*
+        
+        lxc exec bcm-host-template -- systemctl stop docker
+        lxc exec bcm-host-template -- systemctl enable docker
+        
+        #stop the template since we don't need it running anymore.
+        lxc stop bcm-host-template
+        
+        lxc profile remove bcm-host-template docker_privileged
+        lxc network detach bcmbr0 bcm-host-template
     fi
     
-    ## checking if this alleviates docker swarm troubles in lxc.
-    #https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
-    lxc exec bcm-host-template -- touch /.dockerenv
-    lxc exec bcm-host-template -- mkdir -p /etc/docker
+    # Let's publish a snapshot. This will be the basis of our LXD image.
+    lxc snapshot bcm-host-template bcmHostSnapshot
     
-    # this helps suppress some warning messages.  TODO
-    lxc file push ./sysctl.conf bcm-host-template/etc/sysctl.conf
-    lxc exec bcm-host-template -- chmod 0644 /etc/sysctl.conf
-    
-    # clean up the image before publication
-    lxc exec bcm-host-template -- apt-get autoremove -qq
-    lxc exec bcm-host-template -- apt-get clean -qq
-    lxc exec bcm-host-template -- rm -rf /tmp/*
-    
-    lxc exec bcm-host-template -- systemctl stop docker
-    lxc exec bcm-host-template -- systemctl enable docker
-    
-    #stop the template since we don't need it running anymore.
-    lxc stop bcm-host-template
-    
-    lxc profile remove bcm-host-template docker_privileged
-    lxc network detach bcmbr0 bcm-host-template
-fi
-
-# Let's publish a snapshot. This will be the basis of our LXD image.
-lxc snapshot bcm-host-template bcmHostSnapshot
-
-# publish the resulting image
-# other members of the LXD cluster will be able to pull and run this image
-echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
-lxc publish bcm-host-template/bcmHostSnapshot --alias "$LXC_BCM_BASE_IMAGE_NAME"
-
-if [[ $BCM_DEPLOY_TIERS == 1 ]]; then
-    # All tiers require that the bcm-template image be available.
-    # let's look for it before we even attempt anything.
-    if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-        bash -c "./tiers/up.sh --all"
-    else
-        echo "LXC image '$LXC_BCM_BASE_IMAGE_NAME' doesn't exist. Can't deploy BCM tiers."
-    fi
+    # publish the resulting image
+    # other members of the LXD cluster will be able to pull and run this image
+    echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
+    lxc publish bcm-host-template/bcmHostSnapshot --alias "$LXC_BCM_BASE_IMAGE_NAME"
+else
+    echo "The image '$LXC_BCM_BASE_IMAGE_NAME' is already published."
 fi

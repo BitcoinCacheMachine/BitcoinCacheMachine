@@ -1,7 +1,10 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
+
+# ensure gateway tier is up.
+bash -c "$BCM_GIT_DIR/project/up.sh"
 
 # shellcheck disable=SC1091
 source ./env
@@ -99,8 +102,8 @@ for endpoint in $(bcm cluster list --endpoints); do
             # make sure gateway and kafka hosts can reach the swarm master.
             # this steps helps resolve networking before we issue any meaningful
             # commands.
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:2377
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 bcm-gateway-01:5000
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:2377
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:5000
             lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$BCM_PRIVATE_REGISTRY"
             
             if [[ $HOST_ENDING -le 3 ]]; then

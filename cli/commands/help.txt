@@ -18,7 +18,6 @@ Available Commands:
   cluster      Create, destroy, and manage BCM clusters (i.e., LXD cluster). Add/remove new 
                computers to an existing cluster.
   provision    Provision critical BCM data center components.
-  deprovision  Remove critical BCM data center components.
   stack        Deploy and undeploy BCM software workloads (e.g., lnd, opentimestamps, etc.).
   git          Sign git commits and git tags using your Trezor-backed GPG certificates.
   file         Create and verify file signatures, encrypt and decrypt files with your Trezor.

@@ -25,6 +25,9 @@ if [[ -z $CHAIN ]]; then
     exit
 fi
 
+# Perform provisioning activities for dependent dier.
+bash -c "$BCM_GIT_DIR/project/tiers/ui/up.sh"
+
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"
 CONTAINER_NAME="bcm-bitcoin-$HOST_ENDING"
@@ -68,9 +71,9 @@ if [[ -d "$SRC_DIR/chainstate" ]]; then
 fi
 
 if [[ "$UPLOAD_BLOCKS" == 1 ]]; then
-    # let's see if the gogogo file is there. If so, then we've already
+    # let's see if the gogo file is there. If so, then we've already
     # previously uploaded this stuff and we can skip the next procedure
-    if ! lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogogo" ]; then
+    if ! lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogo" ]; then
         lxc file push -r -p "$SRC_DIR/blocks" "$CONTAINER_NAME/$DEST_DIR"
     else
         echo "INFO: Skipping upload of blocks since it appears to have been uploaded already."
@@ -78,14 +81,14 @@ if [[ "$UPLOAD_BLOCKS" == 1 ]]; then
 fi
 
 if [[ "$UPLOAD_CHAINSTATE" == 1 ]]; then
-    if ! lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogogo" ]; then
+    if ! lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogo" ]; then
         lxc file push -r -p "$SRC_DIR/chainstate" "$CONTAINER_NAME/$DEST_DIR"
     else
         echo "INFO: Skipping upload of chainstate since it appears to have been uploaded already."
     fi
 fi
 
-if ! lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogogo" ]; then
+if ! lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogo" ]; then
     lxc exec "$CONTAINER_NAME" -- mkdir -p "$DEST_DIR"
-    lxc exec "$CONTAINER_NAME" -- touch "$DEST_DIR/gogogo"
+    lxc exec "$CONTAINER_NAME" -- touch "$DEST_DIR/gogo"
 fi

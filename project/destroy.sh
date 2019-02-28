@@ -3,6 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+
+source ./env
+
 DELETE_BCM_IMAGE=1
 DELETE_LXC_BASE=1
 
@@ -27,7 +30,13 @@ for i in "$@"; do
     esac
 done
 
-./tiers/destroy.sh --all
+bcm tier remove bitcoin >>/dev/null
+
+bcm tier remove ui >>/dev/null
+
+bcm tier remove kafka >>/dev/null
+
+bcm tier remove gateway >>/dev/null
 
 # stop bcm-host-template
 if lxc list --format csv | grep "bcm-host-template" | grep -q "RUNNING"; then
@@ -67,3 +76,6 @@ if lxc project list | grep -q "$BCM_PROJECT_NAME"; then
     lxc project switch default
     lxc project delete "$BCM_PROJECT_NAME"
 fi
+
+# clean up any hanging images
+bash -c "$BCM_GIT_DIR/project/shared/clear_unlabeled_lxc_images.sh"

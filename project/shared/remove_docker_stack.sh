@@ -21,7 +21,7 @@ if [[ -z "$STACK_NAME" ]]; then
 fi
 
 if lxc list --format csv | grep -q "bcm-gateway-01"; then
-    if ! lxc exec bcm-gateway-01 -- wait-for-it -t 2 127.0.0.1:2377; then
+    if ! lxc exec bcm-gateway-01 -- wait-for-it -t 2 -q 127.0.0.1:2377; then
         echo "ERROR: The docker swarm service on bcm-gateway-01 is not working correctly. Can't remove stack '$STACK_NAME'."
         echo "You may need to re-run 'bcm provision'."
         exit
@@ -29,5 +29,6 @@ if lxc list --format csv | grep -q "bcm-gateway-01"; then
     
     if lxc exec bcm-gateway-01 -- docker stack ls --format "{{.Name}}" | grep -q "$STACK_NAME"; then
         lxc exec bcm-gateway-01 -- docker stack rm "$STACK_NAME"
+        sleep 2
     fi
 fi

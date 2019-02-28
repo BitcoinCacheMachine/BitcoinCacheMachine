@@ -37,6 +37,12 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     exit
 fi
 
+# first, let's ensure we have SSH access to the server.
+if ! wait-for-it -t 30 "$BCM_SSH_HOSTNAME:22"; then
+    echo "ERROR: Could not contact the remote machine."
+    exit
+fi
+
 # shellcheck disable=SC1091
 source ./env
 

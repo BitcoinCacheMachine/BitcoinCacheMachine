@@ -19,21 +19,24 @@ First, have Ubuntu Server 18.04 Server [installed on a USB thumb drive](https://
 11. On the "Software selection" page, choose "Done" (don't select any packages) and select Done to continue.
 12. On the User information page, enter the following details. For server name, choose a memorable name.
 
-    Name:           ubuntu
-    server name:    some_local_dns_name
-    Username:       ubuntu
-    password:       CHANGE_ME
-    password:       CHANGE_ME
+```
+Name:           ubuntu
+server name:    some_local_dns_name
+Username:       ubuntu
+password:       CHANGE_ME
+password:       CHANGE_ME
+```
 
 13. Select 'Yes' to the 'Are you sure you want to continue' page.
 14. Remove the installation media when directed and press enter to restart.
 
 The server should start Ubuntu Server. If successful, you will be presented with a login prompt. Login with the username and password that was set up in previous steps, then run the following command:
 
+---- TODO perform curl over TOR.
 ```bash
-curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/ServerPrep/master/prep.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/master/cluster/server_prep.sh | sudo bash
 ```
 
-The output of the above command SHOULD end with 'SSH ONION SITE & AUTH TOKEN'. The value presented here should be securely transmitted to your administrator (e.g., Signal Private Messenger, Keybase Chat).
+The output of the above command SHOULD end with 'SSH ONION SITE & AUTH TOKEN'. The value presented here should be securely transmitted to your administrator. The password that was set by the remote installation technician should be communicated as well. 
 
 TODO: see if we can support boot-to-network (PXE) and cloud-init provisioning.

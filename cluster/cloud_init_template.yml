@@ -1,9 +1,23 @@
 #cloud-config
 package_upgrade: true
 
+# allows for link-local name resolution from SDN controller.
+packages:
+ - avahi-daemon
+
+# Add groups to the system
+# The following example adds the ubuntu group with members 'root' and 'sys'
+# and the empty group cloud-users.
+groups:
+  - ubuntu: [root,sys]
+  - lxd
+
+# Add users to the system. Users are added after groups are added.
 users:
-  - name: ubuntu
-    sudo: true
+  - default
+  - name: bcm
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: lxd
     ssh_authorized_keys:
       - $SSH_AUTHORIZED_KEY
 

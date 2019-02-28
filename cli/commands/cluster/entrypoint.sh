@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -20,11 +20,16 @@ fi
 
 BCM_CLUSTER_NAME="$(lxc remote get-default)"
 BCM_ENDPOINTS_FLAG=0
+BCM_DRIVER=ssh
 BCM_SSH_HOSTNAME=
 BCM_SSH_USERNAME=
 
 for i in "$@"; do
     case $i in
+        --driver=*)
+            BCM_DRIVER="${i#*=}"
+            shift # past argument=value
+        ;;
         --cluster-name=*)
             BCM_CLUSTER_NAME="${i#*=}"
             shift # past argument=value
@@ -51,12 +56,31 @@ if [[ $BCM_HELP_FLAG == 1 ]]; then
     exit
 fi
 
+
+if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
+    echo "ERROR: BCM Cluster driver MUST be 'ssh' or 'multipass'."
+    exit
+fi
+
+
 if [[ $BCM_CLUSTER_NAME == "local" ]]; then
     echo "ERROR: BCM_CLUSTER_NAME was not defined. Set the cluster name with '--cluster-name='"
     exit
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
+    # if the BCM_DRIVER is multipass, then we assume the remote endpoint doesn't
+    # exist and we need to create it via multipass. Once there's an SSH service available
+    # on that endpoint, we can continue.
+    if [[ $BCM_DRIVER == multipass ]]; then
+        BCM_SSH_USERNAME="bcm"
+        BCM_SSH_HOSTNAME="$BCM_CLUSTER_NAME-$(hostname)"
+        
+        bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME"
+        
+        # update the hostname to its avahi daemon name.
+        BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME.local"
+    fi
     
     # first check to ensure that the cluster doesn't already exist.
     if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
@@ -67,10 +91,23 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     elif [[ $BCM_CLI_VERB == "destroy" ]]; then
+    
+    if [[ $BCM_DRIVER == multipass ]]; then
+        VM_NAME="$BCM_CLUSTER_NAME-$(hostname)"
+        if multipass list | grep -q "$VM_NAME"; then
+            multipass stop "$VM_NAME"
+            multipass delete "$VM_NAME"
+            multipass delete "$VM_NAME"
+        fi
+        
+        multipass purge
+    fi
+    
+    
     # if the LXC remote for the cluster doesn't exist, then we'll state as such and quit.
     # if it's the cluster master add the LXC remote so we can manage it.
     if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
-        echo "WARNING: Cluster '$BCM_CLUSTER_NAME' doesn't exist. Can't delete."
+        echo "WARNING: LXC REMOTE '$BCM_CLUSTER_NAME' doesn't exist. Can't delete."
         exit
     fi
     

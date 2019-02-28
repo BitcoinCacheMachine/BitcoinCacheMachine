@@ -20,11 +20,10 @@ if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
     echo "HiddenServicePort 22 127.0.0.1:22" | sudo tee -a /etc/tor/torrc
     echo "HiddenServiceAuthorizeClient stealth $(hostname)_ssh" | sudo tee -a /etc/tor/torrc
     sudo systemctl restart tor
+    sleep 5
 fi
 
 if [[ -f /var/lib/tor/ssh/hostname ]]; then
     echo "SSH ONION SITE & AUTH TOKEN:"
     echo "  $(sudo cat /var/lib/tor/ssh/hostname)"
-else
-    echo "TOR endpoint information unavailable."
 fi

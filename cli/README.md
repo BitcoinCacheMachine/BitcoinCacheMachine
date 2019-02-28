@@ -12,14 +12,14 @@ If the cli is configured correctly, you can `bcm info` to get an overview of you
 * PASSWORD_STORE_DIR:         Directory of your Trezor GPG-backed standard unix password manager store.
 * BCM_ACTIVE:                 [0|1] - whether the 'bcm' environment should use the ~/.bcm directory or revert to using your home directory (~/.gnupg and ~/.password_store)
 * BCM_DEBUG:                  [0|1] - Whether the 'bcm' CLI should emit detailed information.
-* DOCKER_IMAGE_CACHE:             [hostname] - DNS name of LXD image cache and/or docker mirror registy. Useful for development.
+* DOCKER_IMAGE_CACHE:         [hostname] - DNS name of LXD image cache and/or docker mirror registy. Useful for development.
 * LXD_CLUSTER:                Name of the cluster your LXD client is configured to target.
 
 ## Get an overview of your LXD configuration
 
 Use the `bcm show` command to get an overview of your LXD container configuation. This command simply outputs various `lxd show` commands so you can get a snapshot view of your LXC/LXD configuration. The following resources are displayed:
 
-* LXC Hosts
+* LXC Hosts/containers
 * LXC Networks
 * LXC Storage Pools
 * LXD Storage Volumes for pool bcm_btrfs
@@ -28,4 +28,4 @@ Use the `bcm show` command to get an overview of your LXD container configuation
 * LXD Images
 * LXC Cluster
 * LXD Projects
-* LXD client Remotes
+* LXD Client Remotes

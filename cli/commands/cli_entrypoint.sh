@@ -86,12 +86,6 @@ if [[ "$(lxc remote get-default)" == "local" ]]; then
     exit
 fi
 
-# provision and deprovision deploy and undeploy BCMBase which are critical data center components
-# common to ALL BCM deployments. This includes bitcoind.
-if [[ "$BCM_CLI_COMMAND" == "provision" || "$BCM_CLI_COMMAND" == "deprovision" ]]; then
-    ./provision/entrypoint.sh "$@"
-fi
-
 if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"
 fi
@@ -106,4 +100,8 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" ]]; then
     ./stack_cli/entrypoint.sh
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
+    bash -c "$BCM_GIT_DIR/project/destroy.sh"
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:5.1.0"

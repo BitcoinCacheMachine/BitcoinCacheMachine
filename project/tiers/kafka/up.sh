@@ -1,7 +1,10 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
+
+# ensure gateway tier is up.
+bash -c "$BCM_GIT_DIR/project/tiers/gateway/up.sh"
 
 # shellcheck disable=1091
 source ./params.sh "$@"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -70,8 +70,9 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
     else
         echo "ERROR: Could not find '$UP_FILE'."
     fi
-    
-    elif [[ $BCM_CLI_VERB == "rm" || $BCM_CLI_VERB == "remove"  ]]; then
+fi
+
+if [[ $BCM_CLI_VERB == "remove"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
     validateParams;
     
@@ -82,16 +83,22 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
     else
         echo "ERROR: Could not find '$DESTROY_FILE'."
     fi
+fi
+
+if [[ $BCM_CLI_VERB == "list" ]]; then
     
-    elif [[ $BCM_CLI_VERB == "list" ]]; then
-    DEPLOYED_STACKS="$(lxc exec bcm-gateway-01 -- docker stack list --format "{{ .Name }}")"
-    for STACK in ${STACKS[*]}
-    do
-        if ! echo "$DEPLOYED_STACKS" | grep -q "$STACK"; then
-            echo "$STACK";
-        fi
-    done
-else
-    echo "ERROR: '$BCM_CLI_VERB' is not a valid command."
-    cat ./help.txt
+    if lxc list --format csv | grep -q "bcm-gateway-01"; then
+        DEPLOYED_STACKS="$(lxc exec bcm-gateway-01 -- docker stack list --format "{{ .Name }}")"
+        for STACK in ${STACKS[*]}
+        do
+            if ! echo "$DEPLOYED_STACKS" | grep -q "$STACK"; then
+                echo "$STACK";
+            fi
+        done
+    fi
+fi
+
+if [[ $BCM_CLI_VERB == "clear" ]]; then
+    bcm stack remove clightning --chain=testnet
+    bcm stack remove bitcoind --chain=testnet
 fi
