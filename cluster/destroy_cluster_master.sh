@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
@@ -50,7 +50,7 @@ if lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
 fi
 
 # let's mount the directory via sshfs. This contains the lxd seed file.
-REMOTE_MOUNTPOINT="$BCM_TEMP_DIR/provisioning"
+source ./env
 SSH_KEY_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/id_rsa"
 
 # provision the machine by uploading the preseed and running the install script.

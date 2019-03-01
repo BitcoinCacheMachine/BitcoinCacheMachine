@@ -37,6 +37,12 @@ The server should start Ubuntu Server. If successful, you will be presented with
 curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/master/cluster/server_prep.sh | sudo bash
 ```
 
-The output of the above command SHOULD end with 'SSH ONION SITE & AUTH TOKEN'. The value presented here should be securely transmitted to your administrator. The password that was set by the remote installation technician should be communicated as well. 
+The output of the above command SHOULD end with 'SSH ONION SITE & AUTH TOKEN'. The value presented here should be securely transmitted to your administrator. The password that was set by the remote installation technician should be communicated as well.
+
+Finish the process by restarting the computer:
+
+```bash
+sudo shutdown -r now
+```
 
 TODO: see if we can support boot-to-network (PXE) and cloud-init provisioning.

@@ -68,23 +68,27 @@ if [[ $BCM_CLUSTER_NAME == "local" ]]; then
     exit
 fi
 
+if [[ -z $BCM_SSH_USERNAME ]]; then
+    BCM_SSH_USERNAME=bcm
+fi
+
+if [[ -z $BCM_SSH_HOSTNAME ]]; then
+    BCM_SSH_HOSTNAME="bcm-$(hostname)"
+fi
+
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    # if the BCM_DRIVER is multipass, then we assume the remote endpoint doesn't
-    # exist and we need to create it via multipass. Once there's an SSH service available
-    # on that endpoint, we can continue.
-    if [[ $BCM_DRIVER == multipass ]]; then
-        BCM_SSH_USERNAME="bcm"
-        BCM_SSH_HOSTNAME="$BCM_CLUSTER_NAME-$(hostname)"
-        
-        bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME"
-        
-        # update the hostname to its avahi daemon name.
-        BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"".local"
+    
+    BCM_SSH_KEY_PATH="$BCM_TEMP_DIR/id_rsa_""$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME"
+    # let's generate a temporary SSH key if it doesn't exist.
+    if [[ ! -f "$BCM_SSH_KEY_PATH" ]]; then
+        # this key is for temporary use and used only during initial provisioning.
+        ssh-keygen -t rsa -b 4096 -C "bcm@$VM_NAME.local" -f "$BCM_SSH_KEY_PATH" -N ""
+        chmod 400 "$BCM_SSH_KEY_PATH.pub"
     fi
     
     # first check to ensure that the cluster doesn't already exist.
     if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
-        bash -c "$BCM_GIT_DIR/cluster/up_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
+        bash -c "$BCM_GIT_DIR/cluster/up_cluster_master.sh --driver=$BCM_DRIVER --cluster-name=$BCM_CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME --ssh-key-path=$BCM_SSH_KEY_PATH"
     else
         echo "ERROR: BCM Cluster with name 'BCM_CLUSTER_NAME' already exists!"
         exit
@@ -101,8 +105,9 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         fi
         
         multipass purge
-
-        sed '/$PATTERN/d' "$HOME/.ssh/known_hosts"
+        
+        # remove the entry for the host in your ~/.ssh/known_hosts
+        ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$VM_NAME"
     fi
     
     # if the LXC remote for the cluster doesn't exist, then we'll state as such and quit.

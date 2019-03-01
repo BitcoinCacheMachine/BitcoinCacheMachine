@@ -15,6 +15,7 @@ fi
 SSH_USERNAME=
 SSH_HOSTNAME=
 SSH_PUSH=0
+BCM_SSH_KEY_PATH=
 
 for i in "$@"; do
     case $i in
@@ -24,6 +25,10 @@ for i in "$@"; do
         ;;
         --username=*)
             SSH_USERNAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --ssh-key-path=*)
+            BCM_SSH_KEY_PATH="${i#*=}"
             shift # past argument=value
         ;;
         --push)
@@ -76,9 +81,16 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
         # Push to desintion if specified.
         if [[ $SSH_PUSH == 1 ]]; then
             if [[ $SSH_HOSTNAME == *.onion ]]; then
-                torify ssh-copy-id -f -i "$PUB_KEY_PATH" "$SSH_USERNAME@$SSH_HOSTNAME"
+                echo "TODO"
+                #torify ssh-copy-id -f -i "$PUB_KEY_PATH" "$SSH_USERNAME@$SSH_HOSTNAME"
             else
-                ssh-copy-id -f -i "$PUB_KEY_PATH" "$SSH_USERNAME@$SSH_HOSTNAME"
+                # we assume here that we have an SSH connection to push an AUTHORIZED_KEYS entry.
+                if [[ ! -z $BCM_SSH_KEY_PATH ]]; then
+                    if [[ -f $BCM_SSH_KEY_PATH ]]; then
+                        SSH_AUTHORIZED_KEY=$(<"$BCM_SSH_KEY_PATH.pub")
+                        ssh -i "$BCM_SSH_KEY_PATH"  "$SSH_USERNAME@$SSH_HOSTNAME" -- echo "$SSH_AUTHORIZED_KEY" > /home/bcm/.ssh/authorized_keys
+                    fi
+                fi
             fi
         fi
         

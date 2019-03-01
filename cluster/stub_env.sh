@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 IS_MASTER=0
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
+BCM_SSH_KEY_PATH=
 
 for i in "$@"; do
     case $i in
@@ -19,6 +20,10 @@ for i in "$@"; do
         ;;
         --ssh-hostname=*)
             BCM_SSH_HOSTNAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --ssh-key-path=*)
+            BCM_SSH_KEY_PATH="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -44,29 +49,21 @@ touch "$ENV_FILE"
 # generate an LXD secret for the new VM lxd endpoint.
 export BCM_ENDPOINT_NAME="$BCM_ENDPOINT_NAME"
 
-# first let's check on the remote SSH service.
-wait-for-it -t 60 "$BCM_SSH_HOSTNAME:22"
-
+# if the user override the keypath, we will use that instead.
 if [[ ! -f $BCM_SSH_KEY_PATH ]]; then
-    # if the user override the keypath, we will use that instead.
-    SSH_KEY_FILE="$ENDPOINT_DIR/id_rsa"
-    if [[ ! -z "$BCM_SSH_KEY_PATH" ]]; then
-        if [[ -f "$BCM_SSH_KEY_PATH" ]]; then
-            SSH_KEY_FILE="$BCM_SSH_KEY_PATH"
-        fi
-    fi
-    
-    if [[ ! -f $SSH_KEY_FILE ]]; then
-        # this key is for temporary use and used only during initial provisioning.
-        ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_FILE" -N ""
-        chmod 400 "$SSH_KEY_FILE.pub"
-    fi
-    
-    if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
-        torify ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-    else
-        ssh-copy-id -i "$SSH_KEY_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-    fi
+    BCM_SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+    # this key is for temporary use and used only during initial provisioning.
+    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$BCM_SSH_KEY_PATH" -N ""
+    chmod 400 "$BCM_SSH_KEY_PATH.pub"
+fi
+
+if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
+    torify ssh-copy-id -i "$BCM_SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+else
+    # not let's do an ssh-keyscan so we can get the remote identity added to our ~/.ssh/known_hosts file
+    wait-for-it -t 10 "$BCM_SSH_HOSTNAME:22"
+    ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$HOME/.ssh/known_hosts"
+    ssh-copy-id -i "$BCM_SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
