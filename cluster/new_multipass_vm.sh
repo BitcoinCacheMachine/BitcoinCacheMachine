@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VM_NAME=
@@ -68,10 +68,16 @@ envsubst <./cloud_init_template.yml >"$BCM_TEMP_DIR/cloud-init_bcm_""$VM_NAME.ym
 # launch the new VM with the custom cloud-init.
 multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$BCM_TEMP_DIR/cloud-init_bcm_""$VM_NAME.yml" bionic
 
+multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
+
+multipass exec "$VM_NAME"  -- chmod 0755 /home/multipass/server_prep.sh
+
+multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
+
 multipass restart "$VM_NAME"
 
-IPV4_ADDRESS="$(multipass list --format csv | grep $VM_NAME | awk -F "\"*,\"*" '{print $3}')"
-echo "$IPV4_ADDRESS   $VM_NAME" | sudo tee -a /etc/hosts
+# call the following scripts so do a static /etc/hosts mapping since multipass doesn't natively do DNS (or I need more research)
+bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
 
 # not let's do an ssh-keyscan so we can get the remote identity added to our ~/.ssh/known_hosts file
 ssh-keyscan -H "$VM_NAME" >> "$HOME/.ssh/known_hosts"

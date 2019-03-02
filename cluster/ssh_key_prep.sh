@@ -46,25 +46,10 @@ ENDPOINT_DIR="$TEMP_DIR/$BCM_ENDPOINT_NAME"
 mkdir -p "$ENDPOINT_DIR"
 touch "$ENV_FILE"
 
+bash -c "$BCM_GIT_DIR/cluster/ssh_key_prep.sh --ssh-key-path=$BCM_SSH_KEY_PATH --endpoint-dir=$ENDPOINT_DIR --ssh-username=$BCM_SSH_USERNAME  --ssh-hostname=$BCM_SSH_HOSTNAME"
+
 # generate an LXD secret for the new VM lxd endpoint.
 export BCM_ENDPOINT_NAME="$BCM_ENDPOINT_NAME"
-
-# if the user override the keypath, we will use that instead.
-if [[ ! -f $BCM_SSH_KEY_PATH ]]; then
-    BCM_SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
-    # this key is for temporary use and used only during initial provisioning.
-    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$BCM_SSH_KEY_PATH" -N ""
-    chmod 400 "$BCM_SSH_KEY_PATH.pub"
-fi
-
-if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
-    torify ssh-copy-id -i "$BCM_SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-else
-    # not let's do an ssh-keyscan so we can get the remote identity added to our ~/.ssh/known_hosts file
-    wait-for-it -t 10 "$BCM_SSH_HOSTNAME:22"
-    ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$HOME/.ssh/known_hosts"
-    ssh-copy-id -i "$BCM_SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-fi
 
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"

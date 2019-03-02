@@ -8,6 +8,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install -y tor openssh-server avahi-daemon
 sudo apt-get remove lxd lxd-client -y
+sudo apt-get autoremove -y
 
 # todo add ability to interactively select management interface (if multiple)
 if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then

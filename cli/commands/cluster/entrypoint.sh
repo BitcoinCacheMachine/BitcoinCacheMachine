@@ -18,7 +18,9 @@ if ! snap list | grep -q lxd; then
     bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
 fi
 
+PREFIX="bcm-"
 BCM_CLUSTER_NAME="$(lxc remote get-default)"
+BCM_CLUSTER_NAME=${BCM_CLUSTER_NAME#"$PREFIX"}
 BCM_ENDPOINTS_FLAG=0
 BCM_DRIVER=ssh
 BCM_SSH_HOSTNAME=
@@ -63,6 +65,19 @@ if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
 fi
 
 
+if [[ "$BCM_CLI_VERB" == "list" ]]; then
+    if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
+        if lxc info | grep -q "server_clustered: true"; then
+            lxc cluster list | grep "$BCM_CLUSTER_NAME" | awk '{print $2}'
+            exit
+        fi
+    fi
+    
+    lxc remote list --format csv | grep "bcm-" | awk -F "," '{print $1}' | awk '{print $1;}'
+    
+    exit
+fi
+
 if [[ $BCM_CLUSTER_NAME == "local" ]]; then
     echo "ERROR: BCM_CLUSTER_NAME was not defined. Set the cluster name with '--cluster-name='"
     exit
@@ -73,16 +88,15 @@ if [[ -z $BCM_SSH_USERNAME ]]; then
 fi
 
 if [[ -z $BCM_SSH_HOSTNAME ]]; then
-    BCM_SSH_HOSTNAME="bcm-$(hostname)"
+    BCM_SSH_HOSTNAME="bcm-$BCM_CLUSTER_NAME-$(hostname)"
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    
-    BCM_SSH_KEY_PATH="$BCM_TEMP_DIR/id_rsa_""$BCM_SSH_USERNAME""_""$BCM_SSH_HOSTNAME"
+    BCM_SSH_KEY_PATH="$BCM_TEMP_DIR/id_rsa_""$BCM_SSH_HOSTNAME"
     # let's generate a temporary SSH key if it doesn't exist.
     if [[ ! -f "$BCM_SSH_KEY_PATH" ]]; then
         # this key is for temporary use and used only during initial provisioning.
-        ssh-keygen -t rsa -b 4096 -C "bcm@$VM_NAME.local" -f "$BCM_SSH_KEY_PATH" -N ""
+        ssh-keygen -t rsa -b 4096 -C "bcm@$BCM_SSH_HOSTNAME" -f "$BCM_SSH_KEY_PATH" -N ""
         chmod 400 "$BCM_SSH_KEY_PATH.pub"
     fi
     
@@ -93,11 +107,11 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         echo "ERROR: BCM Cluster with name 'BCM_CLUSTER_NAME' already exists!"
         exit
     fi
-    
-    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
-    
+fi
+
+if [[ $BCM_CLI_VERB == "destroy" ]]; then
     if [[ $BCM_DRIVER == multipass ]]; then
-        VM_NAME="$BCM_CLUSTER_NAME-$(hostname)"
+        VM_NAME="bcm-$BCM_CLUSTER_NAME-$(hostname)"
         if multipass list | grep -q "$VM_NAME"; then
             multipass stop "$VM_NAME"
             multipass delete "$VM_NAME"
@@ -114,7 +128,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     # if it's the cluster master add the LXC remote so we can manage it.
     if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
         echo "WARNING: LXC REMOTE '$BCM_CLUSTER_NAME' doesn't exist. Can't delete."
-        exit
     fi
     
     # if the user didn't pass the cluster name, then we assume the user wants to delete the active cluster.
@@ -127,19 +140,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
-    
     bash -c "$BCM_GIT_DIR/cluster/destroy_cluster_master.sh --cluster-name=$BCM_CLUSTER_NAME  --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
     
-    elif [[ "$BCM_CLI_VERB" == "list" ]]; then
-    export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
-    
-    if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
-        if lxc info | grep -q "server_clustered: true"; then
-            lxc cluster list | grep "$BCM_CLUSTER_NAME" | awk '{print $2}'
-        fi
-    else
-        echo
+    # update the SDN controller's /etc/hosts file if it's a multipass VM.
+    if [[ $BCM_DRIVER == multipass ]]; then
+        bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
     fi
-else
-    cat ./help.txt
 fi

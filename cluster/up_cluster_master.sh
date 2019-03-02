@@ -45,14 +45,12 @@ if [[ $BCM_DRIVER == multipass ]]; then
     bash -c "$BCM_GIT_DIR/cli/commands/install/snap_multipass_install.sh"
     
     BCM_SSH_USERNAME="bcm"
-    BCM_SSH_HOSTNAME="$BCM_CLUSTER_NAME-$(hostname)"
+    BCM_SSH_HOSTNAME="bcm-$BCM_CLUSTER_NAME-$(hostname)"
     
     bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME --ssh-key-path=$BCM_SSH_KEY_PATH"
     
     # update the hostname to its avahi daemon name.
     BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
-    IPV4_ADDRESS="$(multipass list --format csv | grep $BCM_SSH_HOSTNAME | awk -F "\"*,\"*" '{print $3}')"
-    echo "$IPV4_ADDRESS   $BCM_SSH_HOSTNAME" | sudo tee -a /etc/hosts
 fi
 
 if [[ -z "$BCM_SSH_USERNAME" ]]; then
@@ -127,15 +125,14 @@ if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
     wait-for-it -t 0 "$BCM_SSH_HOSTNAME:8443"
     
-    if [[ $BCM_DRIVER == multipass ]]; then
-        
-        echo "Adding a lxd remote for cluster '$BCM_CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."
-        lxc remote add "$BCM_CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
-    fi
-    lxc remote switch "$BCM_CLUSTER_NAME"
+    lxc remote add "bcm-$BCM_CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
+    lxc remote switch "bcm-$BCM_CLUSTER_NAME"
 fi
 
 echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster."
 echo "Consider adding hosts to your new cluster with 'bcm cluster add' (TODO). This helps achieve local high-availability."
 echo ""
 echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"
+
+rm -f "$BCM_TEMP_DIR/id_rsa_$BCM_SSH_HOSTNAME"
+rm -f "$BCM_TEMP_DIR/id_rsa_$BCM_SSH_HOSTNAME.pub"
