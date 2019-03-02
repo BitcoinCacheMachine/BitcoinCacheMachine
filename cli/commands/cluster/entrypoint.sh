@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -64,6 +64,10 @@ if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
     exit
 fi
 
+if [[ $BCM_CLUSTER_NAME == "local" ]]; then
+    echo "ERROR: BCM_CLUSTER_NAME was not defined. Set the cluster name with '--cluster-name='"
+    exit
+fi
 
 if [[ "$BCM_CLI_VERB" == "list" ]]; then
     if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
@@ -75,11 +79,6 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
     
     lxc remote list --format csv | grep "bcm-" | awk -F "," '{print $1}' | awk '{print $1;}'
     
-    exit
-fi
-
-if [[ $BCM_CLUSTER_NAME == "local" ]]; then
-    echo "ERROR: BCM_CLUSTER_NAME was not defined. Set the cluster name with '--cluster-name='"
     exit
 fi
 
@@ -119,9 +118,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         fi
         
         multipass purge
-        
-        # remove the entry for the host in your ~/.ssh/known_hosts
-        ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$VM_NAME"
+
     fi
     
     # if the LXC remote for the cluster doesn't exist, then we'll state as such and quit.

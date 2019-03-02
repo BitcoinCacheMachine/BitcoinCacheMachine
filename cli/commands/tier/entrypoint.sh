@@ -43,11 +43,19 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         echo "WARNING: BCM tier already exists."
     fi
     
-    bash -c "$BCM_GIT_DIR/project/tiers/create_tier.sh --tier-name=$TIER_NAME"
+    if [[ $TIER_NAME == "gateway" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/gateway/up.sh"
+    else
+        bash -c "$BCM_GIT_DIR/project/tiers/create_tier.sh --tier-name=$TIER_NAME"
+    fi
     
     elif [[ $BCM_CLI_VERB == "remove" ]]; then
     if bcm tier list | grep -q "$TIER_NAME"; then
-        bash -c "$BCM_GIT_DIR/project/tiers/remove_tier.sh --tier-name=$TIER_NAME"
+        if [[ $TIER_NAME == "gateway" ]]; then
+            bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
+        else
+            bash -c "$BCM_GIT_DIR/project/tiers/remove_tier.sh --tier-name=$TIER_NAME"
+        fi
     else
         echo "WARNING: BCM Tier '$TIER_NAME' does not exist."
     fi

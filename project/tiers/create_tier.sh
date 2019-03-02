@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
@@ -27,7 +27,9 @@ bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$BCM_TIER_NAME"
 
 # Now, let's fetch the docker swarm token so we can start the rest of the tier.
 # shellcheck disable=SC1090
-source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
+if [[ $BCM_TIER_NAME != "gateway" ]]; then
+    source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
+fi
 
 # configure and start the containers
 for endpoint in $(bcm cluster list --endpoints); do

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
@@ -46,6 +46,9 @@ if lxc remote list --format csv | grep -q "bcm-$BCM_CLUSTER_NAME"; then
     echo "Removing lxd remote for cluster '$BCM_CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."
     lxc remote remove "bcm-$BCM_CLUSTER_NAME"
 fi
+
+# remove the entry for the host in your ~/.ssh/known_hosts
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$BCM_SSH_HOSTNAME"
 
 if [[ -d "$BCM_TEMP_DIR/$BCM_CLUSTER_NAME" ]]; then
     rm -rf "${BCM_TEMP_DIR:?}/$BCM_CLUSTER_NAME"

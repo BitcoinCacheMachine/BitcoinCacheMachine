@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 source ./env
 
 DELETE_BCM_IMAGE=1
-DELETE_LXC_BASE=1
+DELETE_LXC_BASE=0
 
 for i in "$@"; do
     case $i in

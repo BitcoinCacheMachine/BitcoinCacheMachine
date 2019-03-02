@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # ensure gateway tier is up.
@@ -8,12 +8,6 @@ bash -c "$BCM_GIT_DIR/project/up.sh"
 
 # shellcheck disable=SC1091
 source ./env
-
-# first let's check to see if we have any gateways
-# if so, we quit unless the user has told us to override.
-if lxc list --format csv -c n | grep -q "bcm-gateway-01"; then
-    echo "WARNING: LXC host 'bcm-gateway-01' exists."
-fi
 
 # first, create the profile that represents the tier.
 bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=gateway --yaml-path=$(pwd)/tier_profile.yml"
@@ -30,20 +24,22 @@ lxc file push ./dhcpd_conf.yml bcm-gateway-01/etc/netplan/10-lxc.yaml
 if lxc list --format csv -c=ns | grep bcm-gateway-01 | grep -q STOPPED; then
     # start the LXC host and wait for dockerd
     lxc start bcm-gateway-01
-    bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
-    
-    # prepare the host.
-    lxc exec bcm-gateway-01 -- ifmetric eth0 50
-    lxc exec bcm-gateway-01 -- docker pull registry:latest
-    lxc exec bcm-gateway-01 -- docker tag registry:latest bcm-registry:latest
-    
-    lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >> /dev/null
-    lxc file push ./bcm-gateway-01.daemon.json bcm-gateway-01/etc/docker/daemon.json
-    
-    # restart the host so it runs with new dockerd daemon config.
-    lxc restart bcm-gateway-01
-    bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
 fi
+
+bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
+
+# prepare the host.
+lxc exec bcm-gateway-01 -- ifmetric eth0 50
+lxc exec bcm-gateway-01 -- docker pull registry:latest
+lxc exec bcm-gateway-01 -- docker tag registry:latest bcm-registry:latest
+
+lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >> /dev/null
+lxc file push ./bcm-gateway-01.daemon.json bcm-gateway-01/etc/docker/daemon.json
+
+# restart the host so it runs with new dockerd daemon config.
+lxc restart bcm-gateway-01
+bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
+
 
 # TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
@@ -84,7 +80,7 @@ lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c 
 # shellcheck disable=SC1090
 source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
-MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
+MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
 HOSTNAME=
 for endpoint in $(bcm cluster list --endpoints); do
     if [[ $endpoint != "$MASTER_NODE" ]]; then

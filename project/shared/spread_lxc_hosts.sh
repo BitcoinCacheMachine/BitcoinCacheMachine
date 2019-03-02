@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
 BCM_TIER_NAME=
 
@@ -22,7 +22,7 @@ if [[ -z $BCM_TIER_NAME ]]; then
 fi
 
 # let's get a bcm-gateway LXC instance on each cluster endpoint.
-MASTER_NODE=$(lxc info | grep server_name | xargs | awk 'NF>1{print $NF}')
+MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
 for ENDPOINT in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     LXC_HOSTNAME="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
