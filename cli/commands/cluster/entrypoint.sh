@@ -70,6 +70,7 @@ fi
 
 if [[ "$BCM_CLI_VERB" == "list" ]]; then
     if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
+    
         if lxc info | grep -q "server_clustered: true"; then
             lxc cluster list | grep "$BCM_CLUSTER_NAME" | awk '{print $2}'
             exit

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # ensure gateway tier is up.
@@ -82,9 +82,9 @@ source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
 HOSTNAME=
-for endpoint in $(bcm cluster list --endpoints); do
-    if [[ $endpoint != "$MASTER_NODE" ]]; then
-        HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+for ENDPOINT in $(bcm cluster list --endpoints); do
+    if [[ $ENDPOINT != "$MASTER_NODE" ]]; then
+        HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
         HOSTNAME="bcm-gateway-$(printf %02d "$HOST_ENDING")"
         
         if [[ $HOST_ENDING -ge 2 ]]; then
