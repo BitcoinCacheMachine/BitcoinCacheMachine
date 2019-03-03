@@ -39,26 +39,26 @@ else
     echo "WARNING: PASSWORD_STORE_DIR directory '$PASSWORD_STORE_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
-if [[ -d "$SSH_DIR" ]]; then
+if [[ -d "$BCM_SSH_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then
-        if [ "$SSH_DIR" != "$HOME/.ssh" ]; then
-            echo "Deleting $SSH_DIR."
-            sudo rm -Rf "$SSH_DIR"
+        if [ "$BCM_SSH_DIR" != "$HOME/.ssh" ]; then
+            echo "Deleting $BCM_SSH_DIR."
+            sudo rm -Rf "$BCM_SSH_DIR"
         fi
     fi
 else
-    echo "WARNING: SSH_DIR directory '$SSH_DIR' does not exist. You may need to run 'bcm init'."
+    echo "WARNING: BCM_SSH_DIR directory '$BCM_SSH_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
 # now let;s unmount the temp directory and remove the folders.
-encfs -u "$BCM_TEMP_DIR">>/dev/null
+encfs -u "$BCM_WORKING_DIR">>/dev/null
 
-if [[ -d "$BCM_TEMP_DIR" ]]; then
-    echo "Removing $BCM_TEMP_DIR"
-    rm -rf "$BCM_TEMP_DIR"
+if [[ -d "$BCM_WORKING_DIR" ]]; then
+    echo "Removing $BCM_WORKING_DIR"
+    rm -rf "$BCM_WORKING_DIR"
 fi
 
-if [[ -d "$BCM_TEMP_DIR""_enc" ]]; then
-    echo "Removing $BCM_TEMP_DIR""_enc"
-    rm -rf "$BCM_TEMP_DIR""_enc"
+if [[ -d "$BCM_WORKING_DIR""_enc" ]]; then
+    echo "Removing $BCM_WORKING_DIR""_enc"
+    rm -rf "$BCM_WORKING_DIR""_enc"
 fi

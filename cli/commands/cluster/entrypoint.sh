@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -64,11 +64,6 @@ if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
     exit
 fi
 
-if [[ $BCM_CLUSTER_NAME == "local" ]]; then
-    echo "ERROR: BCM_CLUSTER_NAME was not defined. Set the cluster name with '--cluster-name='"
-    exit
-fi
-
 if [[ "$BCM_CLI_VERB" == "list" ]]; then
     if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
         if lxc info | grep -q "server_clustered: true"; then
@@ -82,6 +77,11 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
     exit
 fi
 
+if [[ $BCM_CLUSTER_NAME == "local" ]]; then
+    echo "ERROR: BCM_CLUSTER_NAME was not defined. Set the cluster name with '--cluster-name='"
+    exit
+fi
+
 if [[ -z $BCM_SSH_USERNAME ]]; then
     BCM_SSH_USERNAME=bcm
 fi
@@ -91,7 +91,12 @@ if [[ -z $BCM_SSH_HOSTNAME ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    BCM_SSH_KEY_PATH="$BCM_TEMP_DIR/id_rsa_""$BCM_SSH_HOSTNAME"
+    if bcm cluster list | grep -q "bcm-$BCM_CLUSTER_NAME"; then
+        echo "The BCM Cluster 'bcm-$BCM_CLUSTER_NAME' already exists!"
+        exit
+    fi
+    
+    BCM_SSH_KEY_PATH="$BCM_WORKING_DIR/id_rsa_""$BCM_SSH_HOSTNAME"
     # let's generate a temporary SSH key if it doesn't exist.
     if [[ ! -f "$BCM_SSH_KEY_PATH" ]]; then
         # this key is for temporary use and used only during initial provisioning.
@@ -103,12 +108,16 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
         bash -c "$BCM_GIT_DIR/cluster/up_cluster_master.sh --driver=$BCM_DRIVER --cluster-name=$BCM_CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME --ssh-key-path=$BCM_SSH_KEY_PATH"
     else
-        echo "ERROR: BCM Cluster with name 'BCM_CLUSTER_NAME' already exists!"
+        echo "ERROR: BCM cluster 'BCM_CLUSTER_NAME' already exists!"
         exit
     fi
 fi
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
+    if ! bcm cluster list | grep -q "bcm-$BCM_CLUSTER_NAME"; then
+        echo "WARNING: The BCM Cluster 'bcm-$BCM_CLUSTER_NAME' doesn't appear to exist!"
+    fi
+    
     if [[ $BCM_DRIVER == multipass ]]; then
         VM_NAME="bcm-$BCM_CLUSTER_NAME-$(hostname)"
         if multipass list | grep -q "$VM_NAME"; then
@@ -118,7 +127,9 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         fi
         
         multipass purge
-
+        
+        # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
+        ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$VM_NAME"
     fi
     
     # if the LXC remote for the cluster doesn't exist, then we'll state as such and quit.
@@ -143,4 +154,6 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
     if [[ $BCM_DRIVER == multipass ]]; then
         bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
     fi
+    
+    echo "The BCM cluster '$BCM_CLUSTER_NAME' and associated artifacts have been removed."
 fi

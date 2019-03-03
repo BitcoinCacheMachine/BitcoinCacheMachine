@@ -60,10 +60,10 @@ fi
 if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
     torify ssh-copy-id -i "$BCM_SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 else
-    # not let's do an ssh-keyscan so we can get the remote identity added to our ~/.ssh/known_hosts file
+    # not let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
     wait-for-it -t 10 "$BCM_SSH_HOSTNAME:22"
-    ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$HOME/.ssh/known_hosts"
-    ssh-copy-id -i "$BCM_SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+    ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
+    ssh-copy-id -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"

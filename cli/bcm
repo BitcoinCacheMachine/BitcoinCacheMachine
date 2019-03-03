@@ -28,11 +28,14 @@ fi
 #     exit
 # fi
 
-if grep -qs "$BCM_TEMP_DIR" /proc/mounts; then
-    mkdir -p "$BCM_TEMP_DIR""_enc"
-    mkdir -p "$BCM_TEMP_DIR"
-    encfs "$BCM_TEMP_DIR""_enc" "$BCM_TEMP_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN" >> /dev/null
+if grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
+    mkdir -p "$BCM_WORKING_DIR""_enc"
+    mkdir -p "$BCM_WORKING_DIR"
+    encfs "$BCM_WORKING_DIR""_enc" "$BCM_WORKING_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN" >> /dev/null
 fi
+
+mkdir -p "$BCM_SSH_DIR"
+mkdir -p "$BCM_WORKING_DIR"
 
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

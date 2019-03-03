@@ -6,8 +6,9 @@ export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 
 BCM_RUNTIME_DIR="$HOME/.bcm"
 export BCM_PRIVATE_REGISTRY="bcm-gateway-01:5010"
-export SSH_DIR="$BCM_RUNTIME_DIR/ssh"
-export BCM_TEMP_DIR="$BCM_RUNTIME_DIR/tmp"
+export BCM_SSH_DIR="$BCM_RUNTIME_DIR/ssh"
+export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/bcm"
+export BCM_KNOWN_HOSTS_FILE="$HOME/.ssh/known_hosts"
 
 GNUPGHOME="$BCM_RUNTIME_DIR/gnupg"
 PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/password_store"
@@ -17,7 +18,7 @@ PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/password_store"
 if [[ $BCM_ACTIVE == 0 ]]; then
 	GNUPGHOME="$HOME/.gnupg"
 	PASSWORD_STORE_DIR="$HOME/.password_store"
-	SSH_DIR="$HOME/.ssh"
+	BCM_SSH_DIR="$HOME/.ssh"
 fi
 
 export GNUPGHOME="$GNUPGHOME"

@@ -47,9 +47,6 @@ if lxc remote list --format csv | grep -q "bcm-$BCM_CLUSTER_NAME"; then
     lxc remote remove "bcm-$BCM_CLUSTER_NAME"
 fi
 
-# remove the entry for the host in your ~/.ssh/known_hosts
-ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$BCM_SSH_HOSTNAME"
-
-if [[ -d "$BCM_TEMP_DIR/$BCM_CLUSTER_NAME" ]]; then
-    rm -rf "${BCM_TEMP_DIR:?}/$BCM_CLUSTER_NAME"
+if [[ -d "$BCM_WORKING_DIR/$BCM_CLUSTER_NAME" ]]; then
+    rm -rf "${BCM_WORKING_DIR:?}/$BCM_CLUSTER_NAME"
 fi

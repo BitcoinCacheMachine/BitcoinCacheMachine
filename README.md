@@ -28,7 +28,8 @@ Here are some of the development goals for Bitcoin Cache Machine:
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
 * Require hardware wallets for cryptographic operations (PGP, SSH, and Bitcoin transactions).
 * Pre-configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.).
-* Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications, etc...
+* Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications.
+* Enhance overall security and performance and network health by running a Tor middle relay and serving bitcoin blocks over Tor.
 
 ## How to Run Bitcoin Cache Machine
 

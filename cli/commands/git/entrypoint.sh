@@ -144,7 +144,7 @@ if [[ $BCM_CLI_VERB == "push" ]]; then
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
     sudo docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
-    -v "$SSH_DIR":/root/.ssh \
+    -v "$BCM_SSH_DIR":/root/.ssh \
     -v "$GIT_REPO_DIR":/gitrepo \
     -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
     -e SSH_USERNAME="$SSH_USERNAME" \

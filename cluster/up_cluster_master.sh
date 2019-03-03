@@ -84,7 +84,7 @@ fi
 
 # generate Trezor-backed SSH keys for interactively login.
 #SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"
-bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push
+bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --push --ssh-key-path="$BCM_SSH_KEY_PATH"
 
 # since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
 LXD_CERT_FILE="$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd.cert"
@@ -105,7 +105,7 @@ if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
     torify scp -i "$BCM_SSH_KEY_PATH" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
     torify scp -i "$BCM_SSH_KEY_PATH" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
     torify ssh -i "$BCM_SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
-    torify ssh -i "$BCM_SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "env BCM_TEMP_DIR=$BCM_TEMP_DIR $REMOTE_MOUNTPOINT/endpoint_provision.sh"
+    torify ssh -i "$BCM_SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "env BCM_WORKING_DIR=$BCM_WORKING_DIR $REMOTE_MOUNTPOINT/endpoint_provision.sh"
     torify wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
 else
     ssh -i "$BCM_SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- mkdir -p "$REMOTE_MOUNTPOINT"
@@ -134,5 +134,3 @@ echo "Consider adding hosts to your new cluster with 'bcm cluster add' (TODO). T
 echo ""
 echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"
 
-rm -f "$BCM_TEMP_DIR/id_rsa_$BCM_SSH_HOSTNAME"
-rm -f "$BCM_TEMP_DIR/id_rsa_$BCM_SSH_HOSTNAME.pub"
