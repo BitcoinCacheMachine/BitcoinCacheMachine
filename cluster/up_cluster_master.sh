@@ -42,8 +42,6 @@ done
 # exist and we need to create it via multipass. Once there's an SSH service available
 # on that endpoint, we can continue.
 if [[ $BCM_DRIVER == multipass ]]; then
-    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_multipass_install.sh"
-    
     BCM_SSH_USERNAME="bcm"
     BCM_SSH_HOSTNAME="bcm-$BCM_CLUSTER_NAME-$(hostname)"
     

@@ -39,6 +39,16 @@ else
     fi
 fi
 
+if [ -z ${BCM_SSH_DIR+x} ]; then
+    echo "  --BCM_SSH_DIR:           N/A";
+else
+    if [[ -d $BCM_SSH_DIR ]]; then
+        echo "  --BCM_SSH_DIR:                $BCM_SSH_DIR"
+    else
+        echo "  --BCM_SSH_DIR:         N/A"
+    fi
+fi
+
 echo "  --BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "  --BCM_DEBUG:                  $BCM_DEBUG"
 
@@ -68,3 +78,6 @@ else
     echo "  --DOCKER_IMAGE_CACHE:         $DOCKER_IMAGE_CACHE";
 fi
 
+echo ""
+echo "Local multipass VMs:"
+multipass list

@@ -89,13 +89,13 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
                     if [[ -f $BCM_SSH_KEY_PATH ]]; then
                         cat "$PUB_KEY_PATH" | ssh -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a /home/bcm/.ssh/authorized_keys
                         
-                        #REMOVE ALL OTHER KEYS EXCEPT THE NEW ONE
-                        # we're going to remove the SSH PUBKEY from BCM_SSH_KEY_PATH from the authorized_keys
-                        # file on the remote host. Then we're going to delete
-                        cat "$BCM_SSH_KEY_PATH.pub" | ssh -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" 'cat >> /home/bcm/.ssh/authorized_keys'
+                        # # #REMOVE ALL OTHER KEYS EXCEPT THE NEW ONE
+                        # # # we're going to remove the SSH PUBKEY from BCM_SSH_KEY_PATH from the authorized_keys
+                        # # # file on the remote host. Then we're going to delete
+                        # cat "$PUB_KEY_PATH" | ssh -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" 'cat > /home/bcm/.ssh/authorized_keys'
                         
-                        rm -f "BCM_SSH_KEY_PATH"
-                        rm -f "$BCM_SSH_KEY_PATH.pub"
+                        # rm -f "BCM_SSH_KEY_PATH"
+                        # rm -f "$BCM_SSH_KEY_PATH.pub"
                         
                         # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
                         ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$SSH_HOSTNAME"
@@ -103,6 +103,8 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
                         # new key is up there, now let's do a ssh-keyscan from our SDN controller
                         # so we won't get any annoying warnings about keys changing.
                         ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
+                        
+                        exit
                     fi
                 fi
             fi

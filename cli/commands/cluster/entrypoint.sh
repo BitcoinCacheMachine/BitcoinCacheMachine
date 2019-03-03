@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -62,6 +62,10 @@ fi
 if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
     echo "ERROR: BCM Cluster driver MUST be 'ssh' or 'multipass'."
     exit
+fi
+
+if [[ $BCM_DRIVER == "multipass" ]]; then
+    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_multipass_install.sh"
 fi
 
 if [[ "$BCM_CLI_VERB" == "list" ]]; then
