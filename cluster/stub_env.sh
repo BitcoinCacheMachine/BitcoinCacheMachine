@@ -7,6 +7,7 @@ IS_MASTER=0
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
 BCM_SSH_KEY_PATH=
+BCM_DRIVER=ssh
 
 for i in "$@"; do
     case $i in
@@ -24,6 +25,10 @@ for i in "$@"; do
         ;;
         --ssh-key-path=*)
             BCM_SSH_KEY_PATH="${i#*=}"
+            shift # past argument=value
+        ;;
+        --driver=*)
+            BCM_DRIVER="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -70,6 +75,18 @@ BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
 export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
 export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
+
+MACVLAN_INTERFACE=
+if [[ $BCM_DRIVER == "multipass" ]]; then
+    MACVLAN_INTERFACE=ens3
+fi
+
+PHYSICAL_UNDERLAY_INTERFACE=
+OUTSIDE_INTERFACE=
+
+export MACVLAN_INTERFACE="$MACVLAN_INTERFACE"
+export PHYSICAL_UNDERLAY_INTERFACE="$PHYSICAL_UNDERLAY_INTERFACE"
+export OUTSIDE_INTERFACE="$OUTSIDE_INTERFACE"
 
 if [ $IS_MASTER -eq 1 ]; then
     envsubst <./envtemplates/master_defaults.env >"$ENV_FILE"

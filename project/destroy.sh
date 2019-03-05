@@ -3,10 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-
 source ./env
 
-DELETE_BCM_IMAGE=1
+DELETE_BCM_IMAGE=0
 DELETE_LXC_BASE=0
 
 for i in "$@"; do
@@ -30,6 +29,7 @@ for i in "$@"; do
     esac
 done
 
+# shellcheck disable=2129
 bcm tier remove bitcoin >>/dev/null
 
 bcm tier remove ui >>/dev/null

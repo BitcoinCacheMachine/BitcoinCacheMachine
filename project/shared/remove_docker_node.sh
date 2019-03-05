@@ -27,14 +27,13 @@ if lxc list --format csv | grep "RUNNING" | grep -q "bcm-gateway-01"; then
     
     
     # delete the node IDs matching the NODE_NAME var.
-    RESULT="$(lxc exec bcm-gateway-01 -- docker node ls --format '{{.ID}},{{.Hostname}}')"
-    NODE_ID=
-    NODE_ID="$(echo "$RESULT" | grep "$NODE_NAME" | cut -d: -f1)"
+    RESULT="$(lxc exec bcm-gateway-01 -- docker node ls --format '{{.ID}},{{.Hostname}}' | grep "$NODE_NAME" | cut -d: -f1)"
+    NODE_ID="$(echo "$RESULT" | grep "$NODE_NAME" )"
     
     if [[ ! -z $NODE_ID ]]; then
         # we would only perform this step if we're not removing the last node.
         if ! echo "$RESULT" | grep -q bcm-gateway-01; then
-            lxc exec bcm-gateway-01 -- docker node rm "$NODE_ID" --force
+            lxc exec bcm-gateway-01 -- docker node remove "$NODE_ID" --force
         fi
     fi
 fi

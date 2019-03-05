@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # the base project
@@ -14,7 +14,6 @@ for i in "$@"; do
         ;;
     esac
 done
-
 
 # let's make sure the cluster name is set.
 if [[ -z "$BCM_PROJECT_NAME" ]]; then

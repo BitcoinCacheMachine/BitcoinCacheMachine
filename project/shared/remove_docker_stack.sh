@@ -28,7 +28,7 @@ if lxc list --format csv | grep -q "bcm-gateway-01"; then
     fi
     
     if lxc exec bcm-gateway-01 -- docker stack ls --format "{{.Name}}" | grep -q "$STACK_NAME"; then
-        lxc exec bcm-gateway-01 -- docker stack rm "$STACK_NAME"
-        sleep 2
+        lxc exec bcm-gateway-01 -- docker stack remove "$STACK_NAME"
+        sleep 5
     fi
 fi

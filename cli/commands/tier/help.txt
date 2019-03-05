@@ -1,5 +1,11 @@
 Description:
-  Create (deploy) or destroy a BCM tier.
+  Create/provision and remove/deprovision a BCM tier to your active BCM cluster.
+
+Available Commands:
+  create    Deploy a BCM system container tier from your cluster.
+  remove    Remove a BCM system container tier from your cluster.
 
 Usage:
-  bcm deploy create|destroy TIER_NAME
+  bcm deploy COMMAND TIER_NAME
+
+Note: TIER_NAME can be 'bitcoin', 'ui', 'kafka', or 'gateway'.

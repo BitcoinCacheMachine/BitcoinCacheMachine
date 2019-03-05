@@ -1,10 +1,18 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# ensure gateway tier is up.
-bash -c "$BCM_GIT_DIR/project/tiers/gateway/up.sh"
+# don't even think about proceeding unless the gateway BCM tier is up and running.
+if bcm tier list | grep -q kafka; then
+    echo "The 'kafka' tier is already provisioned."
+    exit
+fi
+
+# don't even think about proceeding unless the gateway BCM tier is up and running.
+if ! bcm tier list | grep -q gateway; then
+    bcm tier create gateway
+fi
 
 # shellcheck disable=1091
 source ./params.sh "$@"

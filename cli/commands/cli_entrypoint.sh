@@ -78,12 +78,14 @@ if [[ "$BCM_CLI_COMMAND" == "ssh" ]]; then
     exit
 fi
 
-# all the command below REQUIRE a HTTPS LXD endpoint. Stop here if the local LXD client doesn't have one configured.
-# this also applies to locally installed LXD instances; we ALWAYS deploy against HTTPS (no unix socket).
-if [[ "$(lxc remote get-default)" == "local" ]]; then
-    echo "ERROR: LXC remote is set to local. ALL BCM activities are performed over HTTPS (even for local/standalone installs)."
-    echo "   --- Consider creating a BCM cluster using 'bcm cluster create'."
-    exit
+if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
+    ./show.sh
+fi
+
+# if the current cluster is not configured, let's bring it into existence.
+# a working cluster is required for all subsequent commands.
+if [[ $(lxc remote get-default) == "local" ]]; then
+    bcm cluster create
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
@@ -92,10 +94,6 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
     ./stack/entrypoint.sh "$@"
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
-    ./show.sh
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" ]]; then

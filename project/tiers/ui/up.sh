@@ -3,7 +3,10 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-bash -c "$BCM_GIT_DIR/project/tiers/kafka/up.sh"
+# don't even think about proceeding unless the gateway BCM tier is up and running.
+if ! bcm tier list | grep -q kafka; then
+    bcm tier create kafka
+fi
 
 # shellcheck disable=SC1091
 source ./env
@@ -28,3 +31,4 @@ fi
 if [[ $BCM_DEPLOY_STACK_KAFKACONTROLCENTER == 1 ]]; then
     bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkacontrolcenter/env"
 fi
+

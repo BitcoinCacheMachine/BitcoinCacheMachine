@@ -53,28 +53,15 @@ for endpoint in $(bcm cluster list --endpoints); do
     # using MACVLAN to expose services to the physical network underlay
     if [[ $BCM_TIER_TYPE == 2 ]]; then
         # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
-        # shellcheck disable=1090
-        
-        VALID=0
-        while [[ "$VALID" == 0 ]]
-        do
-            BCM_LXD_PHYSICAL_INTERFACE=
-            lxc network list --format csv | grep physical | cut -d, -f1
-            
-            # TODO Do some error checking on network interface selection.
-            read -rp "Please enter the physical network interface that you want to expose network services on (i.e., data path):  " BCM_LXD_PHYSICAL_INTERFACE
-            
-            if lxc network list --format csv | grep physical | grep -q "$BCM_LXD_PHYSICAL_INTERFACE"; then
-                lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$BCM_LXD_PHYSICAL_INTERFACE"
-                VALID=1
-            else
-                echo "Invalid entry. Please try again."
-            fi
-        done
+        if lxc network list --format csv | grep physical | grep -q "$MACVLAN_INTERFACE"; then
+            lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$MACVLAN_INTERFACE"
+        fi        
     fi
     
-    # let's bring up the host then wait for dockerd to start.
-    lxc start "$HOSTNAME"
+    if lxc list --format csv --columns ns | grep "$HOSTNAME" | grep -q "STOPPED"; then
+        # let's bring up the host then wait for dockerd to start.
+        lxc start "$HOSTNAME"
+    fi
     
     bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
     
@@ -82,12 +69,15 @@ for endpoint in $(bcm cluster list --endpoints); do
     # all nodes from this script are workers. Manager hosts are implemented
     # outside this script (see gateway).
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
-        lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:2377
-        lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:5000
-        lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
+        if lxc exec bcm-kafka-01 -- docker info | grep "Swarm: " | grep -q "inactive"; then
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:2377
+            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:5000
+            lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
+        fi
     fi
 done
 
+# let's call a Tier-specific up script if there is one.
 if [[ -f "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/up.sh" ]]; then
     bash -c "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/up.sh"
 fi

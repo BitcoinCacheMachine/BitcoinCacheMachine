@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -87,7 +87,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
                 # we assume here that we have an SSH connection to push an AUTHORIZED_KEYS entry.
                 if [[ ! -z $BCM_SSH_KEY_PATH ]]; then
                     if [[ -f $BCM_SSH_KEY_PATH ]]; then
-                        cat "$PUB_KEY_PATH" | ssh -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a /home/bcm/.ssh/authorized_keys
+                        ssh -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a /home/bcm/.ssh/authorized_keys < "$PUB_KEY_PATH"
                         
                         # # #REMOVE ALL OTHER KEYS EXCEPT THE NEW ONE
                         # # # we're going to remove the SSH PUBKEY from BCM_SSH_KEY_PATH from the authorized_keys
@@ -98,7 +98,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
                         # rm -f "$BCM_SSH_KEY_PATH.pub"
                         
                         # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
-                        ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$SSH_HOSTNAME"
+                        ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$SSH_HOSTNAME"  >> /dev/null
                         
                         # new key is up there, now let's do a ssh-keyscan from our SDN controller
                         # so we won't get any annoying warnings about keys changing.

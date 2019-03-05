@@ -43,7 +43,7 @@ done
 # on that endpoint, we can continue.
 if [[ $BCM_DRIVER == multipass ]]; then
     BCM_SSH_USERNAME="bcm"
-    BCM_SSH_HOSTNAME="bcm-$BCM_CLUSTER_NAME-$(hostname)"
+    BCM_SSH_HOSTNAME="bcm-$BCM_CLUSTER_NAME"
     
     bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME --ssh-key-path=$BCM_SSH_KEY_PATH"
     
@@ -78,7 +78,7 @@ if [[ $BCM_SSH_USERNAME == "bcm" ]]; then
 fi
 
 # let's mount the directory via sshfs. This contains the lxd seed file.
-./stub_env.sh --endpoint-name="$BCM_ENDPOINT_NAME" --master --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME" --ssh-key-path="$BCM_SSH_KEY_PATH"
+./stub_env.sh --endpoint-name="$BCM_ENDPOINT_NAME" --master --ssh-username="$BCM_SSH_USERNAME" --ssh-hostname="$BCM_SSH_HOSTNAME" --ssh-key-path="$BCM_SSH_KEY_PATH" --driver="$BCM_DRIVER"
 
 # generate Trezor-backed SSH keys for interactively login.
 #SSH_IDENTITY="$BCM_SSH_USERNAME"'@'"$BCM_SSH_HOSTNAME"

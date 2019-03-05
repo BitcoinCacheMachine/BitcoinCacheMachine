@@ -6,7 +6,7 @@
 
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install -y tor openssh-server avahi-daemon
+sudo apt-get install -y tor openssh-server avahi-daemon stubby
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 

@@ -4,10 +4,9 @@ Description:
 Usage:
   bcm stack [COMMAND]
 
-COMMANDS:
+Available Commands:
   deploy    Deploy a BCM stack to the existing cluster.
   remove    Remove a deployed stack from a cluster. Note that this ONLY 
             removes the specified component and NOT any of its dependencies.
   list      List currently deployed stacks.
   clear     Removes all app-level containers, leaving critical data center components.
-

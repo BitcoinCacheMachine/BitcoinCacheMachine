@@ -16,7 +16,7 @@ for i in "$@"; do
     esac
 done
 
-echo "Polling for dockerd on LXC host '$LXC_HOST'."
+echo "Waiting for dockerd on LXC host '$LXC_HOST'."
 
 if lxc list | grep -q "$LXC_HOST"; then
     while true; do
@@ -28,4 +28,6 @@ if lxc list | grep -q "$LXC_HOST"; then
             printf "."
         fi
     done
+    
+    echo ""
 fi

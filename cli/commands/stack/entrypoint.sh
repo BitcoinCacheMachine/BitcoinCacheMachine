@@ -47,6 +47,11 @@ function validateStackParam(){
     fi
 }
 
+# make sure we have a cluster!  If not, create one.
+if bcm info | grep "LXD Remote: " | cut -d ":" -f 2 | xargs | grep -q "Not set."; then
+    echo "A cluster was not found. BCM will attempt to create one."
+    bcm cluster create
+fi
 
 # this is a list of stacks that we can deploy
 # corresponds to directories in $BCM_STACK_DIR
