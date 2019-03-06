@@ -22,4 +22,4 @@ if [[ $BCM_DEPLOY_STACK_KAFKACONTROLCENTER == 1 ]]; then
     bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=kafkacontrolcenter"
 fi
 
-bash -c "$BCM_GIT_DIR/project/tiers/remove_tier.sh --tier-name=ui"
+bash -c "$BCM_GIT_DIR/project/shared/remove_tier.sh --tier-name=ui"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 ZOOKEEPER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-zookeeper:3.4.13"

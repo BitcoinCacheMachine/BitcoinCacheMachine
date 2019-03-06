@@ -2,8 +2,9 @@ Description:
   Create/provision and remove/deprovision a BCM tier to your active BCM cluster.
 
 Available Commands:
-  create    Deploy a BCM system container tier from your cluster.
-  remove    Remove a BCM system container tier from your cluster.
+  create    Deploy a BCM system container tier from your data center.
+  remove    Remove a BCM system container tier from your data center.
+  list      List BCM tiers that are currently provisioned to your data center.
 
 Usage:
   bcm deploy COMMAND TIER_NAME

@@ -14,6 +14,9 @@ if ! bcm tier list | grep -q gateway; then
     bcm tier create gateway
 fi
 
+# Let's provision the system containers to the cluster.
+bash -c "$BCM_GIT_DIR/project/shared/create_tier.sh --tier-name=kafka"
+
 # shellcheck disable=1091
 source ./params.sh "$@"
 
@@ -25,7 +28,7 @@ export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
 
 # shellcheck disable=SC1091
 source ./zookeeper/get_env.sh
-bash -c "./zookeeper/up_lxc_zookeeper.sh"
+bash -c "./zookeeper/up.sh"
 
 export ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT"
 export ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS"

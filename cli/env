@@ -4,10 +4,10 @@ export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
 export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 
-BCM_RUNTIME_DIR="$HOME/.bcm"
+export BCM_RUNTIME_DIR="$HOME/.bcm"
 export BCM_PRIVATE_REGISTRY="bcm-gateway-01:5010"
 export BCM_SSH_DIR="$HOME/.ssh"
-export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/bcm"
+export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/clusters"
 export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 
 GNUPGHOME="$BCM_RUNTIME_DIR/gnupg"
@@ -16,9 +16,9 @@ PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/password_store"
 # when the user sets this to 1, we will use their ~/.gnupg and ~/.ssh and ~/.password_store directories
 # instead of the BCM defaults under BCM_RUNTIME_DIR
 if [[ $BCM_ACTIVE == 0 ]]; then
-	GNUPGHOME="$HOME/.gnupg"
-	PASSWORD_STORE_DIR="$HOME/.password_store"
-	BCM_SSH_DIR="$HOME/.ssh"
+    GNUPGHOME="$HOME/.gnupg"
+    PASSWORD_STORE_DIR="$HOME/.password_store"
+    BCM_SSH_DIR="$HOME/.ssh"
 fi
 
 export GNUPGHOME="$GNUPGHOME"

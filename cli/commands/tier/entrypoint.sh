@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -35,35 +35,35 @@ if [ -z "${TIER_NAME}" ]; then
     echo "Please specify a BCM tier."
     cat ./help.txt
     exit
-    elif [[ $BCM_CLI_VERB == "create" ]]; then
-    if bcm tier list | grep -q "$TIER_NAME"; then
-        echo "WARNING: BCM tier already exists."
-        exit
-    fi
-    
+fi
+
+if [[ $BCM_CLI_VERB == "create" ]]; then
     if [[ $TIER_NAME == "gateway" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/gateway/up.sh"
-        elif [[ $TIER_NAME == "kafka" ]]; then
+    fi
+    
+    if [[ $TIER_NAME == "kafka" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/kafka/up.sh"
-        elif [[ $TIER_NAME == "ui" ]]; then
+    fi
+    
+    if [[ $TIER_NAME == "ui" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/ui/up.sh"
-        elif  [[ $TIER_NAME == "bitcoin" ]]; then
+    fi
+    
+    if  [[ $TIER_NAME == "bitcoin" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
     fi
 fi
 
 if [[ $BCM_CLI_VERB == "remove" ]]; then
-    if bcm tier list | grep -q "$TIER_NAME"; then
-        if [[ $TIER_NAME == "gateway" ]]; then
-            bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
-            elif [[ $TIER_NAME == "kafka" ]]; then
-            bash -c "$BCM_GIT_DIR/project/tiers/kafka/destroy.sh"
-            elif [[ $TIER_NAME == "ui" ]]; then
-            bash -c "$BCM_GIT_DIR/project/tiers/ui/destroy.sh"
-            elif  [[ $TIER_NAME == "bitcoin" ]]; then
-            bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/destroy.sh"
-        fi
-        
+    if [[ $TIER_NAME == "gateway" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
+        elif [[ $TIER_NAME == "kafka" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/kafka/destroy.sh"
+        elif [[ $TIER_NAME == "ui" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/ui/destroy.sh"
+        elif  [[ $TIER_NAME == "bitcoin" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/destroy.sh"
     fi
 fi
 

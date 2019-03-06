@@ -18,7 +18,7 @@ profiles:
   name: bcm_default
 cluster:
   enabled: true
-  server_name: $BCM_ENDPOINT_NAME
+  server_name: $BCM_SSH_HOSTNAME
   cluster_address: $BCM_CLUSTER_MASTER_ENDPOINT_IP:8443
   cluster_certificate: "$BCM_LXD_CLUSTER_CERTIFICATE
 "

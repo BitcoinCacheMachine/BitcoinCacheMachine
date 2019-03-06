@@ -22,13 +22,6 @@ if [[ -z $BCM_TIER_NAME ]]; then
     exit
 fi
 
-export "BCM_TIER_NAME=$BCM_TIER_NAME"
-
-# Call the tier specific destroy script, if any.
-if [[ -f "./$BCM_TIER_NAME/destroy.sh" ]]; then
-    bash -c "./$BCM_TIER_NAME/destroy.sh"
-fi
-
 # iterate over endpoints and delete actual LXC hosts.
 for LXD_ENDPOINT in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$LXD_ENDPOINT" | tail -c 2)
@@ -40,7 +33,7 @@ for LXD_ENDPOINT in $(bcm cluster list --endpoints); do
     fi
     
     bash -c "$BCM_LXD_OPS/delete_lxc_container.sh --container-name=$LXC_HOST"
-    bash -c "$BCM_LXD_OPS/delete_cluster_dockerdisk.sh --container-name=$LXC_HOST --endpoint=$LXD_ENDPOINT"
+    bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$LXC_HOST --endpoint=$LXD_ENDPOINT"
 done
 
 PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'

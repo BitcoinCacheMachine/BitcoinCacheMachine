@@ -3,17 +3,18 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1091
-source ./env
-
-BCM_CLUSTER_NAME=$(lxc remote get-default)
+ENDPOINT_DIR=
+CLUSTER_NAME=$(lxc remote get-default)
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
+
+# shellcheck disable=SC1091
+source ./env
 
 for i in "$@"; do
     case $i in
         --cluster-name=*)
-            BCM_CLUSTER_NAME="${i#*=}"
+            CLUSTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
         --ssh-username=*)
@@ -23,6 +24,10 @@ for i in "$@"; do
         --ssh-hostname=*)
             BCM_SSH_HOSTNAME="${i#*=}"
             shift # past argument=value
+        ;;
+        --endpoint-dir=*)
+            ENDPOINT_DIR="${i#*=}"
+            shift
         ;;
         *)
             # unknown option
@@ -39,14 +44,14 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
 fi
 
 # if it's the cluster master add the LXC remote so we can manage it.
-if lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
+if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
     echo "Switching lxd remote to local."
     lxc remote switch local
     
-    echo "Removing lxd remote for cluster '$BCM_CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."
-    lxc remote remove "$BCM_CLUSTER_NAME"
+    echo "Removing lxd remote for cluster '$CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."
+    lxc remote remove "$CLUSTER_NAME"
 fi
 
-if [[ -d "$BCM_WORKING_DIR/$BCM_CLUSTER_NAME" ]]; then
-    rm -rf "${BCM_WORKING_DIR:?}/$BCM_CLUSTER_NAME"
+if [[ -d "$BCM_WORKING_DIR/$CLUSTER_NAME" ]]; then
+    rm -rf "${BCM_WORKING_DIR:?}/$CLUSTER_NAME"
 fi

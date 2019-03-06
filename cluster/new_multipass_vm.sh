@@ -13,7 +13,7 @@ MEM_SIZE="4098"
 
 # CPU_COUNT is cores.
 CPU_COUNT=4
-BCM_SSH_KEY_PATH=
+ENDPOINT_DIR=
 
 for i in "$@"; do
     case $i in
@@ -33,8 +33,8 @@ for i in "$@"; do
             CPU_COUNT="${i#*=}"
             shift # past argument=value
         ;;
-        --ssh-key-path=*)
-            BCM_SSH_KEY_PATH="${i#*=}"
+        --endpoint-dir=*)
+            ENDPOINT_DIR="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -48,25 +48,31 @@ if [[ -z $VM_NAME ]]; then
     exit
 fi
 
+if [[ -f "$ENDPOINT_DIR/id_rsa" ]]; then
+    SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+else
+    echo "ERROR: '$ENDPOINT_DIR/id_rsa' does not exist!"
+    exit
+fi
+
 echo "Creating a new multipass VM with the following resources:"
 
 echo "VM_NAME:  $VM_NAME"
 echo "DISK_SIZE $DISK_SIZE"
 echo "MEM_SIZE: $MEM_SIZE"
 echo "CPU_COUNT: $CPU_COUNT"
-echo "BCM_SSH_KEY_PATH: $BCM_SSH_KEY_PATH"
 
 # we need to update the cloud-init to include the bcm user and it's associated SSH key.
 # we'll create a temporary one here. It'll get purged AFTER the `bcm cluster create` process
 # when the Trezor SSH keys are placed up there.
 
 # generate the custom cloud-init file.
-SSH_AUTHORIZED_KEY=$(<"$BCM_SSH_KEY_PATH.pub")
+SSH_AUTHORIZED_KEY=$(<"$SSH_KEY_PATH.pub")
 export SSH_AUTHORIZED_KEY="$SSH_AUTHORIZED_KEY"
-envsubst <./cloud_init_template.yml >"$BCM_WORKING_DIR/cloud-init_bcm_""$VM_NAME.yml"
+envsubst <./cloud_init_template.yml >"$ENDPOINT_DIR/cloud-init.yml"
 
 # launch the new VM with the custom cloud-init.
-multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$BCM_WORKING_DIR/cloud-init_bcm_""$VM_NAME.yml" bionic
+multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$ENDPOINT_DIR/cloud-init.yml" bionic
 
 multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
 
@@ -82,4 +88,4 @@ bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
 # let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
 ssh-keyscan -H "$VM_NAME" >> "$BCM_KNOWN_HOSTS_FILE"
 
-rm -rf "$BCM_WORKING_DIR/cloud-init_bcm_""$VM_NAME.yml"
+rm -rf "$ENDPOINT_DIR/cloud-init.yml"

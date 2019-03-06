@@ -1,13 +1,14 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
-BCM_SSH_KEY_PATH=
+SSH_KEY_PATH=
 BCM_DRIVER=ssh
+ENDPOINT_DIR=
 
 for i in "$@"; do
     case $i in
@@ -23,8 +24,8 @@ for i in "$@"; do
             BCM_SSH_HOSTNAME="${i#*=}"
             shift # past argument=value
         ;;
-        --ssh-key-path=*)
-            BCM_SSH_KEY_PATH="${i#*=}"
+        --endpoint-dir=*)
+            ENDPOINT_DIR="${i#*=}"
             shift # past argument=value
         ;;
         --driver=*)
@@ -47,28 +48,29 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     exit
 fi
 
-ENDPOINT_DIR="$TEMP_DIR/$BCM_ENDPOINT_NAME"
-mkdir -p "$ENDPOINT_DIR"
-touch "$ENV_FILE"
+if [[ ! -d "$ENDPOINT_DIR" ]]; then
+    echo "ERROR: ENDPOINT_DIR does not exist."
+    exit
+fi
 
-# generate an LXD secret for the new VM lxd endpoint.
-export BCM_ENDPOINT_NAME="$BCM_ENDPOINT_NAME"
 
 # if the user override the keypath, we will use that instead.
-if [[ ! -f $BCM_SSH_KEY_PATH ]]; then
-    BCM_SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+# the key already exists if it's a multipass VM. If we're provisioning a new
+# remote SSH host, we would have to generate a new one.
+SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+if [[ ! -f $SSH_KEY_PATH ]]; then
     # this key is for temporary use and used only during initial provisioning.
-    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$BCM_SSH_KEY_PATH" -N ""
-    chmod 400 "$BCM_SSH_KEY_PATH.pub"
+    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_PATH" -N ""
+    chmod 400 "$SSH_KEY_PATH.pub"
 fi
 
 if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
-    torify ssh-copy-id -i "$BCM_SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+    torify ssh-copy-id -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 else
     # not let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
     wait-for-it -t 10 "$BCM_SSH_HOSTNAME:22"
     ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
-    ssh-copy-id -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+    ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
@@ -88,19 +90,19 @@ export MACVLAN_INTERFACE="$MACVLAN_INTERFACE"
 export PHYSICAL_UNDERLAY_INTERFACE="$PHYSICAL_UNDERLAY_INTERFACE"
 export OUTSIDE_INTERFACE="$OUTSIDE_INTERFACE"
 
+touch "$ENDPOINT_DIR/env"
 if [ $IS_MASTER -eq 1 ]; then
     envsubst <./envtemplates/master_defaults.env >"$ENV_FILE"
     elif [ $IS_MASTER -ne 1 ]; then
     envsubst <./envtemplates/member_defaults.env >"$ENV_FILE"
 else
-    echo "Incorrect usage. Please specify whether $BCM_ENDPOINT_NAME is an LXD cluster master or member."
+    echo "Incorrect usage. Please specify whether '$BCM_SSH_HOSTNAME' is an LXD cluster master or member."
 fi
 
 if [ $IS_MASTER -eq 1 ]; then
-    envsubst <./lxd_preseed/lxd_master_preseed.yml >"$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd_preseed.yml"
-    #bcm pass insert --name="$BCM_CLUSTER_NAME/$BCM_ENDPOINT_NAME/lxd_preseed.yml"
+    envsubst <./lxd_preseed/lxd_master_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
     elif [ $IS_MASTER -ne 1 ]; then
-    envsubst <./lxd_preseed/lxd_member_preseed.yml >"$TEMP_DIR/$BCM_ENDPOINT_NAME/lxd_preseed.yml"
+    envsubst <./lxd_preseed/lxd_member_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
 else
-    echo "Incorrect usage. Please specify whether $BCM_ENDPOINT_NAME is an LXD cluster master or member."
+    echo "Incorrect usage. Please specify whether '$BCM_SSH_HOSTNAME' is an LXD cluster master or member."
 fi

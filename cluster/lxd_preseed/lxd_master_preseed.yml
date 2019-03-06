@@ -17,6 +17,6 @@ profiles:
       type: disk
   name: bcm_default
 cluster:
-  server_name: $BCM_ENDPOINT_NAME
+  server_name: $BCM_SSH_HOSTNAME
   enabled: true
 

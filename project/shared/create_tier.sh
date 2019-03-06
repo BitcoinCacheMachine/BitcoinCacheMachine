@@ -37,25 +37,26 @@ for endpoint in $(bcm cluster list --endpoints); do
     HOSTNAME="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
     
     # each tier has a specific daemon.json config
-    lxc file push "./$BCM_TIER_NAME/daemon.json" "$HOSTNAME/etc/docker/daemon.json"
+    lxc file push "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/daemon.json" "$HOSTNAME/etc/docker/daemon.json"
     
     # each tier can have a specific dhcp conf file, but it's optional due to default behavior.
-    DHCPD_CONF_FILE="./$BCM_TIER_NAME/dhcp_conf.yml"
+    DHCPD_CONF_FILE="$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/dhcp_conf.yml"
     if [[ -f "$DHCPD_CONF_FILE" ]]; then
         lxc file push "$DHCPD_CONF_FILE" "$HOSTNAME/etc/netplan/10-lxc.yaml"
     fi
     
     # let's source the tier and get required config variables.
     # shellcheck disable=1090
-    source "./$BCM_TIER_NAME/env"
+    source "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/env"
     
     # TIER_TYPE of value 2 means one interface (eth1) in container is
     # using MACVLAN to expose services to the physical network underlay
     if [[ $BCM_TIER_TYPE == 2 ]]; then
         # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
         if lxc network list --format csv | grep physical | grep -q "$MACVLAN_INTERFACE"; then
+            source $
             lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$MACVLAN_INTERFACE"
-        fi        
+        fi
     fi
     
     if lxc list --format csv --columns ns | grep "$HOSTNAME" | grep -q "STOPPED"; then
@@ -76,8 +77,3 @@ for endpoint in $(bcm cluster list --endpoints); do
         fi
     fi
 done
-
-# let's call a Tier-specific up script if there is one.
-if [[ -f "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/up.sh" ]]; then
-    bash -c "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/up.sh"
-fi

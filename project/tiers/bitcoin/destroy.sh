@@ -8,4 +8,4 @@ if ! bcm tier list | grep -q gateway; then
     bcm tier create gateway
 fi
 
-bash -c "$BCM_GIT_DIR/project/tiers/remove_tier.sh --tier-name=bitcoin"
+bash -c "$BCM_GIT_DIR/project/shared/remove_tier.sh --tier-name=bitcoin"
