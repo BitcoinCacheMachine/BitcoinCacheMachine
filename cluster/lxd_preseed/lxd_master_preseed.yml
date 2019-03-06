@@ -17,6 +17,6 @@ profiles:
       type: disk
   name: bcm_default
 cluster:
-  server_name: $BCM_SSH_HOSTNAME
+  server_name: $LXD_SERVER_NAME
   enabled: true
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 LXC_HOSTNAME=
 CLUSTER_ENDPOINT=

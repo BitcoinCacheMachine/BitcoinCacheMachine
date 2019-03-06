@@ -10,6 +10,7 @@ config:
           - type: dhcp
             ipv4: true
             control: auto
+            
 description:
 devices:
   eth0:

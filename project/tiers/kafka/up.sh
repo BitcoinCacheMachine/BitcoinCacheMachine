@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # don't even think about proceeding unless the gateway BCM tier is up and running.
@@ -15,7 +15,7 @@ if ! bcm tier list | grep -q gateway; then
 fi
 
 # Let's provision the system containers to the cluster.
-bash -c "$BCM_GIT_DIR/project/shared/create_tier.sh --tier-name=kafka"
+bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=kafka"
 
 # shellcheck disable=1091
 source ./params.sh "$@"

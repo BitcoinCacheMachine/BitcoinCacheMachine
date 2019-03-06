@@ -30,13 +30,13 @@ for i in "$@"; do
 done
 
 # shellcheck disable=2129
-bcm tier remove bitcoin >>/dev/null
+bcm tier remove bitcoin
 
-bcm tier remove ui >>/dev/null
+bcm tier remove ui
 
-bcm tier remove kafka >>/dev/null
+bcm tier remove kafka
 
-bcm tier remove gateway >>/dev/null
+bcm tier remove gateway
 
 # stop bcm-host-template
 if lxc list --format csv | grep "bcm-host-template" | grep -q "RUNNING"; then

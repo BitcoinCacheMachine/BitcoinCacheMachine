@@ -80,6 +80,7 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     ./show.sh
+    exit
 fi
 
 # if the current cluster is not configured, let's bring it into existence.

@@ -1,10 +1,12 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# ensure basic needs are met.
-bash -c "$BCM_GIT_DIR/project/up.sh"
+# only continue if the necessary image exists.
+if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+    bash -c "$BCM_GIT_DIR/project/up.sh"
+fi
 
 # shellcheck disable=SC1091
 source ./env
@@ -34,10 +36,9 @@ lxc exec bcm-gateway-01 -- docker pull registry:latest
 lxc exec bcm-gateway-01 -- docker tag registry:latest bcm-registry:latest
 
 # only do this if the swarm hasn't already been initialized.
-if lxc exec bcm-gateway-01 -- docker info | grep "Swarm: " | grep -q "inactive"; then
-    lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >> /dev/null
-fi
+lxc exec bcm-gateway-01 -- docker swarm init --advertise-addr eth1 >> /dev/null
 
+# upload the docker daemon config to bcm-gateway-01
 lxc file push ./bcm-gateway-01.daemon.json bcm-gateway-01/etc/docker/daemon.json
 
 # restart the host so it runs with new dockerd daemon config.

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -56,24 +56,6 @@ if [[ $BCM_HELP_FLAG == 1 ]]; then
     exit
 fi
 
-# Check to see if the computer has hardware virtualization support. If not, then we
-# switch our driver to SSH.
-if ! lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
-    echo "Your computer does NOT support hardware virtualization. You may need to turn this feature on in the BIOS. BCM will be deployed to your machine in a baremetal configuration."
-    BCM_DRIVER=ssh
-fi
-
-if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
-    echo "ERROR: BCM Cluster driver MUST be 'ssh' or 'multipass'."
-    exit
-fi
-
-if [[ $BCM_DRIVER == "multipass" ]]; then
-    BCM_SSH_HOSTNAME="bcm-$(hostname)"
-    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_multipass_install.sh"
-fi
-
-
 if [[ "$BCM_CLI_VERB" == "list" ]]; then
     if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
         lxc cluster list | grep "$CLUSTER_NAME" | awk '{print $2}'
@@ -84,6 +66,26 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
     
     exit
 fi
+
+if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
+    echo "ERROR: BCM Cluster driver MUST be 'ssh' or 'multipass'."
+    exit
+fi
+
+if [[ $BCM_DRIVER == "multipass" ]]; then
+    # Check to see if the computer has hardware virtualization support. If not, then we
+    # switch our driver to SSH.
+    if ! lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
+        echo "Your computer does NOT support hardware virtualization. You may need to turn this feature on in the BIOS. BCM will be deployed to your machine in a baremetal configuration."
+        BCM_DRIVER=ssh
+    else
+        BCM_SSH_HOSTNAME="bcm-$(hostname)"
+        bash -c "$BCM_GIT_DIR/cli/commands/install/snap_multipass_install.sh"
+    fi
+fi
+
+
+
 
 # if the cluster name is local, then we assume the user hasn't overridden
 # what was set in 'lxc remote get-default'. If so, we will assume a cluster

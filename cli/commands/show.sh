@@ -1,5 +1,12 @@
 #!/bin/bash
 
+set -Eeuo pipefail
+
+if [[ $(lxc remote get-default) == "local" ]]; then
+    echo "ERROR: current LXD remote is set to local. You may need to run 'bcm cluster create'."
+    exit
+fi
+
 echo ""
 echo "LXD system containers:"
 lxc list

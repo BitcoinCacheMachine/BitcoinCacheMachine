@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
@@ -100,6 +100,8 @@ else
 fi
 
 if [ $IS_MASTER -eq 1 ]; then
+    LXD_SERVER_NAME="$BCM_SSH_HOSTNAME-01"
+    export LXD_SERVER_NAME="$LXD_SERVER_NAME"
     envsubst <./lxd_preseed/lxd_master_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
     elif [ $IS_MASTER -ne 1 ]; then
     envsubst <./lxd_preseed/lxd_member_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"

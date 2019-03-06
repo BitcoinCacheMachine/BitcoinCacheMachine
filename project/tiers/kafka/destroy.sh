@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=1091
@@ -33,4 +33,4 @@ bash -c ./broker/destroy_lxc_broker.sh
 bash -c ./zookeeper/destroy.sh
 
 
-bash -c "$BCM_GIT_DIR/project/shared/remove_tier.sh --tier-name=kafka"
+bash -c "$BCM_LXD_OPS/remove_tier.sh --tier-name=kafka"

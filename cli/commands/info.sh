@@ -7,6 +7,7 @@ BCM_CERT_USERNAME=
 BCM_CERT_HOSTNAME=
 BCM_DEFAULT_KEY_ID=
 
+
 echo "ACTIVE_ENVIRONMENT:"
 if [ -z ${GNUPGHOME+x} ]; then
     echo "GNUPGHOME:           N/A";
