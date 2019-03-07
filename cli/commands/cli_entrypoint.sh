@@ -83,11 +83,6 @@ if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     exit
 fi
 
-# if the current cluster is not configured, let's bring it into existence.
-# a working cluster is required for all subsequent commands.
-if [[ $(lxc remote get-default) == "local" ]]; then
-    bcm cluster create
-fi
 
 if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"

@@ -6,27 +6,10 @@ cd "$(dirname "$0")"
 # shellcheck disable=SC1091
 source ./env
 
-CHAIN=
-
-for i in "$@"; do
-    case $i in
-        --chain=*)
-            CHAIN="${i#*=}"
-            shift # past argument=value
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
-done
-
-if [[ -z $CHAIN ]]; then
-    echo "CHAIN not specified. Exiting"
-    exit
-fi
+CHAIN="$BCM_DEFAULT_CHAIN"
 
 # first, let's make sure we deploy our direct dependencies.
-bcm stack deploy bitcoind --chain="$CHAIN"
+bcm stack deploy bitcoind
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"

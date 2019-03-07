@@ -13,7 +13,8 @@ fi
 STACK_NAME=${3:-}
 
 # Regardless of components, you must specify whether you want to deploy it against testnet or mainnet.
-CHAIN=
+CHAIN="$BCM_DEFAULT_CHAIN"
+
 for i in "$@"; do
     case $i in
         --chain=*)
@@ -47,11 +48,6 @@ function validateStackParam(){
     fi
 }
 
-# make sure we have a cluster!  If not, create one.
-if bcm info | grep "LXD Remote: " | cut -d ":" -f 2 | xargs | grep -q "Not set."; then
-    echo "A cluster was not found. BCM will attempt to create one."
-    bcm cluster create
-fi
 
 # this is a list of stacks that we can deploy
 # corresponds to directories in $BCM_STACK_DIR
@@ -63,6 +59,17 @@ STACKS[1]="clightning"
 # STACKS[lightning-charge]=0
 # STACKS[opentimestamps]=0
 # STACKS[spark]=0
+
+# make sure the user has sent in a valid command; quit if not.
+if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "deploy" && $BCM_CLI_VERB != "remove" && $BCM_CLI_VERB != "clear" ]]; then
+    echo "ERROR: The valid commands for 'bcm stack' are 'list', 'deploy', 'remove', and 'clear'."
+    exit
+fi
+
+# if the current cluster is not configured, let's bring it into existence.
+if [[ $(lxc remote get-default) == "local" ]]; then
+    bcm cluster create
+fi
 
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
     validateStackParam "$BCM_CLI_VERB";

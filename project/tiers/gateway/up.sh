@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
-if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     bash -c "$BCM_GIT_DIR/project/up.sh"
 fi
 

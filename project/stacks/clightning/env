@@ -1,5 +1,5 @@
 export IMAGE_NAME="bcm-clightning"
-export IMAGE_TAG="master"
+export IMAGE_TAG="v0.7.0"
 export TIER_NAME="bitcoin"
 export STACK_FILE="clightning.yml"
 export STACK_NAME="clightning"

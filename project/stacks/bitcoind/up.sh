@@ -3,10 +3,16 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+
+# don't even think about proceeding unless the gateway BCM tier is up and running.
+if ! bcm tier list | grep -q bitcoin; then
+    bcm tier create bitcoin
+fi
+
 # shellcheck disable=SC1091
 source ./env
 
-CHAIN=
+CHAIN="$BCM_DEFAULT_CHAIN"
 
 for i in "$@"; do
     case $i in
@@ -24,9 +30,6 @@ if [[ -z $CHAIN ]]; then
     echo "CHAIN not specified. Exiting"
     exit
 fi
-
-# Perform provisioning activities for dependent dier.
-bash -c "$BCM_GIT_DIR/project/tiers/ui/up.sh"
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"
@@ -61,6 +64,7 @@ fi
 # then we can use it to seed # our new full node with blocks.
 # this is better because we won't have to bog the TOR network down.
 if [[ -d "$SRC_DIR/blocks" ]]; then
+    # TODO, see if we can minimize the amount of blocks to be uploaded, eg., last 300 blocks.
     UPLOAD_BLOCKS=1
 else
     echo "Note: You can push the raw blockchain when the $SRC_DIR/blocks directory exists."

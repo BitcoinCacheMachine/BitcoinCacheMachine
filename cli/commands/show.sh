@@ -46,7 +46,3 @@ fi
 echo ""
 echo "LXD projects:"
 lxc project list
-
-echo ""
-echo "LXD remotes:"
-lxc remote list

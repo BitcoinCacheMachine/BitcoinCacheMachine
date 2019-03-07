@@ -9,6 +9,17 @@ if [ -z "${BCM_CLI_VERB}" ]; then
     exit
 fi
 
+# make sure the user has sent in a valid command; quit if not.
+if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "remove" ]]; then
+    echo "ERROR: The valid commands for 'bcm tier' are 'list', 'create', and 'remove'."
+    exit
+fi
+
+# if the current cluster is not configured, let's bring it into existence.
+if [[ $(lxc remote get-default) == "local" ]]; then
+    bcm cluster create
+fi
+
 if [[ $BCM_CLI_VERB == "list" ]]; then
     LXC_LIST_OUTPUT=$(lxc list --format csv --columns ns | grep "RUNNING")
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-gateway"; then
