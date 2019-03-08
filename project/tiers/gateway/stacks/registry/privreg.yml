@@ -16,25 +16,8 @@ services:
       placement:
         constraints:
           - node.hostname == ${TARGET_HOST}
-    # secrets:
-    #   - source: privreg_tls_cert
-    #     target: /var/lib/registry/privreg.cert
-    #     uid: '0'
-    #     gid: '0'
-    #     mode: 0400
-    #   - source: privreg_tls_key
-    #     target: /var/lib/registry/privreg.key
-    #     uid: '0'
-    #     gid: '0'
-    #     mode: 0400
 
 
 volumes:
   private-registry-data:
-
-# secrets:
-#   privreg_tls_cert:
-#     file: "privreg.cert"
-#   privreg_tls_key:
-#     file: "privreg.key"
 

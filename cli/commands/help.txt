@@ -3,7 +3,7 @@ Description:
   commands below. If you just pulled BCM to your local machine and want to get started consider the 
   following steps:
   
-    1) Initialize your SDN controller and create new Trezor-backed GPG certificates and password store 
+    1) Initialize your SDN Controller and create new Trezor-backed GPG certificates and password store 
        using 'bcm init'.
     2) Create a new cluster using 'bcm cluster create'. Add cluster endpoints (new computers) to the cluster 
        by running 'bcm cluster add' (TODO).

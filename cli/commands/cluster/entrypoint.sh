@@ -137,7 +137,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
     ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME"
     bash -c "$BCM_GIT_DIR/cluster/destroy_cluster_master.sh --endpoint-dir=$ENDPOINT_DIR --cluster-name=$CLUSTER_NAME --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME"
     
-    # update the SDN controller's /etc/hosts file if it's a multipass VM.
+    # update the SDN Controller's /etc/hosts file if it's a multipass VM.
     if [[ $BCM_DRIVER == multipass ]]; then
         bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
     fi

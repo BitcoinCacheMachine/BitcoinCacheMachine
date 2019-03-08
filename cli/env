@@ -25,3 +25,13 @@ fi
 export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$(date +'%Y-%j')"
+
+if [[ -z $BCM_DOCKER_IMAGE_CACHE ]]; then
+    BCM_DOCKER_IMAGE_CACHE="https://registry-1.docker.io"
+fi
+export BCM_DOCKER_IMAGE_CACHE="$BCM_DOCKER_IMAGE_CACHE"
+
+if [[ -z $BCM_LXD_IMAGE_CACHE ]]; then
+    BCM_LXD_IMAGE_CACHE="https://images.linuxcontainers.org"
+fi
+export BCM_LXD_IMAGE_CACHE="$BCM_LXD_IMAGE_CACHE"

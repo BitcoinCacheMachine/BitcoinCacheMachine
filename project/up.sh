@@ -59,8 +59,8 @@ if ! lxc image list --format csv | grep -q "bcm-bionic-base"; then
     # 'images' is the publicly avaialb e image server. Used whenever there's no LXD image cache specified.
     IMAGE_REMOTE="images"
     
-    if [ ! -z ${LXD_IMAGE_CACHE+x} ]; then
-        IMAGE_REMOTE="$LXD_IMAGE_CACHE"
+    if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
+        IMAGE_REMOTE="$BCM_LXD_IMAGE_CACHE"
         if ! lxc remote list --format csv | grep -q "$IMAGE_REMOTE"; then
             lxc remote add "$IMAGE_REMOTE" "$IMAGE_REMOTE:8443"
         fi

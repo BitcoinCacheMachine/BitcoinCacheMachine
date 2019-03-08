@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
@@ -48,18 +48,27 @@ bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-ga
 
 # TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
-REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
-if [[ ! -z ${DOCKER_IMAGE_CACHE+x} ]]; then
-    REGISTRY_PROXY_REMOTEURL="http://$DOCKER_IMAGE_CACHE:5000"
+REGISTRY_PROXY_REMOTEURL="$BCM_DOCKER_IMAGE_CACHE"
+if [[ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]]; then
+    REGISTRY_PROXY_REMOTEURL="$BCM_DOCKER_IMAGE_CACHE"
 fi
 
 # push the stack files up tthere.
 lxc file push  -p -r ./stacks/ bcm-gateway-01/root/gateway/
 
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5000 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL" docker stack deploy -c "/root/$BCM_TIER_NAME/stacks/registry/regmirror.yml" regmirror
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" \
+TARGET_PORT=5000 \
+TARGET_HOST="bcm-gateway-01" \
+REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL" \
+docker stack deploy -c "/root/$BCM_TIER_NAME/stacks/registry/regmirror.yml" regmirror
+
 lxc exec bcm-gateway-01 -- wait-for-it -t 0 "bcm-gateway-01:5000"
 
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" TARGET_PORT=5010 TARGET_HOST="bcm-gateway-01" docker stack deploy -c "/root/gateway/stacks/registry/privreg.yml" privreg
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" \
+TARGET_PORT=5010 \
+TARGET_HOST="bcm-gateway-01" \
+docker stack deploy -c "/root/gateway/stacks/registry/privreg.yml" privateregistry
+
 lxc exec bcm-gateway-01 -- wait-for-it -t 0 "bcm-gateway-01:5010"
 
 # tag and push the registry image to our local private registry.
@@ -118,7 +127,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
             # another registry mirror and private registry in case node1 goes offline.
             # We will only have 2 locations for docker image distribution.
             if [[ $HOST_ENDING == 2 ]]; then
-                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://$BCM_PRIVATE_REGISTRY" docker stack deploy -c "/root/gateway/stacks/registry/regmirror.yml" regmirror2
+                lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="bcm-gateway-01" REGISTRY_PROXY_REMOTEURL="http://bcm-gateway-01:5000" docker stack deploy -c "/root/gateway/stacks/registry/regmirror.yml" regmirror2
             fi
         fi
     fi

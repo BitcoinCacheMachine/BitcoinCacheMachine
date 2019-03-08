@@ -56,10 +56,10 @@ echo "BCM_DEBUG:                  $BCM_DEBUG"
 
 # remove any legacy lxd software and install install lxd via snap
 if snap list | grep -q lxd; then
-    if [[ $(lxc remote get-default) != "local" ]]; then
-        echo "LXD Remote:                 $(lxc remote get-default)"
+    if [[ "$(lxc remote get-default)" != "local" ]]; then
+        echo "BCM_LXD_REMOTE:             $(lxc remote get-default)"
     else
-        echo "LXD Remote:                 Not set."
+        echo "BCM_LXD_REMOTE:             Not set."
     fi
 else
     echo ""
@@ -67,16 +67,12 @@ else
 fi
 
 
-if [ -z ${LXD_IMAGE_CACHE+x} ]; then
-    echo "LXD_IMAGE_CACHE:            Not set.";
-else
-    echo "LXD_IMAGE_CACHE:            $LXD_IMAGE_CACHE";
+if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
+    echo "BCM_LXD_IMAGE_CACHE:        $BCM_LXD_IMAGE_CACHE";
 fi
 
-if [ -z ${DOCKER_IMAGE_CACHE+x} ]; then
-    echo "DOCKER_IMAGE_CACHE:         Not set.";
-else
-    echo "DOCKER_IMAGE_CACHE:         $DOCKER_IMAGE_CACHE";
+if [ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
+    echo "BCM_DOCKER_IMAGE_CACHE:     $BCM_DOCKER_IMAGE_CACHE";
 fi
 
 if [ ! -z ${BCM_DEFAULT_CHAIN+x} ]; then
