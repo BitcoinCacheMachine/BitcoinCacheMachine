@@ -67,8 +67,10 @@ else
 fi
 
 
-if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
+if [ -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
     echo "BCM_LXD_IMAGE_CACHE:        $BCM_LXD_IMAGE_CACHE";
+else
+    echo "BCM_LXD_IMAGE_CACHE:        images"
 fi
 
 if [ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then

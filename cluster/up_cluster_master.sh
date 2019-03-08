@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 CLUSTER_NAME=
 BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
-BCM_SSH_KEY_PATH=
+SSH_KEY_PATH=
 BCM_DRIVER=ssh
 ENDPOINT_DIR=
 
@@ -48,16 +48,60 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     exit
 fi
 
-if [[ -d "$ENDPOINT_DIR" ]]; then
-    BCM_SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+if [[ ! -d "$ENDPOINT_DIR" ]]; then
+    echo "ERROR: Endpoint directory '$ENDPOINT_DIR' does not exist."
+    exit
+fi
+
+# if the user override the keypath, we will use that instead.
+# the key already exists if it's a multipass VM. If we're provisioning a new
+# remote SSH host, we would have to generate a new one.
+SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+if [[ ! -f $SSH_KEY_PATH ]]; then
+    # this key is for temporary use and used only during initial provisioning.
+    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_PATH" -N ""
+    chmod 400 "$SSH_KEY_PATH.pub"
 fi
 
 # if the BCM_DRIVER is multipass, then we assume the remote endpoint doesn't
 # exist and we need to create it via multipass. Once there's an SSH service available
 # on that endpoint, we can continue.
 if [[ $BCM_DRIVER == multipass ]]; then
+    # the multipass cloud-init process already has the bcm user provisioned
     bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR"
+    elif [[ $BCM_DRIVER == ssh ]]; then
+    ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+    # SSH_PUB_KEY_TEXT="$(<$SSH_KEY_PATH.pub)"
+    # export SSH_PUB_KEY_TEXT="$SSH_PUB_KEY_TEXT"
+    # envsubst < ./ssh_host_init.sh > ./ssh_host_init_temp.sh
+    # ssh  "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" 'sudo -n -s bash' < ssh_host_init_temp.sh
+    # rm ./ssh_host_init_temp.sh
 fi
+
+
+
+
+# # directory on remote host where we're going to work.
+# DIR="/home/$BCM_SSH_USERNAME"
+
+# # create the directory on the remote host.
+# ssh -i "$BCM_SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- mkdir -p "$DIR"
+
+# # push the file up to the remote host using SCP
+# scp -i "$BCM_SSH_KEY_PATH" ./server_prep.sh "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$DIR/server_prep.sh"
+
+# # change the permissions on the scripts and run it.
+# ssh -i "$BCM_SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$DIR/server_prep.sh"
+# ssh -i "$BCM_SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$DIR/server_prep.sh"
+
+
+
+# call the following scripts so do a static /etc/hosts mapping since multipass doesn't natively do DNS (or I need more research)
+bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
+
+# let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
+ssh-keyscan -H "$VM_NAME" >> "$BCM_KNOWN_HOSTS_FILE"
+
 
 # first, let's ensure we have SSH access to the server.
 if ! wait-for-it -t 30 "$BCM_SSH_HOSTNAME:22"; then

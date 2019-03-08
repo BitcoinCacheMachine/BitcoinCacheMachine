@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -87,7 +87,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
                 # we assume here that we have an SSH connection to push an AUTHORIZED_KEYS entry.
                 if [[ ! -z $BCM_SSH_KEY_PATH ]]; then
                     if [[ -f $BCM_SSH_KEY_PATH ]]; then
-                        ssh -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a /home/bcm/.ssh/authorized_keys < "$PUB_KEY_PATH"
+                        ssh -i "$BCM_SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a "/home/$SSH_USERNAME/.ssh/authorized_keys" < "$PUB_KEY_PATH"
                         
                         # # #REMOVE ALL OTHER KEYS EXCEPT THE NEW ONE
                         # # # we're going to remove the SSH PUBKEY from BCM_SSH_KEY_PATH from the authorized_keys

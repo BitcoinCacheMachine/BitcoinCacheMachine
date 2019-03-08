@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -84,9 +84,6 @@ if [[ $BCM_DRIVER == "multipass" ]]; then
     fi
 fi
 
-
-
-
 # if the cluster name is local, then we assume the user hasn't overridden
 # what was set in 'lxc remote get-default'. If so, we will assume a cluster
 # will be created with the name of `bcm-hostname`
@@ -103,13 +100,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
     ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME"
     mkdir -p "$ENDPOINT_DIR"
-    SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
-    # let's generate a temporary SSH key if it doesn't exist.
-    if [[ ! -f "$SSH_KEY_PATH" ]]; then
-        # this key is for temporary use and used only during initial provisioning.
-        ssh-keygen -t rsa -b 4096 -C "bcm@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_PATH" -N ""
-        chmod 400 "$SSH_KEY_PATH.pub"
-    fi
     
     # first check to ensure that the cluster doesn't already exist.
     if ! lxc remote list | grep -q "$CLUSTER_NAME"; then

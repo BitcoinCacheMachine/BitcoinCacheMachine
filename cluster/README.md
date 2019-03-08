@@ -28,9 +28,9 @@ If you want to run BCM on one or more dedicated server machines (e.g., an old NU
 12. On the User information page, enter the following details. For server name, choose a memorable name.
 
 ```
-Name:           ubuntu
+Name:           bcm
 server name:    some_local_dns_name
-Username:       ubuntu
+Username:       bcm
 password:       CHANGE_ME
 password:       CHANGE_ME
 ```

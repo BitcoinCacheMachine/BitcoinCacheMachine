@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # the base project
@@ -58,11 +58,10 @@ fi
 if ! lxc image list --format csv | grep -q "bcm-bionic-base"; then
     # 'images' is the publicly avaialb e image server. Used whenever there's no LXD image cache specified.
     IMAGE_REMOTE="images"
-    
-    if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
-        IMAGE_REMOTE="$BCM_LXD_IMAGE_CACHE"
+    if [[ ! -z $BCM_LXD_IMAGE_CACHE ]]; then
         if ! lxc remote list --format csv | grep -q "$IMAGE_REMOTE"; then
             lxc remote add "$IMAGE_REMOTE" "$IMAGE_REMOTE:8443"
+            IMAGE_REMOTE="$BCM_LXD_IMAGE_CACHE"
         fi
     fi
     

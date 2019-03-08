@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
@@ -53,16 +53,6 @@ if [[ ! -d "$ENDPOINT_DIR" ]]; then
     exit
 fi
 
-
-# if the user override the keypath, we will use that instead.
-# the key already exists if it's a multipass VM. If we're provisioning a new
-# remote SSH host, we would have to generate a new one.
-SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
-if [[ ! -f $SSH_KEY_PATH ]]; then
-    # this key is for temporary use and used only during initial provisioning.
-    ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_PATH" -N ""
-    chmod 400 "$SSH_KEY_PATH.pub"
-fi
 
 if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
     torify ssh-copy-id -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"

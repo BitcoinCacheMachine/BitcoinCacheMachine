@@ -31,7 +31,4 @@ if [[ -z $BCM_DOCKER_IMAGE_CACHE ]]; then
 fi
 export BCM_DOCKER_IMAGE_CACHE="$BCM_DOCKER_IMAGE_CACHE"
 
-if [[ -z $BCM_LXD_IMAGE_CACHE ]]; then
-    BCM_LXD_IMAGE_CACHE="https://images.linuxcontainers.org"
-fi
 export BCM_LXD_IMAGE_CACHE="$BCM_LXD_IMAGE_CACHE"

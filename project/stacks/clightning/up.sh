@@ -6,8 +6,6 @@ cd "$(dirname "$0")"
 # shellcheck disable=SC1091
 source ./env
 
-CHAIN="$BCM_DEFAULT_CHAIN"
-
 # first, let's make sure we deploy our direct dependencies.
 bcm stack deploy bitcoind
 
@@ -25,9 +23,12 @@ CONTAINER_NAME="bcm-bitcoin-$HOST_ENDING"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "bcm-gateway-01/root/stacks/$TIER_NAME/$STACK_NAME"
 
-lxc exec bcm-gateway-01 -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" CHAIN="$CHAIN" HOST_ENDING="$HOST_ENDING" docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$CHAIN"
+lxc exec bcm-gateway-01 -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
+CHAIN="$BCM_DEFAULT_CHAIN" \
+HOST_ENDING="$HOST_ENDING" \
+docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
 
-DEST_DIR="/var/lib/docker/volumes/clightning-""$CHAIN""_clightning-data/_data"
+DEST_DIR="/var/lib/docker/volumes/clightning-""$BCM_DEFAULT_CHAIN""_clightning-data/_data"
 if lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogo" ]; then
     lxc exec "$CONTAINER_NAME" -- mkdir -p "$DEST_DIR"
     lxc exec "$CONTAINER_NAME" -- touch "$DEST_DIR/gogo"

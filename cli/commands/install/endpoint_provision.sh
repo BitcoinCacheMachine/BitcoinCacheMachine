@@ -12,13 +12,10 @@ if ! snap list | grep -q lxd; then
     sudo snap install lxd --channel=candidate
 fi
 
-# if the lxd groups doesn't exist, create it.
-if ! grep -q lxd /etc/group; then
-    sudo addgroup --system lxd
-fi
-
+# if the 'bcm' user doesn't exist, let's create it and add it
+# to the NOPASSWD sudoers list (like we have in cloud-init provisioned machines)
 if groups "$USER" | grep -q lxd; then
-    sudo adduser "${USER}" lxd
+    sudo adduser bcm
     sudo gpasswd -a "${USER}" lxd
 fi
 
