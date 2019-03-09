@@ -70,15 +70,7 @@ if [[ $BCM_DRIVER == multipass ]]; then
     # the multipass cloud-init process already has the bcm user provisioned
     bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR"
     elif [[ $BCM_DRIVER == ssh ]]; then
-    PUB_KEY_TEXT="$(<$SSH_KEY_PATH.pub)"
-    ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-    # ssh -t -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "sudo touch /etc/sudoers.d/$BCM_SSH_USERNAME"
-    # echo "$BCM_SSH_USERNAME ALL=(ALL) NOPASSWD:ALL" | ssh -t -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "sudo cat >> /etc/sudoers.d/$BCM_SSH_USERNAME"
-    
-    # #echo "ubuntu ALL=(ALL) NOPASSWD:ALL" |  && cat >> /etc/sudoers.d/ubuntu"
-    # #echo "$PUB_KEY_TEXT" > ssh "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo tee -a "/home/bcm/.ssh/authorized_keys"
-    # # cat "$PUB_KEY_PATH" | ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" 'cat >> /home/bcm/.ssh/authorized_keys'
-    
+    ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "bcm@$BCM_SSH_HOSTNAME"
 fi
 
 # let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
@@ -127,11 +119,11 @@ fi
 LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
 
 # provision the machine by uploading the preseed and running the install script.
-ssh -i "$SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- mkdir -p "$REMOTE_MOUNTPOINT"
-scp -i "$SSH_KEY_PATH" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
-scp -i "$SSH_KEY_PATH" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
-ssh -i "$SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
-ssh -i "$SSH_KEY_PATH" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+ssh -i "$SSH_KEY_PATH" -t -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- mkdir -p "$REMOTE_MOUNTPOINT"
+scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
+scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
 wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
 
 # if it's the cluster master add the LXC remote so we can manage it.

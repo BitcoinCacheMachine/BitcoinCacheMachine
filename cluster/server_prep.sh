@@ -16,7 +16,7 @@ if ! grep -q lxd /etc/group; then
 fi
 
 if ! groups bcm | grep -q lxd; then
-    sudo useradd -g lxd -m bcm
+    sudo useradd -g lxd -g sudo -m bcm
 fi
 
 if [[ ! -d /home/bcm/.ssh ]]; then
@@ -25,6 +25,7 @@ fi
 
 if [[ ! -f /home/bcm/.ssh/authorized_keys ]]; then
     sudo touch /home/bcm/.ssh/authorized_keys
+    chown bcm:lxd -R /home/bcm/.ssh
 fi
 
 sudo touch /etc/sudoers.d/bcm

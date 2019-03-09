@@ -70,7 +70,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     fi
     
     KEY_NAME="id_rsa_trezor.pub"
-    PUB_KEY_PATH="$ENDPOINT_DIR/$KEY_NAME"
+    TREZOR_PUB_KEY_PATH="$ENDPOINT_DIR/$KEY_NAME"
     
     sudo docker run -t --rm \
     -v "$ENDPOINT_DIR":/root/.ssh \
@@ -80,12 +80,12 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     bcm-trezor:latest bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME > /root/.ssh/$KEY_NAME"
     
-    if [[ ! -f "$PUB_KEY_PATH" ]]; then
+    if [[ ! -f "$TREZOR_PUB_KEY_PATH" ]]; then
         echo "ERROR: SSH Key did not generate successfully!"
         exit
     fi
     
-    echo "Congratulations! Your new SSH public key can be found at '$PUB_KEY_PATH'"
+    #echo "Congratulations! Your new SSH public key can be found at '$TREZOR_PUB_KEY_PATH'"
     
     # We'll stop here unless instructed to push the new key.
     if [[ $SSH_PUSH != 1 ]]; then
@@ -93,17 +93,8 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     fi
     
     if [[ -f $SSH_KEY_PATH ]]; then
-        #ssh -t -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a "/home/bcm/.ssh/authorized_keys" < "$PUB_KEY_PATH"
-        cat "$PUB_KEY_PATH" | ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" 'cat >> /home/bcm/.ssh/authorized_keys'
-        
-        #ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-        # # #REMOVE ALL OTHER KEYS EXCEPT THE NEW ONE
-        # # # we're going to remove the SSH PUBKEY from SSH_KEY_PATH from the authorized_keys
-        # # # file on the remote host. Then we're going to delete
-        # cat "$PUB_KEY_PATH" | ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" 'cat > /home/bcm/.ssh/authorized_keys'
-        
-        # rm -f "SSH_KEY_PATH"
-        # rm -f "$SSH_KEY_PATH.pub"
+        # push the trezor ssh pubkey to the destination.
+        ssh -t -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a "/home/$SSH_USERNAME/.ssh/authorized_keys" < "$TREZOR_PUB_KEY_PATH"
         
         # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
         ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$SSH_HOSTNAME"  >> /dev/null
@@ -113,8 +104,6 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
         ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
         
         exit
-    else
-        echo "TODO: push the new key using password-based authentication."
     fi
 fi
 
