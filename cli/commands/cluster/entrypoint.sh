@@ -80,7 +80,14 @@ if [[ $BCM_DRIVER == "multipass" ]]; then
         BCM_DRIVER=ssh
     else
         BCM_SSH_HOSTNAME="bcm-$(hostname)"
-        bash -c "$BCM_GIT_DIR/cli/commands/install/snap_multipass_install.sh"
+        
+        # Next make sure multipass is installed so we can run type-1 VMs
+        if ! snap list | grep -q multipass; then
+            # if it doesn't, let's install
+            echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
+            sudo snap install multipass --beta --classic
+            sleep 10
+        fi
     fi
 fi
 
@@ -130,11 +137,5 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
     # update the SDN Controller's /etc/hosts file if it's a multipass VM.
     if [[ $BCM_DRIVER == multipass ]]; then
         bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
-    fi
-    
-    if [[ -d "$BCM_RUNTIME_DIR" ]]; then
-        rm -rf "${BCM_RUNTIME_DIR:?}/clusters"
-    else
-        echo "WARNING: $BCM_RUNTIME_DIR does not exist!"
     fi
 fi

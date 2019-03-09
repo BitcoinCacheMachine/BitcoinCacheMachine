@@ -4,9 +4,9 @@ set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
-BCM_SSH_USERNAME=
+BCM_SSH_USERNAME=bcm
 BCM_SSH_HOSTNAME=
-SSH_KEY_PATH=
+# SSH_KEY_PATH=
 BCM_DRIVER=ssh
 ENDPOINT_DIR=
 
@@ -28,6 +28,10 @@ for i in "$@"; do
             ENDPOINT_DIR="${i#*=}"
             shift # past argument=value
         ;;
+        # --ssh-key-path=*)
+        #     SSH_KEY_PATH="${i#*=}"
+        #     shift # past argument=value
+        # ;;
         --driver=*)
             BCM_DRIVER="${i#*=}"
             shift # past argument=value
@@ -51,16 +55,6 @@ fi
 if [[ ! -d "$ENDPOINT_DIR" ]]; then
     echo "ERROR: ENDPOINT_DIR does not exist."
     exit
-fi
-
-
-if [[ $BCM_SSH_HOSTNAME == *.onion ]]; then
-    torify ssh-copy-id -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-else
-    # not let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
-    wait-for-it -t 10 "$BCM_SSH_HOSTNAME:22"
-    ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
-    ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"

@@ -27,6 +27,9 @@ if [[ ! -f /home/bcm/.ssh/authorized_keys ]]; then
     sudo touch /home/bcm/.ssh/authorized_keys
 fi
 
+sudo touch /etc/sudoers.d/bcm
+echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
+
 # todo add ability to interactively select management interface (if multiple)
 if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
     echo "ListenAddress 0.0.0.0" | sudo tee -a /etc/ssh/sshd_config

@@ -5,6 +5,7 @@ bcm init --cert-name="Satoshi Nakamoto" --username="satoshi" --hostname="bitcoin
 
 # Create a cluster on a remote machine
 # bcm cluster create --driver=ssh --cluster-name="hostname" --ssh-username="bcm" --ssh-hostname="fqdn"
+bcm cluster create
 
 # deploy bcm components
 bcm stack deploy clightning --chain=testnet

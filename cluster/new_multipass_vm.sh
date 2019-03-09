@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VM_NAME=
@@ -9,7 +9,7 @@ VM_NAME=
 DISK_SIZE="50"
 
 # MEM_SIZE is in MB. 4092 = 4GB
-MEM_SIZE="4098"
+MEM_SIZE="4098M"
 
 # CPU_COUNT is cores.
 CPU_COUNT=4
@@ -74,10 +74,16 @@ envsubst <./cloud_init_template.yml >"$ENDPOINT_DIR/cloud-init.yml"
 # launch the new VM with the custom cloud-init.
 multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$ENDPOINT_DIR/cloud-init.yml" bionic
 
-# multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
-# multipass exec "$VM_NAME"  -- chmod 0755 /home/multipass/server_prep.sh
-# multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
+multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
+multipass exec "$VM_NAME"  -- chmod 0755 /home/multipass/server_prep.sh
+multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
 
 multipass restart "$VM_NAME"
+
+# call the following scripts so do a static /etc/hosts mapping since multipass doesn't natively do DNS (or I need more research)
+bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
+
+# let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
+ssh-keyscan -H "$VM_NAME" >> "$BCM_KNOWN_HOSTS_FILE"
 
 rm -rf "$ENDPOINT_DIR/cloud-init.yml"
