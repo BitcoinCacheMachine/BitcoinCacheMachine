@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # the base project
@@ -104,7 +104,6 @@ if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
         
         sleep 5
         
-        # TODO provide configuration item to route these requests over local TOR proxy
         echo "Installing required software on LXC host 'bcm-host-template'."
         lxc exec bcm-host-template -- apt-get update
         
@@ -121,7 +120,7 @@ if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
         lxc exec bcm-host-template -- touch /.dockerenv
         lxc exec bcm-host-template -- mkdir -p /etc/docker
         
-        # this helps suppress some warning messages.  TODO
+        # this helps suppress some warning messages.
         lxc file push ./sysctl.conf bcm-host-template/etc/sysctl.conf
         lxc exec bcm-host-template -- chmod 0644 /etc/sysctl.conf
         
@@ -147,6 +146,10 @@ if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     # other members of the LXD cluster will be able to pull and run this image
     echo "Publishing bcm-host-template/bcmHostSnapshot 'bcm-template' on cluster '$(lxc remote get-default)'."
     lxc publish bcm-host-template/bcmHostSnapshot --alias "$LXC_BCM_BASE_IMAGE_NAME"
+    
+    if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+        lxc delete bcm-host-template
+    fi
 else
     echo "The image '$LXC_BCM_BASE_IMAGE_NAME' is already published."
 fi

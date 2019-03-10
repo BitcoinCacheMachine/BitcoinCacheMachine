@@ -10,7 +10,7 @@ fi
 echo "Starting tor in the background."
 service tor start
 
-wait-for-it -t 0 127.0.0.1:9050
+wait-for-it -t 10 127.0.0.1:9050
 
 sleep 10
 

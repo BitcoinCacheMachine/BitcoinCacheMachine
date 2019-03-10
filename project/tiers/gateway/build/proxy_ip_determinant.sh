@@ -27,7 +27,6 @@ TOR_CONTROL_HOST="$LOCAL_GW_LXD_HOST_IP:9051"
 
 echo "Using '$TOR_PROXY' and '$TOR_CONTROL_HOST' for the TOR Proxy and TOR Control ports, respectively."
 
-# TODO make this cleaner.
 OVERLAY_NETWORK_IP=$(ip addr | grep "172.16.238." | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
 
 

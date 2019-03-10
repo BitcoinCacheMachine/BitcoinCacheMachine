@@ -29,7 +29,7 @@ HOST_ENDING="$HOST_ENDING" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
 
 DEST_DIR="/var/lib/docker/volumes/clightning-""$BCM_DEFAULT_CHAIN""_clightning-data/_data"
-if lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogo" ]; then
+if ! lxc exec "$CONTAINER_NAME" -- [ -f "$DEST_DIR/gogo" ]; then
     lxc exec "$CONTAINER_NAME" -- mkdir -p "$DEST_DIR"
     lxc exec "$CONTAINER_NAME" -- touch "$DEST_DIR/gogo"
 fi

@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.7'
 services:
   # https://github.com/ElementsProject/lightning-charge
   # image listens on TCP 9112

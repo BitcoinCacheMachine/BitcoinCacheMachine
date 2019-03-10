@@ -1,4 +1,3 @@
-Usage: lightning/cli/lightning-cli <command> [<params>...]
 --lightning-dir=<dir>  Set working directory. All other files are relative to this (default: "/root/.lightning")
 --rpc-file <arg>       Set JSON-RPC socket (or /dev/tty) (default: "lightning-rpc")
 --help|-h              Show this message. Use the command help (without hyphens -- "lightning-cli help") to get a list of all RPC commands
@@ -61,13 +60,13 @@ check command_to_check
 getlog [level]
     Show logs, with optional log {level} (info|unusual|debug|io)
 
-fundchannel id satoshi [feerate] [announce]
-    Fund channel with {id} using {satoshi} (or 'all') satoshis, at optional {feerate}
+fundchannel id satoshi [feerate] [announce] [minconf]
+    Fund channel with {id} using {satoshi} (or 'all') satoshis, at optional {feerate}. Only use outputs that have {minconf} confirmations.
 
 listconfigs [config]
     List all configuration options, or with [config], just that one.
 
-sendpay route payment_hash [description] [msatoshi]
+sendpay route payment_hash [label] [msatoshi] [bolt11]
     Send along {route} in return for preimage of {payment_hash}
 
 waitsendpay payment_hash [timeout]
@@ -75,6 +74,9 @@ waitsendpay payment_hash [timeout]
 
 listpayments [bolt11] [payment_hash]
     Show outgoing payments
+
+listsendpays [bolt11] [payment_hash]
+    Show sendpay, old and current, optionally limiting to {bolt11} or {payment_hash}.
 
 listpeers [id] [level]
     Show current peers, if {level} is set, include logs for {id}
@@ -94,7 +96,7 @@ listforwards
 ping id [len] [pongbytes]
     Send peer {id} a ping of length {len} (default 128) asking for {pongbytes} (default 128)
 
-withdraw destination satoshi [feerate]
+withdraw destination satoshi [feerate] [minconf]
     Send to {destination} address {satoshi} (or 'all') amount via Bitcoin transaction, at optional {feerate}
 
 newaddr [addresstype]
@@ -109,8 +111,14 @@ listfunds
 dev-rescan-outputs 
     Synchronize the state of our funds with bitcoind
 
-pay bolt11 [msatoshi] [description] [riskfactor] [maxfeepercent] [retry_for] [maxdelay] [exemptfee]
-    Send payment specified by {bolt11} with {msatoshi}
+pay bolt11 [msatoshi] [label] [riskfactor] [maxfeepercent] [retry_for] [maxdelay] [exemptfee]
+    Send payment specified by {bolt11} with {amount}
 
 paystatus [bolt11]
     Detail status of attempts to pay {bolt11}, or all
+
+listpays [bolt11]
+    List result of payment {bolt11}, or all
+
+---
+run `lightning-cli help <command>` for more information on a specific command

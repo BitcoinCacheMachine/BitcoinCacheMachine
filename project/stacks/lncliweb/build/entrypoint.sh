@@ -20,7 +20,7 @@ do
 done
 
 echo "Waiting on lnd grpc interface to respond. It could take several hours while bitcoind and lnd do their thing (block download/validation/indexing/graph creation, etc.)"
-wait-for-it -t 0 lndrpc:10009
+wait-for-it -t 10 lndrpc:10009
 
 echo "launching node server"
 node server

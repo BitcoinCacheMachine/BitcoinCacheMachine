@@ -52,5 +52,3 @@ Finish the process by restarting the computer:
 ```bash
 sudo shutdown -r now
 ```
-<!-- 
-TODO: see if we can support boot-to-network (PXE) and cloud-init provisioning. -->

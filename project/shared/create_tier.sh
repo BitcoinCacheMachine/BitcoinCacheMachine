@@ -68,8 +68,8 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     # outside this script (see gateway).
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
         if lxc exec "$HOSTNAME" -- docker info | grep "Swarm: " | grep -q "inactive"; then
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:2377
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:5000
+            lxc exec "$HOSTNAME" -- wait-for-it -t 15 -q bcm-gateway-01:2377
+            lxc exec "$HOSTNAME" -- wait-for-it -t 15 -q bcm-gateway-01:5000
             lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
         fi
     fi

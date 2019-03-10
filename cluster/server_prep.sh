@@ -31,7 +31,7 @@ fi
 sudo touch /etc/sudoers.d/bcm
 echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
 
-# todo add ability to interactively select management interface (if multiple)
+# update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
 if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
     echo "ListenAddress 0.0.0.0" | sudo tee -a /etc/ssh/sshd_config
     sudo systemctl restart ssh

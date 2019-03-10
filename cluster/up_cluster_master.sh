@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 CLUSTER_NAME=
@@ -132,7 +132,7 @@ if ! lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
     source "$ENV_FILE"
     
     echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
-    wait-for-it -t 0 "$BCM_SSH_HOSTNAME:8443"
+    wait-for-it -t 10 "$BCM_SSH_HOSTNAME:8443"
     
     lxc remote add "$CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
     lxc remote switch "$CLUSTER_NAME"

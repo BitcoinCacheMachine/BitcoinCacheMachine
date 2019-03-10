@@ -43,9 +43,14 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     fi
     
     # create the LXC host with the attached profiles.
-    # TODO allow options of unprivileged.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
         PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
+        
+        # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.  If not, we call $BCM_GIT_DIR/project/create_bcm_host_template.sh.sh
+        if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+            bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
+        fi
+        
         lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile=bcm_default --profile=docker_privileged --profile="$PROFILE_NAME"
     else
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."

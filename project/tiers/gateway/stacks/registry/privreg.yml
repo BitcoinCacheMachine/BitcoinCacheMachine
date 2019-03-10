@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.7'
 services:
   private-registry:
     image: ${DOCKER_IMAGE}

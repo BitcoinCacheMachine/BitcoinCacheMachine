@@ -7,7 +7,7 @@
 
 # # Wait for necessary services then create a syslog connector on Kafka Connected
 # # send REST command to Kafka to configure a TCP syslog connector
-# wait-for-it -t 0 manager1:8082 -- wait-for-it -t 0 manager1:8081 -- wait-for-it -t 0 manager1:8083
+# wait-for-it -t 10 manager1:8082 -- wait-for-it -t 10 manager1:8081 -- wait-for-it -t 10 manager1:8083
 
 # sleep 90
 

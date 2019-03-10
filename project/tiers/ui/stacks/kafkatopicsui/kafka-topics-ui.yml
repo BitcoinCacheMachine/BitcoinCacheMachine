@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.7'
 services:
   #listens on 8000
   #PROXY: true makes to so topicsUI proxies kafka-rest calls so we don't have to expose kafka rest to network

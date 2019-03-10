@@ -7,24 +7,11 @@ source /bcm/proxy_ip_determinant.sh
 
 echo "BCM /entrypoint.sh for clightning"
 
-
-#TODO we need to remove TOR lcoally and use the remove gateway host, but CLIGHTNING doesn't support this yet
-# so we have to use a local TOR instance.
-
-# TOR_PROXY="127.0.0.1:9050"
-# TOR_CONTROL_HOST="127.0.0.1:9051"
-
-# /usr/bin/tor -f /etc/tor/torrc &
-
-# sleep 30
-
 wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL_HOST"
 
 # wait for the managementt plane.
 bash -c "/bcm/wait_for_gogo.sh --gogofile=/root/.lightning/gogo"
-
-#sleep 160
 
 if [[ ! -z "$CHAIN" ]]; then
     if [[ $CHAIN == "testnet" ]]; then

@@ -10,7 +10,7 @@ A bitcoin lightning daemon (default values shown for network: testnet).
 --bitcoin-rpcport <arg>              bitcoind RPC port
 --pid-file=<file>                    Specify pid file (default: "lightningd-testnet.pid")
 --log-level <arg>                    log level (io, debug, info, unusual, broken) (default: INFO)
---log-prefix <arg>                   log prefix (default: lightningd(175):)
+--log-prefix <arg>                   log prefix (default: lightningd(595):)
 --log-file=<file>                    log to file instead of stdout
 --version|-V                         Print version and exit
 --lightning-dir=<dir>                Set working directory. All other files are relative to this (default: "/root/.lightning")
@@ -47,5 +47,5 @@ A bitcoin lightning daemon (default values shown for network: testnet).
 --autocleaninvoice-expired-by <arg>  If expired invoice autoclean enabled, invoices that have expired for at least this given seconds are cleaned (default: 86400)
 --proxy <arg>                        Set a socks v5 proxy IP address and port
 --tor-service-password <arg>         Set a Tor hidden service password
---always-use-proxy <arg>             Use the proxy always (default: false)
+--always-use-proxy <arg>             Use the proxy always (default: true)
 --disable-dns                        Disable DNS lookups of peers

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 if [[ -z $BCM_ACTIVE ]]; then
@@ -22,10 +22,12 @@ if snap list | grep -q docker; then
     fi
 fi
 
-# # Only run commands if we have local LXD client installed (we just install the full lxd snap).
-# if ! snap list | grep -q lxd; then
-#     echo "WARNING: The LXD snap is not installed locally. You may need to run the BCM setup script."
-#     exit
+# # check to see if we have Trezor-backed GPG certificates.  If not, let's create them.
+# if bcm info | grep -q "BCM_DEFAULT_KEY_ID"; then
+#     echo "Trezor-backed GPG certificates were not found."
+    
+#     # Init your SDN controller; create a new GPG certificate 'Satoshi Nakamoto satoshi@bitcoin.org'
+#     bcm init --cert-name="Satoshi Nakamoto" --username="satoshi" --hostname="bitcoin.org"
 # fi
 
 if grep -qs "$BCM_WORKING_DIR" /proc/mounts; then

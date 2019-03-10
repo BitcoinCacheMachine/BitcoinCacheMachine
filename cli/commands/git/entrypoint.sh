@@ -150,7 +150,7 @@ if [[ $BCM_CLI_VERB == "push" ]]; then
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 0 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$BCM_GIT_CLIENT_USERNAME" && git push
+    bcm-trezor:latest trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 10 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$BCM_GIT_CLIENT_USERNAME" && git push
 fi
 
 if sudo docker ps | grep -q "gitter"; then

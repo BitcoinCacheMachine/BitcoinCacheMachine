@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.7'
 services:
   # Provides admin interface to lnd
   # listens on 8280

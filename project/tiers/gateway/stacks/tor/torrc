@@ -3,7 +3,7 @@ SocksPort 0.0.0.0:9050
 DNSPort 0.0.0.0:9053
 ControlPort 0.0.0.0:9051
 
-# todo make hashedcontrolpassword dynamic
+# make hashedcontrolpassword dynamic
 HashedControlPassword 16:636F375265169CAD60A42471829C572329F60910808906AA3285B34764
 
 # Log err to info

@@ -10,7 +10,6 @@ if bcm tier list | grep -q bitcoin; then
     exit
 fi
 
-
 # don't even think about proceeding unless the gateway BCM tier is up and running.
 if ! bcm tier list | grep -q ui; then
     bcm tier create ui

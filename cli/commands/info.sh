@@ -80,7 +80,3 @@ fi
 if [ ! -z ${BCM_DEFAULT_CHAIN+x} ]; then
     echo "BCM_DEFAULT_CHAIN:          $BCM_DEFAULT_CHAIN";
 fi
-
-echo ""
-echo "Local multipass VMs:"
-multipass list

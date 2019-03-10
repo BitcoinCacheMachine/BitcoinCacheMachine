@@ -6,9 +6,9 @@ Description:
     1) Initialize your SDN Controller and create new Trezor-backed GPG certificates and password store 
        using 'bcm init'.
     2) Create a new cluster using 'bcm cluster create'. Add cluster endpoints (new computers) to the cluster 
-       by running 'bcm cluster add' (TODO).
+       by running 'bcm cluster add'.
     3) Deploy critical BCM data center components to all cluster endpoints using the 'bcm provision' command.
-    4) TODO: Use 'bcm stack deploy <stack_name>' to deploy a Bitcoin-related software stack to the active cluster.
+    4) Use 'bcm stack deploy <stack_name>' to deploy a Bitcoin-related software stack to the active cluster.
 
 Usage:
   bcm [command] --help

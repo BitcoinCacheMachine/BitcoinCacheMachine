@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.7'
 services:
   registry-mirror:
     image: ${DOCKER_IMAGE}
@@ -9,7 +9,6 @@ services:
     environment:
       REGISTRY_HTTP_ADDR: :5000
       REGISTRY_HTTP_HOST: http://${TARGET_HOST}:5000
-      # TODO update REGISTRY HTTP SECRET.
       REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:-CHANGEME}
       REGISTRY_PROXY_REMOTEURL: ${REGISTRY_PROXY_REMOTEURL:-https://registry-1.docker.io}
       REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data

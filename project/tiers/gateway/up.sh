@@ -1,11 +1,11 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
 if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    bash -c "$BCM_GIT_DIR/project/up.sh"
+    bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 fi
 
 # shellcheck disable=SC1091
@@ -45,8 +45,6 @@ lxc file push ./bcm-gateway-01.daemon.json bcm-gateway-01/etc/docker/daemon.json
 lxc restart bcm-gateway-01
 bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
 
-
-# TODO - make static
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
 REGISTRY_PROXY_REMOTEURL="$BCM_DOCKER_IMAGE_CACHE"
 if [[ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]]; then
@@ -62,14 +60,14 @@ TARGET_HOST="bcm-gateway-01" \
 REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL" \
 docker stack deploy -c "/root/$BCM_TIER_NAME/stacks/registry/regmirror.yml" regmirror
 
-lxc exec bcm-gateway-01 -- wait-for-it -t 0 "bcm-gateway-01:5000"
+lxc exec bcm-gateway-01 -- wait-for-it -t 10 "bcm-gateway-01:5000"
 
 lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" \
 TARGET_PORT=5010 \
 TARGET_HOST="bcm-gateway-01" \
 docker stack deploy -c "/root/gateway/stacks/registry/privreg.yml" privateregistry
 
-lxc exec bcm-gateway-01 -- wait-for-it -t 0 "bcm-gateway-01:5010"
+lxc exec bcm-gateway-01 -- wait-for-it -t 10 "bcm-gateway-01:5010"
 
 # tag and push the registry image to our local private registry.
 lxc exec bcm-gateway-01 -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
@@ -112,9 +110,9 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
             # make sure gateway and kafka hosts can reach the swarm master.
             # this steps helps resolve networking before we issue any meaningful
             # commands.
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:2377
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 -q bcm-gateway-01:5000
-            lxc exec "$HOSTNAME" -- wait-for-it -t 0 "$BCM_PRIVATE_REGISTRY"
+            lxc exec "$HOSTNAME" -- wait-for-it -t 10 -q bcm-gateway-01:2377
+            lxc exec "$HOSTNAME" -- wait-for-it -t 10 -q bcm-gateway-01:5000
+            lxc exec "$HOSTNAME" -- wait-for-it -t 10 "$BCM_PRIVATE_REGISTRY"
             
             if [[ $HOST_ENDING -le 3 ]]; then
                 lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_MANAGER_JOIN_TOKEN" bcm-gateway-01:2377

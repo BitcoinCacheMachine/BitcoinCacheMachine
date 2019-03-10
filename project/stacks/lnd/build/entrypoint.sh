@@ -29,10 +29,10 @@ else
 	exit 1
 fi
 
-wait-for-it -t 0 bitcoindrpc:$PORT
+wait-for-it -t 10 bitcoindrpc:$PORT
 
 echo "Waiting for tcp://bitcoindrpc:28332 (ZMQ interface for tx & block notification)"
-wait-for-it -t 0 bitcoindrpc:28332
+wait-for-it -t 10 bitcoindrpc:28332
 
 # here we poll the remote bitcoind instance using the RPC interface to check
 # on the sync status of bitcoind.  Only once it has fully validated the blockchain
