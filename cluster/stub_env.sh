@@ -6,7 +6,6 @@ cd "$(dirname "$0")"
 IS_MASTER=0
 BCM_SSH_USERNAME=bcm
 BCM_SSH_HOSTNAME=
-# SSH_KEY_PATH=
 BCM_DRIVER=ssh
 ENDPOINT_DIR=
 
@@ -28,10 +27,6 @@ for i in "$@"; do
             ENDPOINT_DIR="${i#*=}"
             shift # past argument=value
         ;;
-        # --ssh-key-path=*)
-        #     SSH_KEY_PATH="${i#*=}"
-        #     shift # past argument=value
-        # ;;
         --driver=*)
             BCM_DRIVER="${i#*=}"
             shift # past argument=value

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 if [[ -z $BCM_ACTIVE ]]; then
@@ -25,7 +25,7 @@ fi
 # # check to see if we have Trezor-backed GPG certificates.  If not, let's create them.
 # if bcm info | grep -q "BCM_DEFAULT_KEY_ID"; then
 #     echo "Trezor-backed GPG certificates were not found."
-    
+
 #     # Init your SDN controller; create a new GPG certificate 'Satoshi Nakamoto satoshi@bitcoin.org'
 #     bcm init --cert-name="Satoshi Nakamoto" --username="satoshi" --hostname="bitcoin.org"
 # fi

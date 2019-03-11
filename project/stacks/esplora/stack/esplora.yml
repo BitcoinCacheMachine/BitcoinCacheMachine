@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  esplora:
+    image: ${IMAGE_NAME}
+    hostname: esplora-${CHAIN:-testnet}
+    ports:
+      - "${BCM_SERVICE_PORT}:5000"
+    volumes:
+      - esplora-data:/root/.esplora
+    environment:
+      CHAIN: ${CHAIN:-testnet}
+      HOST_ENDING: ${HOST_ENDING:-01}
+    networks:
+      bitcoindrpcnet:
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-ui == true
+
+volumes:
+  esplora-data:
+
+networks:
+  bitcoindrpcnet:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet

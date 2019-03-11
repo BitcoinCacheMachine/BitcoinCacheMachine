@@ -105,7 +105,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
-    ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME"
+    ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME-01"
     mkdir -p "$ENDPOINT_DIR"
     
     # first check to ensure that the cluster doesn't already exist.

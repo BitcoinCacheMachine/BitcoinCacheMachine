@@ -25,7 +25,7 @@ fi
 
 if [[ ! -f /home/bcm/.ssh/authorized_keys ]]; then
     sudo touch /home/bcm/.ssh/authorized_keys
-    chown bcm:lxd -R /home/bcm/.ssh
+    sudo chown bcm:lxd -R /home/bcm/.ssh
 fi
 
 sudo touch /etc/sudoers.d/bcm

@@ -34,8 +34,8 @@ function validateParams() {
         exit
     fi
     
-    if [[ "$CHAIN" != "testnet" &&  "$CHAIN" != "mainnet" ]]; then
-        echo "ERROR: CHAIN MUST be either 'testnet' or 'mainnet'."
+    if [[ "$CHAIN" != "testnet" &&  "$CHAIN" != "mainnet" && "$CHAIN" != "regtest" ]]; then
+        echo "ERROR: CHAIN MUST be either 'testnet', 'mainnet', or 'regtest'."
         exit
     fi
 }
@@ -88,13 +88,7 @@ if [[ $BCM_CLI_VERB == "remove"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
     validateParams;
     
-    #echo "Deploying '$STACK_NAME' to bitcoind '$CHAIN'."
-    DESTROY_FILE="$BCM_STACKS_DIR/$STACK_NAME/destroy.sh"
-    if [[ -f "$DESTROY_FILE" ]]; then
-        $DESTROY_FILE "$@"
-    else
-        echo "ERROR: Could not find '$DESTROY_FILE'."
-    fi
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME-$BCM_DEFAULT_CHAIN"
 fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then

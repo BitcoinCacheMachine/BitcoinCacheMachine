@@ -25,10 +25,10 @@ CONTAINER_NAME="bcm-bitcoin-$HOST_ENDING"
 # push the stack and build files
 lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" "bcm-gateway-01/root/stacks/bitcoin/"
 
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
-CHAIN="$BCM_DEFAULT_CHAIN" \
-HOST_ENDING="$HOST_ENDING" \
-docker stack deploy -c "/root/stacks/bitcoin/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
+#AUTH_PASSWORD="$(apg -n 1 -m 30 -M CN)"
+#AUTH_PASSWORD_HASH=$(python3 rpcauth.py bitcoind "$AUTH_PASSWORD" | grep "rpcauth=")
+
+lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" CHAIN="$BCM_DEFAULT_CHAIN" HOST_ENDING="$HOST_ENDING" docker stack deploy -c "/root/stacks/bitcoin/bitcoind/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
 
 UPLOAD_BLOCKS=0
 UPLOAD_CHAINSTATE=0
@@ -38,9 +38,6 @@ DEST_DIR='/var/lib/docker/volumes/bitcoind-'"$BCM_DEFAULT_CHAIN"'_bitcoin_data/_
 if [[ $BCM_DEFAULT_CHAIN == "testnet" ]]; then
     SRC_DIR="$HOME/.bitcoin/testnet3"
     DEST_DIR="$DEST_DIR/testnet3"
-    elif [[ $BCM_DEFAULT_CHAIN == 'regtest' ]]; then
-    SRC_DIR="$HOME/.bitcoin/regtest"
-    DEST_DIR="$DEST_DIR/regtest"
 fi
 
 # if the $HOME/.bitcoin/blocks (or testnet3/blocks) directory exists,

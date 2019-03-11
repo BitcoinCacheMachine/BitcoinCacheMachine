@@ -23,8 +23,10 @@ if [[ ! -z "$CHAIN" ]]; then
         GOGO_FILE=/root/.bitcoin/testnet3/gogo
         elif [[ "$CHAIN" == "mainnet" ]]; then
         GOGO_FILE=/root/.bitcoin/gogo
+        elif [[ "$CHAIN" == "regtest" ]]; then
+        GOGO_FILE=/root/.bitcoin/regtest/gogo
     else
-        echo "Error: CHAIN must be either 'testnet' or 'mainnet'."
+        echo "Error: CHAIN must be either 'testnet', 'mainnet', or 'regtest'."
         exit
     fi
     

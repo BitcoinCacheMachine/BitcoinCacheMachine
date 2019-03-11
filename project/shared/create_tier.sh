@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_TIER_NAME=
@@ -48,11 +48,23 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     source "$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/env"
     
     # TIER_TYPE of value 2 means one interface (eth1) in container is
-    # using MACVLAN to expose services to the physical network underlay
+    # using MACVLAN to expose services on the physical network underlay network.
     if [[ $BCM_TIER_TYPE == 2 ]]; then
         # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
-        if lxc network list --format csv | grep physical | grep -q "$MACVLAN_INTERFACE"; then
-            lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$MACVLAN_INTERFACE"
+        ACTIVE_CLUSTER="$(lxc remote get-default)"
+        ACTIVE_ENDPOINT="$ACTIVE_CLUSTER-$(printf %02d "$HOST_ENDING")"
+        ENDPOINT_ENV_PATH="$BCM_WORKING_DIR/$ACTIVE_CLUSTER/$ACTIVE_ENDPOINT/env"
+        if [[ -f "$ENDPOINT_ENV_PATH" ]]; then
+            source "$ENDPOINT_ENV_PATH"
+            
+            # wire up the interface if the MACVLAN_INTERFACE variable is defined.
+            if [[ ! -z "$MACVLAN_INTERFACE" ]]; then
+                if lxc network list --format csv | grep physical | grep -q "$MACVLAN_INTERFACE"; then
+                    lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$MACVLAN_INTERFACE"
+                fi
+            fi
+        else
+            echo "ERROR: The '$ACTIVE_ENDPOINT/env' does not exist. Can't wire up the macvlan interface."
         fi
     fi
     

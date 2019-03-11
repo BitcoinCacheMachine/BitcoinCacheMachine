@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux
+set -Eeu
 
 # give the container a few seconds to get its shit together
 sleep 3

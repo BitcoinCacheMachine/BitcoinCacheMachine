@@ -6,10 +6,10 @@ cd "$(dirname "$0")"
 VM_NAME=
 
 # DISK size is in GBs
-DISK_SIZE="50"
+DISK_SIZE="150"
 
 # MEM_SIZE is in MB. 4092 = 4GB
-MEM_SIZE="4098M"
+MEM_SIZE="8196M"
 
 # CPU_COUNT is cores.
 CPU_COUNT=4
