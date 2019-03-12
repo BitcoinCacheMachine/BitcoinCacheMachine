@@ -36,7 +36,7 @@ fi
 
 # get the current directory where this script is so we can set ENVs in ~/.bashrc
 echo "Setting BCM_GIT_DIR environment variable in current shell to '$(pwd)'"
-BCM_GIT_DIR=$(pwd)
+BCM_GIT_DIR="$(pwd)"
 export BCM_GIT_DIR="$BCM_GIT_DIR"
 export BCM_RUNTIME_DIR="$BCM_RUNTIME_DIR"
 
@@ -45,11 +45,17 @@ BASHRC_FILE="$HOME/.bashrc"
 BCM_BASHRC_START_FLAG='###START_BCM###'
 BCM_BASHRC_END_FLAG='###END_BCM###'
 
+if [[ ! -f $BASHRC_FILE ]]; then
+    touch "$BASHRC_FILE"
+    sudo chmod 0644 "$BASHRC_FILE"
+fi
+
 if grep -Fxq "$BCM_BASHRC_START_FLAG" "$BASHRC_FILE"; then
     echo "BCM flag discovered in '$BASHRC_FILE'. Please inspect your '$BASHRC_FILE' to clear any BCM-related content, if appropriate."
 else
     echo "Writing commands to '$BASHRC_FILE' to enable the BCM CLI."
     {
+        echo ""
         echo "$BCM_BASHRC_START_FLAG"
         echo "export BCM_GIT_DIR=$BCM_GIT_DIR"
         # shellcheck disable=SC2016
