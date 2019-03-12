@@ -72,7 +72,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     KEY_NAME="id_rsa_trezor.pub"
     TREZOR_PUB_KEY_PATH="$ENDPOINT_DIR/$KEY_NAME"
     
-    sudo docker run -t --rm \
+    docker run -t --rm \
     -v "$ENDPOINT_DIR":/root/.ssh \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
@@ -114,7 +114,7 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     fi
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    sudo docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     --device="$BCM_TREZOR_USB_PATH" \

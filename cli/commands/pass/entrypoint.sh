@@ -36,7 +36,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     fi
     
     # How we reference the password.
-    sudo docker run -t --name pass --rm \
+    docker run -t --name pass --rm \
     -v "$GNUPGHOME":/root/.gnupg:rw \
     -v "$PASSWORD_STORE_DIR":/root/.password-store:rw \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
@@ -80,7 +80,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     # only run this if we don't have a .gpg-id file, which indicates it's
     # already been initialized
     if [[ ! -f "$GNUPGHOME/.gpg-id" ]]; then
-        sudo docker run -it --name pass --rm \
+        docker run -it --name pass --rm \
         -v "$GNUPGHOME":/root/.gnupg \
         -v "$PASSWORD_STORE_DIR":/root/.password-store \
         -e BCM_CERT_NAME="$BCM_CERT_NAME" \
@@ -100,7 +100,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     fi
     
     # How we reference the password.
-    sudo docker run -it --name pass --rm \
+    docker run -it --name pass --rm \
     -v "$GNUPGHOME":/root/.gnupg:rw \
     -v "$PASSWORD_STORE_DIR":/root/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
@@ -110,7 +110,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     elif [[ $BCM_CLI_VERB == "list" ]]; then
     if ! bcm info | grep -q "PASSWORD_STORE_DIR:     N/A"; then
         # How we reference the password.
-        sudo docker run -it --name pass --rm \
+        docker run -it --name pass --rm \
         -v "$GNUPGHOME":/root/.gnupg:ro \
         -v "$PASSWORD_STORE_DIR":/root/.password-store \
         --device="$BCM_TREZOR_USB_PATH" \
@@ -120,7 +120,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     fi
     elif [[ $BCM_CLI_VERB == "rm" || $BCM_CLI_VERB == "remove" ]]; then
     # How we reference the password.
-    sudo docker run -it --name pass --rm \
+    docker run -it --name pass --rm \
     -v "$GNUPGHOME":/root/.gnupg:rw \
     -v "$PASSWORD_STORE_DIR":/root/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
@@ -129,7 +129,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     
     elif [[ $BCM_CLI_VERB == "insert" ]]; then
     # How we reference the password.
-    sudo docker run -it --name pass --rm \
+    docker run -it --name pass --rm \
     -v "$GNUPGHOME":/root/.gnupg:rw \
     -v "$PASSWORD_STORE_DIR":/root/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \

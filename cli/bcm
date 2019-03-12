@@ -11,7 +11,7 @@ fi
 source ./env
 
 if snap list | grep -q docker; then
-    if ! sudo docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
+    if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
         CHOICE=
         read -rp "The docker image for the BCM SDN Controller is unavailable. Would you like to build it now (n/y): " CHOICE
         if [[ $CHOICE == "y" ]]; then

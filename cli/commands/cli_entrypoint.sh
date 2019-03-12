@@ -99,3 +99,7 @@ fi
 if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
     bash -c "$BCM_GIT_DIR/project/destroy.sh"
 fi
+
+if [[ $BCM_HELP_FLAG == 1 ]]; then
+    cat ./help.txt
+fi

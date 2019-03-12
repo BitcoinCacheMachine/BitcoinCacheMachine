@@ -32,7 +32,7 @@ for i in "$@"; do
     esac
 done
 
-if ! sudo docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
+if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
     bash -c "$BCM_GIT_DIR/controller/build.sh"
 fi
 
@@ -51,7 +51,7 @@ BCM_CERT_HOSTNAME="$(echo "$BCM_CERT_HOSTNAME" | xargs)"
 
 if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
     # run the container.
-    sudo docker run -it --name trezorgpg --rm \
+    docker run -it --name trezorgpg --rm \
     -v "$GNUPGHOME":/root/.gnupg \
     -e BCM_CERT_NAME="$BCM_CERT_NAME" \
     -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
@@ -59,10 +59,13 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     bcm-trezor:latest trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
     
+    #    --user "$(id -u)":"$(id -g)" \
+    # -w /tmp \
+    # -v "$GNUPGHOME":/tmp \
     echo "Your public key and public keyring material can be found at '$GNUPGHOME/trezor'."
 fi
 
-BCM_DEFAULT_KEY_ID=$(sudo docker run -it --name trezorgpg --rm -v "$GNUPGHOME":/root/.gnupg bcm-trezor:latest gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
+BCM_DEFAULT_KEY_ID=$(docker run -it --name trezorgpg --rm -v "$GNUPGHOME":/root/.gnupg bcm-trezor:latest gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
 BCM_DEFAULT_KEY_ID="${BCM_DEFAULT_KEY_ID#*/}"
 BCM_DEFAULT_KEY_ID="$(echo "$BCM_DEFAULT_KEY_ID" | awk '{print $1}')"
 

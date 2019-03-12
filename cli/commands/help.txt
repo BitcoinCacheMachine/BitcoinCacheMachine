@@ -7,8 +7,8 @@ Description:
        using 'bcm init'.
     2) Create a new cluster using 'bcm cluster create'. Add cluster endpoints (new computers) to the cluster 
        by running 'bcm cluster add'.
-    3) Deploy critical BCM data center components to all cluster endpoints using the 'bcm provision' command.
-    4) Use 'bcm stack deploy <stack_name>' to deploy a Bitcoin-related software stack to the active cluster.
+    3) Use 'bcm stack deploy <stack_name>' to deploy a Bitcoin-related software stack to the active cluster.
+       Export 'BCM_DEFAULT_CHAIN' to change the default chain when deploying components (testnet, mainnet, regtest).
 
 Usage:
   bcm [command] --help

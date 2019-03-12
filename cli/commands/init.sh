@@ -33,17 +33,17 @@ if [[ "$BCM_HELP_FLAG" == 1 ]]; then
 fi
 
 if [[ -z "$BCM_CERT_NAME" ]]; then
-    echo "BCM_CERT_NAME not set."
+    echo "BCM_CERT_NAME not set. Please use '--cert-name='Satoshi Nakamoto'"
     exit
 fi
 
 if [[ -z "$BCM_CERT_USERNAME" ]]; then
-    echo "BCM_CERT_USERNAME not set."
+    echo "BCM_CERT_USERNAME not set. Please use '--username='satoshi'"
     exit
 fi
 
 if [[ -z "$BCM_CERT_HOSTNAME" ]]; then
-    echo "BCM_CERT_HOSTNAME not set."
+    echo "BCM_CERT_HOSTNAME not set. Please use '--hostname='bitcoin.org'"
     exit
 fi
 

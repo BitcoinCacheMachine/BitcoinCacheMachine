@@ -111,10 +111,10 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
         echo "BCM_DEFAULT_KEY_ID: $BCM_DEFAULT_KEY_ID"
     fi
     
-    if ! sudo docker ps | grep -q "gitter"; then
+    if ! docker ps | grep -q "gitter"; then
         # shellcheck disable=SC1090
         source "$BCM_GIT_DIR/controller/export_usb_path.sh"
-        sudo docker run -d --name gitter \
+        docker run -d --name gitter \
         -v "$GNUPGHOME":/root/.gnupg \
         -v "$GIT_REPO_DIR":/gitrepo \
         --device="$BCM_TREZOR_USB_PATH" \
@@ -127,8 +127,8 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
         sleep 2
     fi
     
-    if sudo docker ps | grep -q "gitter"; then
-        sudo docker exec -it gitter /bcm/commit_sign_git_repo.sh
+    if docker ps | grep -q "gitter"; then
+        docker exec -it gitter /bcm/commit_sign_git_repo.sh
     fi
 fi
 
@@ -143,7 +143,7 @@ if [[ $BCM_CLI_VERB == "push" ]]; then
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    sudo docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_SSH_DIR":/root/.ssh \
     -v "$GIT_REPO_DIR":/gitrepo \
     -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
@@ -153,7 +153,7 @@ if [[ $BCM_CLI_VERB == "push" ]]; then
     bcm-trezor:latest trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 10 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$BCM_GIT_CLIENT_USERNAME" && git push
 fi
 
-if sudo docker ps | grep -q "gitter"; then
-    sudo docker kill gitter >/dev/null
-    sudo docker system prune -f >/dev/null
+if docker ps | grep -q "gitter"; then
+    docker kill gitter >/dev/null
+    docker system prune -f >/dev/null
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 echo "BCM /entrypoint.sh for electrumpersonalserver"
 
 if [[ ! -z "$CHAIN" ]]; then
