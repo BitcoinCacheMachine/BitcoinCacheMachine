@@ -78,6 +78,8 @@ if [[ $BCM_DRIVER == "multipass" ]]; then
     if ! lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
         echo "Your computer does NOT support hardware virtualization. You may need to turn this feature on in the BIOS. BCM will be deployed to your machine in a baremetal configuration."
         BCM_DRIVER=ssh
+        BCM_SSH_HOSTNAME="$(hostname)"
+        BCM_SSH_USERNAME="$(whoami)"
     else
         BCM_SSH_HOSTNAME="bcm-$(hostname)"
         
