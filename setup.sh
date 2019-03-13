@@ -5,11 +5,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-export BCM_ACTIVE=1
-
-# shellcheck disable=SC1091
-source ./cli/env
-
 # let's set the local git client user and email settings to prevent error messages
 # related to an unconfigured git client. Test
 if [[ -z $(git config --get --local user.name) ]]; then
@@ -38,7 +33,6 @@ fi
 echo "Setting BCM_GIT_DIR environment variable in current shell to '$(pwd)'"
 BCM_GIT_DIR="$(pwd)"
 export BCM_GIT_DIR="$BCM_GIT_DIR"
-export BCM_RUNTIME_DIR="$BCM_RUNTIME_DIR"
 
 # commands in ~/.bashrc are delimited by these literals.
 BASHRC_FILE="$HOME/.bashrc"
@@ -111,9 +105,13 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
     if grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
         echo "$HOME/.ssh/config already configured correctly."
     else
-        echo "$SSH_ONION_TEXT" >> "$SSH_LOCAL_CONF"
-        echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p" >> "$SSH_LOCAL_CONF"
+        {
+            echo "$SSH_ONION_TEXT"
+            echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p"
+        } >> "$SSH_LOCAL_CONF"
     fi
 fi
 
-echo "Done setting up your machine to use the Bitcoin Cache Machine CLI. Open a new terminal then type 'bcm --help'."
+echo "Done setting up your machine to use the Bitcoin Cache Machine CLI."
+echo " You may need to logout to refresh your group membership."
+echo "Afterwards, open a new terminal then type 'bcm --help'."

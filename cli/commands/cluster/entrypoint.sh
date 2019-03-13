@@ -118,6 +118,27 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
+    if [[ $(lxc remote get-default) == "local" ]]; then
+        echo "ERROR: The current LXD remote is set to 'local'. You may not have a cluster to destroy."
+        exit
+    fi
+    
+    CONTINUE=0
+    while [[ "$CONTINUE" == 0 ]]
+    do
+        echo "WARNING: Are you sure you want to delete the current cluster '$(lxc remote get-default)'? This will DESTROY ALL DATA!!!"
+        read -rp "Are you sure (y/n):  "   CHOICE
+        
+        if [[ "$CHOICE" == "y" ]]; then
+            CONTINUE=1
+            elif [[ "$CHOICE" == "n" ]]; then
+            exit
+        else
+            echo "Invalid entry. Please try again."
+        fi
+    done
+    
+    
     if [[ $BCM_DRIVER == multipass ]]; then
         BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
         if multipass list | grep -q "$BCM_SSH_HOSTNAME"; then
