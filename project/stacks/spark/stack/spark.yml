@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  spark:
+    image: ${IMAGE_NAME}
+    hostname: spark-${CHAIN:-testnet}
+    ports:
+      - "${BCM_SERVICE_PORT}:9737"
+    volumes:
+      - clightning-data:/root/.lightning
+    environment:
+      CHAIN: ${CHAIN:-testnet}
+      HOST_ENDING: ${HOST_ENDING:-01}
+    networks:
+      clightningrpcnet:
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+volumes:
+  clightning-data:
+    external: true
+    name: clightning-${CHAIN:-testnet}_clightning-data
+
+networks:
+  clightningrpcnet:
+    external: true
+    name: clightning-${CHAIN:-testnet}_clightningrpcnet
