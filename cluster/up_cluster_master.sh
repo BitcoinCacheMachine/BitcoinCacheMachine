@@ -70,7 +70,7 @@ if [[ $BCM_DRIVER == multipass ]]; then
     # the multipass cloud-init process already has the bcm user provisioned
     bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR"
     elif [[ $BCM_DRIVER == ssh ]]; then
-    ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "bcm@$BCM_SSH_HOSTNAME"
+    ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
 # let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file

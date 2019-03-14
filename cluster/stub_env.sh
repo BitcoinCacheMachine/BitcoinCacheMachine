@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 IS_MASTER=0
-BCM_SSH_USERNAME=bcm
+BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
 BCM_DRIVER=ssh
 ENDPOINT_DIR=

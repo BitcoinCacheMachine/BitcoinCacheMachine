@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 ENDPOINT_DIR=
 CLUSTER_NAME=$(lxc remote get-default)
-BCM_SSH_USERNAME=bcm
+BCM_SSH_USERNAME=
 BCM_SSH_HOSTNAME=
 
 # shellcheck disable=SC1091
