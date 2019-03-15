@@ -43,13 +43,15 @@ if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
     echo "ERROR: BCM_SSH_HOSTNAME not specified. Use --ssh-hostname="
 fi
 
-# if it's the cluster master add the LXC remote so we can manage it.
-if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
-    echo "Switching lxd remote to local."
-    lxc remote switch local
-    
-    echo "Removing lxd remote for cluster '$CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."
-    lxc remote remove "$CLUSTER_NAME"
+if [[ $(lxc remote get-default) != "local" ]]; then
+    # if it's the cluster master add the LXC remote so we can manage it.
+    if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
+        echo "Switching lxd remote to local."
+        lxc remote switch "local"
+        
+        echo "Removing lxd remote for cluster '$CLUSTER_NAME' at '$BCM_SSH_HOSTNAME:8443'."
+        lxc remote remove "$CLUSTER_NAME"
+    fi
 fi
 
 if [[ -d "$BCM_WORKING_DIR/$CLUSTER_NAME" ]]; then

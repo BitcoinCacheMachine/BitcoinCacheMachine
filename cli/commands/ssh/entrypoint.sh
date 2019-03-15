@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -94,7 +94,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     
     if [[ -f $SSH_KEY_PATH ]]; then
         # push the trezor ssh pubkey to the destination.
-        ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME" sudo tee -a "/home/$SSH_USERNAME/.ssh/authorized_keys" < "$TREZOR_PUB_KEY_PATH"
+        ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME"
         
         # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
         ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$SSH_HOSTNAME"  >> /dev/null

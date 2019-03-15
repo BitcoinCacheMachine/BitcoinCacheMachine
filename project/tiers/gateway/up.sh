@@ -4,9 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
-if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
-fi
+bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 
 # shellcheck disable=SC1091
 source ./env

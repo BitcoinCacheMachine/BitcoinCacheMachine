@@ -2,6 +2,8 @@
 
 set -Eeu
 
+sleep 3
+
 # shellcheck disable=SC1091
 source /bcm/proxy_ip_determinant.sh
 

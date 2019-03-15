@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 CLUSTER_NAME=
@@ -9,6 +9,7 @@ BCM_SSH_HOSTNAME=
 SSH_KEY_PATH=
 BCM_DRIVER=ssh
 ENDPOINT_DIR=
+NODE_NAME=
 
 for i in "$@"; do
     case $i in
@@ -90,7 +91,6 @@ if [[ $BCM_SSH_USERNAME == "bcm" ]]; then
     REMOTE_MOUNTPOINT='/home/bcm/bcm'
 fi
 
-# let's mount the directory via sshfs. This contains the lxd seed file.
 ./stub_env.sh --master \
 --ssh-username="$BCM_SSH_USERNAME"  \
 --ssh-hostname="$BCM_SSH_HOSTNAME" \

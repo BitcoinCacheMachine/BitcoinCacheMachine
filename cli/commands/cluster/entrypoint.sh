@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -67,7 +67,7 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
     exit
 fi
 
-if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" ]]; then
+if [[ $BCM_DRIVER != "ssh" && $BCM_DRIVER != "multipass" && $BCM_DRIVER != "local"  ]]; then
     echo "ERROR: BCM Cluster driver MUST be 'ssh' or 'multipass'."
     exit
 fi
@@ -78,9 +78,11 @@ if [[ $BCM_DRIVER == "multipass" ]]; then
     if ! lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
         echo "Your computer does NOT support hardware virtualization. You may need to turn this feature on in the BIOS. BCM will be deployed to your machine in a baremetal configuration."
         BCM_DRIVER=ssh
-        BCM_SSH_HOSTNAME="bcm-$(hostname)"
+        BCM_SSH_HOSTNAME="$(hostname)"
         BCM_SSH_USERNAME="$(whoami)"
     else
+        # the cloud-init file for multipass uses 'bcm' as the username.
+        BCM_SSH_USERNAME="bcm"
         BCM_SSH_HOSTNAME="bcm-$(hostname)"
         
         # Next make sure multipass is installed so we can run type-1 VMs
@@ -91,16 +93,21 @@ if [[ $BCM_DRIVER == "multipass" ]]; then
             sleep 10
         fi
     fi
+    elif [[ $BCM_DRIVER == "local" ]]; then
+    BCM_DRIVER=ssh
+    BCM_SSH_HOSTNAME="bcm-$(hostname)"
+    BCM_SSH_USERNAME="$(whoami)"
 fi
 
-# if the cluster name is local, then we assume the user hasn't overridden
-# what was set in 'lxc remote get-default'. If so, we will assume a cluster
-# will be created with the name of `bcm-hostname`
 if [[ $CLUSTER_NAME == "local" ]]; then
     CLUSTER_NAME="bcm-$(hostname)"
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
+    # if the cluster name is local, then we assume the user hasn't overridden
+    # what was set in 'lxc remote get-default'. If so, we will assume a cluster
+    # will be created with the name of `bcm-hostname`
+    
     if bcm cluster list | grep -q "$CLUSTER_NAME"; then
         echo "The BCM Cluster '$CLUSTER_NAME' already exists!"
         exit
@@ -109,6 +116,12 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
     ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME-01"
     mkdir -p "$ENDPOINT_DIR"
+    
+    # let's add an alias in /etc/hosts so the SDN controller can resolve 'bcm-$(hostname)'
+    HOSTS_ENTRY="127.0.1.1    $BCM_SSH_HOSTNAME"
+    if ! grep -Fxq "$HOSTS_ENTRY" /etc/hosts; then
+        echo "$HOSTS_ENTRY" | sudo tee -a /etc/hosts
+    fi
     
     # first check to ensure that the cluster doesn't already exist.
     if ! lxc remote list | grep -q "$CLUSTER_NAME"; then
@@ -120,15 +133,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    if [[ $(lxc remote get-default) == "local" ]]; then
-        echo "ERROR: The current LXD remote is set to 'local'. You may not have a cluster to destroy."
-        exit
-    fi
-    
     CONTINUE=0
     while [[ "$CONTINUE" == 0 ]]
     do
-        echo "WARNING: Are you sure you want to delete the current cluster '$(lxc remote get-default)'? This will DESTROY ALL DATA!!!"
+        echo "WARNING: Are you sure you want to delete the current cluster '$CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
         read -rp "Are you sure (y/n):  "   CHOICE
         
         if [[ "$CHOICE" == "y" ]]; then
@@ -151,6 +159,8 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         
         # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
         ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$BCM_SSH_HOSTNAME" >> /dev/null
+        elif [[ $BCM_DRIVER == "ssh" ]]; then
+        sudo sed -i -e "s/127.0.1.1    bcm-$(hostname)//g" /etc/hosts
     fi
     
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"

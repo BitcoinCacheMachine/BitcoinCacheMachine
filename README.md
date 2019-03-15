@@ -30,14 +30,13 @@ Here are some of the development goals for Bitcoin Cache Machine:
 * Pre-configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.).
 * Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications.
 * Enhance overall security and performance and network health by running a Tor middle relay and serving bitcoin blocks over Tor.
+* Facilitate local (SSH) and remote using [SSH port-forwarding](https://help.ubuntu.com/community/SSH/OpenSSH/PortForwarding) with TOR transport for cluster administration.
 
 ## How to Run Bitcoin Cache Machine
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have one or more always-on computers with a reliable Internet connection. You can run BCM in a hardware-based VM or directly on bare-metal.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have one or more always-on computers with a reliable Internet connection. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal.
 
-BCM application components are deployed using the [LXD REST](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker](https://www.docker.com/) APIs. LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI installs all the software you will need.
-
-Documentation for BCM is being migrated to [BCM Docs](https://www.bitcoincachemachine.org/docs/) website.
+BCM application components are deployed using the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](https://www.docker.com/). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI is designed to handle the installation and deployment of all software.
 
 ## Getting Started
 
@@ -65,15 +64,19 @@ cd "$BCM_GIT_DIR"
 source ~/.bashrc
 ```
 
-Feel free to change the directory in which you store the BCM repository on your machine. Just update the `BCM_GIT_DIR` variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Running `bcm` at the terminal displays top-level commands. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
+Feel free to change the directory in which you store the BCM repository on your machine. Just update the `BCM_GIT_DIR` variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Since `setup.sh` modifies group membership, you will have to log out and log back in before the BCM CLI operates correctly. Running `bcm` at the terminal displays top-level commands. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
 
 ## Deploying your own BCM Infrastructure
 
 After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy `clightning` and all its dependencies including `bitcoind`, run the `bcm stack deploy clightning` command.
 
+## Documentation
+
+Documentation for BCM can be found on the [BCM Docs](https://www.bitcoincachemachine.org/docs/) public website.  It's definitely an area that needs work.
+
 ## How to contribute
 
-Users wanting to contribute to the project may submit pull requests for review. A Keybase Team has been created for those wanting to discuss project ideas and coordinate. [Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
+Users wanting to contribute to the project may submit pull requests for review. Users wanting to contribute documentation can fork the BCM public website [here](https://github.com/BitcoinCacheMachine/bcmweb) and add blog posts in the `_posts` directory. A Keybase Team has been created for those wanting to discuss project ideas and coordinate. [Keybase Team for Bitcoin Cache Machine](https://keybase.io/team/btccachemachine)
 
 You can also donate to the development of BCM by sending Bitcoin (BTC) to the following address.
 
