@@ -1,11 +1,9 @@
 #!/bin/bash
 
-set -Eeu
-
-sleep 3
+set -Eeuo pipefail
 
 # shellcheck disable=SC1091
-source /bcm/proxy_ip_determinant.sh
+source /bcm/proxy_ip_determinant.sh --host-ending="$HOST_ENDING"
 
 if [[ -z "$TOR_PROXY" ]]; then
     echo "ERROR:  TOR_PROXY could not be determined."

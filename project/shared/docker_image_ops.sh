@@ -93,11 +93,13 @@ if [[ $REBUILD == 1 ]]; then
         lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
     fi
     
+    # refresh the docker-base image
+    bash -c "$BCM_GIT_DIR/project/tiers/gateway/build_push_docker_base.sh"
+    
     # let's build the image and push it to our private registry.
     IMAGE_FQDN="$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
     
     echo "Preparing the docker image '$IMAGE_FQDN'"
-    
     lxc exec "$LXC_HOST" -- docker build -t "$IMAGE_FQDN" /root/build/
     lxc exec "$LXC_HOST" -- docker push "$IMAGE_FQDN"
 else

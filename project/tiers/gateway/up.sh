@@ -71,14 +71,8 @@ lxc exec bcm-gateway-01 -- wait-for-it -t 10 "bcm-gateway-01:5010"
 lxc exec bcm-gateway-01 -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 lxc exec bcm-gateway-01 -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
-# now let's build some custom images that we're going run on each bcm-gateway
-# namely TOR
-lxc exec bcm-gateway-01 -- docker pull ubuntu:latest
-
-lxc file push -p -r ./build/ bcm-gateway-01/root/gateway/
-
-lxc exec bcm-gateway-01 -- docker build -t "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest" /root/gateway/build/
-lxc exec bcm-gateway-01 -- docker push "$BCM_PRIVATE_REGISTRY/bcm-docker-base:latest"
+# build and push the docker-base docker image.
+./build_push_docker_base.sh
 
 TOR_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-tor:latest"
 lxc exec bcm-gateway-01 -- docker build -t "$TOR_IMAGE" "/root/gateway/build/tor/"

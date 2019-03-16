@@ -1,2 +1,2 @@
-export REMOTE_MOUNTPOINT="$BCM_WORKING_DIR/provisioning"
+export REMOTE_MOUNTPOINT="/tmp/provisioning"
 export ENV_FILE="$ENDPOINT_DIR/env"

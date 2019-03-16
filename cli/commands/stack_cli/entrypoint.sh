@@ -13,25 +13,14 @@ else
 fi
 
 export BCM_CLI_COMMAND="$BCM_CLI_COMMAND"
+CHAIN="$BCM_DEFAULT_CHAIN"
+CHAIN_TEXT="-$CHAIN"
+CMD_TEXT=$(echo "$@" | sed 's/.* //')
 
-shopt -s expand_aliases
-
-BCM_HELP_FLAG=0
-BCM_FORCE_FLAG=0
-
-for i in "$@"; do
-    case $i in
-        --help)
-            BCM_HELP_FLAG=1
-            shift # past argument=value
-        ;;
-        --force)
-            BCM_FORCE_FLAG=1
-            shift # past argument=value
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
-done
-
+# get the bitcoind instance
+DOCKER_CONTAINER_ID=$(lxc exec bcm-bitcoin-01 -- docker ps | grep bcm-bitcoin-core: | awk '{print $1}')
+if [[ $BCM_CLI_COMMAND == "bitcoin-cli" ]]; then
+    lxc exec bcm-bitcoin-01 -- docker exec -it "$DOCKER_CONTAINER_ID" bitcoin-cli "$CHAIN_TEXT" "$CMD_TEXT"
+    elif [[ $BCM_CLI_COMMAND == "lightning-cli" ]]; then
+    lxc exec bcm-bitcoin-01 -- docker exec -it "$DOCKER_CONTAINER_ID" lightning-cli "$CMD_TEXT"
+fi
