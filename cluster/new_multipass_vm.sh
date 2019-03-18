@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VM_NAME=
@@ -80,8 +80,11 @@ multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
 
 multipass restart "$VM_NAME"
 
-# call the following scripts so do a static /etc/hosts mapping since multipass doesn't natively do DNS (or I need more research)
-bash -c "$BCM_GIT_DIR/cli/shared/update_controller_etc_hosts.sh"
+
+IPV4_ADDRESS=$(multipass list --format csv | grep $VM_NAME | awk -F "\"*,\"*" '{print $3}')
+if [[ ! -z $IPV4_ADDRESS && ! -z $VM_NAME ]]; then
+    echo "$IPV4_ADDRESS    $VM_NAME" | sudo tee -a /etc/hosts
+fi
 
 # let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
 ssh-keyscan -H "$VM_NAME" >> "$BCM_KNOWN_HOSTS_FILE"

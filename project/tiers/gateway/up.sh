@@ -46,7 +46,7 @@ bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-ga
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
 REGISTRY_PROXY_REMOTEURL="$BCM_DOCKER_IMAGE_CACHE"
 if [[ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]]; then
-    REGISTRY_PROXY_REMOTEURL="$BCM_DOCKER_IMAGE_CACHE"
+    REGISTRY_PROXY_REMOTEURL="http://$BCM_DOCKER_IMAGE_CACHE:5000"
 fi
 
 # push the stack files up tthere.

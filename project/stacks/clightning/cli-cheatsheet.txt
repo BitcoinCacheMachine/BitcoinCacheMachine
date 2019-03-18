@@ -1,7 +1,7 @@
-lightning-cli listnodes
-lightning-cli listchannels
-lightning-cli listinvoices
-lightning-cli listconfigs
-lightning-cli getinfo
-lightning-cli newaddr
-lightning-cli listfunds
+bcm lightning-cli listnodes
+bcm lightning-cli listchannels
+bcm lightning-cli listinvoices
+bcm lightning-cli listconfigs
+bcm lightning-cli getinfo
+bcm lightning-cli newaddr
+bcm lightning-cli listfunds

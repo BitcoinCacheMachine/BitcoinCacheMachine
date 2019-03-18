@@ -18,9 +18,20 @@ CHAIN_TEXT="-$CHAIN"
 CMD_TEXT=$(echo "$@" | sed 's/.* //')
 
 # get the bitcoind instance
-DOCKER_CONTAINER_ID=$(lxc exec bcm-bitcoin-01 -- docker ps | grep bcm-bitcoin-core: | awk '{print $1}')
 if [[ $BCM_CLI_COMMAND == "bitcoin-cli" ]]; then
-    lxc exec bcm-bitcoin-01 -- docker exec -it "$DOCKER_CONTAINER_ID" bitcoin-cli "$CHAIN_TEXT" "$CMD_TEXT"
+    DOCKER_CONTAINER_ID=$(lxc exec bcm-bitcoin-01 -- docker ps | grep bcm-bitcoin-core: | awk '{print $1}')
+    if [[ ! -z $DOCKER_CONTAINER_ID ]]; then
+        lxc exec bcm-bitcoin-01 -- docker exec -it "$DOCKER_CONTAINER_ID" bitcoin-cli "$CHAIN_TEXT" "$CMD_TEXT"
+    else
+        echo "WARNING: Docker container not found for clightning. You may need to run 'bcm stack deploy bitcoind'."
+    fi
+    
     elif [[ $BCM_CLI_COMMAND == "lightning-cli" ]]; then
-    lxc exec bcm-bitcoin-01 -- docker exec -it "$DOCKER_CONTAINER_ID" lightning-cli "$CMD_TEXT"
+    DOCKER_CONTAINER_ID=$(lxc exec bcm-bitcoin-01 -- docker ps | grep bcm-clightning: | awk '{print $1}')
+    if [[ ! -z "$DOCKER_CONTAINER_ID" ]]; then
+        lxc exec bcm-bitcoin-01 -- docker exec -it "$DOCKER_CONTAINER_ID" lightning-cli "$CMD_TEXT"
+    else
+        echo "WARNING: Docker container not found for clightning. You may need to run 'bcm stack deploy clightning'."
+    fi
+    
 fi

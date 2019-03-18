@@ -3,7 +3,7 @@ FROM bcm-gateway-01:5010/bcm-docker-base:latest
 
 RUN set -ex \
 	&& apt-get update \
-	&& apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu gnupg2 tar wget \
+	&& apt-get install -y --no-install-recommends ca-certificates dirmngr gosu gnupg2 tar wget \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV BITCOIN_VERSION 0.17.1

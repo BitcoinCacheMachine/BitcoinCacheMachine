@@ -59,9 +59,9 @@ if ! lxc image list --format csv | grep -q "bcm-bionic-base"; then
     # 'images' is the publicly avaialb e image server. Used whenever there's no LXD image cache specified.
     IMAGE_REMOTE="images"
     if [[ ! -z $BCM_LXD_IMAGE_CACHE ]]; then
+        IMAGE_REMOTE="$BCM_LXD_IMAGE_CACHE"
         if ! lxc remote list --format csv | grep -q "$IMAGE_REMOTE"; then
             lxc remote add "$IMAGE_REMOTE" "$IMAGE_REMOTE:8443"
-            IMAGE_REMOTE="$BCM_LXD_IMAGE_CACHE"
         fi
     fi
     
@@ -96,9 +96,8 @@ if ! lxc list --format csv | grep -q bcm-host-template; then
     lxc init bcm-bionic-base -p bcm_default -p docker_privileged -n bcmbr0 bcm-host-template
 fi
 
-
+# if our image is not prepared, let's go ahead and create it.
 if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    
     if lxc list --format csv -c=ns | grep bcm-host-template | grep -q STOPPED; then
         lxc start bcm-host-template
         

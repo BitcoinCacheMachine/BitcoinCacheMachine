@@ -12,29 +12,13 @@ fi
 
 STACK_NAME=${3:-}
 
-# Regardless of components, you must specify whether you want to deploy it against testnet or mainnet.
-CHAIN="$BCM_DEFAULT_CHAIN"
-
-for i in "$@"; do
-    case $i in
-        --chain=*)
-            CHAIN="${i#*=}"
-            shift # past argument=value
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
-done
-
-
 function validateParams() {
-    if [[ -z "$CHAIN" ]]; then
+    if [[ -z "$BCM_DEFAULT_CHAIN" ]]; then
         echo "ERROR: A CHAIN MUST be specified.  Use --chain=<testnet|mainnet>"
         exit
     fi
     
-    if [[ "$CHAIN" != "testnet" &&  "$CHAIN" != "mainnet" && "$CHAIN" != "regtest" ]]; then
+    if [[ "$BCM_DEFAULT_CHAIN" != "testnet" &&  "$BCM_DEFAULT_CHAIN" != "mainnet" && "$BCM_DEFAULT_CHAIN" != "regtest" ]]; then
         echo "ERROR: CHAIN MUST be either 'testnet', 'mainnet', or 'regtest'."
         exit
     fi
@@ -75,7 +59,7 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
     validateStackParam "$BCM_CLI_VERB";
     validateParams;
     
-    #echo "Deploying '$STACK_NAME' to bitcoind '$CHAIN'."
+    #echo "Deploying '$STACK_NAME' to bitcoind '$BCM_DEFAULT_CHAIN'."
     UP_FILE="$BCM_STACKS_DIR/$STACK_NAME/up.sh"
     if [[ -f "$UP_FILE" ]]; then
         $UP_FILE "$@"

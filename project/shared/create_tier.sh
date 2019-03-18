@@ -62,6 +62,9 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
                 if lxc network list --format csv | grep physical | grep -q "$MACVLAN_INTERFACE"; then
                     lxc config device add "$HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$MACVLAN_INTERFACE"
                 fi
+            else
+                echo "ERROR: MACVLAN_INTERFACE was not specified."
+                exit
             fi
         else
             echo "ERROR: The '$ACTIVE_ENDPOINT/env' does not exist. Can't wire up the macvlan interface."

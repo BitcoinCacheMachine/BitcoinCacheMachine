@@ -1,2 +1,0 @@
-export REMOTE_MOUNTPOINT="/tmp/provisioning"
-export ENV_FILE="$ENDPOINT_DIR/env"
