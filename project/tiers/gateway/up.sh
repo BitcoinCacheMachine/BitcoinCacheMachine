@@ -58,14 +58,14 @@ TARGET_HOST="bcm-gateway-01" \
 REGISTRY_PROXY_REMOTEURL="$REGISTRY_PROXY_REMOTEURL" \
 docker stack deploy -c "/root/$BCM_TIER_NAME/stacks/registry/regmirror.yml" regmirror
 
-lxc exec bcm-gateway-01 -- wait-for-it -t 10 "bcm-gateway-01:5000"
+lxc exec bcm-gateway-01 -- wait-for-it -t 30 "bcm-gateway-01:5000"
 
 lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="bcm-registry:latest" \
 TARGET_PORT=5010 \
 TARGET_HOST="bcm-gateway-01" \
 docker stack deploy -c "/root/gateway/stacks/registry/privreg.yml" privateregistry
 
-lxc exec bcm-gateway-01 -- wait-for-it -t 10 "bcm-gateway-01:5010"
+lxc exec bcm-gateway-01 -- wait-for-it -t 30 "bcm-gateway-01:5010"
 
 # tag and push the registry image to our local private registry.
 lxc exec bcm-gateway-01 -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"

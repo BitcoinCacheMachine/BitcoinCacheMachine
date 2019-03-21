@@ -1,0 +1,77 @@
+version: '3.7'
+services:
+  btcpayserver:
+    image: ${IMAGE_NAME}
+    hostname: btcpayserver-${CHAIN}
+    ports:
+      - "49392:49392"
+    volumes:
+      - btcpay_datadir:/datadir
+      - nbxplorer_datadir:/root/.nbxplorer
+    networks:
+      postgresnet:
+      clightningnet:
+      nbxplorernet:
+    environment:
+      CHAIN: ${CHAIN:-testnet}
+      HOST_ENDING: ${HOST_ENDING:-01}
+      BTCPAY_POSTGRES: User ID=postgres;Host=postgres;Port=5432;Database=btcpayserver-${CHAIN:-regtest}
+      BTCPAY_NETWORK: ${CHAIN:-testnet}
+      BTCPAY_BIND: 0.0.0.0:49392
+      BTCPAY_ROOTPATH: ${BTCPAY_ROOTPATH:-/}
+      # BTCPAY_SSHCONNECTION: "root@host.docker.internal"
+      # BTCPAY_SSHTRUSTEDFINGERPRINTS: ${BTCPAY_SSHTRUSTEDFINGERPRINTS}
+      # BTCPAY_SSHKEYFILE: ${BTCPAY_SSHKEYFILE}
+      BTCPAY_DEBUGLOG: btcpay.log
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+  postgres:
+    image: postgres:9.6.5
+    networks:
+      postgresnet:
+    volumes:
+      - postgres_datadir:/var/lib/postgresql/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+volumes:
+  btcpay_datadir:
+  postgres_datadir:
+  nbxplorer_datadir:
+    external: true
+    name: nbxplorer-${CHAIN:-testnet}_nbxplorer_datadir
+
+networks:
+  postgresnet:
+
+  nbxplorernet:
+    external: true
+    name: nbxplorer-${CHAIN:-testnet}_nbxplorernet
+
+  clightningnet:
+    external: true
+    name: clightning-${CHAIN:-testnet}_clightningrpcnet
+
+      # VIRTUAL_NETWORK: nginx-proxy
+      # VIRTUAL_PORT: 49392
+      # VIRTUAL_HOST: ${BTCPAY_HOST}
+      # VIRTUAL_HOST_NAME: "btcpay"
+      # SSL_POLICY: Mozilla-Modern
+      # LETSENCRYPT_HOST: ${BTCPAY_HOST}
+      # LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-<no value>}
+      # BTCPAY_LTCEXPLORERURL: http://nbxplorer:32838/
+      # BTCPAY_CHAINS: "ltc,btc"
+      # BTCPAY_LTCLIGHTNING: "type=clightning;server=unix://etc/clightning_litecoin/lightning-rpc"
+      # BTCPAY_BTCEXPLORERURL: http://nbxplorer:32838/
+      # BTCPAY_BTCLIGHTNING: "type=clightning;server=unix://etc/clightning_bitcoin/lightning-rpc"
+      # BTCPAY_BTCEXTERNALSPARK: "server=/spark/btc/;cookiefile=/etc/clightning_bitcoin_spark/.cookie"
+      # BTCPAY_BTCEXTERNALCHARGE: "server=/lightning-charge/btc/;cookiefilepath=/etc/clightning_bitcoin_charge/.cookie"

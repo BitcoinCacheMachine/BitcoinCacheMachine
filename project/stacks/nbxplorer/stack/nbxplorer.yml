@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+  nbxplorer:
+    image: ${IMAGE_NAME}
+    hostname: nbxplorer-${CHAIN:-testnet}
+    volumes:
+      - bitcoin_data:/root/.bitcoin
+      - nbxplorer_datadir:/datadir
+    environment:
+      CHAIN: ${CHAIN:-testnet}
+      HOST_ENDING: ${HOST_ENDING:-01}
+      NBXPLORER_NETWORK: ${CHAIN:-testnet}
+      NBXPLORER_BIND: 0.0.0.0:32838
+      NBXPLORER_NOAUTH: 1
+      NBXPLORER_CHAINS: "btc"
+      NBXPLORER_BTCRPCURL: http://bitcoindrpc-${CHAIN}:${BITCOIND_RPCPORT}/
+      NBXPLORER_BTCNODEENDPOINT: bitcoindrpc-${CHAIN}:${BITCOIND_P2PPORT}
+    networks:
+      bitcoindrpcnet:
+      nbxplorernet:
+        aliases:
+          - nbxplorerrpc-${CHAIN:-testnet}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+volumes:
+  nbxplorer_datadir: 
+
+  bitcoin_data:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoin_data
+
+networks:
+  bitcoindrpcnet:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
+
+  nbxplorernet:
+    driver: overlay
+    attachable: true

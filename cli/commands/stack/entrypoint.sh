@@ -32,13 +32,17 @@ function validateStackParam(){
     fi
 }
 
+# install local LXD if it's not here already.
+if ! snap list | grep -q lxd; then
+    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+fi
 
 # this is a list of stacks that we can deploy
 # corresponds to directories in $BCM_STACK_DIR
 STACKS[0]="bitcoind"
 STACKS[1]="clightning"
 # STACKS[2]="lnd"
-# STACKS[3]="eclaire"
+# STACKS[3]="eclair"
 # STACKS[esplora]=0
 # STACKS[lightning-charge]=0
 # STACKS[opentimestamps]=0
@@ -89,6 +93,9 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "clear" ]]; then
-    bcm stack remove clightning --chain=testnet
-    bcm stack remove bitcoind --chain=testnet
+    bcm stack remove btcpayserver
+    bcm stack remove nbxplorer
+    bcm stack remove spark
+    bcm stack remove clightning
+    bcm stack remove bitcoind
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_HELP_FLAG=0
@@ -94,6 +94,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 BCM_SSH_USERNAME="bcm"
                 CLUSTER_NAME="bcm-$(hostname)"
                 BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
+                MACVLAN_INTERFACE="ens3"
                 
                 # Next make sure multipass is installed so we can run type-1 VMs
                 if ! snap list | grep -q multipass; then
@@ -122,13 +123,13 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 BCM_SSH_HOSTNAME=
                 BCM_SSH_USERNAME=
                 
-                # TODO get the USERNAME and HOSTNAME from the user.
                 echo "Please enter the DNS-resolveable hostname of the remote SSH endpoint you want to deploy BCM to:  "
                 read -rp "SSH Hostname:  "   BCM_SSH_HOSTNAME
                 wait-for-it -t 15 "$BCM_SSH_HOSTNAME:22"
                 
                 echo "Please enter the username that has administrative privilieges on $BCM_SSH_HOSTNAME"
                 read -rp "SSH username:  "   BCM_SSH_USERNAME
+                
                 
                 CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
             else
@@ -137,6 +138,11 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         done
     fi
     
+    # let's ask the user which network interface they want to expose BCM services on
+    if [[ -z $MACVLAN_INTERFACE ]]; then
+        echo "Please enter the network interface you want to expose BCM services on: "
+        read -rp "Network Interface:  "   MACVLAN_INTERFACE
+    fi
     
     # if the cluster name is local, then we assume the user hasn't overridden
     # what was set in 'lxc remote get-default'. If so, we will assume a cluster
@@ -150,7 +156,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
     ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME"
     mkdir -p "$ENDPOINT_DIR"
-    
     
     # first check to ensure that the cluster doesn't already exist.
     if ! lxc remote list | grep -q "$CLUSTER_NAME"; then
@@ -238,21 +243,22 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    CONTINUE=0
-    while [[ "$CONTINUE" == 0 ]]
-    do
-        echo "WARNING: Are you sure you want to delete the current cluster '$CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
-        read -rp "Are you sure (y/n):  "   CHOICE
-        
-        if [[ "$CHOICE" == "y" ]]; then
-            CONTINUE=1
-            elif [[ "$CHOICE" == "n" ]]; then
-            exit
-        else
-            echo "Invalid entry. Please try again."
-        fi
-    done
-    
+    if [[ $CLUSTER_NAME != "local" ]]; then
+        CONTINUE=0
+        while [[ "$CONTINUE" == 0 ]]
+        do
+            echo "WARNING: Are you sure you want to delete the current cluster '$CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
+            read -rp "Are you sure (y/n):  "   CHOICE
+            
+            if [[ "$CHOICE" == "y" ]]; then
+                CONTINUE=1
+                elif [[ "$CHOICE" == "n" ]]; then
+                exit
+            else
+                echo "Invalid entry. Please try again."
+            fi
+        done
+    fi
     
     # TODO ITERATE OVER FOLDERS IN CLUSTER FOLDER AND DELETE BASED ON env.
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
@@ -297,9 +303,8 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                 echo "ERROR: Can't find $ENDPOINT_DIR/env. Can't delete the LXD endpoint."
             fi
         done
-    fi
-    
-    if [[ -d "$CLUSTER_DIR" ]]; then
+        
+        # delete the cluster directory
         rm -rf "${CLUSTER_DIR:?}"
     fi
 fi

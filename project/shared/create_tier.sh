@@ -64,7 +64,6 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
                 fi
             else
                 echo "ERROR: MACVLAN_INTERFACE was not specified."
-                exit
             fi
         else
             echo "ERROR: The '$ACTIVE_ENDPOINT/env' does not exist. Can't wire up the macvlan interface."
@@ -74,9 +73,8 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     if lxc list --format csv --columns ns | grep "$HOSTNAME" | grep -q "STOPPED"; then
         # let's bring up the host then wait for dockerd to start.
         lxc start "$HOSTNAME"
+        bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
     fi
-    
-    bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
     
     # if TIER type is >=1 then we wait for gateway which is assumed to exist.
     # all nodes from this script are workers. Manager hosts are implemented

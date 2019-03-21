@@ -84,8 +84,17 @@ else
 fi
 
 LXD_SERVER_NAME="$BCM_SSH_HOSTNAME"
-export LXD_SERVER_NAME="$LXD_SERVER_NAME"
 if [ $IS_MASTER -eq 1 ]; then
+    # these two lines are so that ssh hosts can have the correct naming convention for LXD node info.
+    if [[ ! "$LXD_SERVER_NAME" == *"-01"* ]]; then
+        LXD_SERVER_NAME="$LXD_SERVER_NAME-01"
+    fi
+    
+    if [[ ! "$LXD_SERVER_NAME" == *"bcm-"* ]]; then
+        LXD_SERVER_NAME="bcm-$LXD_SERVER_NAME"
+    fi
+    
+    export LXD_SERVER_NAME="$LXD_SERVER_NAME"
     envsubst <./lxd_preseed/lxd_master_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
     elif [ $IS_MASTER -ne 1 ]; then
     envsubst <./lxd_preseed/lxd_member_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
