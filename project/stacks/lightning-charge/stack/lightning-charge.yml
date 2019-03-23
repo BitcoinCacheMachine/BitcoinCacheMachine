@@ -1,38 +1,49 @@
 version: '3.7'
 services:
-  # https://github.com/ElementsProject/lightning-charge
-  # image listens on TCP 9112
   lightning-charge:
-    image: ${BCM_INSTALL_BITCOIN_LIGHTNING_CHARGE_DOCKER_IMAGE}
+    image: ${IMAGE_NAME}
     networks:
-      lightningd_lightningdrpcnet:
-      lightning-chargenet:
+      bitcoindrpcnet:
+      clightningnet:
+      lightningchargenet:
         aliases:
-          lightningchargerpc
+          - lightningchargerpc-${CHAIN}
     volumes:
-      - lightning-charge-data:/data
-      - lightningd-data:/etc/lightning
-      - bitcoind-testnet-data:/etc/bitcoin
+      - lightning-charge-data:/opt/charged
+      - clightning-data:/etc/lightning
+      - bitcoin-data:/etc/bitcoin
+      - bitcoin-cli:/usr/local/bin
     environment:
       API_TOKEN: mySecretToken
       LN_PATH: /etc/lightning
-      BITCOIND_URI: http://user:changeme@bitcoindrpc:18332
+      NETWORK: ${CHAIN:-testnet}
     deploy:
       mode: replicated
       replicas: 1
       placement:
-        constraints: 
-          - engine.labels.purpose == bitcoin
+        constraints:
+          - engine.labels.bcm-bitcoin == true
 
 volumes:
   lightning-charge-data:
-  lightningd-data:
+  clightning-data:
     external: true
-  bitcoind-testnet-data:
+    name: clightning-${CHAIN:-testnet}_clightning-data
+
+  bitcoin-data:
     external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoin_data
+
+  bitcoin-cli:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoin_cli
 
 networks:
-  lightningd_lightningdrpcnet:
-    external: true
-  lightning-chargenet:  #for components needing to talk to the lightning-charge API.
+  lightningchargenet:
     attachable: true
+  bitcoindrpcnet:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
+  clightningnet:
+    external: true
+    name: clightning-${CHAIN:-testnet}_clightningrpcnet

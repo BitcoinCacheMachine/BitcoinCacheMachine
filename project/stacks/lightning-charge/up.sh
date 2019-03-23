@@ -7,8 +7,7 @@ cd "$(dirname "$0")"
 source ./env
 
 # first, let's make sure we deploy our direct dependencies.
-bcm stack deploy nbxplorer
-bcm stack deploy lightning-charge
+bcm stack deploy clightning
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"
@@ -16,11 +15,12 @@ CONTAINER_NAME="bcm-bitcoin-$HOST_ENDING"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
---docker-hub-image-name="$DOCKER_HUB_IMAGE" \
+--build-context="$(pwd)/build/" \
 --container-name="$CONTAINER_NAME" \
 --image-name="$IMAGE_NAME" \
 --image-tag="$IMAGE_TAG"
 
+#--docker-hub-image-name="$DOCKER_HUB_IMAGE" \
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "bcm-gateway-01/root/stacks/$TIER_NAME/$STACK_NAME"
 

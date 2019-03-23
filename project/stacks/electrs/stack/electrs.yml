@@ -1,25 +1,21 @@
 version: '3.7'
 services:
-  nbxplorer:
+  electrs:
     image: ${IMAGE_NAME}
-    hostname: nbxplorer-${CHAIN:-testnet}
+    ports:
+      - "50001:50001"
+    hostname: electrs-${CHAIN:-testnet}
     volumes:
-      - bitcoin_data:/root/.bitcoin
-      - nbxplorer_datadir:/datadir
+      - electrs-data:/root/.electrs
+      - bitcoin-data:/root/.bitcoin:ro
     environment:
       CHAIN: ${CHAIN:-testnet}
       HOST_ENDING: ${HOST_ENDING:-01}
-      NBXPLORER_NETWORK: ${CHAIN:-testnet}
-      NBXPLORER_BIND: 0.0.0.0:32838
-      NBXPLORER_CHAINS: "btc"
-      NBXPLORER_BTCRPCURL: http://bitcoindrpc-${CHAIN}:${BITCOIND_RPCPORT}/
-      NBXPLORER_BTCNODEENDPOINT: bitcoindrpc-${CHAIN}:${BITCOIND_P2PPORT}
-      #NBXPLORER_NOAUTH: 1
     networks:
       bitcoindrpcnet:
-      nbxplorernet:
+      electrsnet:
         aliases:
-          - nbxplorerrpc-${CHAIN:-testnet}
+          - electrsnet_${CHAIN:-testnet}
     deploy:
       mode: replicated
       replicas: 1
@@ -28,9 +24,9 @@ services:
           - engine.labels.bcm-bitcoin == true
 
 volumes:
-  nbxplorer_datadir: 
+  electrs-data:
 
-  bitcoin_data:
+  bitcoin-data:
     external: true
     name: bitcoind-${CHAIN:-testnet}_bitcoin_data
 
@@ -39,6 +35,6 @@ networks:
     external: true
     name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
 
-  nbxplorernet:
+  electrsnet:
     driver: overlay
     attachable: true

@@ -93,6 +93,7 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "clear" ]]; then
+    bcm stack remove lightning-charge
     bcm stack remove btcpayserver
     bcm stack remove nbxplorer
     bcm stack remove spark

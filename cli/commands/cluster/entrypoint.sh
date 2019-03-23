@@ -76,10 +76,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         CONTINUE=0
         while [[ "$CONTINUE" == 0 ]]
         do
-            echo "Would you like to deploy BCM to bare-metal, a hardware-based VM (more secure), or to a remote SSH endpoint?"
-            read -rp "(multipass/baremetal/ssh):  "   CHOICE
+            echo "Would you like to deploy BCM locally, a hardware-based VM (more secure), or to a remote SSH endpoint?"
+            read -rp "(vm/local/ssh):  "   CHOICE
             
-            if [[ "$CHOICE" == "multipass" ]]; then
+            if [[ "$CHOICE" == "vm" ]]; then
                 CONTINUE=1
                 # Check to see if the computer has hardware virtualization support. If not, then we
                 # switch our driver to SSH.
@@ -104,14 +104,14 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                     sleep 10
                 fi
                 
-                elif [[ "$CHOICE" == "baremetal" ]]; then
+                elif [[ "$CHOICE" == "local" ]]; then
                 CONTINUE=1
                 BCM_DRIVER=baremetal
                 CLUSTER_NAME="bcm-$(hostname)"
                 BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
                 BCM_SSH_USERNAME="$(whoami)"
                 
-                # let's add an alias in /etc/hosts so the SDN controller can resolve 'bcm-$(hostname)'
+                # let's add an alias in /etc/hosts so the SDN controller can resolve 'bcm-$(hostname)-01'
                 HOSTS_ENTRY="127.0.1.1    $BCM_SSH_HOSTNAME"
                 if ! grep -Fxq "$HOSTS_ENTRY" /etc/hosts; then
                     echo "$HOSTS_ENTRY" | sudo tee -a /etc/hosts

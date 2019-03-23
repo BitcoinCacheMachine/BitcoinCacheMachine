@@ -4,7 +4,7 @@ services:
     image: ${IMAGE_NAME}
     hostname: btcpayserver-${CHAIN}
     ports:
-      - "49392:49392"
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
     volumes:
       - btcpay_datadir:/datadir
       - nbxplorer_datadir:/root/.nbxplorer
@@ -17,12 +17,15 @@ services:
       HOST_ENDING: ${HOST_ENDING:-01}
       BTCPAY_POSTGRES: User ID=postgres;Host=postgres;Port=5432;Database=btcpayserver-${CHAIN:-regtest}
       BTCPAY_NETWORK: ${CHAIN:-testnet}
-      BTCPAY_BIND: 0.0.0.0:49392
+      BTCPAY_BIND: 0.0.0.0:${SERVICE_PORT}
       BTCPAY_ROOTPATH: ${BTCPAY_ROOTPATH:-/}
       # BTCPAY_SSHCONNECTION: "root@host.docker.internal"
       # BTCPAY_SSHTRUSTEDFINGERPRINTS: ${BTCPAY_SSHTRUSTEDFINGERPRINTS}
       # BTCPAY_SSHKEYFILE: ${BTCPAY_SSHKEYFILE}
       BTCPAY_DEBUGLOG: btcpay.log
+    configs:
+      - source: btcpayserver_config
+        target: /datadir/TestNet/settings.config
     deploy:
       mode: replicated
       replicas: 1
@@ -49,6 +52,10 @@ volumes:
   nbxplorer_datadir:
     external: true
     name: nbxplorer-${CHAIN:-testnet}_nbxplorer_datadir
+
+configs:
+  btcpayserver_config:
+    file: settings.config
 
 networks:
   postgresnet:
