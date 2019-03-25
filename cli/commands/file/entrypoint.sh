@@ -78,7 +78,7 @@ source "$GNUPGHOME/env"
 if [[ $BCM_CLI_VERB == "encrypt" ]]; then
     # start the container / trezor-gpg-agent
     docker run -it --rm --name trezorencryptor \
-    -v "$GNUPGHOME":/root/.gnupg \
+    -v "$GNUPGHOME":/home/user/.gnupg \
     -v "$INPUT_DIR":/inputdir \
     -v "$OUTPUT_DIR":/outputdir \
     bcm-trezor:latest gpg --output "/inputdir/$INPUT_FILE_NAME.gpg" --encrypt --recipient "$BCM_DEFAULT_KEY_ID" "/outputdir/$INPUT_FILE_NAME"

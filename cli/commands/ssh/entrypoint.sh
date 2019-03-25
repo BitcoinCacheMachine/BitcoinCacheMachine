@@ -73,7 +73,8 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     TREZOR_PUB_KEY_PATH="$ENDPOINT_DIR/$KEY_NAME"
     
     docker run -t --rm \
-    -v "$ENDPOINT_DIR":/root/.ssh \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$ENDPOINT_DIR":/home/user/.ssh \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     -e KEY_NAME="$KEY_NAME" \
@@ -115,6 +116,7 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
     docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     --device="$BCM_TREZOR_USB_PATH" \

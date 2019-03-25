@@ -22,7 +22,7 @@ if [[ -d "$GNUPGHOME" ]]; then
     
     if [[ $GNUPGHOME != "$HOME/.gnupg" ]]; then
         echo "Deleting $GNUPGHOME."
-        sudo rm -Rf "$GNUPGHOME"
+        rm -Rf "$GNUPGHOME"
     fi
 else
     echo "WARNING: GNUPGHOME directory '$GNUPGHOME' does not exist. You may need to run 'bcm init'."
@@ -32,7 +32,7 @@ if [[ -d "$PASSWORD_STORE_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then
         if [ "$PASSWORD_STORE_DIR" != "$HOME/.password_store" ]; then
             echo "Deleting $PASSWORD_STORE_DIR."
-            sudo rm -Rf "$PASSWORD_STORE_DIR"
+            rm -Rf "$PASSWORD_STORE_DIR"
         fi
     fi
 else
@@ -43,7 +43,7 @@ if [[ -d "$BCM_SSH_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then
         if [ "$BCM_SSH_DIR" != "$HOME/.ssh" ]; then
             echo "Deleting $BCM_SSH_DIR."
-            sudo rm -Rf "$BCM_SSH_DIR"
+            rm -Rf "$BCM_SSH_DIR"
         fi
     fi
 else

@@ -12,7 +12,8 @@ echo "entering decrypt.sh"
 # echo "INPUT_FILE_NAME: $INPUT_FILE_NAME"
 
 # docker run -it --rm \
-#     -v $BCM_PROJECT_DIR:/root/.gnupg \
+#     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+#     -v $BCM_PROJECT_DIR:/home/user/.gnupg \
 #     -v $INPUT_FILE_DIR:/sigdir \
 #     --device=$BCM_TREZOR_USB_PATH \
 #     bcm-trezor:latest gpg --output /sigdir/$INPUT_FILE_NAME.decrypted --decrypt /sigdir/$INPUT_FILE_NAME

@@ -1,37 +1,78 @@
-FROM golang:latest
-#1.10.3
+FROM golang:alpine as builder
 
-# lnd p2p, grpc server
-EXPOSE 9735 10009
-
+# Force Go to use the cgo based DNS resolver. This is required to ensure DNS
+# queries required to connect to linked containers succeed.
 ENV GODEBUG netdns=cgo
 
-RUN apt-get update
-RUN apt-get install curl jq wait-for-it -y
-RUN go get -u github.com/golang/dep/cmd/dep
+# Install dependencies and build the binaries.
+RUN apk add --no-cache --update alpine-sdk git make gcc \
+    &&  git clone https://github.com/lightningnetwork/lnd /go/src/github.com/lightningnetwork/lnd \
+    &&  cd /go/src/github.com/lightningnetwork/lnd \
+    &&  make \
+    &&  make install
 
-RUN git clone https://github.com/lightningnetwork/lnd $GOPATH/src/github.com/lightningnetwork/lnd
-WORKDIR $GOPATH/src/github.com/lightningnetwork/lnd
-RUN dep ensure
-RUN go install . ./cmd/...
+# Start a new, final image.
+FROM alpine as final
 
-RUN mkdir -p /data && mkdir -p /var/logs/lnd
-
-# where lnd data goes
+# Define a root volume for data persistence.
 VOLUME /root/.lnd
 
-# certificate data used by lnd and remote grpc services
-VOLUME /config
+# Add bash and ca-certs, for quality of life and SSL-related reasons.
+RUN apk --no-cache add \
+    bash \
+    ca-certificates
 
-# macaroons for grpc access
-VOLUME /macaroons
+# Copy the binaries from the builder image.
+COPY --from=builder /go/bin/lncli /bin/
+COPY --from=builder /go/bin/lnd /bin/
 
-# logs, duh
-VOLUME /logs
+# Expose lnd ports (p2p, rpc).
+EXPOSE 9735 10009
 
-WORKDIR /root/.lnd
-
+# Specify the start command and entrypoint as the lnd daemon.
 ADD ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["lnd"]
+
+
+# FROM golang:latest
+# #1.10.3
+
+# # lnd p2p, grpc server
+# EXPOSE 9735 10009
+
+# ENV GODEBUG netdns=cgo
+
+# RUN apt-get update
+# RUN apt-get install curl jq wait-for-it -y
+# RUN go get -u github.com/golang/dep/cmd/dep
+
+# RUN git clone https://github.com/lightningnetwork/lnd $GOPATH/src/github.com/lightningnetwork/lnd
+# WORKDIR $GOPATH/src/github.com/lightningnetwork/lnd
+# RUN git checkout v0.5.2-beta
+# RUN dep init
+# RUN dep ensure
+# RUN go install . ./cmd/...
+
+# RUN mkdir -p /data && mkdir -p /var/logs/lnd
+
+# # where lnd data goes
+# VOLUME /root/.lnd
+
+# # certificate data used by lnd and remote grpc services
+# VOLUME /config
+
+# # macaroons for grpc access
+# VOLUME /macaroons
+
+# # logs, duh
+# VOLUME /logs
+
+# WORKDIR /root/.lnd
+
+# ADD ./entrypoint.sh /entrypoint.sh
+# RUN chmod +x /entrypoint.sh
+
+# ENTRYPOINT ["/entrypoint.sh"]

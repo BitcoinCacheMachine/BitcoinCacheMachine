@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
@@ -56,7 +56,6 @@ fi
 # if DOCKER_HUB_IMAGE was passed, we assume that we are simply downloading it and pushing it to our private registry.
 # no operations will be performed otherwise.
 if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
-    echo "Pulling a public image down from the Internet."
     lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
     lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
     lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"

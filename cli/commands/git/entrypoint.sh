@@ -115,7 +115,8 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
         # shellcheck disable=SC1090
         source "$BCM_GIT_DIR/controller/export_usb_path.sh"
         docker run -d --name gitter \
-        -v "$GNUPGHOME":/root/.gnupg \
+        -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+        -v "$GNUPGHOME":/home/user/.gnupg \
         -v "$GIT_REPO_DIR":/gitrepo \
         --device="$BCM_TREZOR_USB_PATH" \
         -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
@@ -144,7 +145,8 @@ if [[ $BCM_CLI_VERB == "push" ]]; then
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
     docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
-    -v "$BCM_SSH_DIR":/root/.ssh \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$BCM_SSH_DIR":/home/user/.ssh \
     -v "$GIT_REPO_DIR":/gitrepo \
     -e BCM_GIT_CLIENT_USERNAME="$BCM_GIT_CLIENT_USERNAME" \
     -e SSH_USERNAME="$SSH_USERNAME" \

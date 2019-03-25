@@ -1,14 +1,14 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck disable=SC1091
 source ./env
 
 # first, let's make sure we deploy our direct dependencies.
-bcm stack deploy nbxplorer
-bcm stack deploy lightning-charge
+#bcm stack deploy nbxplorer
+#bcm stack deploy lightning-charge
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"

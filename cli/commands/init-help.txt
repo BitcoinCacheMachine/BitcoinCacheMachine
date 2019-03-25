@@ -4,13 +4,13 @@ Description:
             This command creates new GPG certificates, so have your Trezor handy.
 
 Usage:
-  bcm init --name="BCM" --username="bob" --hostname="laptop"
+  bcm init --cert-name="Satoshi Nakamoto" --username="satoshi" --hostname="bitcoin.org"
 
 Options:
-  --name       Required. The name that will appear in the PGP certificate.
-  --username   Required. The username that will appear in the GPG certificate.
-  --hostname   Required. The FQDN that will appear in the GPG certificate.
-  --dir        Optional. Directory where public key material will be emitted.
-                    The default directory is whatever GNUPGHOME is set to. Consider setting
-                    BCM_ACTIVE=0 in your SHELL to direct your trezor to your home directory.
+  --cert-name   The name that will appear in the PGP certificate.
+  --username    The username that will appear in the GPG certificate.
+  --hostname    The FQDN that will appear in the GPG certificate.
+  --cert-dir    Directory where public key material will be emitted.
+                The default directory is whatever GNUPGHOME is set to. Consider setting
+                BCM_ACTIVE=0 in your SHELL to direct your trezor to your home directory.
 

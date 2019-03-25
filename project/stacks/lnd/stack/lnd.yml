@@ -1,27 +1,25 @@
 version: '3.7'
 services:
-
-  # https://github.com/lightningnetwork/lnd
   lnd:
-    image: ${BCM_BITCOIN_LND_DOCKER_IMAGE}
+    image: ${IMAGE_NAME}
+    hostname: lnd-${CHAIN:-testnet}
     #hostname required for lncl-web certificate hostname purposes (see ./lnd/start-lnd.sh)
-    hostname: lnd
-    networks:
-      bitcoind_bitcoindrpcnet:
-      lndrpcnet:
-        aliases:
-          - lndrpc
-    environment:
-      #LND_BITCOIND_REST_RPC_CREDENTIALS: "bitcoinrpcuser:qwc52LTHRa0w0UGiUr2z7fTz7JvqtxjULZ_2jaZvqmA="
-      LND_CERTIFICATE_HOSTNAME: "lnd"  #this is so there are no certificate verification issues on lncli-web
-      BITCOIND_CHAIN: ${CHAIN:-testnet}
     volumes:
       - lnd-data:/root/.lnd
       - lnd-certificate-data:/config
       - lnd-macaroon-data:/macaroons
       - lnd-log-data:/var/logs/lnd
+    environment:
+      LND_CERTIFICATE_HOSTNAME: lnd-${CHAIN:-testnet}  #this is so there are no certificate verification issues on lncli-web
+      CHAIN: ${CHAIN:-testnet}
+      HOST_ENDING: ${HOST_ENDING:-01}
+    networks:
+      bitcoindrpcnet:
+      lndrpcnet:
+        aliases:
+          - lndrpc-${CHAIN}
     secrets:
-      - source: lnd_conf
+      - source: lnd-config
         target: /root/.lnd/lnd.conf
         uid: '0'
         gid: '0'
@@ -30,24 +28,26 @@ services:
       mode: replicated
       replicas: 1
       placement:
-        constraints: 
-          - engine.labels.purpose == bitcoin
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
 
 networks:
-  lndrpcnet:  #connect to this if you need to communicate with lnd gRPC
+  lndrpcnet:
+    driver: overlay
     attachable: true
 
-  bitcoind_bitcoindrpcnet:
+  bitcoindrpcnet:
     external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
 
 secrets:
-  lnd_conf:
+  lnd-config:
     file: "./lnd-${CHAIN:-testnet}.conf"
 
 volumes:
   lnd-data:
   lnd-log-data:
   
-  # anyone who needs to access lnd's gRPC or REST interface must have access to this data.
   lnd-certificate-data:  
   lnd-macaroon-data: 

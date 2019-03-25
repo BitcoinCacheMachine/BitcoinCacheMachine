@@ -10,7 +10,8 @@ echo "entering create_signature.sh"
 # echo "INPUT_FILE_NAME: $INPUT_FILE_NAME"
 
 # # will pgp sign a file uwing your trezor
-# docker run -it -v $BCM_PROJECT_DIR:/root/.gnupg \
+# docker run -it -v $BCM_PROJECT_DIR:/home/user/.gnupg \
+#     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
 #     -v $INPUT_FILE_DIR:/sigdir \
 #     --device=$BCM_TREZOR_USB_PATH \
 #     bcm-trezor:latest gpg --sign --detach-sig -s /sigdir/$INPUT_FILE_NAME

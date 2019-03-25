@@ -15,7 +15,7 @@ services:
       bitcoindrpcnet:
       clightningrpcnet:
         aliases:
-          - clightningrpc
+          - clightningrpc-${CHAIN}
     secrets:
       - source: clightning_conf
         target: /root/.lightning/config
