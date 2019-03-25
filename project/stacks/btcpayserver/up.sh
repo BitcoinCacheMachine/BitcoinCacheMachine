@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 source ./env
 
 # first, let's make sure we deploy our direct dependencies.
-#bcm stack deploy nbxplorer
+bcm stack deploy nbxplorer
 #bcm stack deploy lightning-charge
 
 # this is the LXC host that the docker container is going to be provisioned to.

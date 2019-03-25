@@ -23,19 +23,16 @@ CONTAINER_NAME="bcm-ui-$HOST_ENDING"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "bcm-gateway-01/root/stacks/$TIER_NAME/$STACK_NAME"
 
-# BCM_SERVICE_PORT=
-# if [[ "$BCM_DEFAULT_CHAIN" == "mainnet" ]]; then
-#     BCM_SERVICE_PORT="$MAINNET_PORT"
-#     elif [[ "$BCM_DEFAULT_CHAIN" == "testnet" ]]; then
-#     BCM_SERVICE_PORT="$TESTNET_PORT"
-#     elif [[ "$BCM_DEFAULT_CHAIN" == "regtest" ]]; then
-#     BCM_SERVICE_PORT="$REGTEST_PORT"
-# else
-#     echo "ERROR: BCM_SERVICE_PORT could not be determined."
-#     exit
-# fi
+# 50001 for mainnet
+SERVICE_PORT="$MAINNET_PORT"
+if [[ "$BCM_DEFAULT_CHAIN" == "testnet" ]]; then
+    SERVICE_PORT="$TESTNET_PORT"
+    elif [[ "$BCM_DEFAULT_CHAIN" == "regtest" ]]; then
+    SERVICE_PORT="$REGTEST_PORT"
+fi
 
 lxc exec bcm-gateway-01 -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
 CHAIN="$BCM_DEFAULT_CHAIN" \
 HOST_ENDING="$HOST_ENDING" \
+SERVICE_PORT="$SERVICE_PORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"

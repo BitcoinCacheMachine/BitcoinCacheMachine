@@ -70,10 +70,10 @@ Feel free to change the directory in which you store the BCM repository on your 
 
 After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy `clightning` and all its dependencies including `bitcoind`, run the `bcm stack deploy clightning` command. Other user-facing components you can deploy include:
 
-`bcm stack deploy spark`
-`bcm stack deploy lnd`
-`bcm stack deploy btcpayserver`
-`bcm stack deploy explora`
+`bcm stack deploy spark`  
+`bcm stack deploy lnd`  
+`bcm stack deploy btcpayserver`  
+`bcm stack deploy explora`  
 
 ## Documentation
 

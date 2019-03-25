@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
@@ -44,8 +44,8 @@ lxc restart bcm-gateway-01
 bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=bcm-gateway-01"
 
 # update the route metric of the gateway host so it prefers eth0 which is lxd network bcmGWNat
-REGISTRY_PROXY_REMOTEURL="$BCM_DOCKER_IMAGE_CACHE"
-if [[ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]]; then
+REGISTRY_PROXY_REMOTEURL="https://registry-1.docker.io"
+if [[ ! -z $BCM_DOCKER_IMAGE_CACHE ]]; then
     REGISTRY_PROXY_REMOTEURL="http://$BCM_DOCKER_IMAGE_CACHE:5000"
 fi
 

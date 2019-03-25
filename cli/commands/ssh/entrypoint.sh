@@ -79,7 +79,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     -e KEY_NAME="$KEY_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME > /root/.ssh/$KEY_NAME"
+    bcm-trezor:latest bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME > /home/user/.ssh/$KEY_NAME"
     
     if [[ ! -f "$TREZOR_PUB_KEY_PATH" ]]; then
         echo "ERROR: SSH Key did not generate successfully!"

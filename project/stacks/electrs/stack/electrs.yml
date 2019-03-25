@@ -3,7 +3,7 @@ services:
   electrs:
     image: ${IMAGE_NAME}
     ports:
-      - "50001:50001"
+      - "${SERVICE_PORT}:${SERVICE_PORT}"
     hostname: electrs-${CHAIN:-testnet}
     volumes:
       - electrs-data:/root/.electrs

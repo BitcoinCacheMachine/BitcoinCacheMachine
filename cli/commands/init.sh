@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CERT_NAME=
@@ -37,8 +37,6 @@ if [[ "$BCM_HELP_FLAG" == 1 ]]; then
 fi
 
 if [[ -d "$GNUPGHOME" ]]; then
-    echo "ERROR: '$GNUPGHOME' already exists and we dare not overwrite it! If you want new certificates, delete the folder manually."
-    echo "Note that this action could seriously impact your ability to manage existing cluster deployments."
     exit
 fi
 

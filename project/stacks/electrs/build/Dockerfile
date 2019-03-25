@@ -5,8 +5,7 @@ RUN apt-get install -y clang cmake
 RUN apt-get install -y libsnappy-dev
 RUN apt-get install -y git
 
-
-#RUN adduser --disabled-login --system --shell /bin/false --uid 1000 user
+# RUN adduser --disabled-login --system --shell /bin/false --uid 1000 user
 
 # USER user
 # WORKDIR /home/user
@@ -23,11 +22,6 @@ EXPOSE 50001
 
 # Prometheus monitoring
 EXPOSE 4224
-
-# make the working directroy /home/user/.electrs
-# this si where the db will be held.
-RUN mkdir /root/.electrs
-WORKDIR /root/.electrs
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
