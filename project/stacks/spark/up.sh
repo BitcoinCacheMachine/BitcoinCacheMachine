@@ -26,9 +26,9 @@ lxc file push -p -r "$(pwd)/stack/" "bcm-gateway-01/root/stacks/$TIER_NAME/$STAC
 lxc exec bcm-gateway-01 -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
 CHAIN="$BCM_DEFAULT_CHAIN" \
 HOST_ENDING="$HOST_ENDING" \
-BCM_SERVICE_PORT="$BCM_SERVICE_PORT" \
+SERVICE_PORT="$BCM_SERVICE_PORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
 
-if [[ ! -z $BCM_SERVICE_PORT ]]; then
-    echo "MACVLAN:$BCM_SERVICE_PORT"
-fi
+ENDPOINT=$(bcm get-ip)
+wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
+xdg-open http://"$ENDPOINT:$SERVICE_PORT" &

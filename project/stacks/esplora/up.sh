@@ -27,3 +27,9 @@ lxc exec bcm-gateway-01 -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IM
 CHAIN="$BCM_DEFAULT_CHAIN" \
 HOST_ENDING="$HOST_ENDING" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
+
+
+
+ENDPOINT=$(bcm get-ip)
+wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
+xdg-open http://"$ENDPOINT:$SERVICE_PORT" &

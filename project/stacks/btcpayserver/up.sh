@@ -7,8 +7,13 @@ cd "$(dirname "$0")"
 source ./env
 
 # first, let's make sure we deploy our direct dependencies.
-bcm stack deploy nbxplorer
-#bcm stack deploy lightning-charge
+if ! bcm stack list | grep -q "clightning"; then
+    bcm stack deploy clightning
+fi
+
+if ! bcm stack list | grep -q "nbxplorer"; then
+    bcm stack deploy nbxplorer
+fi
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"
@@ -29,3 +34,7 @@ CHAIN="$BCM_DEFAULT_CHAIN" \
 HOST_ENDING="$HOST_ENDING" \
 SERVICE_PORT="$SERVICE_PORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
+
+ENDPOINT=$(bcm get-ip)
+wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
+xdg-open http://"$ENDPOINT:$SERVICE_PORT" &

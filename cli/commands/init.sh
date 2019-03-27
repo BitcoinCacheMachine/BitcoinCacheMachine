@@ -40,23 +40,25 @@ if [[ -d "$GNUPGHOME" ]]; then
     exit
 fi
 
-while [[ -z "$BCM_CERT_NAME" ]]; do
-    echo "Please enter the title of the certificate. This is usually your name:  "
-    read -rp "Certificate Title:  "   BCM_CERT_NAME
-done
-
-while [[ -z "$BCM_CERT_USERNAME" ]]; do
-    echo "Please enter the username of the certificate. This is the username part of an email address:  "
-    read -rp "Username:  "   BCM_CERT_USERNAME
-done
-
-while [[ -z "$BCM_CERT_HOSTNAME" ]]; do
-    echo "Please enter the domain name of the certificate. This is the FQDN/domain of the email address:  "
-    read -rp "Domain Name:  "   BCM_CERT_HOSTNAME
-done
-
 
 if [[ ! -d "$GNUPGHOME" ]]; then
+    echo "Your Trezor-backed GPG certificates do not exist. Let's create them now. Make sure you have your Trezor handy."
+    
+    while [[ -z "$BCM_CERT_NAME" ]]; do
+        echo "Please enter the title of the certificate. This is usually your name:  "
+        read -rp "Certificate Title:  "   BCM_CERT_NAME
+    done
+    
+    while [[ -z "$BCM_CERT_USERNAME" ]]; do
+        echo "Please enter the username of the certificate. This is the username part of an email address:  "
+        read -rp "Username:  "   BCM_CERT_USERNAME
+    done
+    
+    while [[ -z "$BCM_CERT_HOSTNAME" ]]; do
+        echo "Please enter the domain name of the certificate. This is the FQDN/domain of the email address:  "
+        read -rp "Domain Name:  "   BCM_CERT_HOSTNAME
+    done
+    
     # shellcheck disable=SC2153
     bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $GNUPGHOME"
     

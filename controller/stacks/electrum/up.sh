@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-echo "up.sh for electrum wallet."
-
 if ! bcm stack list | grep -q "electrs"; then
     bcm stack deploy electrs
 fi

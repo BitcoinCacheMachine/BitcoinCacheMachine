@@ -4,7 +4,7 @@ services:
     image: ${IMAGE_NAME}
     hostname: spark-${CHAIN:-testnet}
     ports:
-      - "${BCM_SERVICE_PORT}:9737"
+      - "${SERVICE_PORT}:9737"
     volumes:
       - clightning-data:/root/.lightning
     environment:
