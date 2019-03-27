@@ -73,7 +73,8 @@ After the BCM CLI is available, you can deploy your own infrastructure using the
 `bcm stack deploy spark`  
 `bcm stack deploy lnd`  
 `bcm stack deploy btcpayserver`  
-`bcm stack deploy explora`  
+`bcm stack deploy esplora`  
+`bcm stack deploy electrs`  
 
 ## Documentation
 

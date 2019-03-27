@@ -96,6 +96,16 @@ if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cl
     ./stack_cli/entrypoint.sh "$@"
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "get-ip" ]]; then
+    ./get/entrypoint.sh "$@"
+fi
+
+# run is for running docker containers AT the SDN controller (not in LXC)
+if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
+    ./run/entrypoint.sh "$@"
+fi
+
+
 if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
     bash -c "$BCM_GIT_DIR/project/destroy.sh"
 fi

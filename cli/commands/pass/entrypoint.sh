@@ -110,20 +110,15 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     bcm-trezor:latest pass "$BCM_PASS_NAME"
     
-    elif [[ $BCM_CLI_VERB == "list" ]]; then
-    if ! bcm info | grep -q "PASSWORD_STORE_DIR:     N/A"; then
-        # How we reference the password.
-        docker run -it --name pass --rm \
-        -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-        -v "$GNUPGHOME":/home/user/.gnupg:ro \
-        -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
-        --device="$BCM_TREZOR_USB_PATH" \
-        bcm-trezor:latest pass ls
-    else
-        echo "ERROR: bcm password store not set."
-    fi
+    elif [[ $BCM_CLI_VERB == "list" || $BCM_CLI_VERB == "ls" ]]; then
+    docker run -it --name pass --rm \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$GNUPGHOME":/home/user/.gnupg:ro \
+    -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
+    --device="$BCM_TREZOR_USB_PATH" \
+    bcm-trezor:latest pass ls
+    
     elif [[ $BCM_CLI_VERB == "rm" || $BCM_CLI_VERB == "remove" ]]; then
-    # How we reference the password.
     docker run -it --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg:rw \
@@ -133,7 +128,6 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     bcm-trezor:latest pass rm "$BCM_PASS_NAME"
     
     elif [[ $BCM_CLI_VERB == "insert" ]]; then
-    # How we reference the password.
     docker run -it --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg:rw \

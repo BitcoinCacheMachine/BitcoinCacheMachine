@@ -40,7 +40,8 @@ if [[ -z "$IMAGE_TAG" ]]; then
     exit
 fi
 
-CONTAINER_NAME="bcm-$BCM_TIER_NAME-01"
+HOST_ENDING="01"
+CONTAINER_NAME="bcm-$BCM_TIER_NAME-$HOST_ENDING"
 STACK_FILE_DIRNAME="$(dirname "$ENV_FILE")"
 
 bash -c "$BCM_GIT_DIR/project/shared/docker_image_ops.sh --docker-hub-image-name=$DOCKERHUB_IMAGE --build-context=$STACK_FILE_DIRNAME/build --container-name=$CONTAINER_NAME --image-name=$IMAGE_NAME --image-tag=$IMAGE_TAG"

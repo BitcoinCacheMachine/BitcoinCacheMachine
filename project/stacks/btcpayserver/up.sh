@@ -12,7 +12,7 @@ bcm stack deploy nbxplorer
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"
-CONTAINER_NAME="bcm-bitcoin-$HOST_ENDING"
+CONTAINER_NAME="bcm-$TIER_NAME-$HOST_ENDING"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \

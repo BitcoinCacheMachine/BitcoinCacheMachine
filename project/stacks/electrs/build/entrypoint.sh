@@ -1,10 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
-
-echo "entrypoint for electrs"
-
-echo "PWD: $(pwd)"
+set -Eeuo pipefail
 
 # 50001 for mainnet
 ELECTRUM_RPC="0.0.0.0:50001"
@@ -18,5 +14,5 @@ if [[ "$CHAIN" == "testnet" ]]; then
 fi
 
 
-#cargo run --release -- -vvv --timestamp --db-dir /root/.electrs/db
-cargo run --release --bin electrs -- -vvvv --daemon-dir /root/.bitcoin --electrum-rpc-addr="$ELECTRUM_RPC" --network="$CHAIN" --daemon-rpc-addr="$BITCOIND_RPC_ADDR"
+#cargo run --release -- -vvv --timestamp
+cargo run --release --bin electrs -- -vvvv --daemon-dir /root/.bitcoin --electrum-rpc-addr="$ELECTRUM_RPC" --network="$CHAIN" --daemon-rpc-addr="$BITCOIND_RPC_ADDR" --db-dir /root/.electrs/db
