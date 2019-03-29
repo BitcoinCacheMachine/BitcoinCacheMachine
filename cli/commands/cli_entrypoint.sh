@@ -45,7 +45,6 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
     ./init.sh "$@"
-    exit
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "pass" ]]; then

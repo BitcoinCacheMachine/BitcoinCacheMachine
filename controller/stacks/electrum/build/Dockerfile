@@ -15,7 +15,7 @@ USER user
 WORKDIR /home/user
 ENV GNUPGHOME=/home/user/.gnupg
 
-COPY ./ThomasV.asc ThomasV.asc
+COPY ThomasV.asc ThomasV.asc
 RUN gpg --import ThomasV.asc
 RUN wget https://download.electrum.org/3.3.4/Electrum-3.3.4.tar.gz
 RUN wget https://download.electrum.org/3.3.4/Electrum-3.3.4.tar.gz.asc
