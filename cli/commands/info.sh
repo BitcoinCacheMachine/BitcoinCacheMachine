@@ -40,31 +40,29 @@ else
     fi
 fi
 
+
+if [ -z ${ELECTRUM_DIR+x} ]; then
+    echo "ELECTRUM_DIR:           N/A";
+else
+    if [[ -d $PASSWORD_STORE_DIR ]]; then
+        echo "ELECTRUM_DIR:               $ELECTRUM_DIR"
+    else
+        echo "ELECTRUM_DIR:               N/A"
+    fi
+fi
+
 if [ -z ${BCM_SSH_DIR+x} ]; then
     echo "BCM_SSH_DIR:           N/A";
 else
     if [[ -d $BCM_SSH_DIR ]]; then
         echo "BCM_SSH_DIR:                $BCM_SSH_DIR"
     else
-        echo "BCM_SSH_DIR:         N/A"
+        echo "BCM_SSH_DIR:                N/A"
     fi
 fi
 
 echo "BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "BCM_DEBUG:                  $BCM_DEBUG"
-
-
-# remove any legacy lxd software and install install lxd via snap
-if snap list | grep -q lxd; then
-    if [[ "$(lxc remote get-default)" != "local" ]]; then
-        echo "BCM_LXD_REMOTE:             $(lxc remote get-default)"
-    else
-        echo "BCM_LXD_REMOTE:             Not set."
-    fi
-else
-    echo ""
-    echo "WARNING: LXD not installed locally."
-fi
 
 
 if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
@@ -77,4 +75,16 @@ fi
 
 if [ ! -z ${BCM_DEFAULT_CHAIN+x} ]; then
     echo "BCM_DEFAULT_CHAIN:          $BCM_DEFAULT_CHAIN";
+fi
+
+# remove any legacy lxd software and install install lxd via snap
+if snap list | grep -q lxd; then
+    if [[ "$(lxc remote get-default)" != "local" ]]; then
+        echo "BCM_LXD_REMOTE:             $(lxc remote get-default)"
+    else
+        echo "BCM_LXD_REMOTE:             N/A"
+    fi
+else
+    echo ""
+    echo "WARNING: LXD not installed locally."
 fi

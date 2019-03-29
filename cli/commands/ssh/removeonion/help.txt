@@ -1,0 +1,11 @@
+Description:
+  Removes an onion address from your torrc file. This command restarts your local tor daemon.
+
+Usage:
+  bcm ssh remove-onion --title="TITLE"
+
+Required Parameters:
+
+  --title=<TITLE>               A one-word title for the endpoint. Example: "US_DENVER_2359"
+                                The user can determine the naming convention, but be consistent.
+

@@ -22,22 +22,17 @@ if snap list | grep -q docker; then
     fi
 fi
 
-# # check to see if we have Trezor-backed GPG certificates.  If not, let's create them.
-# if bcm info | grep -q "BCM_DEFAULT_KEY_ID"; then
-#     echo "Trezor-backed GPG certificates were not found."
-
-#     # Init your SDN controller; create a new GPG certificate 'Satoshi Nakamoto satoshi@bitcoin.org'
-#     bcm init --cert-name="Satoshi Nakamoto" --username="satoshi" --hostname="bitcoin.org"
-# fi
-
 if grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
     mkdir -p "$BCM_WORKING_DIR""_enc"
     mkdir -p "$BCM_WORKING_DIR"
     encfs "$BCM_WORKING_DIR""_enc" "$BCM_WORKING_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN" >> /dev/null
 fi
 
-mkdir -p "$BCM_SSH_DIR"
 mkdir -p "$BCM_WORKING_DIR"
+
+if ! docker image list --format "{{.Repository}}:{{.Tag}}" | grep -q "bcm-trezor:$BCM_VERSION"; then
+    bash -c "$BCM_GIT_DIR/controller/build.sh"
+fi
 
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

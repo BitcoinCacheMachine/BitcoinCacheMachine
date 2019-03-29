@@ -8,7 +8,12 @@ CHOICE=n
 if [[ -d "$GNUPGHOME" ]]; then
     while [[ "$CONTINUE" == 0 ]]
     do
-        echo "WARNING: Are you sure you want to delete '$GNUPGHOME' and '$PASSWORD_STORE_DIR' directories."
+        echo "WARNING: Are you sure you want to delete following directories:"
+        echo ""
+        echo " - $GNUPGHOME"
+        echo " - $PASSWORD_STORE_DIR"
+        echo " - $ELECTRUM_DIR"
+        echo ""
         read -rp "Are you sure (y/n):  "   CHOICE
         
         if [[ "$CHOICE" == "y" ]]; then
@@ -20,6 +25,7 @@ if [[ -d "$GNUPGHOME" ]]; then
         fi
     done
     
+    # never delete GNUPGHOME UNLESS if the CLI is set to HOME/.gnupg (ie must be under ~/.bcm)
     if [[ $GNUPGHOME != "$HOME/.gnupg" ]]; then
         echo "Deleting $GNUPGHOME."
         rm -Rf "$GNUPGHOME"
@@ -37,6 +43,17 @@ if [[ -d "$PASSWORD_STORE_DIR" ]]; then
     fi
 else
     echo "WARNING: PASSWORD_STORE_DIR directory '$PASSWORD_STORE_DIR' does not exist. You may need to run 'bcm init'."
+fi
+
+if [[ -d "$ELECTRUM_DIR" ]]; then
+    if [[ "$CHOICE" == 'y' ]]; then
+        if [ "$ELECTRUM_DIR" != "$HOME/.electrum" ]; then
+            echo "Deleting $ELECTRUM_DIR."
+            rm -Rf "$ELECTRUM_DIR"
+        fi
+    fi
+else
+    echo "WARNING: ELECTRUM_DIR directory '$PASSWORD_STORE_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
 if [[ -d "$BCM_SSH_DIR" ]]; then

@@ -7,7 +7,7 @@ VALUE=${2:-}
 if [ ! -z "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
-    echo "Please provide a SSH command."
+    echo "Please provide a ssh command."
     cat ./help.txt
     exit
 fi
@@ -17,6 +17,9 @@ SSH_HOSTNAME=
 SSH_PUSH=0
 SSH_KEY_PATH=
 ENDPOINT_DIR=
+ONION_ADDRESS=
+AUTH_TOKEN=
+TITLE=
 
 for i in "$@"; do
     case $i in
@@ -36,6 +39,18 @@ for i in "$@"; do
             SSH_KEY_PATH="${i#*=}"
             shift # past argument=value
         ;;
+        --onion=*)
+            ONION_ADDRESS="${i#*=}"
+            shift # past argument=value
+        ;;
+        --token=*)
+            AUTH_TOKEN="${i#*=}"
+            shift # past argument=value
+        ;;
+        --title=*)
+            TITLE="${i#*=}"
+            shift # past argument=value
+        ;;
         --push)
             SSH_PUSH=1
             shift # past argument=value
@@ -46,25 +61,17 @@ for i in "$@"; do
     esac
 done
 
-if [[ -z $SSH_HOSTNAME ]]; then
-    echo "SSH_HOSTNAME can't be empty."
-fi
-
-if [[ -z $SSH_USERNAME ]]; then
-    echo "Error:  SSH_USERNAME not set"
-    exit
-fi
-
-# shellcheck disable=SC1090
-source "$BCM_GIT_DIR/controller/export_usb_path.sh"
-if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
-    echo "Could not determine Trezor USB PATH."
-    exit
-fi
-
 if [[ $BCM_CLI_VERB == "newkey" ]]; then
-    if [[ -z $SSH_HOSTNAME ]]; then
-        echo "SSH_HOSTNAME is empty."
+    
+    
+    # shellcheck disable=SC1090
+    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+    if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
+        echo "Could not determine Trezor USB PATH."
+        exit
+    fi
+    
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
         cat ./newkey/help.txt
         exit
     fi
@@ -109,8 +116,15 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "connect" ]]; then
+    
     if [[ $BCM_HELP_FLAG == 1 ]]; then
         cat ./connect/help.txt
+        exit
+    fi
+    # shellcheck disable=SC1090
+    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+    if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
+        echo "Could not determine Trezor USB PATH."
         exit
     fi
     
@@ -126,6 +140,86 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
 fi
 
 
-if [[ $BCM_CLI_VERB == "list" ]]; then
-    bcm pass list | grep 'bcm/ssh/'
+if [[ $BCM_CLI_VERB == "add-onion" ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./addonion/help.txt
+        exit
+    fi
+    
+    if [[ -z $ONION_ADDRESS ]]; then
+        echo "ERROR: ONION_ADDRESS is not defined. Use --onion=<ONION_ADDRESS>"
+        exit
+    fi
+    
+    if [[ -z $AUTH_TOKEN ]]; then
+        echo "ERROR: AUTH_TOKEN is not defined. Use --token=<AUTH_TOKEN>"
+        exit
+    fi
+    
+    if [[ -z $TITLE ]]; then
+        echo "ERROR: TITLE is not defined. Use --title=<TITLE>"
+        exit
+    fi
+    
+    # construct the tor string.
+    TOR_STRING="HidServAuth $ONION_ADDRESS $AUTH_TOKEN #BCM_SSH: $TITLE"
+    TORRC=/etc/tor/torrc
+    if grep -Fxq "$TOR_STRING" "$TORRC"; then
+        echo "This SSH endpoint '$TITLE' is already defined in '$TORRC'. You can use 'bcm ssh remove-onion' to remove it.'"
+    else
+        # let's further check to ensure you're not inserting an existing onion address else the tor service
+        # won't start due to duplicates.
+        if grep -Fxq "$ONION_ADDRESS" "$TORRC"; then
+            echo "$TOR_STRING" | sudo tee -a "$TORRC" >>/dev/null
+            sudo systemctl restart tor
+            wait-for-it -t 15 --quiet 127.0.0.1:9050>>/dev/null
+            
+            echo "$TITLE has been added to $TORRC and your local tor client has been restarted."
+        else
+            echo "WARNING: you already have an onion endpoint with the same onion address! No changes were made."
+        fi
+    fi
+    
+    exit
+fi
+
+
+if [[ $BCM_CLI_VERB == "remove-onion" ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./removeonion/help.txt
+        exit
+    fi
+    
+    if [[ -z $TITLE ]]; then
+        echo "ERROR: TITLE is not defined. Use --title=<TITLE>"
+        exit
+    fi
+    
+    # construct the tor string.
+    TORRC=/etc/tor/torrc
+    if grep -q "#BCM_SSH: $TITLE" "$TORRC"; then
+        sudo sed -i '/'"#BCM_SSH: $TITLE"'/d' "$TORRC"
+        
+        # restart tor daemon
+        # TODO only restart if the line was in there in the first place
+        sudo systemctl restart tor >>/dev/null
+        wait-for-it -t 15 --quiet 127.0.0.1:9050>>/dev/null
+        
+        echo "'$TITLE' has been removed from '$TORRC' and your local tor daemon has been restarted."
+    else
+        echo "'$TITLE' was not found in $TORRC"
+    fi
+    
+    exit
+fi
+
+if [[ $BCM_CLI_VERB == "list-onion" ]]; then
+    echo "TITLE,ONION_ADDRESS"
+    while read -r LINE; do
+        if [[ "$LINE" =~ "#BCM_SSH:" ]]; then
+            TITLE=$(echo "$LINE" | awk '{print $5;}')
+            ONION=$(echo "$LINE"| awk '{print $2;}')
+            echo "$TITLE,$ONION"
+        fi
+    done </etc/tor/torrc
 fi

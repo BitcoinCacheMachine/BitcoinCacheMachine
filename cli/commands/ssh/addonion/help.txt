@@ -1,0 +1,15 @@
+Description:
+  Allows you to programmatically add an SSH onion endpoint to your BCM CLI. This 
+  command updates your localhost's /etc/tor/torrc file. Warning: your tor service is 
+  restarted which may impact running programs.
+
+Usage:
+  bcm ssh add-onion --onion="ONION_ADDRESS" --token="AUTH_TOKEN" --title="TITLE"
+
+Required Parameters:
+
+  --onion=<ONION_ADDRESS>       Required. The TOR onion address of your SSH endpoint.
+  --token=<AUTH_TOKEN>          The authenticated tor onion service token.
+  --title=<TITLE>               A one-word title for the endpoint. Example: "US_DENVER_2359"
+                                The user can determine the naming convention, but be consistent.
+

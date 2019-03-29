@@ -18,9 +18,6 @@ fi
 
 #  TODO make MACVLAN interface accessible somehow...
 #sudo route add -4 "$(bcm get-ip)"/32 dev wlp3s0 metric 50
-
-ELECTRUM_DIR="$BCM_RUNTIME_DIR/electrum"
-
 if [[ ! -d "$ELECTRUM_DIR" ]]; then
     mkdir -p "$ELECTRUM_DIR/testnet"
     

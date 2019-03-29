@@ -23,7 +23,6 @@ for i in "$@"; do
     case $i in
         --help)
             BCM_HELP_FLAG=1
-            shift # past argument=value
         ;;
         --force)
             BCM_FORCE_FLAG=1
