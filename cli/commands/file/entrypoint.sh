@@ -81,7 +81,7 @@ if [[ $BCM_CLI_VERB == "encrypt" ]]; then
     -v "$GNUPGHOME":/home/user/.gnupg \
     -v "$INPUT_DIR":/inputdir \
     -v "$OUTPUT_DIR":/outputdir \
-    bcm-trezor:latest gpg --output "/inputdir/$INPUT_FILE_NAME.gpg" --encrypt --recipient "$BCM_DEFAULT_KEY_ID" "/outputdir/$INPUT_FILE_NAME"
+    "bcm-trezor:$BCM_VERSION" gpg --output "/inputdir/$INPUT_FILE_NAME.gpg" --encrypt --recipient "$DEFAULT_KEY_ID" "/outputdir/$INPUT_FILE_NAME"
     
     if [[ -f "$INPUT_FILE_PATH.gpg" ]]; then
         echo "Encrypted file created at $INPUT_FILE_PATH.gpg"

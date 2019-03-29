@@ -16,4 +16,4 @@ echo "entering decrypt.sh"
 #     -v $BCM_PROJECT_DIR:/home/user/.gnupg \
 #     -v $INPUT_FILE_DIR:/sigdir \
 #     --device=$BCM_TREZOR_USB_PATH \
-#     bcm-trezor:latest gpg --output /sigdir/$INPUT_FILE_NAME.decrypted --decrypt /sigdir/$INPUT_FILE_NAME
+#     "bcm-trezor:$BCM_VERSION" gpg --output /sigdir/$INPUT_FILE_NAME.decrypted --decrypt /sigdir/$INPUT_FILE_NAME

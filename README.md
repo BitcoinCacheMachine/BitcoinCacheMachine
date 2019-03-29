@@ -64,18 +64,18 @@ cd "$BCM_GIT_DIR"
 source ~/.bashrc
 ```
 
-Feel free to change the directory in which you store the BCM repository on your machine. Just update the `BCM_GIT_DIR` variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Since `setup.sh` modifies group membership, you will have to log out and log back in before the BCM CLI operates correctly. Running `bcm` at the terminal displays top-level commands. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
+Feel free to change the directory in which you store the BCM repository on your machine. Just update the `BCM_GIT_DIR` variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Since `setup.sh` modifies group membership, you will have to log out and log back in before the BCM CLI operates correctly. Running `bcm` at the terminal builds the docker images needed to run bcm commands. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
 
 ## Deploying your own BCM Infrastructure
 
-After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy `clightning` and all its dependencies including `bitcoind`, run the `bcm stack deploy clightning` command. Other user-facing components you can deploy include:
+After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other user-facing components you can deploy include:
 
 `bcm stack deploy spark`  
 `bcm stack deploy btcpayserver`  
 `bcm stack deploy esplora`  
 `bcm stack deploy electrs`  
 
-You can also run GUI-based applications that are fully integrated into your back end infrastructure. For example, run `bcm run electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server (`electrs`).
+You can also run GUI-based applications that are fully integrated into your back end infrastructure. For example, run `bcm run electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server (`electrs`).  You can use the `bcm info` command to view your current BCM environment variables--certificate, password, ssh, wallet, and certificate stores as well as deployment information like current cluster that under management and the chain (i.e., mainnet, testnet, regtest) you're targeting.
 
 ## Documentation
 

@@ -42,7 +42,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     -v "$PASSWORD_STORE_DIR":/home/user/.password-store:rw \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest bash -c "pass generate $BCM_PASS_NAME --no-symbols 32 >>/dev/null"
+    "bcm-trezor:$BCM_VERSION" bash -c "pass generate $BCM_PASS_NAME --no-symbols 32 >>/dev/null"
     
     elif [[ $BCM_CLI_VERB == "init" ]]; then
     
@@ -89,7 +89,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
         -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
         -e BCM_CERT_HOSTNAME="$BCM_CERT_HOSTNAME" \
         --device="$BCM_TREZOR_USB_PATH" \
-        bcm-trezor:latest pass init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
+        "bcm-trezor:$BCM_VERSION" pass init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
     else
         echo "WARNING: The password repo has already been initialized."
     fi
@@ -108,7 +108,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest pass "$BCM_PASS_NAME"
+    "bcm-trezor:$BCM_VERSION" pass "$BCM_PASS_NAME"
     
     elif [[ $BCM_CLI_VERB == "list" || $BCM_CLI_VERB == "ls" ]]; then
     docker run -it --name pass --rm \
@@ -116,7 +116,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     -v "$GNUPGHOME":/home/user/.gnupg:ro \
     -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest pass ls
+    "bcm-trezor:$BCM_VERSION" pass ls
     
     elif [[ $BCM_CLI_VERB == "rm" || $BCM_CLI_VERB == "remove" ]]; then
     docker run -it --name pass --rm \
@@ -125,7 +125,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest pass rm "$BCM_PASS_NAME"
+    "bcm-trezor:$BCM_VERSION" pass rm "$BCM_PASS_NAME"
     
     elif [[ $BCM_CLI_VERB == "insert" ]]; then
     docker run -it --name pass --rm \
@@ -134,5 +134,5 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest pass insert "$BCM_PASS_NAME"
+    "bcm-trezor:$BCM_VERSION" pass insert "$BCM_PASS_NAME"
 fi

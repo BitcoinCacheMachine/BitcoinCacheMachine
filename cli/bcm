@@ -10,14 +10,12 @@ fi
 # shellcheck disable=1090
 source ./env
 
-if snap list | grep -q docker; then
-    if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
+if ! snap list | grep -q docker; then
+    if ! docker image list --format "{{.Repository}}:{{.Tag}}" | grep -q "bcm-gpgagent:$BCM_VERSION"; then
         CHOICE=
-        read -rp "The docker image for the BCM SDN Controller is unavailable. Would you like to build it now (n/y): " CHOICE
+        read -rp "WARNING: BCM docker images do not exist. Create them now? (y/n): " CHOICE
         if [[ $CHOICE == "y" ]]; then
             bash -c "$BCM_GIT_DIR/controller/build.sh"
-        else
-            exit
         fi
     fi
 fi
@@ -29,10 +27,6 @@ if grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
 fi
 
 mkdir -p "$BCM_WORKING_DIR"
-
-if ! docker image list --format "{{.Repository}}:{{.Tag}}" | grep -q "bcm-trezor:$BCM_VERSION"; then
-    bash -c "$BCM_GIT_DIR/controller/build.sh"
-fi
 
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

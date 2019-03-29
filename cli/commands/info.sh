@@ -5,7 +5,7 @@ set -Eeuo pipefail
 BCM_CERT_NAME=
 BCM_CERT_USERNAME=
 BCM_CERT_HOSTNAME=
-BCM_DEFAULT_KEY_ID=
+DEFAULT_KEY_ID=
 
 
 echo "ACTIVE_ENVIRONMENT:"
@@ -21,8 +21,8 @@ else
             BCM_CERT_NAME="$BCM_CERT_NAME"
             BCM_CERT_USERNAME="$BCM_CERT_USERNAME"
             BCM_CERT_HOSTNAME="$BCM_CERT_HOSTNAME"
-            BCM_DEFAULT_KEY_ID="$BCM_DEFAULT_KEY_ID"
-            echo "  BCM_DEFAULT_KEY_ID:         $BCM_DEFAULT_KEY_ID"
+            DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
+            echo "  DEFAULT_KEY_ID:             $DEFAULT_KEY_ID"
             echo "  BCM_CERT_TITLE:             $BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
         fi
     else
@@ -65,6 +65,18 @@ echo "BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "BCM_DEBUG:                  $BCM_DEBUG"
 
 
+# remove any legacy lxd software and install install lxd via snap
+if snap list | grep -q lxd; then
+    if ! lxc remote get-default | grep -q "local"; then
+        echo "BCM_LXD_REMOTE:             $(lxc remote get-default)"
+    else
+        echo "BCM_LXD_REMOTE:             N/A"
+    fi
+else
+    echo ""
+    echo "WARNING: LXD not installed locally."
+fi
+
 if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
     echo "BCM_LXD_IMAGE_CACHE:        $BCM_LXD_IMAGE_CACHE";
 fi
@@ -75,16 +87,4 @@ fi
 
 if [ ! -z ${BCM_DEFAULT_CHAIN+x} ]; then
     echo "BCM_DEFAULT_CHAIN:          $BCM_DEFAULT_CHAIN";
-fi
-
-# remove any legacy lxd software and install install lxd via snap
-if snap list | grep -q lxd; then
-    if [[ "$(lxc remote get-default)" != "local" ]]; then
-        echo "BCM_LXD_REMOTE:             $(lxc remote get-default)"
-    else
-        echo "BCM_LXD_REMOTE:             N/A"
-    fi
-else
-    echo ""
-    echo "WARNING: LXD not installed locally."
 fi

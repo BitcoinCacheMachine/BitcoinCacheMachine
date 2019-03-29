@@ -14,7 +14,7 @@ echo "entering create_signature.sh"
 #     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
 #     -v $INPUT_FILE_DIR:/sigdir \
 #     --device=$BCM_TREZOR_USB_PATH \
-#     bcm-trezor:latest gpg --sign --detach-sig -s /sigdir/$INPUT_FILE_NAME
+#     "bcm-trezor:$BCM_VERSION" gpg --sign --detach-sig -s /sigdir/$INPUT_FILE_NAME
 
 # if [[ -f $BCM_TREZOR_FILE_PATH.sig ]]; then
 #     echo "Signature created at $BCM_TREZOR_FILE_PATH.sig"

@@ -3,14 +3,15 @@
 export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
 export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
-export BCM_VERSION="v0.0.1"
 
+# todo, make last digit ++ from latest git tag.
+export BCM_VERSION="v0.0.6"
+export BCM_DOCKER_BASE_TAG="18.04"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 export BCM_PRIVATE_REGISTRY="bcm-gateway-01:5010"
 export BCM_SSH_DIR="$BCM_RUNTIME_DIR/ssh"
+export ELECTRUM_DIR="$BCM_RUNTIME_DIR/electrum"
 export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/clusters"
-export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
-
 
 GNUPGHOME="$BCM_RUNTIME_DIR/gnupg"
 PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/password_store"
@@ -21,12 +22,15 @@ if [[ $BCM_ACTIVE == 0 ]]; then
     GNUPGHOME="$HOME/.gnupg"
     PASSWORD_STORE_DIR="$HOME/.password_store"
     BCM_SSH_DIR="$HOME/.ssh"
+    ELECTRUM_DIR="$HOME/.electrum"
 fi
 
 export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
-export ELECTRUM_DIR="$BCM_RUNTIME_DIR/electrum"
+export ELECTRUM_DIR="$ELECTRUM_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$(date +'%Y-%j')"
+export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
+
 
 if [ -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
     BCM_DOCKER_IMAGE_CACHE="https://registry-1.docker.io"

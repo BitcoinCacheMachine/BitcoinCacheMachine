@@ -2,7 +2,7 @@ Description:
   Perform secure Trezor-backed GIT operations to sign git commits and tags.
 
 Usage:
-  bcm git [command] -n=<BCM_PROJECT_OVERRIDE_DIR> -g=<BCM_GIT_REPO_DIR> -m='<BCM_GIT_COMMIT_MESSAGE>'
+  bcm git [command] -n=<BCM_PROJECT_OVERRIDE_DIR> -g=<BCM_GIT_REPO_DIR> -m='<GIT_COMMIT_MESSAGE>'
 
 Available Commands:
   commit        Stages and commits everything the chosen repository. The 

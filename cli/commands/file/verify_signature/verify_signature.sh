@@ -12,4 +12,4 @@ echo "entering decrypt.sh"
 
 # docker run -it -v $BCM_PROJECT_DIR:/home/user/.gnupg \
 #     -v $INPUT_FILE_DIR:/sigdir \
-#     bcm-trezor:latest gpg --verify /sigdir/$INPUT_FILE_NAME.sig /sigdir/$INPUT_FILE_NAME
+#     "bcm-trezor:$BCM_VERSION" gpg --verify /sigdir/$INPUT_FILE_NAME.sig /sigdir/$INPUT_FILE_NAME

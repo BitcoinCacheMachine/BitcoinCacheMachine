@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CERT_NAME=
@@ -79,17 +79,17 @@ if [[ ! -d "$GNUPGHOME" ]]; then
         -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
         -e BCM_CERT_HOSTNAME="$BCM_CERT_HOSTNAME" \
         --device="$BCM_TREZOR_USB_PATH" \
-        bcm-trezor:latest trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
+        "bcm-trezor:$BCM_VERSION" trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
         
         echo "Your public key and public keyring material can be found at '$GNUPGHOME/trezor'."
     fi
     
-    BCM_DEFAULT_KEY_ID=$(docker run -it --name trezorgpg --rm -v "$GNUPGHOME":/home/user/.gnupg bcm-trezor:latest gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
-    BCM_DEFAULT_KEY_ID="${BCM_DEFAULT_KEY_ID#*/}"
-    BCM_DEFAULT_KEY_ID="$(echo "$BCM_DEFAULT_KEY_ID" | awk '{print $1}')"
+    DEFAULT_KEY_ID=$(docker run -it --name trezorgpg --rm -v "$GNUPGHOME":/home/user/.gnupg "bcm-trezor:$BCM_VERSION" gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
+    DEFAULT_KEY_ID="${DEFAULT_KEY_ID#*/}"
+    DEFAULT_KEY_ID="$(echo "$DEFAULT_KEY_ID" | awk '{print $1}')"
     
     {
-        echo "export BCM_DEFAULT_KEY_ID="'"'"$BCM_DEFAULT_KEY_ID"'"'
+        echo "export DEFAULT_KEY_ID="'"'"$DEFAULT_KEY_ID"'"'
         # shellcheck disable=SC2086
         echo "export BCM_CERT_NAME="'"'$BCM_CERT_NAME'"'
         
@@ -111,5 +111,12 @@ if [[ ! -d "$PASSWORD_STORE_DIR" ]]; then
     echo "Your GPG keys and password store have successfully initialized. Be sure to back it up!"
 else
     echo "ERROR: $PASSWORD_STORE_DIR already exists."
+    exit
+fi
+
+if [[ ! -d "$BCM_SSH_DIR" ]]; then
+    mkdir "$BCM_SSH_DIR"
+else
+    echo "ERROR: $BCM_SSH_DIR already exists."
     exit
 fi

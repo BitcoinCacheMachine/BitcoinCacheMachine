@@ -1,4 +1,6 @@
-FROM bcm-trezor:latest
+ARG BCM_VERSION
+
+FROM bcm-trezor:${BCM_VERSION}
 
 USER root
 WORKDIR /root

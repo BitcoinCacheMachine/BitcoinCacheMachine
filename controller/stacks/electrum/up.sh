@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 if ! bcm stack list | grep -q "electrs"; then
@@ -13,7 +13,7 @@ if ! docker images --format '{{ .Repository }}:{{ .Tag }}' | grep -q "$IMAGE_NAM
     # call the controller build script for the base image just to ensure it exists
     bash -c "$BCM_GIT_DIR/controller/build.sh"
     
-    docker build -t "$IMAGE_NAME" ./build/
+    docker build -t "$IMAGE_NAME" --build-arg BCM_VERSION="$BCM_VERSION" ./build/
 fi
 
 #  TODO make MACVLAN interface accessible somehow...

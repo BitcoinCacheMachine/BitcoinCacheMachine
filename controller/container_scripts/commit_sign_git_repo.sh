@@ -1,25 +1,25 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -ex
 
 cd /gitrepo
 
-echo "DOCKER_GNUPGHOME: '$GNUPGHOME'"
-echo "DOCKER_BCM_GIT_CLIENT_USERNAME: '$BCM_GIT_CLIENT_USERNAME'"
-echo "DOCKER_BCM_EMAIL_ADDRESS: '$BCM_EMAIL_ADDRESS'"
-echo "DOCKER_BCM_GIT_COMMIT_MESSAGE: '$BCM_GIT_COMMIT_MESSAGE'"
-echo "DOCKER_BCM_DEFAULT_KEY_ID: '$BCM_DEFAULT_KEY_ID'"
+echo "GNUPGHOME: '$GNUPGHOME'"
+echo "GIT_CLIENT_USERNAME: '$GIT_CLIENT_USERNAME'"
+echo "BCM_EMAIL_ADDRESS: '$BCM_EMAIL_ADDRESS'"
+echo "GIT_COMMIT_MESSAGE: '$GIT_COMMIT_MESSAGE'"
+echo "DEFAULT_KEY_ID: '$DEFAULT_KEY_ID'"
 
 gpg2 --list-keys
 git config --global commit.gpgsign 1
 git config --global gpg.program "$(command -v gpg2)"
-git config --global user.signingkey "$BCM_DEFAULT_KEY_ID"
+git config --global user.signingkey "$DEFAULT_KEY_ID"
 
 echo "git config --global commit.gpgsign:  $(git config --global --get commit.gpgsign)"
 echo "git config --global gpg.program: $(git config --global --get gpg.program)"
 echo "git config --global user.signingkey: $(git config --global --get user.signingkey)"
 
-git config --global user.name "$BCM_GIT_CLIENT_USERNAME"
+git config --global user.name "$GIT_CLIENT_USERNAME"
 echo "git config --global user.name set to '$(git config --global --get user.name)'"
 
 # email must be passed in since a certificate can have many emails (uids)
@@ -30,6 +30,6 @@ echo "Staging all outstanding changes."
 git add "*"
 
 echo "Committing and signing. Get ready to check your Trezor."
-git commit -S -m "$BCM_GIT_COMMIT_MESSAGE"
+git commit -S -m "$GIT_COMMIT_MESSAGE"
 
 git log --show-signature -1

@@ -86,7 +86,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     -e KEY_NAME="$KEY_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME > /home/user/.ssh/$KEY_NAME"
+    "bcm-trezor:$BCM_VERSION" bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME > /home/user/.ssh/$KEY_NAME"
     
     if [[ ! -f "$TREZOR_PUB_KEY_PATH" ]]; then
         echo "ERROR: SSH Key did not generate successfully!"
@@ -134,7 +134,7 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    bcm-trezor:latest bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME --connect --verbose"
+    "bcm-trezor:$BCM_VERSION" bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME --connect --verbose"
     
     exit
 fi
@@ -222,4 +222,26 @@ if [[ $BCM_CLI_VERB == "list-onion" ]]; then
             echo "$TITLE,$ONION"
         fi
     done </etc/tor/torrc
+fi
+
+
+if [[ $BCM_CLI_VERB == "push-key" ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./push/help.txt
+        exit
+    fi
+    
+    # shellcheck disable=SC1090
+    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+    
+    IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
+    docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$BCM_SSH_DIR":/home/user/.ssh \
+    -v "$GIT_REPO_DIR":/gitrepo \
+    -e GIT_CLIENT_USERNAME="$GIT_CLIENT_USERNAME" \
+    -e SSH_USERNAME="$SSH_USERNAME" \
+    -e SSH_HOSTNAME="$SSH_HOSTNAME" \
+    --device="$BCM_TREZOR_USB_PATH" \
+    "bcm-trezor:$BCM_VERSION" trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 10 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$GIT_CLIENT_USERNAME" && git push
 fi
