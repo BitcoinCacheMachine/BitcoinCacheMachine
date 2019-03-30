@@ -15,7 +15,7 @@ If the cli is configured correctly, you can `bcm info` to get an overview of you
 * BCM_DEBUG:              [0|1] - Whether the 'bcm' CLI should emit detailed information.
 * LXD_REMOTE:             Name of the cluster your LXD client is currently configured to target.
 * BCM_LXD_IMAGE_CACHE:    If set, BCM will pull LXD images from this host.
-* BCM_DOCKER_IMAGE_CACHE:     If set, BCM will configure the Docker mirror cache to use this host instead of Docker Hub.
+* BCM_DOCKER_IMAGE_CACHE: If set, BCM will configure the Docker mirror cache to use this host instead of Docker Hub.
 * BCM_DEFAULT_CHAIN:      Default is testnet. Change this environment variable and BCM will deploy components to that chain. Valid values are "testnet", "mainnet", and "regtest".
 
 ## Get an overview of your LXD configuration

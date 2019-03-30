@@ -21,7 +21,7 @@ done
 bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$BCM_TIER_NAME --yaml-path=$BCM_GIT_DIR/project/tiers/$BCM_TIER_NAME/tier_profile.yml"
 
 # next, provision (but not start) all LXC system containers across the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$BCM_TIER_NAME"
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --prefix=$BCM_TIER_NAME"
 
 # Now, let's fetch the docker swarm token so we can start the rest of the tier.
 # shellcheck disable=SC1090
@@ -81,9 +81,9 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     # outside this script (see gateway).
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
         if lxc exec "$HOSTNAME" -- docker info | grep "Swarm: " | grep -q "inactive"; then
-            lxc exec "$HOSTNAME" -- wait-for-it -t 15 -q bcm-gateway-01:2377
-            lxc exec "$HOSTNAME" -- wait-for-it -t 15 -q bcm-gateway-01:5000
-            lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" bcm-gateway-01:2377
+            lxc exec "$HOSTNAME" -- wait-for-it -t 15 -q "$HOSTNAME":2377
+            lxc exec "$HOSTNAME" -- wait-for-it -t 15 -q "$HOSTNAME":5000
+            lxc exec "$HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" b"$HOSTNAME":2377
         fi
     fi
 done

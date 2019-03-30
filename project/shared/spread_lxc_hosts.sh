@@ -1,13 +1,13 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
-BCM_TIER_NAME=
+HOST_PREFIX=
 
 for i in "$@"; do
     case $i in
-        --tier-name=*)
-            BCM_TIER_NAME="${i#*=}"
+        --prefix=*)
+            HOST_PREFIX="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -21,12 +21,14 @@ if [[ -z $BCM_TIER_NAME ]]; then
     exit
 fi
 
+
 # let's get a bcm-gateway LXC instance on each cluster endpoint.
 MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
 for ENDPOINT in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
-    LXC_HOSTNAME="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
-    LXC_DOCKERVOL="$LXC_HOSTNAME-dockerdisk"
+    VERSION=$(echo "$BCM_VERSION" | tr '.' '-')
+    LXC_HOSTNAME="bcm-$BCM_TIER_NAME-$VERSION-$(printf %02d "$HOST_ENDING")"
+    LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
     
     # only create the new storage volume if it doesn't already exist
     if ! lxc storage volume list bcm_btrfs | grep -q "$LXC_DOCKERVOL"; then

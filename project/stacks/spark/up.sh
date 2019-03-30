@@ -21,9 +21,9 @@ CONTAINER_NAME="bcm-$TIER_NAME-$HOST_ENDING"
 --image-tag="$IMAGE_TAG"
 
 # push the stack and build files
-lxc file push -p -r "$(pwd)/stack/" "bcm-gateway-01/root/stacks/$TIER_NAME/$STACK_NAME"
+lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
-lxc exec bcm-gateway-01 -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
+lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
 CHAIN="$BCM_DEFAULT_CHAIN" \
 HOST_ENDING="$HOST_ENDING" \
 SERVICE_PORT="$BCM_SERVICE_PORT" \

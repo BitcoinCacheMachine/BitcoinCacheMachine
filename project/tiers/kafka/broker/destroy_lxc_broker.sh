@@ -13,8 +13,8 @@ for endpoint in $(bcm cluster list --endpoints); do
     bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$BROKER_STACK_NAME"
 done
 
-if lxc list | grep -q "bcm-gateway-01"; then
-    if lxc exec bcm-gateway-01 -- docker network ls | grep -q kafkanet; then
-        lxc exec bcm-gateway-01 -- docker network remove kafkanet
+if lxc list | grep -q "$BCM_GATEWAY_HOST_NAME"; then
+    if lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker network ls | grep -q kafkanet; then
+        lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker network remove kafkanet
     fi
 fi

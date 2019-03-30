@@ -70,7 +70,7 @@ fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then
     PREFIX="-$BCM_DEFAULT_CHAIN"
-    for STACK in $(lxc exec bcm-gateway-01 -- docker stack list --format '{{ .Name }}' | grep "$BCM_DEFAULT_CHAIN")
+    for STACK in $(lxc exec $BCM_GATEWAY_HOST_NAME -- docker stack list --format '{{ .Name }}' | grep "$BCM_DEFAULT_CHAIN")
     do
         STACK=${STACK%"$PREFIX"}
         echo "$STACK"

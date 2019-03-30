@@ -38,15 +38,17 @@ bcm tier remove kafka
 
 bcm tier remove gateway
 
-# stop bcm-host-template
-if lxc list --format csv | grep "bcm-host-template" | grep -q "RUNNING"; then
-    lxc stop bcm-host-template
+source ./env
+
+# stop $HOST_NAME
+if lxc list --format csv | grep "$HOST_NAME" | grep -q "RUNNING"; then
+    lxc stop "$HOST_NAME"
 fi
 
-# delete bcm-host-template
-if lxc list --format csv | grep -q "bcm-host-template"; then
-    echo "Deleting bcm-host-template lxd host."
-    lxc delete bcm-host-template
+# delete $HOST_NAME
+if lxc list --format csv | grep -q "$HOST_NAME"; then
+    echo "Deleting $HOST_NAME lxd host."
+    lxc delete "$HOST_NAME"
 fi
 
 if [[ $DELETE_BCM_IMAGE == 1 ]]; then
@@ -54,9 +56,9 @@ if [[ $DELETE_BCM_IMAGE == 1 ]]; then
     bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
-# remove image bcm-bionic-base
+# remove image bcm-lxc-base
 if [[ $DELETE_LXC_BASE == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-bionic-base"
+    bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-lxc-base"
 fi
 
 # delete profile 'docker-privileged'

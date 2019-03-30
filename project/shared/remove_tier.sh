@@ -27,8 +27,8 @@ for LXD_ENDPOINT in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$LXD_ENDPOINT" | tail -c 2)
     
     LXC_HOST="bcm-$BCM_TIER_NAME-$(printf %02d "$HOST_ENDING")"
-    if [[ "$LXC_HOST" != 'bcm-gateway-01' ]]; then
-        # we are only going to remove the node if it's not the bcm-gateway-01 node, which is special.
+    if [[ "$LXC_HOST" != "$BCM_GATEWAY_HOST_NAME" ]]; then
+        # we are only going to remove the node if it's not the "$BCM_GATEWAY_HOST_NAME" node, which is special.
         bash -c "$BCM_LXD_OPS/remove_docker_node.sh --node-name=$LXC_HOST"
     fi
     

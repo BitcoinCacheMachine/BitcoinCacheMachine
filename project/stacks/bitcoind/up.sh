@@ -23,9 +23,9 @@ CONTAINER_NAME="bcm-$TIER_NAME-$HOST_ENDING"
 --image-tag="$IMAGE_TAG"
 
 # push the stack and build files
-lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" "bcm-gateway-01/root/stacks/bitcoin/"
+lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" ""$BCM_GATEWAY_HOST_NAME"/root/stacks/bitcoin/"
 
-lxc exec bcm-gateway-01 -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
+lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
 CHAIN="$BCM_DEFAULT_CHAIN" \
 HOST_ENDING="$HOST_ENDING" \
 docker stack deploy -c "/root/stacks/bitcoin/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"

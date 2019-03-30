@@ -12,11 +12,8 @@ source ./env
 
 if ! snap list | grep -q docker; then
     if ! docker image list --format "{{.Repository}}:{{.Tag}}" | grep -q "bcm-gpgagent:$BCM_VERSION"; then
-        CHOICE=
-        read -rp "WARNING: BCM docker images do not exist. Create them now? (y/n): " CHOICE
-        if [[ $CHOICE == "y" ]]; then
-            bash -c "$BCM_GIT_DIR/controller/build.sh"
-        fi
+        # let's build the docker containers at the the controller if they don't exist for this version of BCM.
+        bash -c "$BCM_GIT_DIR/controller/build.sh"
     fi
 fi
 

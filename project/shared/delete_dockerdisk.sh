@@ -31,7 +31,7 @@ if [[ -z $CLUSTER_ENDPOINT ]]; then
     exit
 fi
 
-VOLUME_NAME="$LXC_HOSTNAME-dockerdisk"
+VOLUME_NAME="$LXC_HOSTNAME-docker"
 
 if lxc storage list | grep -q bcm_btrfs; then
     if lxc storage volume list bcm_btrfs | grep "$VOLUME_NAME" | grep -q "$CLUSTER_ENDPOINT"; then
