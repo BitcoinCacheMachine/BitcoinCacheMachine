@@ -2,12 +2,12 @@
 
 set -Eeuo pipefail
 
-BCM_PROFILE_NAME=
+PROFILE_NAME=
 
 for i in "$@"; do
     case $i in
         --profile-name=*)
-            BCM_PROFILE_NAME="${i#*=}"
+            PROFILE_NAME="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -17,6 +17,6 @@ for i in "$@"; do
 done
 
 # delete the profile if it exists.
-if lxc profile list | grep -q "$BCM_PROFILE_NAME"; then
-    lxc profile delete "$BCM_PROFILE_NAME"
+if lxc profile list | grep -q "$PROFILE_NAME"; then
+    lxc profile delete "$PROFILE_NAME"
 fi

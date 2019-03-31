@@ -301,8 +301,6 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                 # clearing all lines from /etc/hosts that contain "$BCM_SSH_HOSTNAME"
                 sudo sed -i "/$BCM_SSH_HOSTNAME/d" /etc/hosts
                 sudo sed -i '/^$/d' /etc/hosts
-            else
-                echo "ERROR: Can't find $ENDPOINT_DIR/env. Can't delete the LXD endpoint."
             fi
         done
         

@@ -1,13 +1,14 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
+cd "$(dirname "$0")"
 
-HOST_PREFIX=
+TIER_NAME=
 
 for i in "$@"; do
     case $i in
-        --prefix=*)
-            HOST_PREFIX="${i#*=}"
+        --tier-name=*)
+            TIER_NAME="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -16,19 +17,18 @@ for i in "$@"; do
     esac
 done
 
-if [[ -z $BCM_TIER_NAME ]]; then
-    echo "BCM_TIER_NAME not set."
+if [[ -z $TIER_NAME ]]; then
+    echo "PRTIER_NAMEEFIX not set."
     exit
 fi
-
 
 # let's get a bcm-gateway LXC instance on each cluster endpoint.
 MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
 for ENDPOINT in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
-    VERSION=$(echo "$BCM_VERSION" | tr '.' '-')
-    LXC_HOSTNAME="bcm-$BCM_TIER_NAME-$VERSION-$(printf %02d "$HOST_ENDING")"
-    LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
+    
+    # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
+    source ./env.sh --host-ending="$HOST_ENDING"
     
     # only create the new storage volume if it doesn't already exist
     if ! lxc storage volume list bcm_btrfs | grep -q "$LXC_DOCKERVOL"; then
@@ -46,7 +46,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     
     # create the LXC host with the attached profiles.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
-        PROFILE_NAME='bcm_'"$BCM_TIER_NAME"'_profile'
+        PROFILE_NAME="bcm-$TIER_NAME-$BCM_VERSION"
         
         # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.  If not, we call $BCM_GIT_DIR/project/create_bcm_host_template.sh.sh
         if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then

@@ -61,6 +61,14 @@ for i in "$@"; do
     esac
 done
 
+if [[ ! -d "$BCM_SSH_DIR" ]]; then
+    mkdir "$BCM_SSH_DIR"
+fi
+
+if [[ ! -f "$BCM_KNOWN_HOSTS_FILE" ]]; then
+    touch "$BCM_KNOWN_HOSTS_FILE"
+fi
+
 if [[ $BCM_CLI_VERB == "newkey" ]]; then
     
     

@@ -10,8 +10,8 @@ if [ -z "${BCM_CLI_VERB}" ]; then
 fi
 
 # make sure the user has sent in a valid command; quit if not.
-if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "remove" ]]; then
-    echo "ERROR: The valid commands for 'bcm tier' are 'list', 'create', and 'remove'."
+if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "destroy" ]]; then
+    echo "ERROR: The valid commands for 'bcm tier' are 'list', 'create', and 'destroy'."
     exit
 fi
 
@@ -66,7 +66,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
 fi
 
-if [[ $BCM_CLI_VERB == "remove" ]]; then
+if [[ $BCM_CLI_VERB == "destroy" ]]; then
     if [[ $TIER_NAME == "gateway" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
         elif [[ $TIER_NAME == "kafka" ]]; then
@@ -78,7 +78,7 @@ if [[ $BCM_CLI_VERB == "remove" ]]; then
     fi
 fi
 
-if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "remove" && $BCM_CLI_VERB != "create" ]]; then
+if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "destroy" && $BCM_CLI_VERB != "create" ]]; then
     echo "ERROR: next command should be 'create', 'remove', or 'list'."
     cat ./help.txt
 fi

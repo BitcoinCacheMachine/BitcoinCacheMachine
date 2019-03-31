@@ -1,6 +1,6 @@
 ARG BCM_DOCKER_BASE_TAG
 
-FROM ubuntu:$BCM_DOCKER_BASE_TAG
+FROM ubuntu:${BCM_DOCKER_BASE_TAG}
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update

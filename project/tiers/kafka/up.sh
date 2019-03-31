@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # don't even think about proceeding unless the gateway BCM tier is up and running.
@@ -15,7 +15,8 @@ if ! bcm tier list | grep -q gateway; then
 fi
 
 # Let's provision the system containers to the cluster.
-bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=kafka"
+export TIER_NAME=kafka
+bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=$TIER_NAME"
 
 # shellcheck disable=1091
 source ./params.sh "$@"
@@ -39,13 +40,13 @@ export KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS"
 bash -c "./broker/up_lxc_broker.sh"
 
 if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaschemareg/env"
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaschemareg/env --container-name=$BCM_KAFKA_HOST_NAME"
 fi
 
 if [[ $BCM_DEPLOY_STACK_KAFKA_REST == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkarest/env"
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkarest/env --container-name=$BCM_KAFKA_HOST_NAME"
 fi
 
 if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaconnect/env"
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaconnect/env  --container-name=$BCM_KAFKA_HOST_NAME"
 fi

@@ -68,7 +68,7 @@ echo "BCM_DEBUG:                  $BCM_DEBUG"
 # remove any legacy lxd software and install install lxd via snap
 if snap list | grep -q lxd; then
     if ! lxc remote get-default | grep -q "local"; then
-        echo "BCM_LXD_REMOTE:             $(lxc remote get-default)"
+        echo "BCM_CLUSTER:                $(lxc remote get-default)"
         
         # let's show some LXD cluster related stuff.
         if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
@@ -83,7 +83,7 @@ if snap list | grep -q lxd; then
             echo "BCM_DEFAULT_CHAIN:          $BCM_DEFAULT_CHAIN";
         fi
     else
-        echo "BCM_LXD_REMOTE:             N/A"
+        echo "BCM_CLUSTER:                N/A"
     fi
 else
     echo ""

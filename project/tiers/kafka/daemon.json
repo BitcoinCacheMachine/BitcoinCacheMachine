@@ -1,12 +1,10 @@
 {
     "storage-driver": "btrfs",
     "registry-mirrors": [
-        "http://bcm-gateway-01:5000",
-        "http://bcm-gateway-02:5001"
+        "http://$BCM_GATEWAY_HOST_NAME:5000"
     ],
     "insecure-registries": [
-        "bcm-gateway-01:5010",
-        "bcm-gateway-02:5011"
+        "$BCM_GATEWAY_HOST_NAME:5010"
     ],
     "labels": [
         "bcm-kafka=true"

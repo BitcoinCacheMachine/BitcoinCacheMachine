@@ -19,11 +19,11 @@ fi
 #  TODO make MACVLAN interface accessible somehow...
 #sudo route add -4 "$(bcm get-ip)"/32 dev wlp3s0 metric 50
 if [[ ! -d "$ELECTRUM_DIR" ]]; then
-    mkdir -p "$ELECTRUM_DIR/testnet"
-    
-    cp ./config "$ELECTRUM_DIR/testnet/config"
-    cp ./config "$ELECTRUM_DIR/config"
+    mkdir "$ELECTRUM_DIR/testnet"
 fi
+
+cp ./config "$ELECTRUM_DIR/testnet/config"
+cp ./config "$ELECTRUM_DIR/config"
 
 XSOCK=/tmp/.X11-unix
 XAUTH=/tmp/.docker.xauth

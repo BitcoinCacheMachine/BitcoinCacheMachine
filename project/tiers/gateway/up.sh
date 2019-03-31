@@ -16,7 +16,7 @@ bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=gateway --yaml-path=$(p
 bash -c "./create_lxc_gateway_networks.sh"
 
 # get all the bcm-gateway-xx containers deployed to the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --prefix=$BCM_GATEWAY_HOST_NAME"
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=gateway"
 
 # let's start the LXD container on the LXD cluster master.
 lxc file push ./dhcpd_conf.yml "$BCM_GATEWAY_HOST_NAME/etc/netplan/10-lxc.yaml"
@@ -68,8 +68,12 @@ lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-regi
 # build and push the docker-base docker image.
 ./build_push_docker_base.sh
 
-TOR_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-tor:latest"
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker build -t "$TOR_IMAGE" "/root/gateway/build/tor/"
+TOR_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-tor:$BCM_VERSION"
+lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker build \
+--build-arg BCM_DOCKER_BASE_TAG="$BCM_DOCKER_BASE_TAG" \
+--build-arg BCM_PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY" \
+-t "$TOR_IMAGE" "/root/gateway/build/tor/"
+
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker push "$TOR_IMAGE"
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/root/gateway/stacks/tor/torstack.yml" torstack
 

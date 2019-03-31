@@ -3,8 +3,9 @@ Description:
 
 Available Commands:
   create    Deploy a BCM system container tier from your data center.
-  remove    Remove a BCM system container tier from your data center.
-  list      List BCM tiers that are currently provisioned to your data center.
+  destroy   Destroy a BCM system container tier. Removes all LXD-related objects
+            related to a particular tier: system containers, lxc profiles, btrfs volumes.
+  list      Lists BCM tiers that are currently provisioned to your data center.
 
 Usage:
   bcm deploy COMMAND TIER_NAME

@@ -1,4 +1,7 @@
-FROM bcm-gateway-01:5010/bcm-docker-base:latest
+ARG BCM_PRIVATE_REGISTRY
+ARG BCM_DOCKER_BASE_TAG
+
+FROM ${BCM_PRIVATE_REGISTRY}/bcm-docker-base:${BCM_DOCKER_BASE_TAG}
 
 RUN apt-get update \
     && apt-get install -y tor

@@ -5,8 +5,8 @@ export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 
 # todo, make last digit ++ from latest git tag.
-export BCM_VERSION="v0.0.9"
-export BCM_DOCKER_BASE_TAG="18.04"
+export BCM_VERSION="v0.0.10"
+export BCM_DOCKER_BASE_TAG="bionic"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 
 export BCM_SSH_DIR="$BCM_RUNTIME_DIR/ssh"
@@ -30,12 +30,11 @@ export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export ELECTRUM_DIR="$ELECTRUM_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$BCM_VERSION"
 export BCM_GATEWAY_HOST_NAME="$(echo bcm-gateway-$BCM_VERSION-01 | tr '.' '-')"
+export BCM_KAFKA_HOST_NAME="$(echo bcm-kafka-$BCM_VERSION-01 | tr '.' '-')"
 export BCM_PRIVATE_REGISTRY="$BCM_GATEWAY_HOST_NAME:5010"
 export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 
-if [[ ! -f $BCM_KNOWN_HOSTS_FILE ]]; then
-    touch "$BCM_KNOWN_HOSTS_FILE"
-fi
+
  
 if [ -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
     BCM_DOCKER_IMAGE_CACHE="registry-1.docker.io"

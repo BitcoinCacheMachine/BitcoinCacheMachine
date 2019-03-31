@@ -120,3 +120,11 @@ else
     echo "ERROR: $BCM_SSH_DIR already exists."
     exit
 fi
+
+
+if [[ ! -d "$BCM_WORKING_DIR" ]]; then
+    mkdir "$BCM_WORKING_DIR"
+else
+    echo "ERROR: $BCM_WORKING_DIR already exists."
+    exit
+fi

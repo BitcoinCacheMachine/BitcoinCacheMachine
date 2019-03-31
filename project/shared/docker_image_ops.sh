@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
@@ -8,7 +8,6 @@ DOCKER_HUB_IMAGE=
 IMAGE_NAME=
 IMAGE_TAG=latest
 BUILD_CONTEXT=
-PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY"
 
 for i in "$@"; do
     case $i in
@@ -48,8 +47,8 @@ if [[ -z $IMAGE_NAME ]]; then
     exit
 fi
 
-if [[ -z $PRIVATE_REGISTRY ]]; then
-    echo "PRIVATE_REGISTRY is empty. Exiting"
+if [[ -z $BCM_PRIVATE_REGISTRY ]]; then
+    echo "BCM_PRIVATE_REGISTRY is empty. Exiting"
     exit
 fi
 
@@ -57,8 +56,8 @@ fi
 # no operations will be performed otherwise.
 if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
     lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
-    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
-    lxc exec "$LXC_HOST" -- docker push "$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    lxc exec "$LXC_HOST" -- docker push "$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
     exit
 fi
 
@@ -96,7 +95,7 @@ if [[ $REBUILD == 1 ]]; then
     bash -c "$BCM_GIT_DIR/project/tiers/gateway/build_push_docker_base.sh"
     
     # let's build the image and push it to our private registry.
-    IMAGE_FQDN="$PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    IMAGE_FQDN="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
     
     echo "Preparing the docker image '$IMAGE_FQDN'"
     lxc exec "$LXC_HOST" -- docker build -t "$IMAGE_FQDN" /root/build/

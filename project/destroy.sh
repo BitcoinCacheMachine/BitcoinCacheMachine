@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 source ./env
 
-DELETE_BCM_IMAGE=0
+DELETE_BCM_IMAGE=1
 DELETE_LXC_BASE=0
 
 for i in "$@"; do
@@ -30,13 +30,13 @@ for i in "$@"; do
 done
 
 # shellcheck disable=2129
-bcm tier remove bitcoin
+bcm tier destroy bitcoin
 
-bcm tier remove ui
+bcm tier destroy ui
 
-bcm tier remove kafka
+bcm tier destroy kafka
 
-bcm tier remove gateway
+bcm tier destroy gateway
 
 source ./env
 
