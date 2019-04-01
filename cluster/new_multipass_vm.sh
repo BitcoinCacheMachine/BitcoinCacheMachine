@@ -48,12 +48,19 @@ if [[ -z $VM_NAME ]]; then
     exit
 fi
 
+if multipass list | grep -q "$VM_NAME"; then
+    echo "bcm cluster destroy --cluster-name=$VM_NAME"
+    exit
+fi
+
 if [[ -f "$ENDPOINT_DIR/id_rsa" ]]; then
     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
 else
     echo "ERROR: '$ENDPOINT_DIR/id_rsa' does not exist!"
     exit
 fi
+
+
 
 echo "Creating a new multipass VM with the following resources:"
 

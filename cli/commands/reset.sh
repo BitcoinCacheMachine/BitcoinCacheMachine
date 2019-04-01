@@ -76,23 +76,20 @@ fi
 
 if [[ -d "$BCM_WORKING_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then
-        # TODO we will only delete this if the directroy is under RUNTIME_DIR
-        echo "Deleting $BCM_WORKING_DIR."
-        rm -Rf "$BCM_WORKING_DIR"
+        # now let;s unmount the temp directory and remove the folders.
+        encfs -u "$BCM_WORKING_DIR">>/dev/null
+        
+        if [[ -d "$BCM_WORKING_DIR" ]]; then
+            echo "Removing $BCM_WORKING_DIR"
+            rm -rf "$BCM_WORKING_DIR"
+        fi
+        
+        if [[ -d "$BCM_WORKING_DIR_ENC" ]]; then
+            echo "Removing $BCM_WORKING_DIR_ENC"
+            rm -rf "$BCM_WORKING_DIR_ENC"
+        fi
     fi
 else
     echo "WARNING: BCM_WORKING_DIR directory '$BCM_WORKING_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
-# # now let;s unmount the temp directory and remove the folders.
-# encfs -u "$BCM_WORKING_DIR">>/dev/null
-
-# if [[ -d "$BCM_WORKING_DIR" ]]; then
-#     echo "Removing $BCM_WORKING_DIR"
-#     rm -rf "$BCM_WORKING_DIR"
-# fi
-
-# if [[ -d "$BCM_WORKING_DIR""_enc" ]]; then
-#     echo "Removing $BCM_WORKING_DIR""_enc"
-#     rm -rf "$BCM_WORKING_DIR""_enc"
-# fi

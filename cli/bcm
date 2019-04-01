@@ -16,11 +16,5 @@ if ! snap list | grep -q docker; then
     fi
 fi
 
-if ! grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
-    mkdir -p "$BCM_WORKING_DIR"
-    mkdir -p "$BCM_WORKING_DIR"
-    encfs "$BCM_WORKING_DIR""_enc" "$BCM_WORKING_DIR" -i=10 --extpass='apg -n 1 -m 30 -M CN' <<< "p"
-fi
-
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

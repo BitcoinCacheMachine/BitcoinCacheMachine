@@ -61,7 +61,7 @@ if [[ ! -d "$GNUPGHOME" ]]; then
     
     # shellcheck disable=SC2153
     bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $GNUPGHOME"
-
+    
     
     echo "Your certificate will appear as:  '$BCM_CERT_NAME $BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME'"
     
@@ -118,10 +118,8 @@ else
     exit
 fi
 
-
-if [[ ! -d "$BCM_WORKING_DIR" ]]; then
-    mkdir "$BCM_WORKING_DIR"
-else
-    echo "ERROR: $BCM_WORKING_DIR already exists."
-    exit
+if ! grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
+    mkdir -p "$BCM_WORKING_DIR_ENC"
+    mkdir -p "$BCM_WORKING_DIR"
+    echo "p" | encfs -o allow_root "$BCM_WORKING_DIR_ENC" "$BCM_WORKING_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN"
 fi

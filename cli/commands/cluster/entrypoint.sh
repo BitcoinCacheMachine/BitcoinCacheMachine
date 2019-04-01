@@ -265,10 +265,9 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
     # TODO ITERATE OVER FOLDERS IN CLUSTER FOLDER AND DELETE BASED ON env.
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
     
-    if [[ ! -d $CLUSTER_DIR ]]; then
-        echo "ERROR: $CLUSTER_DIR not found."
-    else
-        for ENDPOINT_DIR in $(find "$CLUSTER_DIR" -mindepth 1 -maxdepth 1 -type d); do
+    if [[ -d $CLUSTER_DIR ]]; then
+        while IFS= read -r -d '' ENDPOINT_DIR
+        do
             if [[ -f $ENDPOINT_DIR/env ]]; then
                 source "$ENDPOINT_DIR/env"
                 
@@ -287,24 +286,52 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     sudo sed -i '/^$BCM_SSH_HOSTNAME/d' /etc/hosts
                 fi
                 
-                if [[ $(lxc remote get-default) != "local" ]]; then
-                    # if it's the cluster master add the LXC remote so we can manage it.
-                    if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
-                        echo "Switching lxd remote to local."
-                        lxc remote switch "local"
-                        
-                        echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
-                        lxc remote remove "$CLUSTER_NAME"
-                    fi
-                fi
-                
                 # clearing all lines from /etc/hosts that contain "$BCM_SSH_HOSTNAME"
                 sudo sed -i "/$BCM_SSH_HOSTNAME/d" /etc/hosts
                 sudo sed -i '/^$/d' /etc/hosts
             fi
-        done
+        done < <(find "$CLUSTER_DIR" -mindepth 1 -maxdepth 1 -type d -print0)
         
-        # delete the cluster directory
-        rm -rf "${CLUSTER_DIR:?}"
+        
+        # for ENDPOINT_DIR in $(find "$CLUSTER_DIR" -mindepth 1 -maxdepth 1 -type d); do
+        #     if [[ -f $ENDPOINT_DIR/env ]]; then
+        #         source "$ENDPOINT_DIR/env"
+        
+        #         if [[ $BCM_DRIVER == multipass ]]; then
+        #             BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
+        #             if multipass list | grep -q "$BCM_SSH_HOSTNAME"; then
+        #                 multipass stop "$BCM_SSH_HOSTNAME"
+        #                 multipass delete "$BCM_SSH_HOSTNAME"
+        #                 multipass purge
+        #             fi
+        
+        #             # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
+        #             ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$BCM_SSH_HOSTNAME" >> /dev/null
+        
+        #             # clear any relevant /etc/host entries (and remove extra lines)
+        #             sudo sed -i '/^$BCM_SSH_HOSTNAME/d' /etc/hosts
+        #         fi
+        
+        #         # clearing all lines from /etc/hosts that contain "$BCM_SSH_HOSTNAME"
+        #         sudo sed -i "/$BCM_SSH_HOSTNAME/d" /etc/hosts
+        #         sudo sed -i '/^$/d' /etc/hosts
+        #     fi
+        # done
+    else
+        echo "WARNING: $CLUSTER_DIR not found."
     fi
+    
+    if [[ $(lxc remote get-default) != "local" ]]; then
+        # if it's the cluster master add the LXC remote so we can manage it.
+        if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
+            echo "Switching lxd remote to local."
+            lxc remote switch "local"
+            
+            echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
+            lxc remote remove "$CLUSTER_NAME"
+        fi
+    fi
+    
+    # delete the cluster directory
+    rm -rf "${CLUSTER_DIR:?}"
 fi

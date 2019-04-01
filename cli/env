@@ -7,13 +7,14 @@ export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 # todo, make last digit ++ from latest git tag.
 
 # see README.md for versioning scheme.
-export BCM_VERSION="v0.0.0.2"
+export BCM_VERSION="v0.0.2"
 export BCM_DOCKER_BASE_TAG="bionic"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 
 export BCM_SSH_DIR="$BCM_RUNTIME_DIR/ssh"
 export ELECTRUM_DIR="$BCM_RUNTIME_DIR/electrum"
 export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/clusters"
+export BCM_WORKING_DIR_ENC="$BCM_RUNTIME_DIR/.clusters"
 
 GNUPGHOME="$BCM_RUNTIME_DIR/gnupg"
 PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/password_store"
