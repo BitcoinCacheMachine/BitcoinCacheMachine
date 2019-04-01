@@ -93,3 +93,5 @@ else
     echo "WARNING: BCM_WORKING_DIR directory '$BCM_WORKING_DIR' does not exist. You may need to run 'bcm init'."
 fi
 
+echo "Removing all BCM-related entries from /etc/hosts"
+sudo sed -i "/bcm-/d" /etc/hosts

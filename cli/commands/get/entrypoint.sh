@@ -17,5 +17,5 @@ if [[ $BCM_CLI_VERB == "get-ip" ]]; then
     # also known as the macvlan interface IP address
     # get-ip
     
-    lxc info bcm-ui-01 | grep "eth1:\\sinet\\s" | awk 'NF>1{print $NF}'
+    lxc info "$BCM_UI_HOST_NAME" | grep "eth1:\\sinet\\s" | awk 'NF>1{print $NF}'
 fi

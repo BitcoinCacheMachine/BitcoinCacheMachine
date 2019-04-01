@@ -63,6 +63,7 @@ fi
 
 echo "BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "BCM_DEBUG:                  $BCM_DEBUG"
+echo "BCM_DEFAULT_CHAIN:          $BCM_DEFAULT_CHAIN";
 
 
 # remove any legacy lxd software and install install lxd via snap
@@ -79,9 +80,6 @@ if snap list | grep -q lxd; then
             echo "BCM_DOCKER_IMAGE_CACHE:     $BCM_DOCKER_IMAGE_CACHE";
         fi
         
-        if [ ! -z ${BCM_DEFAULT_CHAIN+x} ]; then
-            echo "BCM_DEFAULT_CHAIN:          $BCM_DEFAULT_CHAIN";
-        fi
     else
         echo "BCM_CLUSTER:                N/A"
     fi
