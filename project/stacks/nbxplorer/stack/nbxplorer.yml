@@ -8,7 +8,7 @@ services:
       - nbxplorer_datadir:/datadir
     environment:
       CHAIN: ${CHAIN:-testnet}
-      HOST_ENDING: ${HOST_ENDING:-01}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
       NBXPLORER_NETWORK: ${CHAIN:-testnet}
       NBXPLORER_BIND: 0.0.0.0:32838
       NBXPLORER_CHAINS: "btc"

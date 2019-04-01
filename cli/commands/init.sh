@@ -61,14 +61,11 @@ if [[ ! -d "$GNUPGHOME" ]]; then
     
     # shellcheck disable=SC2153
     bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $GNUPGHOME"
-    
-    if ! docker image list --format "{{.Repository}}" | grep -q "bcm-trezor"; then
-        bash -c "$BCM_GIT_DIR/controller/build.sh"
-    fi
+
     
     echo "Your certificate will appear as:  '$BCM_CERT_NAME $BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME'"
     
-    # shellcheck disable=SC1091
+    
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
     if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
         # run the container.

@@ -34,7 +34,7 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 ## How to Run Bitcoin Cache Machine
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM components run as background server-side processes only, so you'll usually want to have one or more always-on computers with a reliable Internet connection. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM workload components run as background server-side processes only, so you'll usually want to have one or more always-on computers with a reliable Internet connection. User-facing GUI applications such as Electrum Wallet are containerized and require docker (LXC is NOT required for GUI apps). You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal.
 
 BCM application components are deployed using the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](https://www.docker.com/). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI is designed to handle the installation and deployment of all software.
 

@@ -31,3 +31,37 @@ Use the `bcm show` command to get an overview of your LXD container configuation
 * LXD Images
 * LXC Cluster
 * LXD Projects
+
+
+# BCM Versioning
+
+Various BCM versions are defined in ./env, which is available to all BCM scripts. The format is as following:
+
+```bash
+#            vLTS.FEATURE.SYSTEM.APP
+BCM_VERSION="v0.0.0.0"
+```
+
+LTS:        Changes in major LTS REQUIRE a full-backup of user data to off-site storage, complete redeployment of your BCM infrastructure including base OS, and recovery of data. LTS updates use Disaster Recovery methodology (see below).
+FEATURE:    Changes to the system that DO NOT require updates to the underlying host OS but represent major feature releases.
+SYSTEM:     If a version changes a the SYSTEM level, all LXD System-level container and associated LXD resources (e.,g., profiles, volumes, networks) are created and old versions of resources are culled.
+APP:        Changes here require a rebuilding and redeployment of any docker-based image (app-level containers).
+
+The current GIT tag of $BCM_GIT_DIR defines the authoritative current version number.  
+
+
+# Definitions
+
+## System Data
+
+System data are LXD-related resources such as containers, networks, profiles, and volume definitions. This data is NOT necessary to retain since it is effectively generated from the BCM git repo code.
+
+## User Data
+
+User data is any data that is generated from app-level containers. Examples include the contents of bcm_btrfs volumes ending in '-docker'. User data is expected to be backed up using Local-HA and Lightning-enabled decentralized storage (TBD).
+
+# Disaster Recovery Methodology
+
+BCM is a distributed system and works to maintain local high availability of user data. In addition, BCM works to ensure that all data is fully backed up off-site. THe goal is to implement a system that backs user-data up to a decentralized storage service. Once a Lightning-enables services comes out on the Bitcoin Blockchain, it will be integrated.
+
+When A Disaster Recovery occurs, A completely new BCM infrastructure is deployed from sctrach.  After the new version is deployed and BEFORE user-services are started, data is recovered from the decentralized storage service. Once data is restored, app-level services are started.

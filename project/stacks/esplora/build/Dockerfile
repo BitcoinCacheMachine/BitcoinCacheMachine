@@ -1,5 +1,4 @@
 FROM node
-#FROM bcm-gateway-01:5010/bcm-docker-base:latest
 
 RUN apt-get update && apt-get install -y nodejs
 RUN git clone https://github.com/Blockstream/esplora /root/esplora

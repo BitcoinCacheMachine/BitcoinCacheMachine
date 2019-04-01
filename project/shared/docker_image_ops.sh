@@ -98,7 +98,7 @@ if [[ $REBUILD == 1 ]]; then
     IMAGE_FQDN="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
     
     echo "Preparing the docker image '$IMAGE_FQDN'"
-    lxc exec "$LXC_HOST" -- docker build -t "$IMAGE_FQDN" /root/build/
+    lxc exec "$LXC_HOST" -- docker build --build-arg BCM_PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY" --build-arg BCM_DOCKER_BASE_TAG="$BCM_DOCKER_BASE_TAG" -t "$IMAGE_FQDN" /root/build/
     lxc exec "$LXC_HOST" -- docker push "$IMAGE_FQDN"
 else
     echo "The image already exists in the private registry. It will not be re-built."

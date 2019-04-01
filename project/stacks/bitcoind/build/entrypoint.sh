@@ -1,9 +1,8 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 
-# shellcheck disable=SC1091
-source /bcm/proxy_ip_determinant.sh --host-ending="$HOST_ENDING"
+source /bcm/proxy_ip_determinant.sh --host-ending="$LXC_HOSTNAME"
 
 if [[ -z "$TOR_PROXY" ]]; then
     echo "ERROR:  TOR_PROXY could not be determined."

@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# shellcheck disable=SC1091
+
 source ./env
 
 # first, let's make sure we deploy our direct dependencies.
@@ -31,7 +31,7 @@ BITCOIND_P2PPORT=18333
 
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
 CHAIN="$BCM_DEFAULT_CHAIN" \
-HOST_ENDING="$HOST_ENDING" \
+LXC_HOSTNAME="$LXC_HOSTNAME" \
 BITCOIND_RPCPORT="$BITCOIND_RPCPORT" \
 BITCOIND_P2PPORT="$BITCOIND_P2PPORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"

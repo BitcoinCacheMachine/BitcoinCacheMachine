@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 # only continue if the necessary image exists.
 bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 
-# shellcheck disable=SC1091
+
 source ./env
 
 # first, create the profile that represents the tier.

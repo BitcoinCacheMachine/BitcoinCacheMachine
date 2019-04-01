@@ -9,7 +9,7 @@ services:
       - clightning-data:/root/.lightning
     environment:
       CHAIN: ${CHAIN:-testnet}
-      HOST_ENDING: ${HOST_ENDING:-01}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
     networks:
       clightningrpcnet:
     deploy:

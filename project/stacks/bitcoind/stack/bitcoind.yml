@@ -9,7 +9,7 @@ services:
       - bitcoin_cli:/usr/local/bin
     environment:
       CHAIN: ${CHAIN:-testnet}
-      HOST_ENDING: ${HOST_ENDING:-01}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
       AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:-}
     networks:
       bitcoindrpcnet:

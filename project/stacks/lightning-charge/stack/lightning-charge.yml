@@ -17,6 +17,7 @@ services:
       API_TOKEN: mySecretToken
       LN_PATH: /etc/lightning
       NETWORK: ${CHAIN:-testnet}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
     deploy:
       mode: replicated
       replicas: 1

@@ -11,16 +11,15 @@ fi
 source ./env
 
 if ! snap list | grep -q docker; then
-    if ! docker image list --format "{{.Repository}}:{{.Tag}}" | grep -q "bcm-gpgagent:$BCM_VERSION"; then
-        # let's build the docker containers at the the controller if they don't exist for this version of BCM.
+    if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then
         bash -c "$BCM_GIT_DIR/controller/build.sh"
     fi
 fi
 
-if grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
-    mkdir -p "$BCM_WORKING_DIR""_enc"
+if ! grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
     mkdir -p "$BCM_WORKING_DIR"
-    encfs "$BCM_WORKING_DIR""_enc" "$BCM_WORKING_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN" >> /dev/null
+    mkdir -p "$BCM_WORKING_DIR"
+    encfs "$BCM_WORKING_DIR""_enc" "$BCM_WORKING_DIR" -i=10 --extpass='apg -n 1 -m 30 -M CN' <<< "p"
 fi
 
 # call the CLI entrypoint.

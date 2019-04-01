@@ -5,7 +5,9 @@ export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 
 # todo, make last digit ++ from latest git tag.
-export BCM_VERSION="v0.0.10"
+
+# see README.md for versioning scheme.
+export BCM_VERSION="v0.0.0.2"
 export BCM_DOCKER_BASE_TAG="bionic"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 
@@ -31,6 +33,8 @@ export ELECTRUM_DIR="$ELECTRUM_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$BCM_VERSION"
 export BCM_GATEWAY_HOST_NAME="$(echo bcm-gateway-$BCM_VERSION-01 | tr '.' '-')"
 export BCM_KAFKA_HOST_NAME="$(echo bcm-kafka-$BCM_VERSION-01 | tr '.' '-')"
+export BCM_UI_HOST_NAME="$(echo bcm-ui-$BCM_VERSION-01 | tr '.' '-')"
+export BCM_BITCOIN_HOST_NAME="$(echo bcm-bitcoin-$BCM_VERSION-01 | tr '.' '-')"
 export BCM_PRIVATE_REGISTRY="$BCM_GATEWAY_HOST_NAME:5010"
 export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 

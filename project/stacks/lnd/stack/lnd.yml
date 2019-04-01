@@ -12,7 +12,7 @@ services:
     environment:
       LND_CERTIFICATE_HOSTNAME: lnd-${CHAIN:-testnet}  #this is so there are no certificate verification issues on lncli-web
       CHAIN: ${CHAIN:-testnet}
-      HOST_ENDING: ${HOST_ENDING:-01}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
     networks:
       bitcoindrpcnet:
       lndrpcnet:

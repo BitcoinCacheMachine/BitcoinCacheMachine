@@ -69,6 +69,12 @@ if [[ ! -f "$BCM_KNOWN_HOSTS_FILE" ]]; then
     touch "$BCM_KNOWN_HOSTS_FILE"
 fi
 
+
+if [[ $BCM_HELP_FLAG == 1 ]]; then
+    cat ./help.txt
+    exit
+fi
+
 if [[ $BCM_CLI_VERB == "newkey" ]]; then
     
     
@@ -177,7 +183,7 @@ if [[ $BCM_CLI_VERB == "add-onion" ]]; then
     else
         # let's further check to ensure you're not inserting an existing onion address else the tor service
         # won't start due to duplicates.
-        if grep -Fxq "$ONION_ADDRESS" "$TORRC"; then
+        if ! grep -Fxq "$ONION_ADDRESS" "$TORRC"; then
             echo "$TOR_STRING" | sudo tee -a "$TORRC" >>/dev/null
             sudo systemctl restart tor
             wait-for-it -t 15 --quiet 127.0.0.1:9050>>/dev/null

@@ -1,4 +1,7 @@
-FROM bcm-gateway-01:5010/bcm-docker-base:latest
+ARG BCM_PRIVATE_REGISTRY
+ARG BCM_DOCKER_BASE_TAG
+
+FROM ${BCM_PRIVATE_REGISTRY}/bcm-docker-base:${BCM_DOCKER_BASE_TAG}
 
 RUN apt-get update
 RUN apt-get install -y autoconf automake build-essential git libtool libgmp-dev libsqlite3-dev python python3 net-tools zlib1g-dev \

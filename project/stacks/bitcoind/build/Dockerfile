@@ -1,4 +1,8 @@
-FROM bcm-gateway-01:5010/bcm-docker-base:latest
+ARG BCM_PRIVATE_REGISTRY
+ARG BCM_DOCKER_BASE_TAG
+
+FROM ${BCM_PRIVATE_REGISTRY}/bcm-docker-base:${BCM_DOCKER_BASE_TAG}
+
 # this was based on https://github.com/NicolasDorier/docker-bitcoin/tree/master/core
 
 RUN set -ex \

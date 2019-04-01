@@ -6,9 +6,12 @@ Usage:
   bcm ssh [command]
 
 Commands:
-  connect      Connect to a remote SSH server and authenticate using your Trezor.
-  newkey       Generate a new SSH username@hostname keypair.
-  addonion     Add a BCM SSH endpoint exposed as an authenticated onion service.
-  removeonion  Update your torrc to remove BCM SSH endpoints from your configuration.
-  
+  connect       Connect to a remote SSH server and authenticate using your Trezor.
+  newkey        Generate a new SSH username@hostname keypair.
+  add-onion     Add a BCM SSH endpoint exposed as an authenticated onion service.
+  remove-onion  Update your torrc to remove BCM SSH endpoints from your configuration.
+  list-onion    Lists BCM-managed onion entries.
+
 Use "bcm ssh [command] --help" to get help for that command.
+ 
+ 

@@ -14,7 +14,7 @@ services:
       nbxplorernet:
     environment:
       CHAIN: ${CHAIN:-testnet}
-      HOST_ENDING: ${HOST_ENDING:-01}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
       BTCPAY_POSTGRES: User ID=postgres;Host=postgres;Port=5432;Database=btcpayserver-${CHAIN:-regtest}
       BTCPAY_NETWORK: ${CHAIN:-testnet}
       BTCPAY_BIND: 0.0.0.0:${SERVICE_PORT}
