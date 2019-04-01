@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CERT_NAME=
@@ -36,12 +36,12 @@ if [[ "$BCM_HELP_FLAG" == 1 ]]; then
     exit
 fi
 
+#if [[ -d "$GNUPGHOME" ]]; then
+#    exit
+#fi
+echo "GNUPGHOME: $GNUPGHOME"
+
 if [[ -d "$GNUPGHOME" ]]; then
-    exit
-fi
-
-
-if [[ ! -d "$GNUPGHOME" ]]; then
     echo "Your Trezor-backed GPG certificates do not exist. Let's create them now. Make sure you have your Trezor handy."
     
     while [[ -z "$BCM_CERT_NAME" ]]; do
@@ -53,7 +53,7 @@ if [[ ! -d "$GNUPGHOME" ]]; then
         echo "Please enter the username of the certificate. This is the username part of an email address:  "
         read -rp "Username:  "   BCM_CERT_USERNAME
     done
-    
+
     while [[ -z "$BCM_CERT_HOSTNAME" ]]; do
         echo "Please enter the domain name of the certificate. This is the FQDN/domain of the email address:  "
         read -rp "Domain Name:  "   BCM_CERT_HOSTNAME
