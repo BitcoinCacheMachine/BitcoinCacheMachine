@@ -1,5 +1,4 @@
 #!/bin/bash
-#file: bcm.sh
 
 set -Eeuox pipefail
 cd "$(dirname "$0")"
@@ -16,6 +15,6 @@ if ! snap list | grep -q docker; then
         bash -c "$BCM_GIT_DIR/controller/build.sh"
     fi
 fi
-
+#bash -c "$BCM_GIT_DIR/controller/build.sh"
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

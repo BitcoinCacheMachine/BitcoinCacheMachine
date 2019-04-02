@@ -33,8 +33,8 @@ echo "Staging all outstanding changes."
 git add "*"
 
 #signing with annotation if one exists, otherwise, just a tag
-if [ -z $BCM_GIT_TAG_NOTE ]; then
-    echo "Tagging and signing. Get ready to check your Trezor."
+if [[] -z $BCM_GIT_TAG_NOTE ]]; then
+    echo "Tagging and signing without annotation. Get ready to check your Trezor."
     git tag --sign "$BCM_GIT_TAG_NAME"
 else
     echo "Tagging and signing. Get ready to check your Trezor."

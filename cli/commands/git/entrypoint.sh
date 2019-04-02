@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE="${2:-}"
@@ -16,9 +16,9 @@ GIT_REPO_DIR="$BCM_GIT_DIR"
 #GIT_REPO_DIR="/home/ai/git/github/bcm_git_test"
 GIT_COMMIT_MESSAGE=
 GIT_CLIENT_USERNAME=
-DEFAULT_KEY_ID=
 BCM_GIT_TAG_NAME= #is the tag going to be the version or is the version going to be the tag?
 BCM_GIT_TAG_NOTE=
+DEFAULT_KEY_ID=
 
 for i in "$@"; do
     case $i in
