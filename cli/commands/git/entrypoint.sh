@@ -147,7 +147,7 @@ if [[ $BCM_CLI_VERB == "tag" ]]; then
         -e BCM_GIT_TAG_NAME="$BCM_GIT_TAG_NAME" \
         -e BCM_GIT_TAG_NOTE="$BCM_GIT_TAG_NOTE" \
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
-        "bcm-gpgagent:$BCM_VERSION" /bcm/commit_sign_git_repo.sh
+        "bcm-gpgagent:$BCM_VERSION" /bcm/tag_sign_git_repo.sh
     fi
     
     # if docker ps | grep -q "gitter"; then
