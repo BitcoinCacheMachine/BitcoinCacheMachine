@@ -18,7 +18,7 @@ for i in "$@"; do
 done
 
 if [[ -z $TIER_NAME ]]; then
-    echo "PRTIER_NAMEEFIX not set."
+    echo "TIER_NAME not set."
     exit
 fi
 

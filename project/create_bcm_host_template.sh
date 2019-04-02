@@ -92,66 +92,67 @@ if lxc network list | grep bcmbr0 | grep -q PENDING; then
 fi
 
 # if our image is not prepared, let's go ahead and create it.
-if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    # get the HOST_NAME variable from external env
-    source ./env
-    if ! lxc list --format csv | grep -q "$HOST_NAME"; then
-        echo "Creating host '$HOST_NAME'."
-        lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 "$HOST_NAME"
-    fi
-    
-    if lxc list --format csv -c=ns | grep "$HOST_NAME" | grep -q STOPPED; then
-        lxc start "$HOST_NAME"
-        
-        sleep 5
-        
-        echo "Installing required software on LXC host '$HOST_NAME'."
-        lxc exec "$HOST_NAME" -- apt-get update
-        
-        # docker.io is the only package that seems to work seamlessly with
-        # storage backends. Using BTRFS since docker recognizes underlying file system
-        lxc exec "$HOST_NAME" -- apt-get install -y docker.io wait-for-it ifmetric
-        
-        if [[ $BCM_DEBUG == 1 ]]; then
-            lxc exec "$HOST_NAME" -- apt-get install -y jq nmap curl slurm tcptrack dnsutils tcpdump
-        fi
-        
-        ## checking if this alleviates docker swarm troubles in lxc.
-        #https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
-        lxc exec "$HOST_NAME" -- touch /.dockerenv
-        lxc exec "$HOST_NAME" -- mkdir -p /etc/docker
-        
-        # this helps suppress some warning messages.
-        lxc file push ./sysctl.conf "$HOST_NAME"/etc/sysctl.conf
-        lxc exec "$HOST_NAME" -- chmod 0644 /etc/sysctl.conf
-        
-        # clean up the image before publication
-        lxc exec "$HOST_NAME" -- apt-get autoremove -qq
-        lxc exec "$HOST_NAME" -- apt-get clean -qq
-        lxc exec "$HOST_NAME" -- rm -rf /tmp/*
-        
-        lxc exec "$HOST_NAME" -- systemctl stop docker
-        lxc exec "$HOST_NAME" -- systemctl enable docker
-        
-        #stop the template since we don't need it running anymore.
-        lxc stop "$HOST_NAME"
-        
-        lxc profile remove "$HOST_NAME" docker_privileged
-        lxc network detach bcmbr0 "$HOST_NAME"
-    fi
-    
-    # Let's publish a snapshot. This will be the basis of our LXD image.
-    lxc snapshot "$HOST_NAME" bcmHostSnapshot
-    
-    # publish the resulting image
-    # other members of the LXD cluster will be able to pull and run this image
-    echo "Publishing $HOST_NAME""/bcmHostSnapshot" "'$LXC_BCM_BASE_IMAGE_NAME' on cluster '$(lxc remote get-default)'."
-    lxc publish "$HOST_NAME""/bcmHostSnapshot" --alias "$LXC_BCM_BASE_IMAGE_NAME"
-    
-    
-    if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-        lxc delete "$HOST_NAME"
-    fi
-else
+if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     echo "The image '$LXC_BCM_BASE_IMAGE_NAME' is already published."
+    exit
+fi
+
+# get the HOST_NAME variable from external env
+source ./env
+if ! lxc list --format csv | grep -q "$HOST_NAME"; then
+    echo "Creating host '$HOST_NAME'."
+    lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 "$HOST_NAME"
+fi
+
+if lxc list --format csv -c=ns | grep "$HOST_NAME" | grep -q STOPPED; then
+    lxc start "$HOST_NAME"
+    
+    sleep 5
+    
+    echo "Installing required software on LXC host '$HOST_NAME'."
+    lxc exec "$HOST_NAME" -- apt-get update
+    
+    # docker.io is the only package that seems to work seamlessly with
+    # storage backends. Using BTRFS since docker recognizes underlying file system
+    lxc exec "$HOST_NAME" -- apt-get install -y docker.io wait-for-it ifmetric
+    
+    if [[ $BCM_DEBUG == 1 ]]; then
+        lxc exec "$HOST_NAME" -- apt-get install -y jq nmap curl slurm tcptrack dnsutils tcpdump
+    fi
+    
+    ## checking if this alleviates docker swarm troubles in lxc.
+    #https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
+    lxc exec "$HOST_NAME" -- touch /.dockerenv
+    lxc exec "$HOST_NAME" -- mkdir -p /etc/docker
+    
+    # this helps suppress some warning messages.
+    lxc file push ./sysctl.conf "$HOST_NAME"/etc/sysctl.conf
+    lxc exec "$HOST_NAME" -- chmod 0644 /etc/sysctl.conf
+    
+    # clean up the image before publication
+    lxc exec "$HOST_NAME" -- apt-get autoremove -qq
+    lxc exec "$HOST_NAME" -- apt-get clean -qq
+    lxc exec "$HOST_NAME" -- rm -rf /tmp/*
+    
+    lxc exec "$HOST_NAME" -- systemctl stop docker
+    lxc exec "$HOST_NAME" -- systemctl enable docker
+    
+    #stop the template since we don't need it running anymore.
+    lxc stop "$HOST_NAME"
+    
+    lxc profile remove "$HOST_NAME" docker_privileged
+    lxc network detach bcmbr0 "$HOST_NAME"
+fi
+
+# Let's publish a snapshot. This will be the basis of our LXD image.
+lxc snapshot "$HOST_NAME" bcmHostSnapshot
+
+# publish the resulting image
+# other members of the LXD cluster will be able to pull and run this image
+echo "Publishing $HOST_NAME""/bcmHostSnapshot" "'$LXC_BCM_BASE_IMAGE_NAME' on cluster '$(lxc remote get-default)'."
+lxc publish "$HOST_NAME""/bcmHostSnapshot" --alias "$LXC_BCM_BASE_IMAGE_NAME"
+
+
+if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+    lxc delete "$HOST_NAME"
 fi

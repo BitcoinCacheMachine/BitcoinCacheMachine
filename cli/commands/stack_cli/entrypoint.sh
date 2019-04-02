@@ -32,6 +32,5 @@ if [[ $BCM_CLI_COMMAND == "bitcoin-cli" ]]; then
         lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker exec -it "$DOCKER_CONTAINER_ID" lightning-cli "$CMD_TEXT"
     else
         echo "WARNING: Docker container not found for clightning. You may need to run 'bcm stack deploy clightning'."
-    fi
-    
+    fi    
 fi

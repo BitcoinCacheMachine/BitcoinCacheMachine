@@ -22,9 +22,14 @@ if [[ -z $HOST_ENDING ]]; then
 fi
 
 VERSION=$(echo "$BCM_VERSION" | tr '.' '-')
-
-# hostnames MUST be DNS compatible; thus removing '.'
-LXC_HOSTNAME="bcm-$TIER_NAME-$VERSION-$(printf %02d "$HOST_ENDING")"
+LXC_HOSTNAME=
+if [[ $TIER_NAME == "bitcoin" ]]; then
+    # hostnames MUST be DNS compatible; thus removing '.'
+    LXC_HOSTNAME="bcm-$TIER_NAME-$BCM_DEFAULT_CHAIN-$VERSION-$(printf %02d "$HOST_ENDING")"
+else
+    # hostnames MUST be DNS compatible; thus removing '.'
+    LXC_HOSTNAME="bcm-$TIER_NAME-$VERSION-$(printf %02d "$HOST_ENDING")"
+fi
 
 export LXC_HOSTNAME="$LXC_HOSTNAME"
 export LXC_DOCKERVOL="$LXC_HOSTNAME-docker"

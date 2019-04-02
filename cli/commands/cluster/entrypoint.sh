@@ -24,6 +24,7 @@ BCM_DRIVER=
 BCM_SSH_HOSTNAME=
 BCM_SSH_USERNAME=
 MACVLAN_INTERFACE=
+BCM_FORCE_FLAG=0
 
 for i in "$@"; do
     case $i in
@@ -45,6 +46,10 @@ for i in "$@"; do
         ;;
         --endpoints)
             BCM_ENDPOINTS_FLAG=1
+            shift # past argument=value
+        ;;
+        --force=*)
+            BCM_FORCE_FLAG=1
             shift # past argument=value
         ;;
         *) ;;
@@ -294,6 +299,14 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         if [[ $CHOICE == "y" ]]; then
             # delete the cluster directory
             rm -rf "${CLUSTER_DIR:?}"
+        fi
+    fi
+    
+    if [[ $BCM_FORCE_FLAG == 1 ]]; then
+        if multipass list | grep -q "$CLUSTER_NAME-01"; then
+            multipass stop "$CLUSTER_NAME-01"
+            multipass delete "$CLUSTER_NAME-01"
+            multipass purge
         fi
     fi
     

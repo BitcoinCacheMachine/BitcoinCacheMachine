@@ -8,6 +8,7 @@ export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 
 # see README.md for versioning scheme.
 export BCM_VERSION="v0.0.2"
+export BCM_PREVIOUS_VERSION="3.3.4"
 export BCM_DOCKER_BASE_TAG="bionic"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 
@@ -28,6 +29,12 @@ if [[ $BCM_ACTIVE == 0 ]]; then
     ELECTRUM_DIR="$HOME/.electrum"
 fi
 
+
+if [ -z ${BCM_DEFAULT_CHAIN+x} ]; then
+    BCM_DEFAULT_CHAIN="testnet"
+fi
+export BCM_DEFAULT_CHAIN="$BCM_DEFAULT_CHAIN"
+
 export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export ELECTRUM_DIR="$ELECTRUM_DIR"
@@ -35,7 +42,7 @@ export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$BCM_VERSION"
 export BCM_GATEWAY_HOST_NAME="$(echo bcm-gateway-$BCM_VERSION-01 | tr '.' '-')"
 export BCM_KAFKA_HOST_NAME="$(echo bcm-kafka-$BCM_VERSION-01 | tr '.' '-')"
 export BCM_UI_HOST_NAME="$(echo bcm-ui-$BCM_VERSION-01 | tr '.' '-')"
-export BCM_BITCOIN_HOST_NAME="$(echo bcm-bitcoin-$BCM_VERSION-01 | tr '.' '-')"
+export BCM_BITCOIN_HOST_NAME="$(echo bcm-bitcoin-$BCM_DEFAULT_CHAIN-$BCM_VERSION-01 | tr '.' '-')"
 export BCM_PRIVATE_REGISTRY="$BCM_GATEWAY_HOST_NAME:5010"
 export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 
@@ -50,8 +57,3 @@ if [ -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
     BCM_LXD_IMAGE_CACHE="images"
 fi
 export BCM_LXD_IMAGE_CACHE="$BCM_LXD_IMAGE_CACHE"
-
-if [ -z ${BCM_DEFAULT_CHAIN+x} ]; then
-    BCM_DEFAULT_CHAIN="testnet"
-fi
-export BCM_DEFAULT_CHAIN="$BCM_DEFAULT_CHAIN"

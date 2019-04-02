@@ -12,7 +12,11 @@ In general, the steps you take to deploy your own infrastructure is as follows:
 
 The commands above each have a reverse command, e.g., `bcm stack remove` (4), `bcm cluster destroy` (3), and `bcm reset` (2). Use `bcm info` to determine your active environment variables. `bcm show` provides an overview of your LXC containers, storage volumes, networks, images, remotes, etc..
 
+Technical
 
+TODO: DESCRIBE Ultimate goal: SSH direct to "bare-metal":22 then run BCM project-level commands FROM client on the remote server. This is an alternative approach than performing an SSH port-forward operation over TOR. BCM scripts over LXD over TOR too way too long to execute.
+
+BCM application components are deployed using the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](https://www.docker.com/). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI is designed to handle the installation and deployment of all software.
 
 ## Planned Features
 

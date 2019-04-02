@@ -32,11 +32,11 @@ Here are some of the development goals for Bitcoin Cache Machine:
 * Enhance overall security and performance and network health by running a Tor middle relay and serving bitcoin blocks over Tor.
 * Facilitate local (SSH) and remote using [SSH port-forwarding](https://help.ubuntu.com/community/SSH/OpenSSH/PortForwarding) with TOR transport for cluster administration.
 
-## How to Run Bitcoin Cache Machine
+## What is needed to Run Bitcoin Cache Machine
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM workload components run as background server-side processes only, so you'll usually want to have one or more always-on computers with a reliable Internet connection. User-facing GUI applications such as Electrum Wallet are containerized and require docker (LXC is NOT required for GUI apps). You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM data-center workload components run as background server-side processes, so you'll usually want to have one or more always-on computers with a reliable Internet connection, especially if you're running something like BTCPay Server, which serves web pages (e.g., invoices) to external third parties or running a liquidity-providing Lightning node. User-facing GUI applications such as Electrum Wallet are containerized. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal.
 
-BCM application components are deployed using the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](https://www.docker.com/). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI is designed to handle the installation and deployment of all software.
+All you need to get started is an SSH endpoint running Ubuntu 18.04. When running BCM standalone such a user-facing desktop or laptop, data center workloads run within the context of [KVM-based Virtual Machine](https://www.linux-kvm.org/page/Main_Page) if supported by the hardware. README.md in the `cluster` directory has more details on prepping a bare-bones Ubuntu Server for a dedicated back-end server.
 
 ## Getting Started
 
@@ -44,7 +44,7 @@ The first step to getting started with Bitcoin Cache Machine is to clone the git
 
 > NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu (Desktop or Server) >= 18.04. Windows and MacOS are not directly supported, though you can always run Ubuntu in a VM. This goes for both the user-facing SDN controller and [dedicated back-end x86_64 data center hardware](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/tree/master/cluster#how-to-prepare-a-physical-server-for-bcm-workloads).
 
-Start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) from your SDN Controller. Next, configure your local `git` client to download (clone) the BCM github repository using TOR for transport. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
+Start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) from your SDN Controller. Next, configure your local `git` client to clone the BCM github repository using TOR for transport. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
 
 ```bash
 sudo apt-get update
@@ -79,9 +79,9 @@ bcm stack deploy esplora
 bcm stack deploy electrum
 ```
 
-You can run GUI-based applications that are fully integrated into your automatically deployed back-end infrastructure. User-facing applications can also include web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet). Try running `bcm deploy electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploy all required back-end infrastructure, allowing you to operate in a [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
+You can run GUI-based applications that are fully integrated into your automatically deployed back-end infrastructure. User-facing applications can also include web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet). Try running `bcm deploy electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
 
-You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster that under management, and target chain (i.e., mainnet, testnet, regtest) and BCM version. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI. If you have deployed infrastructure, you can access CLI interfaces, e.g,. `bcm bitcoin-cli getnetworkinfo` or `bcm lightning-cli getinfo`. The BCM CLI automaticlaly routes your CLI request to the appropriate app-level container.
+You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster that under management, and target chain (i.e., mainnet, testnet, regtest) and BCM version. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI. If you have deployed infrastructure, you can access CLI interfaces, e.g,. `bcm bitcoin-cli getnetworkinfo` or `bcm lightning-cli getinfo`. The BCM CLI routes your CLI request to the appropriate app-level container.
 
 ## Documentation
 
