@@ -13,10 +13,9 @@ else
 fi
 
 GIT_REPO_DIR="$BCM_GIT_DIR"
-#GIT_REPO_DIR="/home/ai/git/github/bcm_git_test"
 GIT_COMMIT_MESSAGE=
 GIT_CLIENT_USERNAME=
-BCM_GIT_TAG_NAME= #is the tag going to be the version or is the version going to be the tag?
+BCM_GIT_TAG_NAME=
 BCM_GIT_TAG_NOTE=
 DEFAULT_KEY_ID=
 
@@ -39,10 +38,9 @@ for i in "$@"; do
             shift # past argument=value
         ;;
         *)
-            # unknown option
-        ;;
     esac
 done
+
 
 # if BCM_PROJECT_DIR is empty, we'll check to see if someone over-rode
 # the trezor directory. If so, we'll send that in instead.
@@ -119,12 +117,17 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
     # fi
 fi
 
+
 if [[ $BCM_CLI_VERB == "tag" ]]; then
     if [[ -z $BCM_GIT_TAG_NAME ]]; then
         echo "Required parameter BCM_GIT_TAG_NAME not specified. Use '--tag='"
         exit
     fi
-    
+    if [[ -z $BCM_GIT_TAG_NOTE ]]; then
+        echo "Required parameter BCM_GIT_TAG_NOTE not specified. Use '--annotate='"
+        exit
+    fi
+
     if [[ $BCM_DEBUG == 1 ]]; then
         echo "GNUPGHOME: $GNUPGHOME"
         echo "GIT_REPO_DIR: $GIT_REPO_DIR"
