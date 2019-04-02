@@ -13,12 +13,14 @@ fi
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"
-CONTAINER_NAME="bcm-$TIER_NAME-$HOST_ENDING"
+
+# env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
+source "$BCM_GIT_DIR/project/shared/env.sh" --host-ending="$HOST_ENDING"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
 --docker-hub-image-name="$DOCKER_HUB_IMAGE" \
---container-name="$CONTAINER_NAME" \
+--container-name="$LXC_HOSTNAME" \
 --image-name="$IMAGE_NAME" \
 --image-tag="$IMAGE_TAG"
 

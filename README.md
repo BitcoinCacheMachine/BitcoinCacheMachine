@@ -68,18 +68,24 @@ Feel free to change the directory in which you store the BCM repository on your 
 
 ## Deploying your own BCM Infrastructure
 
-After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other user-facing components you can deploy include:
+After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other supported components you can deploy include:
 
-`bcm stack deploy spark`  
-`bcm stack deploy btcpayserver`  
-`bcm stack deploy esplora`  
-`bcm stack deploy electrs`  
+```bash
+bcm stack deploy bitcoind
+bcm stack deploy clightning
+bcm stack deploy spark
+bcm stack deploy btcpayserver
+bcm stack deploy esplora
+bcm stack deploy electrum
+```
 
-You can also run GUI-based applications that are fully integrated into your back end infrastructure. For example, run `bcm run electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server (`electrs`).  You can use the `bcm info` command to view your current BCM environment variables--certificate, password, ssh, wallet, and certificate stores as well as deployment information like current cluster that under management and the chain (i.e., mainnet, testnet, regtest) you're targeting.
+You can run GUI-based applications that are fully integrated into your automatically deployed back-end infrastructure. User-facing applications can also include web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet). Try running `bcm deploy electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploy all required back-end infrastructure, allowing you to operate in a [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
+
+You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster that under management, and target chain (i.e., mainnet, testnet, regtest) and BCM version. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI. If you have deployed infrastructure, you can access CLI interfaces, e.g,. `bcm bitcoin-cli getnetworkinfo` or `bcm lightning-cli getinfo`. The BCM CLI automaticlaly routes your CLI request to the appropriate app-level container.
 
 ## Documentation
 
-Documentation for BCM can be found on the [BCM Docs](https://www.bitcoincachemachine.org/docs/) public website.  It's definitely an area that needs work.
+Documentation for BCM can be found on the [BCM Docs](https://www.bitcoincachemachine.org/docs/) public website.  It's definitely an area that needs work. In the meantime, consult the README.md files in the major directories of this repo.
 
 ## How to contribute
 

@@ -55,7 +55,7 @@ if [[ $BCM_CLI_VERB == "deploy" ]]; then
     #echo "Deploying '$STACK_NAME' to bitcoind '$BCM_DEFAULT_CHAIN'."
     UP_FILE="$BCM_STACKS_DIR/$STACK_NAME/up.sh"
     if [[ -f "$UP_FILE" ]]; then
-        ./up_stack.sh "$UP_FILE" "$@"
+        bash -c "$UP_FILE" "$@"
     else
         echo "ERROR: Could not find '$UP_FILE'."
     fi
