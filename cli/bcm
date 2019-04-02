@@ -1,6 +1,7 @@
 #!/bin/bash
+#file: bcm.sh
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 if [[ -z $BCM_ACTIVE ]]; then

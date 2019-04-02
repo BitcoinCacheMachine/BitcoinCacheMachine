@@ -27,6 +27,10 @@ RUN mkdir /bcm
 ADD ./container_scripts/commit_sign_git_repo.sh /bcm/commit_sign_git_repo.sh
 RUN chmod +x /bcm/commit_sign_git_repo.sh
 
+# run this script to quickly configure and tag and sign a repo
+ADD ./container_scripts/tag_sign_git_repo.sh /bcm/tag_sign_git_repo.sh
+RUN chmod +x /bcm/tag_sign_git_repo.sh
+
 # run this script to quickly configure and commit and sign a repo
 ADD ./container_scripts/git_pull.sh /bcm/git_pull.sh
 RUN chmod +x /bcm/git_pull.sh

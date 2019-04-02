@@ -17,7 +17,7 @@ GIT_REPO_DIR="$BCM_GIT_DIR"
 GIT_COMMIT_MESSAGE=
 GIT_CLIENT_USERNAME=
 DEFAULT_KEY_ID=
-BCM_GIT_TAG_NAME=
+BCM_GIT_TAG_NAME= #is the tag going to be the version or is the version going to be the tag?
 BCM_GIT_TAG_NOTE=
 
 for i in "$@"; do
