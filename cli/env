@@ -8,7 +8,7 @@ export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
 
 # see README.md for versioning scheme.
 export BCM_VERSION="v0.0.2"
-export BCM_PREVIOUS_VERSION="3.3.4"
+export BCM_PREVIOUS_VERSION="v0.0.1"
 export BCM_DOCKER_BASE_TAG="bionic"
 export BCM_RUNTIME_DIR="$HOME/.bcm"
 

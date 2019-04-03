@@ -4,15 +4,13 @@ Description:
   to use SSH push/pull operations, and SSH is configured to use TOR for internet backhaul.
 
 Usage:
-  bcm git tag -g=<BCM_GIT_REPO_DIR> -t=<BCM_GIT_TAG_NAME>
+  bcm git tag --tag="v0.0.1" --message="Version 1"
 
 Parameters:
-  --git-repo-dir=<BCM_GIT_REPO_DIR>             The required path of the git repo you want to tag and sign.
   --tag=<BCM_GIT_TAG_NAME>                      The name of the tag. Typically indicated in version numbers.
-  #--commit-id=<BCM_GIT>                         
-
+  --message=<GIT_COMMIT_MESSAGE>                 The annotation for the tag
+  
 Optional Flags:
-  --annotate=<BCM_GIT_TAG_NOTE>                 The annotation for the tag
   --verify=<BCM_GIT_TAG_NAME>                   Verify tag signature
   --delete=<BCM_GIT_TAG_NAME>                   Delete tags (local)
-
+  --git-repo-dir=<BCM_GIT_REPO_DIR>             The required path of the git repo you want to tag and sign.
