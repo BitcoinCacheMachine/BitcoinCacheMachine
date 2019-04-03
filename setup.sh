@@ -73,7 +73,9 @@ fi
 # let's ensure directories exist for bcm cli commands OUTSIDE of ~/.bcm
 mkdir -p "$HOME/.gnupg"
 mkdir -p "$HOME/.password_store"
-mkdir -p "$HOME/.ssh"
+
+SSH_DIR="$HOME/.ssh"
+mkdir -p "$SSH_DIR"
 
 # configure sshd on the SDN controller. This allows you to install and
 # provision LXD on your localhost for testing or if you want BCM running
@@ -92,11 +94,11 @@ fi
 # this section configured the local SSH client on the Controller so it uses the local SOCKS5 proxy
 # for any SSH host that has a ".onion" address. We use SSH tunneling to expose the remote onion
 # server's LXD API and access it on the controller via a locally expose port (after SSH tunneling)
-SSH_LOCAL_CONF="$HOME/.ssh/config"
+SSH_LOCAL_CONF="$SSH_DIR/config"
 
 # if the .ssh/config file doesn't exist, create it.
 if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
-    mkdir -p "$HOME/.ssh"
+    mkdir -p "$SSH_DIR"
     touch "$SSH_LOCAL_CONF"
 fi
 
@@ -105,7 +107,7 @@ fi
 if [[ -f "$SSH_LOCAL_CONF" ]]; then
     SSH_ONION_TEXT="Host *.onion"
     if grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
-        echo "$HOME/.ssh/config already configured correctly."
+        echo "$SSH_DIR/config already configured correctly."
     else
         {
             echo "$SSH_ONION_TEXT"

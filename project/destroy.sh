@@ -32,7 +32,7 @@ done
 # shellcheck disable=2129
 bcm tier destroy bitcoin
 
-bcm tier destroy ui
+bcm tier destroy underlay
 
 bcm tier destroy kafka
 

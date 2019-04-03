@@ -1,7 +1,7 @@
 export DOCKERHUB_IMAGE="confluentinc/cp-enterprise-control-center:5.1.0"
 export IMAGE_NAME="bcm-kafka-control-center"
 export IMAGE_TAG="5.1.0"
-export BCM_TIER_NAME="ui"
+export BCM_TIER_NAME="underlay"
 export STACK_FILE="kafka-control-center.yml"
 export STACK_NAME="kafkacontrolcenter"
 export SERVICE_NAME="control-center"

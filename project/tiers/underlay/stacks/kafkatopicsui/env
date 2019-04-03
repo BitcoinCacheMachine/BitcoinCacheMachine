@@ -1,7 +1,7 @@
 export DOCKERHUB_IMAGE="landoop/kafka-topics-ui:0.9.4"
 export IMAGE_NAME="bcm-kafka-topics-ui"
 export IMAGE_TAG="0.9.4"
-export BCM_TIER_NAME="ui"
+export BCM_TIER_NAME="underlay"
 export STACK_FILE="kafka-topics-ui.yml"
 export STACK_NAME="kafkatopicsui"
 export SERVICE_NAME="topics-ui"

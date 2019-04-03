@@ -1,13 +1,13 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # in case we're running this script outside of the bcm context
 source "$BCM_GIT_DIR/cli/env"
 
 if ! docker images -q "bcm-trezor"; then
-    docker image rm --force $(docker images -q "bcm-trezor")
+    docker image rm --force "$(docker images -q "bcm-trezor")"
 fi
 # if there's an issue resolving archive.ubuntu.com, follow these steps:
 #https://development.robinwinslow.uk/2016/06/23/fix-docker-networking-dns/#the-permanent-system-wide-fix

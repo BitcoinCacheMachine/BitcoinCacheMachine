@@ -7,6 +7,6 @@
         "$BCM_GATEWAY_HOST_NAME:5010"
     ],
     "labels": [
-        "bcm-ui=true"
+        "bcm-underlay=true"
     ]
 }

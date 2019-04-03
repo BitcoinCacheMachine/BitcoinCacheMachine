@@ -10,4 +10,4 @@ Available Commands:
 Usage:
   bcm deploy COMMAND TIER_NAME
 
-Note: TIER_NAME can be 'bitcoin', 'ui', 'kafka', or 'gateway'.
+Note: TIER_NAME can be 'bitcoin', 'underlay', 'kafka', or 'gateway'.

@@ -74,8 +74,11 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    # ensure we have trezor-backed certificates and password store
-    bcm init
+    
+    if [[ ! -d "$GNUPGHOME/trezor" ]]; then
+        # ensure we have trezor-backed certificates and password store
+        bcm init
+    fi
     
     # if the user didn't specify a driver, let's ask them how we want to proceed.
     # find out if they want a bare-metal or multipass-based deployment.

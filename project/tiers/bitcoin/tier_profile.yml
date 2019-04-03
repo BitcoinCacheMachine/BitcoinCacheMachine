@@ -10,7 +10,7 @@ config:
             control: auto
 
 
-description: "LXD Profile for the ui_dmz LXC container type."
+description: "LXD Profile for the LXC container type."
 devices:
   eth0:
     nictype: bridged

@@ -30,8 +30,8 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
         echo "kafka"
     fi
     
-    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-ui"; then
-        echo "ui"
+    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-underlay"; then
+        echo "underlay"
     fi
     
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-bitcoin"; then
@@ -57,8 +57,8 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/kafka/up.sh"
     fi
     
-    if [[ $TIER_NAME == "ui" ]]; then
-        bash -c "$BCM_GIT_DIR/project/tiers/ui/up.sh"
+    if [[ $TIER_NAME == "underlay" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/underlay/up.sh"
     fi
     
     if  [[ $TIER_NAME == "bitcoin" ]]; then
@@ -71,8 +71,8 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
         elif [[ $TIER_NAME == "kafka" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/kafka/destroy.sh"
-        elif [[ $TIER_NAME == "ui" ]]; then
-        bash -c "$BCM_GIT_DIR/project/tiers/ui/destroy.sh"
+        elif [[ $TIER_NAME == "underlay" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/underlay/destroy.sh"
         elif  [[ $TIER_NAME == "bitcoin" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/destroy.sh"
     fi
