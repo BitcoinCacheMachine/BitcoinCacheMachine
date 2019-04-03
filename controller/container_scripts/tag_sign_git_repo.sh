@@ -29,16 +29,8 @@ echo "git config --global user.name set to '$(git config --global --get user.nam
 git config --global user.email "$BCM_EMAIL_ADDRESS"
 echo "git config --global user.email set to '$(git config --global --get user.email)'"
 
-echo "Staging all outstanding changes."
-git add "*"
-
-#signing with annotation if one exists, otherwise, just a tag
-if [[] -z $BCM_GIT_TAG_NOTE ]]; then
-    echo "Tagging and signing without annotation. Get ready to check your Trezor."
-    git tag --sign "$BCM_GIT_TAG_NAME"
-else
-    echo "Tagging and signing. Get ready to check your Trezor."
-    git tag --sign $BCM_GIT_TAG_NAME -a "$BCM_GIT_TAG_NOTE"
-fi
+#signing with annotation and tag name, as required
+echo "Tagging and signing. Get ready to check your Trezor."
+git tag --sign -a -m "$BCM_GIT_TAG_NOTE" "$BCM_GIT_TAG_NAME"
 
 git log --show-signature -1
