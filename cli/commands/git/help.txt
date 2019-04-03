@@ -9,6 +9,8 @@ Available Commands:
                 commit is GPG signed using the trezor backend.
   push          Pushes the chosen repository over an SSH connection 
                 protected by TOR.
+  tag          Creates, deletes, annotates and signs tags
+
 
 Use "bcm git [command]" to get help for that command.
 

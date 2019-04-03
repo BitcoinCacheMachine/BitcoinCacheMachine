@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE="${2:-}"
@@ -13,8 +13,11 @@ else
 fi
 
 GIT_REPO_DIR="$BCM_GIT_DIR"
+#GIT_REPO_DIR="/home/ai/git/github/bcm_git_test"
 GIT_COMMIT_MESSAGE=
 GIT_CLIENT_USERNAME=
+BCM_GIT_TAG_NAME= #is the tag going to be the version or is the version going to be the tag?
+BCM_GIT_TAG_NOTE=
 DEFAULT_KEY_ID=
 
 for i in "$@"; do
@@ -25,6 +28,14 @@ for i in "$@"; do
         ;;
         --message=*)
             GIT_COMMIT_MESSAGE="${i#*=}"
+            shift # past argument=value
+        ;;
+        --annotate=*)
+            BCM_GIT_TAG_NOTE="${i#*=}"
+            shift # past argument=value
+        ;;
+        --tag=*)
+            BCM_GIT_TAG_NAME="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -73,7 +84,7 @@ export GIT_CLIENT_USERNAME="$GIT_CLIENT_USERNAME"
 export GIT_COMMIT_MESSAGE="$GIT_COMMIT_MESSAGE"
 export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
 
-# now call the appropritae script.
+# now call the appropritate script.
 if [[ $BCM_CLI_VERB == "commit" ]]; then
     if [[ -z $GIT_COMMIT_MESSAGE ]]; then
         echo "Required parameter GIT_COMMIT_MESSAGE not specified. Use '--message='"
@@ -108,6 +119,41 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
     # fi
 fi
 
+if [[ $BCM_CLI_VERB == "tag" ]]; then
+    if [[ -z $BCM_GIT_TAG_NAME ]]; then
+        echo "Required parameter BCM_GIT_TAG_NAME not specified. Use '--tag='"
+        exit
+    fi
+    
+    if [[ $BCM_DEBUG == 1 ]]; then
+        echo "GNUPGHOME: $GNUPGHOME"
+        echo "GIT_REPO_DIR: $GIT_REPO_DIR"
+        echo "GIT_CLIENT_USERNAME: $GIT_CLIENT_USERNAME"
+        echo "DEFAULT_KEY_ID: $DEFAULT_KEY_ID"
+        echo "BCM_GIT_TAG_NAME: $BCM_GIT_TAG_NAME"
+        echo "BCM_GIT_TAG_NOTE: $BCM_GIT_TAG_NOTE"
+    fi
+    
+    if ! docker ps | grep -q "gitter"; then
+        # shellcheck disable=SC1090
+        source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+        docker run -it --rm --name gitter \
+        -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+        -v "$GNUPGHOME":/home/user/.gnupg \
+        -v "$GIT_REPO_DIR":/gitrepo \
+        --device="$BCM_TREZOR_USB_PATH" \
+        -e GIT_CLIENT_USERNAME="$GIT_CLIENT_USERNAME" \
+        -e BCM_EMAIL_ADDRESS="$BCM_CERT_USERNAME"'@'"$BCM_CERT_HOSTNAME" \
+        -e BCM_GIT_TAG_NAME="$BCM_GIT_TAG_NAME" \
+        -e BCM_GIT_TAG_NOTE="$BCM_GIT_TAG_NOTE" \
+        -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
+        "bcm-gpgagent:$BCM_VERSION" /bcm/tag_sign_git_repo.sh
+    fi
+    
+    # if docker ps | grep -q "gitter"; then
+    #     docker exec -it gitter
+    # fi
+fi
 
 if docker ps | grep -q "gitter"; then
     docker kill gitter >/dev/null

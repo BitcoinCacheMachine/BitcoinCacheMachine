@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # This stack run as a desktop GUI application on the SDN Controller. As such, it runs directly in
