@@ -36,7 +36,7 @@ xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 docker run -it --rm --net=host \
 -e DISPLAY="$DISPLAY" \
 -e XAUTHORITY=${XAUTH} \
--e CHAIN="$BCM_DEFAULT_CHAIN" \
+-e CHAIN="$(bcm get-chain)" \
 -e ENDPOINT="$(bcm get-ip)" \
 -v "$XSOCK":"$XSOCK":rw \
 -v "$XAUTH":"$XAUTH":rw \

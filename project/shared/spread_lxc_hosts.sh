@@ -30,6 +30,8 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
     source ./env.sh --host-ending="$HOST_ENDING"
     
+    echo "HERE"
+    
     # only create the new storage volume if it doesn't already exist
     if ! lxc storage volume list bcm_btrfs | grep -q "$LXC_DOCKERVOL"; then
         # then this is normal behavior. Let's create the storage volume

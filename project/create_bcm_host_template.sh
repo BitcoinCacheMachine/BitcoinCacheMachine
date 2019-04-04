@@ -6,28 +6,6 @@ cd "$(dirname "$0")"
 # the base project
 source ./env
 
-for i in "$@"; do
-    case $i in
-        --project-name=*)
-            BCM_PROJECT_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
-    esac
-done
-
-# let's make sure the cluster name is set.
-if [[ -z "$BCM_PROJECT_NAME" ]]; then
-    echo "BCM_PROJECT_NAME not set."
-    exit
-fi
-
-# make sure we're on the right remove
-if ! lxc project list | grep -q "$BCM_PROJECT_NAME"; then
-    lxc project create "$BCM_PROJECT_NAME" -c features.images=false -c features.profiles=false
-    lxc project switch "$BCM_PROJECT_NAME"
-else
-    echo "LXC project '$BCM_PROJECT_NAME' already exists."
-fi
 
 # first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
 # if it exists, we will quit by default, UNLESS the user has passed in an override, in which case

@@ -1,4 +1,4 @@
-Description:
+eDescription:
   bcm init  Initialize your localhost to become an SDN controller (mgmt plane) for your BCM deployments.
             This tool installs docker via snap, and creates docker images needed at the SDN controller. 
             This command creates new GPG certificates, so have your Trezor handy.

@@ -6,6 +6,10 @@ cd "$(dirname "$0")"
 # only continue if the necessary image exists.
 bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 
+# It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
+if lxc project list | grep "(current)" | grep -q "default"; then
+    bcm set-chain "$BCM_DEFAULT_CHAIN"
+fi
 
 source ./env
 

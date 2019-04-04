@@ -10,20 +10,25 @@ if [[ -z "$TOR_PROXY" ]]; then
 fi
 wait-for-it -t 10 "$TOR_PROXY"
 
-if [[ -z "$TOR_CONTROL_HOST" ]]; then
-    echo "ERROR:  TOR_CONTROL_HOST could not be determined."
+if [[ -z "$TOR_CONTROL" ]]; then
+    echo "ERROR:  TOR_CONTROL could not be determined."
     exit
 fi
-wait-for-it -t 10 "$TOR_CONTROL_HOST"
+wait-for-it -t 10 "$TOR_CONTROL"
 
 if [[ ! -z "$CHAIN" ]]; then
-    GOGO_FILE=
+    # these are defaults are for mainnet.
+    GOGO_FILE=/root/.bitcoin/gogo
+    CHAIN_TEXT=""
+    
     if [[ "$CHAIN" == "testnet" ]]; then
         GOGO_FILE=/root/.bitcoin/testnet3/gogo
+        CHAIN_TEXT="-testnet"
         elif [[ "$CHAIN" == "mainnet" ]]; then
         GOGO_FILE=/root/.bitcoin/gogo
         elif [[ "$CHAIN" == "regtest" ]]; then
         GOGO_FILE=/root/.bitcoin/regtest/gogo
+        CHAIN_TEXT="-regtest"
     else
         echo "Error: CHAIN must be either 'testnet', 'mainnet', or 'regtest'."
         exit
@@ -31,12 +36,14 @@ if [[ ! -z "$CHAIN" ]]; then
     
     # wait for the managementt plane.
     bash -c "/bcm/wait_for_gogo.sh --gogofile=$GOGO_FILE"
+    bitcoind -conf=/root/.bitcoin/bitcoin.conf \
+    -datadir=/root/.bitcoin \
+    -proxy="$TOR_PROXY" \
+    -torcontrol="$TOR_CONTROL" \
+    -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" \
+    -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332" \
+    -debug=tor "$CHAIN_TEXT"
     
-    if [[ "$CHAIN" == "testnet" ]]; then
-        bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST" -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332" -debug=tor -testnet
-        elif [[ "$CHAIN" == "mainnet" ]]; then
-        bitcoind -conf=/root/.bitcoin/bitcoin.conf -datadir=/root/.bitcoin -proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL_HOST" -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332" -debug=tor
-    fi
 else
     echo "Error: CHAIN not set."
     exit

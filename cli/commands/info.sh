@@ -61,32 +61,33 @@ else
     fi
 fi
 
+echo "BCM_VERSION:                $BCM_VERSION";
 echo "BCM_ACTIVE:                 $BCM_ACTIVE"
 echo "BCM_DEBUG:                  $BCM_DEBUG"
-echo "BCM_DEFAULT_CHAIN:          $BCM_DEFAULT_CHAIN";
-
 
 # remove any legacy lxd software and install install lxd via snap
-if snap list | grep -q lxd; then
-    if ! lxc remote get-default | grep -q "local"; then
-        echo "BCM_CLUSTER:                $(lxc remote get-default)"
-        
-        # let's show some LXD cluster related stuff.
-        if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
-            echo "BCM_LXD_IMAGE_CACHE:        $BCM_LXD_IMAGE_CACHE";
-        fi
-        
-        if [ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
-            echo "BCM_DOCKER_IMAGE_CACHE:     $BCM_DOCKER_IMAGE_CACHE";
-        fi
-        
-    else
-        echo "BCM_CLUSTER:                N/A"
+if ! lxc remote get-default | grep -q "local"; then
+    echo "BCM_CLUSTER:                $(lxc remote get-default)"
+    
+    # let's show some LXD cluster related stuff.
+    if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
+        echo "BCM_LXD_IMAGE_CACHE:        $BCM_LXD_IMAGE_CACHE";
     fi
-else
+    
+    if [ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
+        echo "BCM_DOCKER_IMAGE_CACHE:     $BCM_DOCKER_IMAGE_CACHE";
+    fi
+    
+    echo "BCM_CHAIN:                  $(bcm get-chain)";
+    
     echo ""
-    echo "WARNING: LXD not installed locally."
+    echo "DEPLOYED_TIERS:"
+    for TIER in $(bcm tier list); do echo "   $TIER"; done
+    
+    echo ""
+    echo "DEPLOYED_STACKS:"
+    for STACK in $(bcm stack list); do echo "   $STACK"; done
+else
+    echo "BCM_CLUSTER:                N/A"
 fi
 
-
-echo "BCM_VERSION:                $BCM_VERSION";

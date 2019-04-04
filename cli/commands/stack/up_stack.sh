@@ -7,11 +7,8 @@ cd "$(dirname "$0")"
 
 source ./env
 
-# this is the LXC host that the docker container is going to be provisioned to.
-HOST_ENDING="01"
-
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
-source "$BCM_GIT_DIR/project/shared/env.sh" --host-ending="$HOST_ENDING"
+source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
@@ -24,19 +21,19 @@ source "$BCM_GIT_DIR/project/shared/env.sh" --host-ending="$HOST_ENDING"
 lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" "$BCM_GATEWAY_HOST_NAME/root/stacks/bitcoin/"
 
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
-CHAIN="$BCM_DEFAULT_CHAIN" \
+CHAIN="$(bcm get-chain)" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
-docker stack deploy -c "/root/stacks/bitcoin/stack/$STACK_FILE" "$STACK_NAME-$BCM_DEFAULT_CHAIN"
+docker stack deploy -c "/root/stacks/bitcoin/stack/$STACK_FILE" "$STACK_NAME-$(bcm get-chain)"
 
 UPLOAD_BLOCKS=0
 UPLOAD_CHAINSTATE=0
 
 SRC_DIR="$HOME/.bitcoin"
-DEST_DIR='/var/lib/docker/volumes/bitcoind-'"$BCM_DEFAULT_CHAIN"'_bitcoin_data/_data'
-if [[ $BCM_DEFAULT_CHAIN == "testnet" ]]; then
+DEST_DIR='/var/lib/docker/volumes/bitcoind-'"$(bcm get-chain)"'_bitcoin_data/_data'
+if [[ $(bcm get-chain) == "testnet" ]]; then
     SRC_DIR="$HOME/.bitcoin/testnet3"
     DEST_DIR="$DEST_DIR/testnet3"
-    elif [[ $BCM_DEFAULT_CHAIN == 'regtest' ]]; then
+    elif [[ $(bcm get-chain) == 'regtest' ]]; then
     SRC_DIR="$HOME/.bitcoin/regtest"
     DEST_DIR="$DEST_DIR/regtest"
 fi

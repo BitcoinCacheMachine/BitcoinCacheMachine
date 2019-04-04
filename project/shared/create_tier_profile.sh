@@ -30,6 +30,4 @@ if ! lxc profile list | grep -q "$PROFILE_NAME"; then
     if [[ -f "$YAML_PATH" ]]; then
         cat "$YAML_PATH" | lxc profile edit "$PROFILE_NAME"
     fi
-else
-    echo "WARNING: LXC profile '$PROFILE_NAME' already exists. It was left unmodified."
 fi

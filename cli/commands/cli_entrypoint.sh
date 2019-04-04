@@ -94,6 +94,14 @@ if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cl
     ./stack_cli/entrypoint.sh "$@"
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "get-chain" ]]; then
+    ./chain/getchain.sh "$@"
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "set-chain" ]]; then
+    ./chain/setchain.sh "$@"
+fi
+
 if [[ "$BCM_CLI_COMMAND" == "get-ip" ]]; then
     ./get/entrypoint.sh "$@"
 fi

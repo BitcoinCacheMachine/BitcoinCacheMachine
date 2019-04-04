@@ -8,6 +8,6 @@ Available Commands:
   list      Lists BCM tiers that are currently provisioned to your data center.
 
 Usage:
-  bcm deploy COMMAND TIER_NAME
+  bcm tier create $TIER_NAME
 
 Note: TIER_NAME can be 'bitcoin', 'underlay', 'kafka', or 'gateway'.

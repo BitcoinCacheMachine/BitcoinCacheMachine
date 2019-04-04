@@ -1,5 +1,3 @@
 # the base project
-BCM_PROJECT_NAME="$BCM_DEFAULT_CHAIN"
+BCM_PROJECT_NAME="$(bcm get-chain)"
 HOST_NAME="$(echo bcm-host-template-$BCM_VERSION | tr '.' '-')"
-
-

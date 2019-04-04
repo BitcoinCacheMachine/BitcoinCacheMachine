@@ -36,7 +36,7 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM data-center workload components run as background server-side processes, so you'll usually want to have one or more always-on computers with a reliable Internet connection, especially if you're running something like BTCPay Server, which serves web pages (e.g., invoices) to external third parties or running a liquidity-providing Lightning node. User-facing GUI applications such as Electrum Wallet are containerized. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal.
 
-All you need to get started is an SSH endpoint running Ubuntu 18.04. When running BCM standalone such a user-facing desktop or laptop, data center workloads run within the context of [KVM-based Virtual Machine](https://www.linux-kvm.org/page/Main_Page) if supported by the hardware. README.md in the `cluster` directory has more details on prepping a bare-bones Ubuntu Server for a dedicated back-end server.
+All you need to get started is an SSH endpoint running Ubuntu 18.04. When running BCM standalone such a user-facing desktop or laptop, data center workloads run within the context of [KVM-based Virtual Machine](https://www.linux-kvm.org/page/Main_Page) if supported by the hardware. README.md in the `cluster` directory has more details on prepping a bare-bones Ubuntu Server for a dedicated back-end server. 
 
 ## Getting Started
 
@@ -81,7 +81,9 @@ bcm stack deploy electrum
 
 You can run GUI-based applications that are fully integrated into your automatically deployed back-end infrastructure. User-facing applications can also include web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet). Try running `bcm deploy electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
 
-You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster that under management, and target chain (i.e., mainnet, testnet, regtest) and BCM version. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI. If you have deployed infrastructure, you can access CLI interfaces, e.g,. `bcm bitcoin-cli getnetworkinfo` or `bcm lightning-cli getinfo`. The BCM CLI routes your CLI request to the appropriate app-level container.
+You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster under management, and target chain (i.e., mainnet, testnet, regtest), etc.. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI. 
+
+Want to switch to deploying regtest or mainnet software? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications. BCM defines an [LXD Project][https://lxd.readthedocs.io/en/latest/projects/] for each CHAIN, so all your processes remain isolated. Of course, the more software you deploy the more hardware resources will be required. BCM will automatically upload bitcoin blocks and optionally chainstate to you back-end datacenter if your SDN controller has a `$HOME/.bitcoin` directory.
 
 ## Documentation
 

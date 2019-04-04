@@ -12,18 +12,6 @@ fi
 
 STACK_NAME=${3:-}
 
-function validateParams() {
-    if [[ -z "$BCM_DEFAULT_CHAIN" ]]; then
-        echo "ERROR: A CHAIN MUST be specified.  Use --chain=<testnet|mainnet>"
-        exit
-    fi
-    
-    if [[ "$BCM_DEFAULT_CHAIN" != "testnet" &&  "$BCM_DEFAULT_CHAIN" != "mainnet" && "$BCM_DEFAULT_CHAIN" != "regtest" ]]; then
-        echo "ERROR: CHAIN MUST be either 'testnet', 'mainnet', or 'regtest'."
-        exit
-    fi
-}
-
 function validateStackParam(){
     if [ -z "${STACK_NAME}" ]; then
         echo "Please provide a BCM stack name."
@@ -50,9 +38,8 @@ fi
 
 if [[ $BCM_CLI_VERB == "deploy" ]]; then
     validateStackParam "$BCM_CLI_VERB";
-    validateParams;
     
-    #echo "Deploying '$STACK_NAME' to bitcoind '$BCM_DEFAULT_CHAIN'."
+    # running the stack up file.
     UP_FILE="$BCM_STACKS_DIR/$STACK_NAME/up.sh"
     if [[ -f "$UP_FILE" ]]; then
         bash -c "$UP_FILE" "$@"
@@ -63,18 +50,19 @@ fi
 
 if [[ $BCM_CLI_VERB == "remove"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
-    validateParams;
     
-    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME-$BCM_DEFAULT_CHAIN"
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME-$(bcm get-chain)"
 fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then
-    PREFIX="-$BCM_DEFAULT_CHAIN"
-    for STACK in $(lxc exec $BCM_GATEWAY_HOST_NAME -- docker stack list --format '{{ .Name }}' | grep "$BCM_DEFAULT_CHAIN")
-    do
-        STACK=${STACK%"$PREFIX"}
-        echo "$STACK"
-    done
+    PREFIX="-$(bcm get-chain)"
+    if lxc list --format csv -c=n | grep -q "$BCM_GATEWAY_HOST_NAME"; then
+        for STACK in $(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$(bcm get-chain)")
+        do
+            STACK=${STACK%"$PREFIX"}
+            echo "$STACK"
+        done
+    fi
 fi
 
 if [[ $BCM_CLI_VERB == "clear" ]]; then

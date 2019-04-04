@@ -24,7 +24,7 @@ fi
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
 # Get the $PROFILE_NAME from env.sh
-source ./env.sh --host-ending="01"
+source ./env.sh
 
 # iterate over endpoints and delete actual LXC hosts.
 for LXD_ENDPOINT in $(bcm cluster list --endpoints); do

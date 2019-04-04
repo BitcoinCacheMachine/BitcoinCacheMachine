@@ -30,11 +30,8 @@ if [[ $BCM_ACTIVE == 0 ]]; then
 fi
 
 
-if [ -z ${BCM_DEFAULT_CHAIN+x} ]; then
-    BCM_DEFAULT_CHAIN="testnet"
-fi
-export BCM_DEFAULT_CHAIN="$BCM_DEFAULT_CHAIN"
 
+export BCM_DEFAULT_CHAIN="regtest"
 export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export ELECTRUM_DIR="$ELECTRUM_DIR"
