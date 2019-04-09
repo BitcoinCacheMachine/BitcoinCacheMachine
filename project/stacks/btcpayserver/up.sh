@@ -5,14 +5,9 @@ cd "$(dirname "$0")"
 
 source ./env
 
-# first, let's make sure we deploy our direct dependencies.
-if ! bcm stack list | grep -q "clightning"; then
-    bcm stack deploy clightning
-fi
+bcm stack deploy clightning
 
-if ! bcm stack list | grep -q "nbxplorer"; then
-    bcm stack deploy nbxplorer
-fi
+bcm stack deploy nbxplorer
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
 source "$BCM_GIT_DIR/project/shared/env.sh"

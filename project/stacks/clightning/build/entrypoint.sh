@@ -8,20 +8,27 @@ wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL"
 
 CMD_TEXT=""
+BITCOIND_RPC_PORT="8332"
 if [[ $CHAIN == "testnet" ]]; then
     CMD_TEXT="--testnet"
+    BITCOIND_RPC_PORT="18332"
     elif [[ $CHAIN == "regtest" ]]; then
     CMD_TEXT="--regtest"
-fi
-
-if [[ -z $BITCOIND_RPC_PORT ]]; then
-    echo "ERROR: BITCOIND_RPC_PORT not supplied. Exiting."
-    exit
+    BITCOIND_RPC_PORT="28332"
 fi
 
 wait-for-it -t 300 "bitcoindrpc-$CHAIN:$BITCOIND_RPC_PORT"
-/root/lightning/lightningd/lightningd --conf=/root/.lightning/config --proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL" --rpcbind="$OVERLAY_NETWORK_IP" "$CMD_TEXT"
+/root/lightning/lightningd/lightningd \
+--conf=/root/.lightning/config \
+--proxy="$TOR_PROXY" \
+--addr="autotor:$TOR_CONTROL" \
+--bitcoin-rpcconnect="bitcoindrpc-$CHAIN" \
+--bitcoin-rpcport="$BITCOIND_RPC_PORT" \
+"$CMD_TEXT"
 
+# --rpcbind="$OVERLAY_NETWORK_IP" \
+# --bitcoin-rpcconnect <arg>           bitcoind RPC host to connect to
+# --bitcoin-rpcport <arg>
 #
 #-proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL" -rpcbind="$OVERLAY_NETWORK_IP" -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332"
 #/root/lightning/lightningd/lightningd --conf=/root/.lightning/config --proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL"

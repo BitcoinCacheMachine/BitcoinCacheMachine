@@ -8,7 +8,7 @@ if ! bcm tier list | grep -q bitcoin; then
     bcm tier create bitcoin
 fi
 
-source ./env
+source ./env.sh
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
 source "$BCM_GIT_DIR/project/shared/env.sh"

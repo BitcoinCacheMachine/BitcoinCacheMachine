@@ -104,9 +104,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 MACVLAN_INTERFACE="ens3"
                 
                 # Next make sure multipass is installed so we can run type-1 VMs
-                
-                MULTIPASS_PATH="$(command -v multipass)"
-                if [[ ! -f $MULTIPASS_PATH ]]; then
+                if [ ! -x "$(command -v multipass)" ]; then
                     echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
                     
                     sudo snap install multipass --beta --classic

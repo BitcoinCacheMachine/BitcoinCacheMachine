@@ -1,11 +1,9 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-
 source ./env
-source "$BCM_GIT_DIR/project/stacks/bitcoind/env.sh"
 
 # first, let's make sure we deploy our direct dependencies.
 if ! bcm stack list | grep -q "bitcoind"; then
@@ -30,7 +28,7 @@ CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
 
-DEST_DIR="/var/lib/docker/volumes/clightning-""$(bcm get-chain)""_clightning-data/_data"
+DEST_DIR="/var/lib/docker/volumes/clightning-""$BCM_ACTIVE_CHAIN""_clightning-data/_data"
 if ! lxc exec "$LXC_HOSTNAME" -- [ -f "$DEST_DIR/gogo" ]; then
     lxc exec "$LXC_HOSTNAME" -- mkdir -p "$DEST_DIR"
     lxc exec "$LXC_HOSTNAME" -- touch "$DEST_DIR/gogo"

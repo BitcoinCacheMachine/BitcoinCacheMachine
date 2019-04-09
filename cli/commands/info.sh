@@ -79,7 +79,7 @@ if ! lxc remote get-default | grep -q "local"; then
         echo "Docker Registry Mirror:     $BCM_DOCKER_IMAGE_CACHE";
     fi
     
-    echo "Active Chain:               $(bcm get-chain)";
+    echo "Active Chain:               $BCM_ACTIVE_CHAIN";
     
 else
     echo "BCM_CLUSTER:                N/A"

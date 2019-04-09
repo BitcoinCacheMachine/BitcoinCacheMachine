@@ -83,7 +83,7 @@ You can run GUI-based applications that are fully integrated into your automatic
 
 You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster under management, and target chain (i.e., mainnet, testnet, regtest), etc.. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI.
 
-Want to switch to deploying `regtest` or `mainnet`? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications. BCM defines an [LXD Project][https://lxd.readthedocs.io/en/latest/projects/] for each chain so processes remain isolated. Of course, the more software you deploy the more hardware resources will be required. BCM will automatically upload bitcoin blocks and (testnet) chainstate to you back-end datacenter if your SDN controller has a `$HOME/.bitcoin` directory.
+Want to switch to deploying `regtest` or `mainnet`? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications. BCM defines a [LXD Project](https://lxd.readthedocs.io/en/latest/projects/) for each Bitcoin chain (data-center isolation). Of course, the more software you deploy the more hardware resources will be required. BCM will automatically upload bitcoin blocks and (testnet) chainstate to you back-end datacenter if your SDN controller has a `$HOME/.bitcoin` directory.
 
 ## Documentation
 

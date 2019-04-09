@@ -47,13 +47,13 @@ fi
 if [[ $BCM_CLI_VERB == "remove"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
     
-    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME-$(bcm get-chain)"
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME-$BCM_ACTIVE_CHAIN"
 fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then
-    PREFIX="-$(bcm get-chain)"
+    PREFIX="-$BCM_ACTIVE_CHAIN"
     if lxc list --format csv -c=n | grep -q "$BCM_GATEWAY_HOST_NAME"; then
-        CHAIN=$(bcm get-chain)
+        CHAIN=$BCM_ACTIVE_CHAIN
         for STACK in $(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN")
         do
             STACK=${STACK%"$PREFIX"}

@@ -106,12 +106,7 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
         "bcm-gpgagent:$BCM_VERSION" /bcm/commit_sign_git_repo.sh
     fi
-    
-    # if docker ps | grep -q "gitter"; then
-    #     docker exec -it gitter
-    # fi
 fi
-
 
 if [[ $BCM_CLI_VERB == "tag" ]]; then
     if [[ -z $BCM_GIT_TAG_NAME ]]; then
@@ -148,10 +143,6 @@ if [[ $BCM_CLI_VERB == "tag" ]]; then
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
         "bcm-gpgagent:$BCM_VERSION" /bcm/tag_sign_git_repo.sh
     fi
-    
-    # if docker ps | grep -q "gitter"; then
-    #     docker exec -it gitter
-    # fi
 fi
 
 if docker ps | grep -q "gitter"; then
