@@ -40,5 +40,13 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 WORKDIR /root/.bitcoin
 
-EXPOSE 8332 8333 18332 18333 18443 18444
+# mainnet ZMQ, testnet ZMQ, regtest ZMQ
+EXPOSE 9332 19332 29332
+
+# mainnet RPC, testnet RPC, regtest RPC
+EXPOSE 8332 18332 28332 
+
+# mainnet p2p, testnet p2p, regtest p2p
+EXPOSE 8333 18333 29333
+
 CMD ["bitcoind"]

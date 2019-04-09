@@ -33,8 +33,6 @@ fi
 
 VOLUME_NAME="$LXC_HOSTNAME-docker"
 
-if lxc storage list | grep -q bcm_btrfs; then
-    if lxc storage volume list bcm_btrfs | grep "$VOLUME_NAME" | grep -q "$CLUSTER_ENDPOINT"; then
-        lxc storage volume delete bcm_btrfs "$VOLUME_NAME" --target "$CLUSTER_ENDPOINT"
-    fi
+if lxc storage volume list default | grep "$VOLUME_NAME" | grep -q "$CLUSTER_ENDPOINT"; then
+    lxc storage volume delete default "$VOLUME_NAME" --target "$CLUSTER_ENDPOINT"
 fi

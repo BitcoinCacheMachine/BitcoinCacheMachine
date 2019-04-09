@@ -33,17 +33,13 @@ Use the `bcm show` command to get an overview of your LXD container configuation
 * LXC Hosts/containers      # filtered on active project
 * LXC Networks              
 * LXC Storage Pools
-* LXD Storage Volumes for pool bcm_btrfs
+* LXD Storage Volumes
 * LXC Profiles
 * LXD Daemon config
 * LXD Images
 * LXC Cluster
 * LXD Projects
 
-## Final notes
-
-Again, if you're looking for more details on the CLI, consult the actual CLI help menus! That's where the good stuff is documented.
-
 ## Stack Level commands
 
-When you deploy BCM stacks using the `bcm stack deploy` command, certain commands MAY become available. For example, after you run `bcm stack deploy bitcoind`, the `bcm bitcoin-cli` command will become available. The BCM CLI automatically routes your CLI request to the appropriate app-level container. Trying running `bcm bitcoin-cli getnetworkinfo` to view bitcoind network output, or trying the `getblockchaininfo` to see where you are in the chain!  All commands are confined to your current bcm CLI CHAIN (cm get-chain. If you want to start deploying mainnet infrastrcture, you can run `bcm set-chain`, and all subsequent bcm commands will target that chain. Note that currently, there is total data-center separation between regtest, testnet, and mainnet modes of operation.
+When you deploy BCM stacks using the `bcm stack deploy` command, certain commands MAY become available. For example, after you run `bcm stack deploy bitcoind`, the `bcm bitcoin-cli` command will become available. The BCM CLI automatically routes your CLI request to the appropriate app-level container. Trying running `bcm bitcoin-cli getnetworkinfo` to view bitcoind network output, or trying the `getblockchaininfo` to see where you are in the chain!  All commands are confined to your current bcm CLI CHAIN (`bcm get-chain`. If you want to start deploying mainnet infrastructure, you can run `bcm set-chain`, and all subsequent bcm commands will target that chain. Note that currently, there is total data-center separation between regtest, testnet, and mainnet modes of operation.

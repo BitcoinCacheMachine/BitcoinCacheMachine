@@ -13,7 +13,7 @@ else
 fi
 
 export BCM_CLI_COMMAND="$BCM_CLI_COMMAND"
-CHAIN="$(bcm get-chain)"
+CHAIN="$BCM_ACTIVE_CHAIN"
 CHAIN_TEXT="-$CHAIN"
 CMD_TEXT=$(echo "$@" | sed 's/.* //')
 

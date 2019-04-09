@@ -1,12 +1,14 @@
 #!/bin/bash
 
+set -ex
+
 # this script preps a NEW server device (Ubuntu 18.04 >) to listen for incoming SSH
 # connections on all interfaces and at an onion site (for remote administration). The
 # server SHOULD exist BEHIND a NAT device with no port forwarding.
 
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install -y tor openssh-server avahi-daemon iotop curl socat 
+sudo apt-get install -y tor openssh-server avahi-daemon iotop curl socat
 # TODO dnscrypt-proxy
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 export IMAGE_NAME="bcm-bitcoin-core"
 export IMAGE_TAG="17.1"
 export TIER_NAME="bitcoin"

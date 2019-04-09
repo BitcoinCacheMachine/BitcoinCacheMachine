@@ -7,7 +7,7 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable. It is in a proof-of-concept stage and deploys to bitcoin TESTNET mode only. Not all features are implemented. Don't put real bitcoin on it. Builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!
+**IMPORTANT!** BCM is brand new and unstable. It is in a proof-of-concept stage! We wouldn't recommend putting real bitcoin on it at this time. Builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!
 
 ## Why Bitcoin Cache Machine Exists
 
@@ -79,15 +79,15 @@ bcm stack deploy esplora
 bcm stack deploy electrum
 ```
 
-You can run GUI-based applications that are fully integrated into your automatically deployed back-end infrastructure. User-facing applications can also include web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet). Try running `bcm deploy electrum` to run a container-based Electrum wallet that is configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
+You can run GUI-based applications that are fully integrated into your automatically deployed back-end infrastructure. User-facing applications can also include web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet). Try running `bcm stack deploy electrum` to run a container-based Electrum wallet desktop application that's configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
 
-You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster under management, and target chain (i.e., mainnet, testnet, regtest), etc.. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI. 
+You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster under management, and target chain (i.e., mainnet, testnet, regtest), etc.. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI.
 
-Want to switch to deploying regtest or mainnet software? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications. BCM defines an [LXD Project][https://lxd.readthedocs.io/en/latest/projects/] for each CHAIN, so all your processes remain isolated. Of course, the more software you deploy the more hardware resources will be required. BCM will automatically upload bitcoin blocks and optionally chainstate to you back-end datacenter if your SDN controller has a `$HOME/.bitcoin` directory.
+Want to switch to deploying `regtest` or `mainnet`? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications. BCM defines an [LXD Project][https://lxd.readthedocs.io/en/latest/projects/] for each chain so processes remain isolated. Of course, the more software you deploy the more hardware resources will be required. BCM will automatically upload bitcoin blocks and (testnet) chainstate to you back-end datacenter if your SDN controller has a `$HOME/.bitcoin` directory.
 
 ## Documentation
 
-Documentation for BCM can be found on the [BCM Docs](https://www.bitcoincachemachine.org/docs/) public website.  It's definitely an area that needs work. In the meantime, consult the README.md files in the major directories of this repo.
+The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo.
 
 ## How to contribute
 

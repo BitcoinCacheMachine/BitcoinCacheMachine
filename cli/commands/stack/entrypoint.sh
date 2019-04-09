@@ -20,10 +20,6 @@ function validateStackParam(){
     fi
 }
 
-# install local LXD if it's not here already.
-if ! snap list | grep -q lxd; then
-    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
-fi
 
 # make sure the user has sent in a valid command; quit if not.
 if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "deploy" && $BCM_CLI_VERB != "remove" && $BCM_CLI_VERB != "clear" ]]; then
@@ -57,7 +53,8 @@ fi
 if [[ $BCM_CLI_VERB == "list" ]]; then
     PREFIX="-$(bcm get-chain)"
     if lxc list --format csv -c=n | grep -q "$BCM_GATEWAY_HOST_NAME"; then
-        for STACK in $(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$(bcm get-chain)")
+        CHAIN=$(bcm get-chain)
+        for STACK in $(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN")
         do
             STACK=${STACK%"$PREFIX"}
             echo "$STACK"

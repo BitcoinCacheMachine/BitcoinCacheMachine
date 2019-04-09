@@ -2,26 +2,27 @@
 
 set -Eeuo pipefail
 
-
-source /bcm/proxy_ip_determinant.sh --host-ending="$LXC_HOSTNAME"
-
-
-echo "BCM /entrypoint.sh for clightning"
+source /bcm/proxy_ip_determinant.sh
 
 wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL"
 
-if [[ ! -z "$CHAIN" ]]; then
-    if [[ $CHAIN == "testnet" ]]; then
-        wait-for-it -t 300 bitcoindrpc-testnet:18332
-        /root/lightning/lightningd/lightningd --conf=/root/.lightning/config --proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL"
-    fi
-else
-    echo "Error: CHAIN not set."
+CMD_TEXT=""
+if [[ $CHAIN == "testnet" ]]; then
+    CMD_TEXT="--testnet"
+    elif [[ $CHAIN == "regtest" ]]; then
+    CMD_TEXT="--regtest"
 fi
 
+if [[ -z $BITCOIND_RPC_PORT ]]; then
+    echo "ERROR: BITCOIND_RPC_PORT not supplied. Exiting."
+    exit
+fi
 
-#--bind-addr="127.0.0.1:9735"
+wait-for-it -t 300 "bitcoindrpc-$CHAIN:$BITCOIND_RPC_PORT"
+/root/lightning/lightningd/lightningd --conf=/root/.lightning/config --proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL" --rpcbind="$OVERLAY_NETWORK_IP" "$CMD_TEXT"
+
+#
 #-proxy="$TOR_PROXY" -torcontrol="$TOR_CONTROL" -rpcbind="$OVERLAY_NETWORK_IP" -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:28332" -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:28332"
 #/root/lightning/lightningd/lightningd --conf=/root/.lightning/config --proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL"
 #--proxy="$TOR_PROXY" --addr="autotor:$TOR_CONTROL"

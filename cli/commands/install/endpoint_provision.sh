@@ -7,8 +7,10 @@ sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 sudo apt-get install tor wait-for-it -y
 
-# remove any legacy lxd software and install install lxd via snap
-if ! snap list | grep -q lxd; then
+echo "INSPECT THIS DOCUMENT"
+
+# install lxd via snap
+if [ ! -x "$(command -v lxd)" ]; then
     sudo snap install lxd --channel=candidate
 fi
 

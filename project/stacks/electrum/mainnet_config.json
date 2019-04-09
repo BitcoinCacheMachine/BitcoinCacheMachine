@@ -1,0 +1,21 @@
+{
+    "alias": "bcm-electrum-mainnet",
+    "batch_rbf": true,
+    "calibration_h": 0,
+    "calibration_v": 0,
+    "check_updates": false,
+    "coin_chooser_output_rounding": true,
+    "config_version": 3,
+    "console-history": [],
+    "is_maximized": false,
+    "recently_open": [
+        "/home/user/.electrum/wallets/default_wallet"
+    ],
+    "rpcuser": "user",
+    "show_addresses_tab": true,
+    "show_console_tab": true,
+    "show_contacts_tab": true,
+    "show_utxo_tab": true,
+    "use_labels": true,
+    "use_revealer": true
+}

@@ -5,7 +5,7 @@ storage_pools:
 - config:
     size: 350GB
   description: "BTRFS storage backend for BCM system containers."
-  name: bcm_btrfs
+  name: default
   driver: btrfs
 profiles:
 - config: {}
@@ -13,9 +13,9 @@ profiles:
   devices:
     root:
       path: /
-      pool: bcm_btrfs
+      pool: default
       type: disk
-  name: bcm_default
+  name: default
 cluster:
   server_name: $LXD_SERVER_NAME
   enabled: true

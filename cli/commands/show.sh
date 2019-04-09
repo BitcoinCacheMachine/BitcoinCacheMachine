@@ -8,6 +8,10 @@ if [[ $(lxc remote get-default) == "local" ]]; then
 fi
 
 echo ""
+echo "LXD Projects:"
+lxc project list
+
+echo ""
 echo "LXD system containers:"
 lxc list
 
@@ -15,15 +19,11 @@ echo ""
 echo "LXD networks:"
 lxc network list
 
-echo ""
-echo "LXD storage pools:"
-lxc storage list
 
-if lxc storage list | grep -q bcm_btrfs; then
-    echo ""
-    echo "LXD storage bcm_btrfs volumes:"
-    lxc storage volume list bcm_btrfs
-fi
+echo ""
+echo "BTRFS volumes:"
+lxc storage volume list default
+
 
 echo ""
 echo "LXD profiles:"

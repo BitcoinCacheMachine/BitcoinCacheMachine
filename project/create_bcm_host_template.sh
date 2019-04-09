@@ -79,7 +79,7 @@ fi
 source ./env
 if ! lxc list --format csv | grep -q "$HOST_NAME"; then
     echo "Creating host '$HOST_NAME'."
-    lxc init bcm-lxc-base -p bcm_default -p docker_privileged -n bcmbr0 "$HOST_NAME"
+    lxc init bcm-lxc-base -p default -p docker_privileged -n bcmbr0 "$HOST_NAME"
 fi
 
 if lxc list --format csv -c=ns | grep "$HOST_NAME" | grep -q STOPPED; then

@@ -8,7 +8,7 @@ System data are LXD-related resources such as containers, networks, profiles, an
 
 ## User Data
 
-User data is any data that is generated from app-level containers. Examples include the contents of bcm_btrfs volumes ending in '-docker'. User data is expected to be backed up using Local-HA and Lightning-enabled decentralized storage (TBD). User data consists of static file data contained in docker volumes and logging data collected by managed by the Kafka stack.
+User data is any data that is generated from app-level containers. Examples include the contents of default btrfs volumes ending in '-docker'. User data is expected to be backed up using Local-HA and Lightning-enabled decentralized storage (TBD). User data consists of static file data contained in docker volumes and logging data collected by managed by the Kafka stack.
 
 # Disaster Recovery Methodology
 

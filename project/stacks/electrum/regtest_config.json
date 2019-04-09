@@ -1,5 +1,5 @@
 {
-    "alias": "bcm-electrum",
+    "alias": "bcm-electrum-regtest",
     "batch_rbf": true,
     "calibration_h": 0,
     "calibration_v": 0,
@@ -9,7 +9,7 @@
     "console-history": [],
     "is_maximized": false,
     "recently_open": [
-        "/home/user/.electrum/testnet/wallets/default_wallet"
+        "/home/user/.electrum/regtest/wallets/default_wallet"
     ],
     "rpcuser": "user",
     "show_addresses_tab": true,

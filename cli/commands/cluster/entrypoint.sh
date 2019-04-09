@@ -14,7 +14,6 @@ else
     exit
 fi
 
-
 CLUSTER_NAME=$(lxc remote get-default)
 BCM_ENDPOINTS_FLAG=0
 BCM_DRIVER=
@@ -70,6 +69,7 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
     exit
 fi
 
+
 if [[ $BCM_CLI_VERB == "create" ]]; then
     
     if [[ ! -d "$GNUPGHOME/trezor" ]]; then
@@ -104,11 +104,13 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 MACVLAN_INTERFACE="ens3"
                 
                 # Next make sure multipass is installed so we can run type-1 VMs
-                if ! snap list | grep -q multipass; then
-                    # if it doesn't, let's install
+                
+                MULTIPASS_PATH="$(command -v multipass)"
+                if [[ ! -f $MULTIPASS_PATH ]]; then
                     echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
+                    
                     sudo snap install multipass --beta --classic
-                    sleep 10
+                    sleep 5
                 fi
                 
                 elif [[ "$CHOICE" == "local" ]]; then
@@ -249,6 +251,8 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
 fi
 
+
+
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
     if [[ $CLUSTER_NAME != "local" ]]; then
         CONTINUE=0
@@ -302,12 +306,10 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         fi
     fi
     
-    if [[ $BCM_FORCE_FLAG == 1 ]]; then
-        if multipass list | grep -q "$CLUSTER_NAME-01"; then
-            multipass stop "$CLUSTER_NAME-01"
-            multipass delete "$CLUSTER_NAME-01"
-            multipass purge
-        fi
+    if multipass list | grep -q "$CLUSTER_NAME-01"; then
+        multipass stop "$CLUSTER_NAME-01"
+        multipass delete "$CLUSTER_NAME-01"
+        multipass purge
     fi
     
     if [[ $CLUSTER_NAME != "local" ]]; then
@@ -323,3 +325,4 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         fi
     fi
 fi
+

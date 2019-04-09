@@ -11,6 +11,7 @@ services:
     environment:
       CHAIN: ${CHAIN:-testnet}
       LXC_HOSTNAME: ${LXC_HOSTNAME}
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT}
     networks:
       bitcoindrpcnet:
       clightningrpcnet:

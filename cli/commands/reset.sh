@@ -55,13 +55,41 @@ fi
 if [[ -d "$ELECTRUM_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then
         if [ "$ELECTRUM_DIR" != "$HOME/.electrum" ]; then
-            echo "Deleting $ELECTRUM_DIR."
-            rm -Rf "$ELECTRUM_DIR"
+            # now let;s unmount the temp directory and remove the folders.
+            encfs -u "$ELECTRUM_DIR">>/dev/null
+            
+            if [[ -d "$ELECTRUM_DIR" ]]; then
+                echo "Removing $ELECTRUM_DIR"
+                rm -rf "$ELECTRUM_DIR"
+            fi
+            
+            if [[ -d "$ELECTRUM_ENC_DIR" ]]; then
+                echo "Removing $ELECTRUM_ENC_DIR"
+                rm -rf "$ELECTRUM_ENC_DIR"
+            fi
         fi
     fi
 else
     echo "WARNING: ELECTRUM_DIR directory '$ELECTRUM_DIR' does not exist. You may need to run 'bcm init'."
 fi
+
+
+# now let;s unmount the temp directory and remove the folders.
+encfs -u "$BCM_WORKING_DIR">>/dev/null
+
+if [[ -d "$BCM_WORKING_DIR" ]]; then
+    echo "Removing $BCM_WORKING_DIR"
+    rm -rf "$BCM_WORKING_DIR"
+fi
+
+if [[ -d "$BCM_WORKING_ENC_DIR" ]]; then
+    echo "Removing $BCM_WORKING_ENC_DIR"
+    rm -rf "$BCM_WORKING_ENC_DIR"
+fi
+
+
+
+
 
 if [[ -d "$BCM_SSH_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then
@@ -84,9 +112,9 @@ if [[ -d "$BCM_WORKING_DIR" ]]; then
             rm -rf "$BCM_WORKING_DIR"
         fi
         
-        if [[ -d "$BCM_WORKING_DIR_ENC" ]]; then
-            echo "Removing $BCM_WORKING_DIR_ENC"
-            rm -rf "$BCM_WORKING_DIR_ENC"
+        if [[ -d "$BCM_WORKING_ENC_DIR" ]]; then
+            echo "Removing $BCM_WORKING_ENC_DIR"
+            rm -rf "$BCM_WORKING_ENC_DIR"
         fi
     fi
 else

@@ -37,6 +37,11 @@ done
 export BCM_HELP_FLAG="$BCM_HELP_FLAG"
 export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
 
+if [[ "$BCM_CLI_COMMAND" == "get-chain" ]]; then
+    ./chain/getchain.sh
+    exit
+fi
+
 if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
     ./reset.sh "$@"
     exit
@@ -81,7 +86,6 @@ if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     exit
 fi
 
-
 if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"
 fi
@@ -94,9 +98,6 @@ if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cl
     ./stack_cli/entrypoint.sh "$@"
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "get-chain" ]]; then
-    ./chain/getchain.sh "$@"
-fi
 
 if [[ "$BCM_CLI_COMMAND" == "set-chain" ]]; then
     ./chain/setchain.sh "$@"
@@ -113,7 +114,7 @@ fi
 
 
 if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
-    bash -c "$BCM_GIT_DIR/project/destroy.sh"
+    bash -c "$BCM_GIT_DIR/project/destroy.sh" "$@"
 fi
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then

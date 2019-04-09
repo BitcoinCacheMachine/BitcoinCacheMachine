@@ -8,7 +8,7 @@ BCM_CERT_HOSTNAME=
 DEFAULT_KEY_ID=
 
 
-echo "ACTIVE_ENVIRONMENT:"
+echo "BCM CLI (client) environment:"
 if [ -z ${GNUPGHOME+x} ]; then
     echo "GNUPGHOME:           N/A";
 else
@@ -67,27 +67,20 @@ echo "BCM_DEBUG:                  $BCM_DEBUG"
 
 # remove any legacy lxd software and install install lxd via snap
 if ! lxc remote get-default | grep -q "local"; then
-    echo "BCM_CLUSTER:                $(lxc remote get-default)"
+    echo ""
+    echo "Active BCM Cluster:         $(lxc remote get-default)"
     
     # let's show some LXD cluster related stuff.
     if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
-        echo "BCM_LXD_IMAGE_CACHE:        $BCM_LXD_IMAGE_CACHE";
+        echo "LXD Image Cache:            $BCM_LXD_IMAGE_CACHE";
     fi
     
     if [ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
-        echo "BCM_DOCKER_IMAGE_CACHE:     $BCM_DOCKER_IMAGE_CACHE";
+        echo "Docker Registry Mirror:     $BCM_DOCKER_IMAGE_CACHE";
     fi
     
-    echo "BCM_CHAIN:                  $(bcm get-chain)";
+    echo "Active Chain:               $(bcm get-chain)";
     
-    echo ""
-    echo "DEPLOYED_TIERS:"
-    for TIER in $(bcm tier list); do echo "   $TIER"; done
-    
-    echo ""
-    echo "DEPLOYED_STACKS:"
-    for STACK in $(bcm stack list); do echo "   $STACK"; done
 else
     echo "BCM_CLUSTER:                N/A"
 fi
-

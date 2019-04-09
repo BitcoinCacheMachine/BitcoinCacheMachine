@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -22,12 +22,6 @@ bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=
 
 # next, provision (but not start) all LXC system containers across the cluster.
 bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$TIER_NAME"
-
-# Now, let's fetch the docker swarm token so we can start the rest of the tier.
-# shellcheck disable=SC1090
-if [[ $TIER_NAME != "gateway" ]]; then
-    source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
-fi
 
 # configure and start the containers
 for ENDPOINT in $(bcm cluster list --endpoints); do
@@ -87,11 +81,10 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     # if TIER type is >=1 then we wait for gateway which is assumed to exist.
     # all nodes from this script are workers. Manager hosts are implemented
     # outside this script (see gateway).
+    source ./get_docker_swarm_tokens.sh
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
-        if lxc exec "$LXC_HOSTNAME" -- docker info | grep "Swarm: " | grep -q "inactive"; then
-            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":2377
-            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":5000
-            lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" "$BCM_GATEWAY_HOST_NAME":2377
-        fi
+        lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":2377
+        lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":5000
+        lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" "$BCM_GATEWAY_HOST_NAME":2377
     fi
 done

@@ -12,7 +12,8 @@ RUN apt-get install -y git
 
 RUN git clone https://github.com/romanz/electrs /root/electrs
 WORKDIR /root/electrs
-RUN git checkout tags/v0.5.0
+RUN git checkout master
+#tags/v0.5.0
 
 RUN cargo build --release
 RUN cargo install --path .

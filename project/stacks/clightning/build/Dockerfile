@@ -9,7 +9,8 @@ RUN apt-get install -y autoconf automake build-essential git libtool libgmp-dev 
 
 RUN git clone https://github.com/ElementsProject/lightning.git /root/lightning
 WORKDIR /root/lightning
-RUN git checkout tags/v0.7.0
+RUN git checkout master
+#tags/v0.7.0
 RUN ./configure
 RUN make
 
