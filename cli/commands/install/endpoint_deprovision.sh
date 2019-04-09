@@ -6,7 +6,7 @@ if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     lxc image delete "$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
-if lxc profile list | grep -q "default"; then
+if lxc profile list --format csv | grep "default" | grep -q ",0" ; then
     lxc profile delete default
 fi
 

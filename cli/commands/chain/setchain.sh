@@ -23,5 +23,7 @@ if ! lxc project list | grep "(current)" | awk '{print $2}' | grep -q "$CHAIN"; 
     fi
     
     lxc project switch "$CHAIN"
-    echo "You are now targeting '$BCM_ACTIVE_CHAIN'"
+    echo "You are now targeting '$CHAIN'"
+else
+    echo "INFO: You're already targeting $CHAIN."
 fi

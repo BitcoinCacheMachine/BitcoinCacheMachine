@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 source ./env
@@ -29,4 +29,9 @@ docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "
 
 ENDPOINT=$(bcm get-ip)
 wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
-xdg-open http://"$ENDPOINT:$SERVICE_PORT" &
+
+# let's the the pariing URL from the container output
+PAIRING_OUTPUT_URL=$(lxc exec "$BCM_GATEWAY_HOST_NAME" --  docker service logs "spark-$BCM_ACTIVE_CHAIN""_spark" | grep 'Pairing URL: ' | awk '{print $5}')
+SPARK_URL=${PAIRING_OUTPUT_URL/0.0.0.0/$ENDPOINT}
+
+xdg-open "$SPARK_URL" &

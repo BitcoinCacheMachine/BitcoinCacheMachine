@@ -42,6 +42,6 @@ for LXD_ENDPOINT in $(bcm cluster list --endpoints); do
     bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$LXC_HOSTNAME --endpoint=$LXD_ENDPOINT"
 done
 
-if lxc profile list | grep -q "$PROFILE_NAME"; then
+if lxc profile list --format csv | grep "PROFILE_NAME" | grep -q ",0" ; then
     lxc profile delete "$PROFILE_NAME"
 fi

@@ -68,7 +68,7 @@ bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_privileged"
 # delete profile 'docker-unprivileged'
 bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_unprivileged"
 
-if lxc network list --format csv | grep -q "bcmbr0"; then
+if lxc network list --format csv | grep "bcmbr0" | grep -q ",0,"; then
     lxc network delete bcmbr0
 fi
 

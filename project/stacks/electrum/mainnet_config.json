@@ -7,9 +7,10 @@
     "coin_chooser_output_rounding": true,
     "config_version": 3,
     "console-history": [],
+    "decimal_point": 0,
     "is_maximized": false,
     "recently_open": [
-        "/home/user/.electrum/wallets/default_wallet"
+        "/home/user/.electrum/wallets/bcm"
     ],
     "rpcuser": "user",
     "show_addresses_tab": true,

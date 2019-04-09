@@ -21,6 +21,6 @@ if [[ -z $NETWORK_NAME ]]; then
     exit
 fi
 
-if lxc network list --format csv | grep -q "$NETWORK_NAME"; then
+if lxc network list --format csv | grep "$NETWORK_NAME" | grep -q ",0,"; then
     lxc network delete "$NETWORK_NAME"
 fi
