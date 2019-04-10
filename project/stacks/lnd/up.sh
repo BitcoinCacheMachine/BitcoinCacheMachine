@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 
@@ -15,7 +15,7 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
 --build-context="$(pwd)/build" \
---container-name="$LXC_HSOTNAME" \
+--container-name="$LXC_HOSTNAME" \
 --image-name="$IMAGE_NAME" \
 --image-tag="$IMAGE_TAG"
 

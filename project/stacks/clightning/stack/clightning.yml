@@ -2,21 +2,22 @@ version: '3.7'
 services:
   clightning:
     image: ${IMAGE_NAME}
-    hostname: clightning-${CHAIN:-testnet}
+    hostname: clightning-${BCM_ACTIVE_CHAIN:-}
     volumes:
       - clightning-data:/root/.lightning
       - clightning-log-data:/var/log/clightning
       - bitcoin_data:/bitcoin/data
       - bitcoin_cli:/usr/local/bin
     environment:
-      CHAIN: ${CHAIN:-testnet}
       LXC_HOSTNAME: ${LXC_HOSTNAME}
-      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT}
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
+      CHAIN_TEXT: ${CHAIN_TEXT:-}
     networks:
       bitcoindrpcnet:
       clightningrpcnet:
         aliases:
-          - clightningrpc-${CHAIN}
+          - clightningrpc-${BCM_ACTIVE_CHAIN}
     secrets:
       - source: clightning_conf
         target: /root/.lightning/config
@@ -36,11 +37,11 @@ volumes:
 
   bitcoin_data:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoin_data
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoin_data
 
   bitcoin_cli:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoin_cli
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoin_cli
 
 networks:
   clightningrpcnet:
@@ -53,7 +54,7 @@ networks:
 
   bitcoindrpcnet:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet
   
 secrets:
   clightning_conf:

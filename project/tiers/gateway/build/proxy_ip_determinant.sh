@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux
+set -Eeu
 
 LOCAL_GW_LXD_HOST_IP=
 TOR_PROXY=

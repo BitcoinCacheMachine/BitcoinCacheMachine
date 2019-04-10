@@ -3,8 +3,6 @@ ARG BCM_DOCKER_BASE_TAG
 
 FROM ${BCM_PRIVATE_REGISTRY}/bcm-docker-base:${BCM_DOCKER_BASE_TAG}
 
-# this was based on https://github.com/NicolasDorier/docker-bitcoin/tree/master/core
-
 RUN set -ex \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends ca-certificates dirmngr gosu gnupg2 tar wget \
@@ -36,17 +34,20 @@ VOLUME /bitcoin/data
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
 
 WORKDIR /root/.bitcoin
 
-# mainnet ZMQ, testnet ZMQ, regtest ZMQ
+# ZMQ BLOCKS (mainnet, testnet, regtest)
 EXPOSE 9332 19332 29332
 
-# mainnet RPC, testnet RPC, regtest RPC
+# ZMQ TX
+EXPOSE 9331 19331 29331
+
+# RPC
 EXPOSE 8332 18332 28332 
 
-# mainnet p2p, testnet p2p, regtest p2p
+# P2P
 EXPOSE 8333 18333 29333
 
-CMD ["bitcoind"]
+#CMD ["bitcoind"]
+ENTRYPOINT ["/entrypoint.sh"]

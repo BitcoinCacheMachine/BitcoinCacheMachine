@@ -7,24 +7,21 @@ source /bcm/proxy_ip_determinant.sh
 wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL"
 
-CMD_TEXT=""
-BITCOIND_RPC_PORT="8332"
-if [[ $CHAIN == "testnet" ]]; then
-    CMD_TEXT="--testnet"
-    BITCOIND_RPC_PORT="18332"
-    elif [[ $CHAIN == "regtest" ]]; then
-    CMD_TEXT="--regtest"
-    BITCOIND_RPC_PORT="28332"
+if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
+    CHAIN_TEXT="-$CHAIN_TEXT"
+    elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
+    CHAIN_TEXT="-$CHAIN_TEXT"
 fi
 
-wait-for-it -t 300 "bitcoindrpc-$CHAIN:$BITCOIND_RPC_PORT"
+wait-for-it -t 300 "bitcoindrpc-$BCM_ACTIVE_CHAIN:$BITCOIND_RPC_PORT"
+
 /root/lightning/lightningd/lightningd \
 --conf=/root/.lightning/config \
 --proxy="$TOR_PROXY" \
 --addr="autotor:$TOR_CONTROL" \
---bitcoin-rpcconnect="bitcoindrpc-$CHAIN" \
+--bitcoin-rpcconnect="bitcoindrpc-$BCM_ACTIVE_CHAIN" \
 --bitcoin-rpcport="$BITCOIND_RPC_PORT" \
-"$CMD_TEXT"
+"$CHAIN_TEXT"
 
 # --rpcbind="$OVERLAY_NETWORK_IP" \
 # --bitcoin-rpcconnect <arg>           bitcoind RPC host to connect to

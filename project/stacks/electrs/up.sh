@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 source ./env.sh
@@ -23,8 +23,12 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
+source "$BCM_GIT_DIR/project/stacks/bitcoind/env"
+source ./env
+
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
-CHAIN="$BCM_ACTIVE_CHAIN" \
+BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
-SERVICE_PORT="$SERVICE_PORT" \
+BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
+ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_ACTIVE_CHAIN"

@@ -83,9 +83,9 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         CONTINUE=0
         while [[ "$CONTINUE" == 0 ]]
         do
-            echo "Would you like to deploy BCM locally, a hardware-based VM (more secure), or to a remote SSH endpoint?"
-            read -rp "(vm/local/ssh):  "   CHOICE
-            
+            # echo "Would you like to deploy BCM locally, a hardware-based VM (more secure), or to a remote SSH endpoint?"
+            # read -rp "(vm/local/ssh):  "   CHOICE
+            CHOICE="vm"
             if [[ "$CHOICE" == "vm" ]]; then
                 CONTINUE=1
                 # Check to see if the computer has hardware virtualization support. If not, then we
@@ -110,20 +110,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                     sudo snap install multipass --beta --classic
                     sleep 5
                 fi
-                
-                elif [[ "$CHOICE" == "local" ]]; then
-                CONTINUE=1
-                BCM_DRIVER=baremetal
-                CLUSTER_NAME="bcm-$(hostname)"
-                BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
-                BCM_SSH_USERNAME="$(whoami)"
-                
-                # let's add an alias in /etc/hosts so the SDN controller can resolve 'bcm-$(hostname)-01'
-                HOSTS_ENTRY="127.0.1.1    $BCM_SSH_HOSTNAME"
-                if ! grep -Fxq "$HOSTS_ENTRY" /etc/hosts; then
-                    echo "$HOSTS_ENTRY" | sudo tee -a /etc/hosts
-                fi
-                
                 elif [[ "$CHOICE" == "ssh" ]]; then
                 CONTINUE=1
                 BCM_DRIVER=ssh
@@ -139,9 +125,20 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 
                 
                 CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
-            else
-                echo "Invalid entry. Please try again."
             fi
+            #     elif [[ "$CHOICE" == "local" ]]; then
+            #     CONTINUE=1
+            #     BCM_DRIVER=baremetal
+            #     CLUSTER_NAME="bcm-$(hostname)"
+            #     BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
+            #     BCM_SSH_USERNAME="$(whoami)"
+            
+            #     # let's add an alias in /etc/hosts so the SDN controller can resolve 'bcm-$(hostname)-01'
+            #     HOSTS_ENTRY="127.0.1.1    $BCM_SSH_HOSTNAME"
+            #     if ! grep -Fxq "$HOSTS_ENTRY" /etc/hosts; then
+            #         echo "$HOSTS_ENTRY" | sudo tee -a /etc/hosts
+            #     fi
+            
         done
     fi
     

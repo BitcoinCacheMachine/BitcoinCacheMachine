@@ -3,12 +3,13 @@ services:
   lnd:
     image: ${IMAGE_NAME}
     hostname: lnd-${CHAIN:-testnet}
-    #hostname required for lncl-web certificate hostname purposes (see ./lnd/start-lnd.sh)
     volumes:
       - lnd-data:/root/.lnd
       - lnd-certificate-data:/config
       - lnd-macaroon-data:/macaroons
       - lnd-log-data:/var/logs/lnd
+      - bitcoin_data:/bitcoin/data
+      - bitcoin_cli:/usr/local/bin
     environment:
       LND_CERTIFICATE_HOSTNAME: lnd-${CHAIN:-testnet}  #this is so there are no certificate verification issues on lncli-web
       CHAIN: ${CHAIN:-testnet}
@@ -40,10 +41,11 @@ networks:
   bitcoindrpcnet:
     external: true
     name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
+  
 
 secrets:
   lnd-config:
-    file: "./lnd-${CHAIN:-testnet}.conf"
+    file: "lnd-${CHAIN:-testnet}.conf"
 
 volumes:
   lnd-data:
@@ -51,3 +53,11 @@ volumes:
   
   lnd-certificate-data:  
   lnd-macaroon-data: 
+
+  bitcoin_data:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoin_data
+
+  bitcoin_cli:
+    external: true
+    name: bitcoind-${CHAIN:-testnet}_bitcoin_cli

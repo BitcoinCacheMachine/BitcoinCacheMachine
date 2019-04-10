@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # don't even think about proceeding unless the gateway BCM tier is up and running.
@@ -8,7 +8,7 @@ if ! bcm tier list | grep -q bitcoin; then
     bcm tier create bitcoin
 fi
 
-source ./env.sh
+source ./stack_env.sh
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
 source "$BCM_GIT_DIR/project/shared/env.sh"
@@ -23,9 +23,17 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 # push the stack and build files
 lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" "$BCM_GATEWAY_HOST_NAME/root/stacks/bitcoin/"
 
+# get bitcoind ENV vars. This file is also
+source ./env --chain="$BCM_ACTIVE_CHAIN"
+
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
-CHAIN="$BCM_ACTIVE_CHAIN" \
+BCM_CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
+BITCOIND_CHAIN_TEXT="$BITCOIND_CHAIN_TEXT" \
+BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
+BITCOIND_ZMQ_BLOCK_PORT="$BITCOIND_ZMQ_BLOCK_PORT" \
+BITCOIND_ZMQ_TX_PORT="$BITCOIND_ZMQ_TX_PORT" \
+STACK_GOGO_FILE="$STACK_GOGO_FILE" \
 docker stack deploy -c "/root/stacks/bitcoin/stack/$STACK_FILE" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
 
 UPLOAD_BLOCKS=1

@@ -6,4 +6,3 @@ export TIER_NAME="bitcoin"
 export STACK_FILE="bitcoind.yml"
 export STACK_NAME="bitcoind"
 export SERVICE_NAME="bitcoind"
-

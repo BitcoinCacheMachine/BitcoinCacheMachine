@@ -1,0 +1,35 @@
+
+
+
+
+# lncli --tlscertpath=/config/tls.cert --macaroonpath=/macaroons/admin.macaroon getinfo
+
+
+
+# here we poll the remote bitcoind instance using the RPC interface to check
+# on the sync status of bitcoind.  Only once it has fully validated the blockchain
+# via the 'verificationprogress' indicator on getblockchaininfo.
+# if [ -z "$LND_BITCOIND_REST_RPC_CREDENTIALS" ]
+# then
+#   echo "LND_BITCOIND_REST_RPC_CREDENTIALS not supplied.  Cannot perform REST calls to remote bitcoind instance.  Quitting."
+#   exit 1
+# fi
+
+# BITCOIND_VERIFICATION_PROGRESS=""
+# checkBitcoindSyncStatus() {
+
+#   BITCOIND_VERIFICATION_PROGRESS=$(curl -s --user $LND_BITCOIND_REST_RPC_CREDENTIALS --data-binary '{"jsonrpc":"1.0","id":"curltext","method":"getblockchaininfo","params":[]}' -H 'content-type:text/plain;' http://bitcoind:$PORT/ | jq '.result.verificationprogress')
+
+#   echo "bitcoind verification progress:  $BITCOIND_VERIFICATION_PROGRESS";
+
+# }
+
+# checkBitcoindSyncStatus #1st execution
+# while [[ ! $BITCOIND_VERIFICATION_PROGRESS = 0.9* ]]; do
+#    sleep 10
+#    checkBitcoindSyncStatus
+# done
+
+# echo "Copying /run/secret/lnd.conf to /root/.lnd/lnd.conf"
+# cp --remove-destination /run/secrets/lnd.conf /root/.lnd/lnd.conf
+# chmod 0444 /root/.lnd/lnd.conf

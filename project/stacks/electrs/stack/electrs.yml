@@ -3,19 +3,22 @@ services:
   electrs:
     image: ${IMAGE_NAME}
     ports:
-      - "${SERVICE_PORT}:${SERVICE_PORT}"
-    hostname: electrs-${CHAIN:-testnet}
+      - "${ELECTRS_RPC_PORT}:${ELECTRS_RPC_PORT}"
+    hostname: electrs-${BCM_ACTIVE_CHAIN:-testnet}
     volumes:
       - electrs-data:/root/.electrs
       - bitcoin-data:/root/.bitcoin:ro
     environment:
-      CHAIN: ${CHAIN:-testnet}
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
       LXC_HOSTNAME: ${LXC_HOSTNAME}
+      ELECTRS_RPC_IP: "0.0.0.0"
+      ELECTRS_RPC_PORT: ${ELECTRS_RPC_PORT:-}
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
     networks:
       bitcoindrpcnet:
       electrsnet:
         aliases:
-          - electrsnet_${CHAIN:-testnet}
+          - electrsnet_${BCM_ACTIVE_CHAIN:-testnet}
     deploy:
       mode: replicated
       replicas: 1
@@ -28,12 +31,12 @@ volumes:
 
   bitcoin-data:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoin_data
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoin_data
 
 networks:
   bitcoindrpcnet:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet
 
   electrsnet:
     driver: overlay

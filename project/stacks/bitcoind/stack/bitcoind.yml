@@ -2,20 +2,25 @@ version: '3.7'
 services:
   bitcoind:
     image: ${DOCKER_IMAGE}
-    hostname: bitcoind-${CHAIN}
+    hostname: bitcoind-${BCM_CHAIN}
     volumes:
       - bitcoin_data:/bitcoin/data
     #  - bitcoin_cookie:/bitcoin/cookie
       - bitcoin_cli:/usr/local/bin
     environment:
-      CHAIN: ${CHAIN:-testnet}
+      BCM_CHAIN: ${BCM_CHAIN:-testnet}
       LXC_HOSTNAME: ${LXC_HOSTNAME}
       AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:-}
+      STACK_GOGO_FILE: ${STACK_GOGO_FILE:-}
+      BITCOIND_CHAIN_TEXT: ${BITCOIND_CHAIN_TEXT:-}
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
+      BITCOIND_ZMQ_BLOCK_PORT: ${BITCOIND_ZMQ_BLOCK_PORT:-}
+      BITCOIND_ZMQ_TX_PORT: ${BITCOIND_ZMQ_TX_PORT:-}
     networks:
       bitcoindrpcnet:
         ipv4_address: 172.16.238.1
         aliases:
-          - bitcoindrpc-${CHAIN}
+          - bitcoindrpc-${BCM_CHAIN}
     configs:
       - source: bitcoin_config
         target: /root/.bitcoin/bitcoin.conf
