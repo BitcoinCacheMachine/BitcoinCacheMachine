@@ -16,6 +16,7 @@ GIT_REPO_DIR="$BCM_GIT_DIR"
 GIT_COMMIT_MESSAGE=
 GIT_CLIENT_USERNAME=
 BCM_GIT_TAG_NAME=
+BCM_GIT_BRANCH=
 DEFAULT_KEY_ID=
 
 for i in "$@"; do
@@ -31,6 +32,10 @@ for i in "$@"; do
         --tag=*)
             BCM_GIT_TAG_NAME="${i#*=}"
             shift # past argument=value
+        ;;
+        --branch-name=*)
+            BCM_GIT_BRANCH="${i#*=}"
+            shift # past argument=value            
         ;;
         *)
     esac
@@ -75,6 +80,7 @@ fi
 export GIT_REPO_DIR="$GIT_REPO_DIR"
 export GIT_CLIENT_USERNAME="$GIT_CLIENT_USERNAME"
 export GIT_COMMIT_MESSAGE="$GIT_COMMIT_MESSAGE"
+export BCM_GIT_BRANCH="$BCM_GIT_BRANCH"
 export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
 
 # now call the appropritate script.
@@ -143,6 +149,40 @@ if [[ $BCM_CLI_VERB == "tag" ]]; then
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
         "bcm-gpgagent:$BCM_VERSION" /bcm/tag_sign_git_repo.sh
     fi
+fi
+
+if [[ $BCM_CLI_VERB == "merge" ]]; then
+    if [[ -z $BCM_GIT_BRANCH ]]; then
+        echo "Required parameter BCM_GIT_BRANCH not specified. Use '--branch-name=<branch>'"
+        exit
+    fi
+    
+    if [[ $BCM_DEBUG == 1 ]]; then
+        echo "GNUPGHOME: $GNUPGHOME"
+        echo "GIT_REPO_DIR: $GIT_REPO_DIR"
+        echo "GIT_CLIENT_USERNAME: $GIT_CLIENT_USERNAME"
+        echo "DEFAULT_KEY_ID: $DEFAULT_KEY_ID"
+        echo "BCM_GIT_BRANCH: $BCM_GIT_BRANCH"
+    fi
+    
+    if ! docker ps | grep -q "gitter"; then
+        # shellcheck disable=SC1090
+        source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+        docker run -it --rm --name gitter \
+        -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+        -v "$GNUPGHOME":/home/user/.gnupg \
+        -v "$GIT_REPO_DIR":/gitrepo \
+        --device="$BCM_TREZOR_USB_PATH" \
+        -e GIT_CLIENT_USERNAME="$GIT_CLIENT_USERNAME" \
+        -e BCM_EMAIL_ADDRESS="$BCM_CERT_USERNAME"'@'"$BCM_CERT_HOSTNAME" \
+        -e BCM_GIT_BRANCH="$BCM_GIT_BRANCH" \
+        -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
+        "bcm-gpgagent:$BCM_VERSION" /bcm/merge_git_repo.sh
+    fi
+    
+    # if docker ps | grep -q "gitter"; then
+    #     docker exec -it gitter
+    # fi
 fi
 
 if docker ps | grep -q "gitter"; then
