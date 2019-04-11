@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeu
+set -Eeux
 cd "$(dirname "$0")"
 
 sudo apt-get remove lxd lxd-client -y

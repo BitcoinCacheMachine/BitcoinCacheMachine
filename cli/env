@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -Eeuo pipefail
+cd "$(dirname "$0")"
+
 export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
 export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_PROJECT_DIR/stacks"
@@ -43,9 +46,12 @@ export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export ELECTRUM_DIR="$ELECTRUM_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$BCM_VERSION"
 
-CHAIN="$(lxc project list | grep '(current)' | awk '{print $2}')"
-if [[ $CHAIN == "default" ]]; then 
-    CHAIN="$BCM_DEFAULT_CHAIN"
+CHAIN="$BCM_DEFAULT_CHAIN"
+if [ "$(lxc remote get-default)" != "local" ]; then
+    CHAIN="$(lxc project list | grep '(current)' | awk '{print $2}')"
+    if [[ $CHAIN == "default" ]]; then 
+        CHAIN="$BCM_DEFAULT_CHAIN"
+    fi
 fi
 
 export BCM_ACTIVE_CHAIN="$CHAIN"
