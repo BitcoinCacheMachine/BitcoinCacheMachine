@@ -4,4 +4,4 @@ set -Eeuo pipefail
 
 echo "entrypoint for esplora"
 
-# esplora
+npm run dev-server

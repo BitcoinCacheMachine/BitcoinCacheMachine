@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
@@ -29,8 +29,17 @@ if [[ $BCM_CLI_COMMAND == "bitcoin-cli" ]]; then
     elif [[ $BCM_CLI_COMMAND == "lightning-cli" ]]; then
     DOCKER_CONTAINER_ID="$(lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker ps | grep bcm-clightning: | awk '{print $1}')"
     if [[ ! -z "$DOCKER_CONTAINER_ID" ]]; then
+        
         lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker exec -it "$DOCKER_CONTAINER_ID" lightning-cli "$CMD_TEXT"
     else
         echo "WARNING: Docker container not found for clightning. You may need to run 'bcm stack deploy clightning'."
-    fi    
+    fi
+    
+    elif [[ $BCM_CLI_COMMAND == "lncli" ]]; then
+    DOCKER_CONTAINER_ID="$(lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker ps | grep bcm-lnd: | awk '{print $1}')"
+    if [[ ! -z "$DOCKER_CONTAINER_ID" ]]; then
+        lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker exec -it "$DOCKER_CONTAINER_ID" lncli --network="$BCM_ACTIVE_CHAIN" "$CMD_TEXT"
+    else
+        echo "WARNING: Docker container not found for clightning. You may need to run 'bcm stack deploy clightning'."
+    fi
 fi

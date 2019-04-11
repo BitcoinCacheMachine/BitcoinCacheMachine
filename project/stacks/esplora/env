@@ -1,7 +1,20 @@
-export IMAGE_NAME="bcm-esplora"
-export IMAGE_TAG="esplora_v2.10"
-export TIER_NAME="esplora"
-export STACK_FILE="esplora.yml"
-export STACK_NAME="esplora"
-export SERVICE_NAME="esplora"
-export SERVICE_PORT="81"
+#!/bin/bash
+
+# ZMQ BLOCKS
+ELECTRS_MAINNET_PORT="50001"
+ELECTRS_TESTNET_PORT="60001"
+ELECTRS_REGTEST_PORT="60401"
+ELECTRS_CMD_TEXT=""
+
+# mainnet is defaults
+ELECTRS_RPC_PORT="$ELECTRS_MAINNET_PORT"
+if [[ "$BCM_ACTIVE_CHAIN" == "testnet" ]]; then
+    ELECTRS_RPC_PORT="$ELECTRS_TESTNET_PORT"
+    ELECTRS_CMD_TEXT="-testnet"
+    elif [[ "$BCM_ACTIVE_CHAIN" == "regtest" ]]; then
+    ELECTRS_RPC_PORT="$ELECTRS_REGTEST_PORT"
+    ELECTRS_CMD_TEXT="-regtest"
+fi
+
+export ELECTRS_CMD_TEXT="$ELECTRS_CMD_TEXT"
+export ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT"

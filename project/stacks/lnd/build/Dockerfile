@@ -34,8 +34,10 @@ EXPOSE 9735 10009
 ADD ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+WORKDIR /root/.lnd
+
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["lnd"]
+
 
 
 # FROM golang:latest

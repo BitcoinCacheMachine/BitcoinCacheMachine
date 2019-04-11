@@ -1,38 +1,63 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
-# error function is used within a bash function in order to send the error
-# message directly to the stderr output and exit.
-error() {
-    echo "$1" >/dev/stderr
-    exit 0
-}
+BITCOIND_HOSTNAME="bitcoindrpc-$BCM_ACTIVE_CHAIN"
 
-# return is used within bash function in order to return the value.
-return() {
-    echo "$1"
-}
+LOCAL_GW_LXD_HOST_IP="$(getent hosts "$LXC_HOSTNAME" | awk '{ print $1 }')"
+TOR_PROXY="$LOCAL_GW_LXD_HOST_IP:9050"
+TOR_CONTROL="$LOCAL_GW_LXD_HOST_IP:9051"
 
-BITCOIND_RPC_PORT="8332"
-BITCOIND_ZMQ_PORT="9332"
-COMMAND_TEXT="--bitcoin.mainnet"
-BITCOIND_ZMQ_BLOCK_PORT=
-BITCOIND_ZMQ_TX_PORT=
+lnd --lnddir=/root/.lnd \
+--configfile=/root/.lnd/lnd.conf \
+--bitcoind.dir="/bitcoin/data" \
+--bitcoind.rpcuser="$BITCOIND_RPC_USERNAME" \
+--bitcoind.rpcpass="$BITCOIND_RPC_PASSWORD" \
+--bitcoind.rpchost="$BITCOIND_HOSTNAME:$BITCOIND_RPC_PORT" \
+--bitcoind.zmqpubrawblock="$BITCOIND_HOSTNAME:$BITCOIND_ZMQ_BLOCK_PORT" \
+--bitcoind.zmqpubrawtx="$BITCOIND_HOSTNAME:$BITCOIND_ZMQ_TX_PORT" \
+--tor.active \
+--tor.socks="$TOR_PROXY" \
+--tor.control="$TOR_CONTROL" \
+--tor.dns="$LOCAL_GW_LXD_HOST_IP:9053" \
+--tor.streamisolation \
+--tor.v3 \
+--logdir="/var/logs/lnd" \
+--bitcoin.node="bitcoind" --bitcoin.active "$CHAIN_TEXT"
 
-# mainnet ZMQ, testnet ZMQ, regtest ZMQ
-EXPOSE 9332 19332 29332
-if [[ $CHAIN == "testnet" ]]; then
-    BITCOIND_RPC_PORT=18332
-    BITCOIND_ZMQ_PORT=19332
-    COMMAND_TEXT="--bitcoin.testnet"
-    elif [[ $CHAIN == "regtest" ]]; then
-    BITCOIND_RPC_PORT=28332
-    BITCOIND_ZMQ_PORT=29332
-    COMMAND_TEXT="--bitcoin.regtest"
-fi
+# --adminmacaroonpath=/macaroons/admin.macaroon \
+# --readonlymacaroonpath=/macaroons/readonly.macaroon \
+# # error function is used within a bash function in order to send the error
+# # message directly to the stderr output and exit.
+# error() {
+#     echo "$1" >/dev/stderr
+#     exit 0
+# }
 
-BITCOIND_NAME="bitcoindrpc-$CHAIN"
+# # return is used within bash function in order to return the value.
+# return() {
+#     echo "$1"
+# }
+
+# #BITCOIND_RPC_PORT="8332"
+# BITCOIND_ZMQ_BLOCKS_PORT="9332"
+# COMMAND_TEXT="--bitcoin.mainnet"
+# BITCOIND_ZMQ_BLOCK_PORT=
+# BITCOIND_ZMQ_TX_PORT=
+
+# # mainnet ZMQ, testnet ZMQ, regtest ZMQ
+# EXPOSE 9332 19332 29332
+# if [[ $CHAIN == "testnet" ]]; then
+#     BITCOIND_RPC_PORT=18332
+#     BITCOIND_ZMQ_PORT=19332
+#     COMMAND_TEXT="--bitcoin.testnet"
+#     elif [[ $CHAIN == "regtest" ]]; then
+#     BITCOIND_RPC_PORT=28332
+#     BITCOIND_ZMQ_PORT=29332
+#     COMMAND_TEXT="--bitcoin.regtest"
+# fi
+
+# BITCOIND_NAME="bitcoindrpc-$CHAIN"
 
 # # if this is the first time we're running, generate the certificate
 # if [ ! -f /config/tls.cert ]; then
@@ -47,14 +72,6 @@ BITCOIND_NAME="bitcoindrpc-$CHAIN"
 #     rm /config/csr.csr
 # fi
 
-lnd --lnddir=/root/.lnd \
---configfile=/root/.lnd/lnd.conf \
---adminmacaroonpath=/macaroons/admin.macaroon \
---bitcoind.rpchost="$BITCOIND_NAME:$BITCOIND_RPC_PORT" \
---bitcoind.zmqpubrawblock="$BITCOIND_NAME:$BITCOIND_ZMQ_BLOCK_PORT" \
---bitcoind.zmqpubrawtx="$BITCOIND_NAME:$BITCOIND_ZMQ_TX_PORT" \
---logdir="/var/logs/lnd" \
---bitcoin.node="bitcoind" --bitcoin.active "$COMMAND_TEXT"
 
 #--bitcoin.chaindir="/bitcoin/data" \
 # --tlscertpath=/config/tls.cert \

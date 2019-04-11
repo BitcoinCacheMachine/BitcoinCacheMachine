@@ -2,7 +2,7 @@ version: '3.7'
 services:
   lnd:
     image: ${IMAGE_NAME}
-    hostname: lnd-${CHAIN:-testnet}
+    hostname: lnd-${BCM_ACTIVE_CHAIN:-testnet}
     volumes:
       - lnd-data:/root/.lnd
       - lnd-certificate-data:/config
@@ -11,14 +11,20 @@ services:
       - bitcoin_data:/bitcoin/data
       - bitcoin_cli:/usr/local/bin
     environment:
-      LND_CERTIFICATE_HOSTNAME: lnd-${CHAIN:-testnet}  #this is so there are no certificate verification issues on lncli-web
-      CHAIN: ${CHAIN:-testnet}
+      LND_CERTIFICATE_HOSTNAME: lnd-${BCM_ACTIVE_CHAIN:-}  #this is so there are no certificate verification issues on lncli-web
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
       LXC_HOSTNAME: ${LXC_HOSTNAME}
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT}
+      BITCOIND_ZMQ_BLOCK_PORT: ${BITCOIND_ZMQ_BLOCK_PORT}
+      BITCOIND_ZMQ_TX_PORT: ${BITCOIND_ZMQ_TX_PORT}
+      CHAIN_TEXT: ${CHAIN_TEXT}
+      BITCOIND_RPC_USERNAME: ${BITCOIND_RPC_USERNAME:-bitcoin}
+      BITCOIND_RPC_PASSWORD: ${BITCOIND_RPC_PASSWORD:-password}
     networks:
       bitcoindrpcnet:
       lndrpcnet:
         aliases:
-          - lndrpc-${CHAIN}
+          - lndrpc-${BCM_ACTIVE_CHAIN}
     secrets:
       - source: lnd-config
         target: /root/.lnd/lnd.conf
@@ -40,12 +46,12 @@ networks:
 
   bitcoindrpcnet:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet
   
 
 secrets:
   lnd-config:
-    file: "lnd-${CHAIN:-testnet}.conf"
+    file: "lnd-${BCM_ACTIVE_CHAIN:-}.conf"
 
 volumes:
   lnd-data:
@@ -56,8 +62,8 @@ volumes:
 
   bitcoin_data:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoin_data
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoin_data
 
   bitcoin_cli:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoin_cli
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoin_cli

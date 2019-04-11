@@ -2,13 +2,13 @@ version: '3.7'
 services:
   esplora:
     image: ${IMAGE_NAME}
-    hostname: esplora-${CHAIN:-testnet}
+    hostname: esplora-${BCM_ACTIVE_CHAIN:-testnet}
     ports:
       - "${BCM_SERVICE_PORT}:5000"
     volumes:
       - esplora-data:/root/.esplora
     environment:
-      CHAIN: ${CHAIN:-testnet}
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-testnet}
       LXC_HOSTNAME: ${LXC_HOSTNAME}
     networks:
       bitcoindrpcnet:
@@ -25,4 +25,4 @@ volumes:
 networks:
   bitcoindrpcnet:
     external: true
-    name: bitcoind-${CHAIN:-testnet}_bitcoindrpcnet
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet

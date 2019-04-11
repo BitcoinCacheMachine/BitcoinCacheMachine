@@ -3,15 +3,15 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-
-source ./env
+source ./env.sh
 
 # first, let's make sure we deploy our direct dependencies.
-bcm stack deploy bitcoind
+if ! bcm stack list | grep -q "bitcoind"; then
+    bcm stack deploy bitcoind
+fi
 
-# this is the LXC host that the docker container is going to be provisioned to.
-HOST_ENDING="01"
-CONTAINER_NAME="bcm-$TIER_NAME-$HOST_ENDING"
+# env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
+source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
@@ -23,9 +23,14 @@ CONTAINER_NAME="bcm-$TIER_NAME-$HOST_ENDING"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
+source "$BCM_GIT_DIR/project/stacks/bitcoind/env"
+source ./env
+
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
-CHAIN="$BCM_ACTIVE_CHAIN" \
+BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
+BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
+
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
 
 

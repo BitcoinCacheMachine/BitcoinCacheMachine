@@ -94,7 +94,7 @@ if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
     ./stack/entrypoint.sh "$@"
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cli" ]]; then
+if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cli" || "$BCM_CLI_COMMAND" == "lncli" ]]; then
     ./stack_cli/entrypoint.sh "$@"
 fi
 
