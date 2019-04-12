@@ -1,0 +1,14 @@
+Description:
+
+  Signs a merge and verifies signatures on the tips of the branches.
+  Tag a git commit using SSH authentication backed by your Trezor and SSH is configured to use TOR for internet backhaul.
+
+Usage:
+  bcm git tag --tag="v0.0.1" --message="Version 1"
+
+Parameters:
+  --branch-name=<branch>                        Specify the branch name that will be merged with the master.
+
+Optional Parameters:
+  --verify-signatures                           Verify if the tips of the branches have been signed with
+                                                trusted keys.
