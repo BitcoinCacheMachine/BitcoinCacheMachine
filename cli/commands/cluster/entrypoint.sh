@@ -71,7 +71,7 @@ fi
 
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    
+    echo "IN BCM CLUSTER CREATE"
     if [[ ! -d "$GNUPGHOME/trezor" ]]; then
         # ensure we have trezor-backed certificates and password store
         bcm init
@@ -146,15 +146,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     if [[ -z $MACVLAN_INTERFACE ]]; then
         echo "Please enter the network interface you want to expose BCM services on: "
         read -rp "Network Interface:  "   MACVLAN_INTERFACE
-    fi
-    
-    # if the cluster name is local, then we assume the user hasn't overridden
-    # what was set in 'lxc remote get-default'. If so, we will assume a cluster
-    # will be created with the name of `bcm-hostname`
-    
-    if bcm cluster list | grep -q "$CLUSTER_NAME"; then
-        echo "The BCM Cluster '$CLUSTER_NAME' already exists!"
-        exit
     fi
     
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
@@ -307,17 +298,15 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         multipass purge
     fi
     
-    if [[ $CLUSTER_NAME != "local" ]]; then
+    if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
         if [[ $(lxc remote get-default) != "local" ]]; then
             # if it's the cluster master add the LXC remote so we can manage it.
-            if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
-                echo "Switching lxd remote to local."
-                lxc remote switch "local"
-                
-                echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
-                lxc remote remove "$CLUSTER_NAME"
-            fi
+            echo "Switching lxd remote to local."
+            lxc remote switch "local"
         fi
+        
+        echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
+        lxc remote remove "$CLUSTER_NAME"
     fi
 fi
 

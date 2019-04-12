@@ -7,7 +7,7 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable. It is in a proof-of-concept stage! We wouldn't recommend putting real bitcoin on it at this time. Builds will be formally tagged once a stable proof-of-concept has been created. YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!
+**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged once a stable proof-of-concept has been created. BCM is in a proof-of-concept stage. Currently, the default branch on github.com is `dev` which is the most up-to-date proof-of-concept version. Once a stable PoC has been created, changes will pulled into the master branch which represents the most tested and stable versions of BCM.  YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!! 
 
 ## Why Bitcoin Cache Machine Exists
 

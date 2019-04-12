@@ -2,8 +2,7 @@ config:
   core.https_address: "0.0.0.0:8443"
   core.trust_password: $BCM_LXD_SECRET
 storage_pools:
-- config:
-    size: 350GB
+- config: {}
   description: "BTRFS storage backend for BCM system containers."
   name: default
   driver: btrfs
@@ -20,3 +19,6 @@ cluster:
   server_name: $LXD_SERVER_NAME
   enabled: true
 
+# goes under storage_pools
+# - config:
+#     size: 350GB
