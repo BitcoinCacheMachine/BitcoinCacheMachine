@@ -177,7 +177,7 @@ if [[ $BCM_CLI_VERB == "merge" ]]; then
         -e BCM_EMAIL_ADDRESS="$BCM_CERT_USERNAME"'@'"$BCM_CERT_HOSTNAME" \
         -e BCM_GIT_BRANCH="$BCM_GIT_BRANCH" \
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
-        "bcm-gpgagent:$BCM_VERSION" /bcm/merge_git_repo.sh
+        "bcm-gpgagent:$BCM_VERSION" /bcm/merge_sign_git_repo.sh
     fi
     
     # if docker ps | grep -q "gitter"; then

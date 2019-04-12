@@ -32,8 +32,8 @@ ADD ./container_scripts/tag_sign_git_repo.sh /bcm/tag_sign_git_repo.sh
 RUN chmod +x /bcm/tag_sign_git_repo.sh
 
 # run this script to quickly configure verify branches and merge them with a signature
-ADD ./container_scripts/merge_sign_repo.sh /bcm/merge_sign_repo.sh
-RUN chmod +x /bcm/merge_sign_repo.sh
+ADD ./container_scripts/merge_sign_git_repo.sh /bcm/merge_sign_git_repo.sh
+RUN chmod +x /bcm/merge_sign_git_repo.sh
 
 # run this script to quickly configure and commit and sign a repo
 ADD ./container_scripts/git_pull.sh /bcm/git_pull.sh
