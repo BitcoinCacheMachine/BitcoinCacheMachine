@@ -303,10 +303,10 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
             # if it's the cluster master add the LXC remote so we can manage it.
             echo "Switching lxd remote to local."
             lxc remote switch "local"
+            
+            echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
+            lxc remote remove "$CLUSTER_NAME"
         fi
-        
-        echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
-        lxc remote remove "$CLUSTER_NAME"
     fi
 fi
 

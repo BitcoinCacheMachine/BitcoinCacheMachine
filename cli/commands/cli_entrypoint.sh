@@ -18,6 +18,7 @@ shopt -s expand_aliases
 
 BCM_HELP_FLAG=0
 BCM_FORCE_FLAG=0
+BCM_VOLUMES_FLAG=0
 
 for i in "$@"; do
     case $i in
@@ -26,7 +27,9 @@ for i in "$@"; do
         ;;
         --force)
             BCM_FORCE_FLAG=1
-            shift # past argument=value
+        ;;
+        --volumes)
+            BCM_VOLUMES_FLAG=1
         ;;
         *)
             # unknown option
@@ -36,6 +39,7 @@ done
 
 export BCM_HELP_FLAG="$BCM_HELP_FLAG"
 export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
+export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
 
 if [[ "$BCM_CLI_COMMAND" == "get-chain" ]]; then
     ./chain/getchain.sh
@@ -88,33 +92,40 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"
+    exit
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
     ./stack/entrypoint.sh "$@"
+    exit
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cli" || "$BCM_CLI_COMMAND" == "lncli" ]]; then
     ./stack_cli/entrypoint.sh "$@"
+    exit
 fi
 
 
 if [[ "$BCM_CLI_COMMAND" == "set-chain" ]]; then
     ./chain/setchain.sh "$@"
+    exit
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "get-ip" ]]; then
     ./get/entrypoint.sh "$@"
+    exit
 fi
 
 # run is for running docker containers AT the SDN controller (not in LXC)
 if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
     ./run/entrypoint.sh "$@"
+    exit
 fi
 
 
 if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
     bash -c "$BCM_GIT_DIR/project/destroy.sh" "$@"
+    exit
 fi
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then

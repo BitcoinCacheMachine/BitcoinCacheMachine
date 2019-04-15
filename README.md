@@ -7,7 +7,9 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged once a stable proof-of-concept has been created. BCM is in a proof-of-concept stage. Currently, the default branch on github.com is `dev` which is the most up-to-date proof-of-concept version. Once a stable PoC has been created, changes will pulled into the master branch which represents the most tested and stable versions of BCM.  YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!! 
+**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged once a stable proof-of-concept has been created. BCM is in a proof-of-concept stage. Currently, the default branch on github.com is `dev` which is the most up-to-date proof-of-concept version. Once a stable PoC has been created, changes will be pulled into the master branch which will represent the most up-to-date stable (and tested) version of BCM.
+
+```YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!```
 
 ## Why Bitcoin Cache Machine Exists
 
@@ -34,7 +36,7 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 ## What is needed to Run Bitcoin Cache Machine
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM data-center workload components run as background server-side processes, so you'll usually want to have one or more always-on computers with a reliable Internet connection, especially if you're running something like BTCPay Server, which serves web pages (e.g., invoices) to external third parties or running a liquidity-providing Lightning node. User-facing GUI applications such as Electrum Wallet are containerized. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM data-center workload components run as background server-side processes, so you'll usually want to have one or more always-on computers with a reliable Internet connection, especially if you're running something like BTCPay Server, which serves web pages (e.g., invoices) to external third parties or running a liquidity-providing Lightning node or acting a JoinMarket maker. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal Ubuntu. User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
 
 All you need to get started is an SSH endpoint running Ubuntu 18.04. When running BCM standalone such a user-facing desktop or laptop, data center workloads run within the context of [KVM-based Virtual Machine](https://www.linux-kvm.org/page/Main_Page) if supported by the hardware. README.md in the `cluster` directory has more details on prepping a bare-bones Ubuntu Server for a dedicated back-end server. 
 
@@ -68,14 +70,14 @@ Feel free to change the directory in which you store the BCM repository on your 
 
 ## Deploying your own BCM Infrastructure
 
-After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other supported components you can deploy include:
+After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other components you can deploy include:
 
 ```bash
 bcm stack deploy bitcoind
 bcm stack deploy clightning
-bcm stack deploy spark
+bcm stack deploy lnd
 bcm stack deploy btcpayserver
-bcm stack deploy esplora
+# bcm stack deploy esplora
 bcm stack deploy electrum
 ```
 

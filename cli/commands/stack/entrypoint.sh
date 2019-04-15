@@ -48,6 +48,18 @@ if [[ $BCM_CLI_VERB == "remove"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
     
     bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME-$BCM_ACTIVE_CHAIN"
+    
+    # if the 'bck stack remove' command was executed with a '--volumes' flag, then we delete
+    # the associated docker volumes this will be defined in a destroy.sh script in each stack directory.
+    if [[ $BCM_VOLUMES_FLAG == 1 ]]; then
+        # running the stack up file.
+        DOWN_FILE="$BCM_STACKS_DIR/$STACK_NAME/destroy.sh"
+        if [[ -f "$DOWN_FILE" ]]; then
+            bash -c "$DOWN_FILE"
+        else
+            echo "ERROR: Could not find '$DOWN_FILE'."
+        fi
+    fi
 fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then

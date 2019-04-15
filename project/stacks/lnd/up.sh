@@ -3,6 +3,9 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+echo "WARNING: lnd deployment using BCM has NOT been fully automated. You MUST be prepared"
+echo "to generate and store unique passwords and resulting cipher seeds."
+
 source ./env.sh
 
 # first, let's make sure we deploy our direct dependencies.
@@ -34,3 +37,7 @@ BITCOIND_ZMQ_TX_PORT="$BITCOIND_ZMQ_TX_PORT" \
 BITCOIND_RPC_USERNAME="bitcoin" \
 BITCOIND_RPC_PASSWORD="password" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
+
+sleep 60
+
+bcm lncli create
