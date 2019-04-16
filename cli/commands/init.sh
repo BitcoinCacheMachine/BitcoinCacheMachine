@@ -36,13 +36,13 @@ if [[ "$BCM_HELP_FLAG" == 1 ]]; then
     exit
 fi
 
-#if [[ -d "$GNUPGHOME" ]]; then
-#    exit
-#fi
-echo "GNUPGHOME: $GNUPGHOME"
-
 mkdir -p "$GNUPGHOME"
-echo "Your Trezor-backed GPG certificates do not exist. Let's create them now. Make sure you have your Trezor handy."
+if [[ -d "$GNUPGHOME/trezor" ]]; then
+    echo "ERROR: a BCM identity already exists at '$GNUPGHOME/trezor'. Please delete that directory or run 'bcm reset'."
+    exit
+else
+    echo "Your Trezor-backed GPG certificates do not exist. Let's create them now. Make sure you have your Trezor handy."
+fi
 
 while [[ -z "$BCM_CERT_NAME" ]]; do
     echo "Please enter the title of the certificate. This is usually your name:  "
@@ -97,7 +97,8 @@ DEFAULT_KEY_ID="$(echo "$DEFAULT_KEY_ID" | awk '{print $1}')"
     echo "export BCM_CERT_HOSTNAME="'"'$BCM_CERT_HOSTNAME'"'
 } >>"$GNUPGHOME/env"
 
-if [[ ! -d "$PASSWORD_STORE_DIR" ]]; then
+mkdir -p "$PASSWORD_STORE_DIR"
+if [[ ! -d "$PASSWORD_STORE_DIR/.git" ]]; then
     # now let's initialize the password repository with the GPG key
     bcm pass init --name="$BCM_CERT_NAME" --username="$BCM_CERT_USERNAME" --hostname="$BCM_CERT_HOSTNAME"
     
@@ -107,13 +108,7 @@ else
     exit
 fi
 
-if [[ ! -d "$BCM_SSH_DIR" ]]; then
-    mkdir "$BCM_SSH_DIR"
-else
-    echo "ERROR: $BCM_SSH_DIR already exists."
-    exit
-fi
-
+mkdir -p "$BCM_SSH_DIR"
 if ! grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
     mkdir -p "$BCM_WORKING_ENC_DIR"
     mkdir -p "$BCM_WORKING_DIR"

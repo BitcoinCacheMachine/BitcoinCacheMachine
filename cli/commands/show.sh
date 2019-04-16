@@ -8,10 +8,6 @@ if [[ $(lxc remote get-default) == "local" ]]; then
 fi
 
 echo ""
-echo "LXD Projects:"
-lxc project list
-
-echo ""
 echo "LXD system containers:"
 lxc list
 
@@ -44,5 +40,5 @@ if lxc info | grep -q "server_clustered: true"; then
 fi
 
 echo ""
-echo "LXD projects:"
+echo "LXD Projects:"
 lxc project list

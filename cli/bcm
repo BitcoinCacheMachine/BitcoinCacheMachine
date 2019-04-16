@@ -14,9 +14,5 @@ bash -c "$BCM_GIT_DIR/controller/build.sh"
 # shellcheck disable=1090
 source ./env
 
-
-
-
-
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

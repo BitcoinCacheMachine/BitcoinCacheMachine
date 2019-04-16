@@ -29,14 +29,14 @@ Here are some of the development goals for Bitcoin Cache Machine:
 * Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
 * Require hardware wallets for cryptographic operations (PGP, SSH, and Bitcoin transactions).
-* Pre-configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.).
+* Configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.).
 * Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications.
 * Enhance overall security and performance and network health by running a Tor middle relay and serving bitcoin blocks over Tor.
 * Facilitate local (SSH) and remote using [SSH port-forwarding](https://help.ubuntu.com/community/SSH/OpenSSH/PortForwarding) with TOR transport for cluster administration.
 
 ## What is needed to Run Bitcoin Cache Machine
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM data-center workload components run as background server-side processes, so you'll usually want to have one or more always-on computers with a reliable Internet connection, especially if you're running something like BTCPay Server, which serves web pages (e.g., invoices) to external third parties or running a liquidity-providing Lightning node or acting a JoinMarket maker. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal Ubuntu. User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
+If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM data-center workload components run as background server-side processes, so you'll usually want to have one or more always-on computers with a reliable Internet connection, especially if you're running something like BTCPay Server, which serves web pages (e.g., invoices) to external third parties or running a liquidity-providing Lightning node or acting a [JoinMarket](https://github.com/JoinMarket-Org/joinmarket-clientserver) maker. You can run BCM data-center workloads in a hardware-based VM (default) or directly on bare-metal Ubuntu. User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
 
 All you need to get started is an SSH endpoint running Ubuntu 18.04. When running BCM standalone such a user-facing desktop or laptop, data center workloads run within the context of [KVM-based Virtual Machine](https://www.linux-kvm.org/page/Main_Page) if supported by the hardware. README.md in the `cluster` directory has more details on prepping a bare-bones Ubuntu Server for a dedicated back-end server. 
 

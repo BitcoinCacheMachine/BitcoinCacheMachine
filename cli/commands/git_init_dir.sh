@@ -3,11 +3,12 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-
 BCM_DIR=$1
+mkdir -p "$BCM_DIR"
+
 if [ ! -d "$BCM_DIR" ]; then
     echo "Creating git repository at $BCM_DIR"
-    mkdir -p "$BCM_DIR"
+    
     
     if [[ -z $(git config --local --get user.name) ]]; then
         git config --local user.name "bcm"

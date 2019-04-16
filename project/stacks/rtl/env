@@ -1,0 +1,7 @@
+export IMAGE_NAME="bcm-rtl"
+export IMAGE_TAG="v0.3.0"
+export TIER_NAME="bitcoin"
+export STACK_FILE="rtl.yml"
+export STACK_NAME="rtl"
+export SERVICE_NAME="rtl"
+export SERVICE_PORT="8181"

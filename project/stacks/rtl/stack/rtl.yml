@@ -1,0 +1,61 @@
+version: '3.7'
+services:
+  rtl:
+    image: ${IMAGE_NAME}
+    hostname: rtl-${BCM_ACTIVE_CHAIN:-testnet}
+    ports:
+      - "${SERVICE_PORT:-3000}:${SERVICE_PORT:-3000}"
+    environment:
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
+      PORT: ${SERVICE_PORT:-3000}
+      MACAROON_PATH: ${MACAROON_PATH:-"/lnd-macaroons"}
+      NODE_AUTH_TYPE: "CUSTOM"
+      TRL_CONFIG_PATH: /root/.rtl/RTL.conf
+      BITCOIND_CONFIG_PATH: /root/.bitcoin
+      RTL_SSO: 1
+      RTL_COOKIE_PATH: /root/.rtl/cookie
+      LOGOUT_REDIRECT_LINK: http://bcm
+      RTL_PASS: ${RTL_PASSWORD:-password}
+      LND_SERVER_URL: lndrpc-${BCM_ACTIVE_CHAIN}
+    networks:
+      lndrpcnet:
+    volumes:
+      - lnd-macaroons:/lnd-macaroons:r
+      - lnd-data:/root/.lnd:r
+      - bitcoind-data:/root/.bitcoin
+    secrets:
+      - source: rtl-config
+        target: /root/.rtl/RTL.conf
+        uid: '0'
+        gid: '0'
+        mode: 0444
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+networks:
+  lndrpcnet:
+    external: true
+    name: lnd-${BCM_ACTIVE_CHAIN:-}_lndrpcnet
+  
+secrets:
+  rtl-config:
+    file: "rtl.conf"
+
+volumes:
+  lnd-macaroons:
+    external: true
+    name: lnd-${BCM_ACTIVE_CHAIN:-}_lnd-macaroon-data
+
+  lnd-data:
+    external: true
+    name: lnd-${BCM_ACTIVE_CHAIN:-}_lnd-data
+
+  bitcoind-data:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoin_data
+

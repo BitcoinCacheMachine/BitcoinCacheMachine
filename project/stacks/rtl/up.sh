@@ -3,13 +3,12 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source ./env.sh
+source ./env
 
-# first, let's make sure we deploy our direct dependencies.
-bcm stack deploy bitcoind
-
-echo "WARNING: lnd deployment using BCM has NOT been fully automated. You MUST be prepared"
-echo "         to generate and store unique passwords and resulting cipher seeds."
+if ! bcm stack list | grep -q lnd; then
+    # first, let's make sure we deploy our direct dependencies.
+    bcm stack deploy lnd
+fi
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
 source "$BCM_GIT_DIR/project/shared/env.sh"
@@ -24,20 +23,16 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
-source "$BCM_GIT_DIR/project/stacks/bitcoind/env"
-source ./env
-
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
-CHAIN_TEXT="$CHAIN_TEXT" \
-BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
-BITCOIND_ZMQ_BLOCK_PORT="$BITCOIND_ZMQ_BLOCK_PORT" \
-BITCOIND_ZMQ_TX_PORT="$BITCOIND_ZMQ_TX_PORT" \
-BITCOIND_RPC_USERNAME="bitcoin" \
-BITCOIND_RPC_PASSWORD="password" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_FILE" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
 
-sleep 15
+ENDPOINT=$(bcm get-ip)
+wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
 
-bcm lncli create
+# let's the the pariing URL from the container output
+PAIRING_OUTPUT_URL=$(lxc exec "$BCM_GATEWAY_HOST_NAME" --  docker service logs "rtl-$BCM_ACTIVE_CHAIN""_rtl" | grep 'Pairing URL: ' | awk '{print $5}')
+RTL_URL=${PAIRING_OUTPUT_URL/0.0.0.0/$ENDPOINT}
+
+xdg-open "$RTL_URL" &

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo nounset
+set -Eeuox nounset
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=

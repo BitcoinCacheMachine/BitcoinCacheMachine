@@ -43,11 +43,14 @@ networks:
   lndrpcnet:
     driver: overlay
     attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.240.0/24
 
   bitcoindrpcnet:
     external: true
     name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet
-  
 
 secrets:
   lnd-config:

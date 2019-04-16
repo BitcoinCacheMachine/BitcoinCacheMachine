@@ -71,7 +71,8 @@ fi
 
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    echo "IN BCM CLUSTER CREATE"
+    MACVLAN_INTERFACE=
+    
     if [[ ! -d "$GNUPGHOME/trezor" ]]; then
         # ensure we have trezor-backed certificates and password store
         bcm init
@@ -83,9 +84,9 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         CONTINUE=0
         while [[ "$CONTINUE" == 0 ]]
         do
-            # echo "Would you like to deploy BCM locally, a hardware-based VM (more secure), or to a remote SSH endpoint?"
-            # read -rp "(vm/local/ssh):  "   CHOICE
-            CHOICE="vm"
+            echo "Would you like to deploy BCM locally, a hardware-based VM (more secure), or to a remote SSH endpoint?"
+            read -rp "(vm/local/ssh):  "   CHOICE
+            
             if [[ "$CHOICE" == "vm" ]]; then
                 CONTINUE=1
                 # Check to see if the computer has hardware virtualization support. If not, then we
@@ -120,25 +121,26 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 read -rp "SSH Hostname:  "   BCM_SSH_HOSTNAME
                 wait-for-it -t 15 "$BCM_SSH_HOSTNAME:22"
                 
+                BCM_SSH_USERNAME=bcm
                 echo "Please enter the username that has administrative privilieges on $BCM_SSH_HOSTNAME"
-                read -rp "SSH username:  "   BCM_SSH_USERNAME
+                read -rp "SSH username (default: bcm):  "   BCM_SSH_USERNAME
+                
                 
                 
                 CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
+                elif [[ "$CHOICE" == "local" ]]; then
+                CONTINUE=1
+                BCM_DRIVER=baremetal
+                CLUSTER_NAME="bcm-$(hostname)"
+                BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
+                BCM_SSH_USERNAME="$(whoami)"
+                
+                # let's add an alias in /etc/hosts so the SDN controller can resolve 'bcm-$(hostname)-01'
+                HOSTS_ENTRY="127.0.1.1    $BCM_SSH_HOSTNAME"
+                if ! grep -Fxq "$HOSTS_ENTRY" /etc/hosts; then
+                    echo "$HOSTS_ENTRY" | sudo tee -a /etc/hosts
+                fi
             fi
-            #     elif [[ "$CHOICE" == "local" ]]; then
-            #     CONTINUE=1
-            #     BCM_DRIVER=baremetal
-            #     CLUSTER_NAME="bcm-$(hostname)"
-            #     BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
-            #     BCM_SSH_USERNAME="$(whoami)"
-            
-            #     # let's add an alias in /etc/hosts so the SDN controller can resolve 'bcm-$(hostname)-01'
-            #     HOSTS_ENTRY="127.0.1.1    $BCM_SSH_HOSTNAME"
-            #     if ! grep -Fxq "$HOSTS_ENTRY" /etc/hosts; then
-            #         echo "$HOSTS_ENTRY" | sudo tee -a /etc/hosts
-            #     fi
-            
         done
     fi
     
@@ -150,6 +152,11 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
     ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME"
+    
+    if [[ "$ENDPOINT_DIR" != *-01 ]]; then
+        ENDPOINT_DIR="$ENDPOINT_DIR-01"
+    fi
+    
     mkdir -p "$ENDPOINT_DIR"
     
     # first check to ensure that the cluster doesn't already exist.
@@ -240,27 +247,29 @@ fi
 
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    if [[ $CLUSTER_NAME != "local" ]]; then
-        CONTINUE=0
-        while [[ "$CONTINUE" == 0 ]]
-        do
-            echo "WARNING: Are you sure you want to delete the current cluster '$CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
-            read -rp "Are you sure (y/n):  "   CHOICE
-            
-            if [[ "$CHOICE" == "y" ]]; then
-                CONTINUE=1
-                elif [[ "$CHOICE" == "n" ]]; then
-                exit
-            else
-                echo "Invalid entry. Please try again."
-            fi
-        done
-    fi
+    
     
     # TODO ITERATE OVER FOLDERS IN CLUSTER FOLDER AND DELETE BASED ON env.
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
     
     if [[ -d $CLUSTER_DIR ]]; then
+        if [[ $CLUSTER_NAME != "local" ]]; then
+            CONTINUE=0
+            while [[ "$CONTINUE" == 0 ]]
+            do
+                echo "WARNING: Are you sure you want to delete the current cluster '$CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
+                read -rp "Are you sure (y/n):  "   CHOICE
+                
+                if [[ "$CHOICE" == "y" ]]; then
+                    CONTINUE=1
+                    elif [[ "$CHOICE" == "n" ]]; then
+                    exit
+                else
+                    echo "Invalid entry. Please try again."
+                fi
+            done
+        fi
+        
         for ENDPOINT_DIR in $(find "$CLUSTER_DIR" -mindepth 1 -maxdepth 1 -type d); do
             if [[ -f $ENDPOINT_DIR/env ]]; then
                 source "$ENDPOINT_DIR/env"
@@ -278,6 +287,18 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     
                     # clear any relevant /etc/host entries (and remove extra lines)
                     sudo sed -i '/^$BCM_SSH_HOSTNAME/d' /etc/hosts
+                    elif [[ $BCM_DRIVER == ssh ]]; then
+                    
+                    SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+                    # LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
+                    # export REMOTE_MOUNTPOINT="/tmp/provisioning"
+                    
+                    # scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_deprovision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
+                    # ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
+                    # ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" env LXC_BCM_BASE_IMAGE_NAME="$LXC_BCM_BASE_IMAGE_NAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
+                    
+                    ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo snap remove lxd
+                    
                 fi
                 
                 # clearing all lines from /etc/hosts that contain "$BCM_SSH_HOSTNAME"

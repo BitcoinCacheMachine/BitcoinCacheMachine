@@ -7,6 +7,7 @@ BITCOIND_HOSTNAME="bitcoindrpc-$BCM_ACTIVE_CHAIN"
 LOCAL_GW_LXD_HOST_IP="$(getent hosts "$LXC_HOSTNAME" | awk '{ print $1 }')"
 TOR_PROXY="$LOCAL_GW_LXD_HOST_IP:9050"
 TOR_CONTROL="$LOCAL_GW_LXD_HOST_IP:9051"
+OVERLAY_NETWORK_IP=$(ip addr | grep "172.16.240." | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
 
 lnd --lnddir=/root/.lnd \
 --configfile=/root/.lnd/lnd.conf \
@@ -16,6 +17,7 @@ lnd --lnddir=/root/.lnd \
 --bitcoind.rpchost="$BITCOIND_HOSTNAME:$BITCOIND_RPC_PORT" \
 --bitcoind.zmqpubrawblock="$BITCOIND_HOSTNAME:$BITCOIND_ZMQ_BLOCK_PORT" \
 --bitcoind.zmqpubrawtx="$BITCOIND_HOSTNAME:$BITCOIND_ZMQ_TX_PORT" \
+--restlisten="$OVERLAY_NETWORK_IP" \
 --tor.active \
 --tor.socks="$TOR_PROXY" \
 --tor.control="$TOR_CONTROL" \

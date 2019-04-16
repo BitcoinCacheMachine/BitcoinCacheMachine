@@ -9,7 +9,7 @@ if bcm tier list | grep -q "underlay"; then
     exit
 fi
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
+# ensure the kafka tier is deployed
 if ! bcm tier list | grep -q "kafka"; then
     bcm tier create kafka
 fi
@@ -18,10 +18,10 @@ fi
 export TIER_NAME=underlay
 bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=$TIER_NAME"
 
-
-source ./env
-
+# if we're in debug mode, some visual UIs will be deployed for kafka inspection
 if [[ $BCM_DEBUG == 1 ]]; then
+    source ./env
+    
     # bring up the docker UI STACKS.
     if [[ $BCM_DEPLOY_STACK_CONNECTUI == 1 ]]; then
         bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/connectui/env --container-name=$BCM_UNDERLAY_HOST_NAME"
