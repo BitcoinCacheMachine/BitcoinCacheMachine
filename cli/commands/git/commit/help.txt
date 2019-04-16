@@ -1,32 +1,16 @@
 Description:
-  Commit and GPG-sign a git repository using a Trezor for secure cryptographic operations..
+  Commit and GPG-sign a git repository using a Trezor for secure cryptographic 
+  operations. All signature operations against a given git repo use your GNUPGHOME
+  directory which can be viewed with 'bcm info'. '$GNUPGHOME/env' contains required 
+  environment variables related to git commits using BCM.
 
 Usage:
-  bcm git commit -g=<BCM_GIT_REPO_DIR> --message='<GIT_COMMIT_MESSAGE>' \
-                 -i=<GIT_CLIENT_USERNAME> -o=<BCM_PROJECT_OVERRIDE_DIR> 
+  bcm git commit --git-repo-dir=$HOME/git/repo \
+                 --message='Git commit message.' 
 
 Parameters:
-  -g=<BCM_GIT_REPO_DIR>                   The required path of the git repo you want to commit and sign.
-                                          --git-repo-dir=<BCM_GIT_REPO_DIR>
+  --git-repo-dir=    The path of the git repo you want to commit and sign. BCM_GIT_DIR by default.
+  --message=         The required message to be included in the git commit.
 
-  --message=<GIT_COMMIT_MESSAGE>      The required message to be included in the commit.
-                                          --git-commit-message=<GIT_COMMIT_MESSAGE>
-
-  -i=<GIT_CLIENT_USERNAME>    The required username to use for the git client. This SHOULD 
-                                  match the username of the remote git repo used when pushing.
-                                  --git-client-username=<GIT_CLIENT_USERNAME>
-
-  -o=<BCM_PROJECT_OVERRIDE_DIR>   Optional. Used to override the default ('bcm project get-default') 
-                                  directory that contains public GPG material used for signing.
-                                  --project-override=<BCM_PROJECT_OVERRIDE_DIR>
-  
-  -e=<BCM_EMAIL_ADDRESS>          Required. Specify the email address used to sign the git commit. This
-                                  MUST be an email listed in the certificate being used to sign the commit.
-                                  For github repos, this is the email in your public GPG certificate.
-  
-  -v=<DEFAULT_KEY_ID>     The ID of the certificate you want to sign with. This cert will be in <BCM_GIT_REPO_DIR>
-
-  --default                       If this flag is specified, the following values will be used:
-                                  BCM_GIT_REPO_DIR:  $BCM_RUNTIME_DIR
-                                  GIT_CLIENT_USERNAME
-                                  BCM_EMAIL_ADDRESS
+ 
+ 

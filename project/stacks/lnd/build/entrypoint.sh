@@ -9,6 +9,9 @@ TOR_PROXY="$LOCAL_GW_LXD_HOST_IP:9050"
 TOR_CONTROL="$LOCAL_GW_LXD_HOST_IP:9051"
 OVERLAY_NETWORK_IP=$(ip addr | grep "172.16.240." | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
 
+touch /root/.lnd/lnd-rtl.conf
+echo "restlisten=$OVERLAY_NETWORK_IP:8080" > /root/.lnd/lnd-rtl.conf
+
 lnd --lnddir=/root/.lnd \
 --configfile=/root/.lnd/lnd.conf \
 --bitcoind.dir="/bitcoin/data" \
@@ -17,7 +20,7 @@ lnd --lnddir=/root/.lnd \
 --bitcoind.rpchost="$BITCOIND_HOSTNAME:$BITCOIND_RPC_PORT" \
 --bitcoind.zmqpubrawblock="$BITCOIND_HOSTNAME:$BITCOIND_ZMQ_BLOCK_PORT" \
 --bitcoind.zmqpubrawtx="$BITCOIND_HOSTNAME:$BITCOIND_ZMQ_TX_PORT" \
---restlisten="$OVERLAY_NETWORK_IP" \
+--restlisten="$OVERLAY_NETWORK_IP:8080" \
 --tor.active \
 --tor.socks="$TOR_PROXY" \
 --tor.control="$TOR_CONTROL" \

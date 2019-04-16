@@ -4,26 +4,25 @@ services:
     image: ${IMAGE_NAME}
     hostname: rtl-${BCM_ACTIVE_CHAIN:-testnet}
     ports:
-      - "${SERVICE_PORT:-3000}:${SERVICE_PORT:-3000}"
+      - "${SERVICE_PORT:-}:${SERVICE_PORT:-}"
+    volumes:
+      - lnd-macaroons:/lnd-macaroons
+      - bitcoind-data:/root/.bitcoin
+        #- lnd-data:/root/.lnd
     environment:
-      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
-      LXC_HOSTNAME: ${LXC_HOSTNAME}
-      PORT: ${SERVICE_PORT:-3000}
-      MACAROON_PATH: ${MACAROON_PATH:-"/lnd-macaroons"}
-      NODE_AUTH_TYPE: "CUSTOM"
-      TRL_CONFIG_PATH: /root/.rtl/RTL.conf
-      BITCOIND_CONFIG_PATH: /root/.bitcoin
+      PORT: ${SERVICE_PORT:-}
+      MACAROON_PATH: ${MACAROON_PATH:-}
+      NODE_AUTH_TYPE: CUSTOM
+      LND_CONFIG_PATH: /root/.lnd/lnd-rtl.conf
+      RTL_CONFIG_PATH: /root/.rtl/RTL.conf
+      #BITCOIND_CONFIG_PATH: /root/.bitcoin/bitcoin.conf
       RTL_SSO: 1
       RTL_COOKIE_PATH: /root/.rtl/cookie
       LOGOUT_REDIRECT_LINK: http://bcm
-      RTL_PASS: ${RTL_PASSWORD:-password}
-      LND_SERVER_URL: lndrpc-${BCM_ACTIVE_CHAIN}
+      RTL_PASS: ${RTL_PASSWORD:-}
+      LND_SERVER_URL: https://lndrpc-${BCM_ACTIVE_CHAIN}:8080/v1
     networks:
-      lndrpcnet:
-    volumes:
-      - lnd-macaroons:/lnd-macaroons:r
-      - lnd-data:/root/.lnd:r
-      - bitcoind-data:/root/.bitcoin
+      lndrpcnet:    
     secrets:
       - source: rtl-config
         target: /root/.rtl/RTL.conf
@@ -44,7 +43,7 @@ networks:
   
 secrets:
   rtl-config:
-    file: "rtl.conf"
+    file: rtl.conf
 
 volumes:
   lnd-macaroons:

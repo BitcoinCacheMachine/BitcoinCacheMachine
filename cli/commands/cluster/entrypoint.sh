@@ -20,7 +20,6 @@ BCM_DRIVER=
 BCM_SSH_HOSTNAME=
 BCM_SSH_USERNAME=
 MACVLAN_INTERFACE=
-BCM_FORCE_FLAG=0
 
 for i in "$@"; do
     case $i in
@@ -42,10 +41,6 @@ for i in "$@"; do
         ;;
         --endpoints)
             BCM_ENDPOINTS_FLAG=1
-            shift # past argument=value
-        ;;
-        --force=*)
-            BCM_FORCE_FLAG=1
             shift # past argument=value
         ;;
         *) ;;

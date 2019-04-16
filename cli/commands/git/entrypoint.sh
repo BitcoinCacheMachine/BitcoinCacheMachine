@@ -179,10 +179,6 @@ if [[ $BCM_CLI_VERB == "merge" ]]; then
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
         "bcm-gpgagent:$BCM_VERSION" /bcm/merge_sign_git_repo.sh
     fi
-    
-    # if docker ps | grep -q "gitter"; then
-    #     docker exec -it gitter
-    # fi
 fi
 
 if docker ps | grep -q "gitter"; then

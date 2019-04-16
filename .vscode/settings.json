@@ -3,9 +3,10 @@
     "editor.cursorBlinking": "phase",
     "editor.cursorWidth": 3,
     "editor.formatOnSave": true,
-    "shellcheck.useWSL": false,
-    "shellcheck.exclude": [
-        1091,
-        1090
-    ],
+    "shellcheck.useWSL": false
+    //,
+    // "shellcheck.exclude": [
+    //     1091,
+    //     1090
+    // ],
 }
