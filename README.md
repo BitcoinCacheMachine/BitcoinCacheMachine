@@ -73,7 +73,7 @@ Feel free to change the directory in which you store the BCM repository on your 
 After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other components you can deploy either alone or in combination with other software include:
 
 | BCMStack | IsFunctional | AppType | DependsOn | InboundOutboundTor | AppServices |
-|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|
 | bitcoind | Yes | data center | bcm tier bitcoin | p2p (in/out) | bitcoind_rpc |
 | clightning | Yes | data center | bcm stack bitcoind | p2p (in/out) | TBD |
 | spark | Yes | data center/web app | bcm stack clightning | N/A | HTTP |
@@ -81,7 +81,7 @@ After the BCM CLI is available, you can deploy your own infrastructure using the
 | btcpayserver | Partially | data center/web app | bcm stack bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP |
 | lnd | Partially | data center | bcm stack bitcoind | p2p (in/out) | TBD |
 | ridethelightning | No | data center/web app | bcm stack lnd | N/A | HTTP |
-| electrs | Yes | data center | bcm stack bitcoind | none | none | ElectrumServerRPC |
+| electrs | Yes | data center | bcm stack bitcoind | none | ElectrumServerRPC |
 | electrum | Yes | Desktop GUI | bcm stack electrs | none | N/A |
 | zap | No | Desktop GUI | bcm stack zap | lnd | N/A |
 | esplora | No | data center/web app | bcm stack bitcoind, electrs | none | HTTP |
