@@ -76,8 +76,8 @@ After the BCM CLI is available, you can deploy your own infrastructure using the
 |---|---|---|---|---|---|
 | bitcoind | Yes | DC | tier bitcoin | p2p (in/out) | bitcoind_rpc |
 | clightning | Yes | DC | bitcoind | p2p (in/out) | TBD |
-| spark | Yes | DC/web app | clightning | N/A | HTTP |
-| nbxplorer | Yes | DC | bitcoind | N/A | None |
+| spark | Yes | DC/web app | clightning | none | HTTP |
+| nbxplorer | Yes | DC | bitcoind | N/A | none |
 | btcpayserver | Partially | DC/web app | bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP |
 | lnd | Partially | DC | bitcoind | p2p (in/out) | TBD |
 | ridethelightning | No | DC/web app | lnd | N/A | HTTP |
@@ -89,13 +89,13 @@ After the BCM CLI is available, you can deploy your own infrastructure using the
 | liquid | No | DC | bitcoind | TBD | TBD |
 | [cachestack](./project/stacks/cachestack/README.md) | No | DC | tier underlay | none | none |
 
-`DC=data center`: processes that run in the "back-end"
+`DC=data center`: processes that run in the "back-end" or "server-side". The back-end can run on a dedicated set Ubuntu machines (preferred for mainnet/production), or you can run the back-end on a user-facing desktop/laptop (useful for testnet/development). The back-end can run as a Type I VM or can be running under an LXD process installed on your localhost (local). Note that you CANNOT expose services clients on your local network when running the back-end as a VM, but app services (e.g., HTTP endpoints) will still be available over the Internet exposed as authenticated onion services.
 
-User-facing applications can be either GUI-based or web apps (see the AppType). Desktop GUI applications are fully integrated into an automatically deployed back-end infrastructure. Web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet) run as server-side data center workloads but are accessed through a web browser. 
+User-facing applications can be either GUI-based or web-based apps (AppType). Desktop GUI applications are fully integrated into an automatically deployed back-end infrastructure. Web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet) run as server-side data center workloads but are accessed through a web browser.
 
-Running `bcm stack deploy electrum` starts an Electrum wallet desktop application that's configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
+Running `bcm stack deploy electrum` starts an Electrum wallet desktop application that's configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure to the active cluster, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/). If a cluster doesn't yet exist, BCM helps you provision one.
 
-You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster under management, and target chain (i.e., mainnet, testnet, regtest), etc.. Want to switch to deploying `regtest` or `mainnet`? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications.
+You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores active cluster under management, and target chain (i.e., mainnet, testnet, regtest). Want to switch to deploying `regtest` or `mainnet`? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications to your active cluster.
 
 ## Documentation
 

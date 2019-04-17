@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 LXC_HOST=
 DOCKER_HUB_IMAGE=
 IMAGE_NAME=
-IMAGE_TAG=latest
+IMAGE_TAG="$BCM_VERSION"
 BUILD_CONTEXT=
 
 for i in "$@"; do

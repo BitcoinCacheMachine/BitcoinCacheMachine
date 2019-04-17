@@ -5,11 +5,13 @@ cd "$(dirname "$0")"
 
 VM_NAME=
 
+# TODO make interactive.
+
 # DISK size is in GBs
 DISK_SIZE="300"
 
 # MEM_SIZE is in MB. 4092 = 4GB
-MEM_SIZE="4098M"
+MEM_SIZE="8096M"
 
 # CPU_COUNT is cores.
 CPU_COUNT=4

@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  rtl:
+  ridethelightning:
     image: ${IMAGE_NAME}
     hostname: rtl-${BCM_ACTIVE_CHAIN:-testnet}
     ports:

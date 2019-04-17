@@ -37,7 +37,7 @@ ENDPOINT=$(bcm get-ip)
 wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
 
 # let's the the pariing URL from the container output
-PAIRING_OUTPUT_URL=$(lxc exec "$BCM_GATEWAY_HOST_NAME" --  docker service logs "rtl-$BCM_ACTIVE_CHAIN""_rtl" | grep 'Pairing URL: ' | awk '{print $5}')
+PAIRING_OUTPUT_URL=$(lxc exec "$BCM_GATEWAY_HOST_NAME" --  docker service logs "$STACK_NAME-$BCM_ACTIVE_CHAIN""_$SERVICE_NAME" | grep 'Pairing URL: ' | awk '{print $5}')
 RTL_URL=${PAIRING_OUTPUT_URL/0.0.0.0/$ENDPOINT}
 
 xdg-open "$RTL_URL" &
