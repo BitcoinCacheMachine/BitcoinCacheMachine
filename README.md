@@ -74,20 +74,22 @@ After the BCM CLI is available, you can deploy your own infrastructure using the
 
 | BCMStack | IsFunctional | AppType | DependsOn | InboundOutboundTor | AppServices |
 |---|---|---|---|---|---|
-| bitcoind | Yes | data center | bcm tier bitcoin | p2p (in/out) | bitcoind_rpc |
-| clightning | Yes | data center | bcm stack bitcoind | p2p (in/out) | TBD |
-| spark | Yes | data center/web app | bcm stack clightning | N/A | HTTP |
-| nbxplorer | Yes | data center | bcm stack bitcoind | N/A | None |
-| btcpayserver | Partially | data center/web app | bcm stack bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP |
-| lnd | Partially | data center | bcm stack bitcoind | p2p (in/out) | TBD |
-| ridethelightning | No | data center/web app | bcm stack lnd | N/A | HTTP |
-| electrs | Yes | data center | bcm stack bitcoind | none | ElectrumServerRPC |
-| electrum | Yes | Desktop GUI | bcm stack electrs | none | N/A |
-| zap | No | Desktop GUI | bcm stack zap | lnd | N/A |
-| esplora | No | data center/web app | bcm stack bitcoind, electrs | none | HTTP |
-| lightning-charge | No | data center | bcm stack clightning | none | TBD |
-| liquid | No | data center | bcm stack bitcoind | TBD | TBD |
-| [cachestack](./project/stacks/cachestack/README.md) | No | data center | bcm tier underlay | none | none |
+| bitcoind | Yes | DC | tier bitcoin | p2p (in/out) | bitcoind_rpc |
+| clightning | Yes | DC | bitcoind | p2p (in/out) | TBD |
+| spark | Yes | DC/web app | clightning | N/A | HTTP |
+| nbxplorer | Yes | DC | bitcoind | N/A | None |
+| btcpayserver | Partially | DC/web app | bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP |
+| lnd | Partially | DC | bitcoind | p2p (in/out) | TBD |
+| ridethelightning | No | DC/web app | lnd | N/A | HTTP |
+| electrs | Yes | DC | bitcoind | none | ElectrumServerRPC |
+| electrum | Yes | Desktop GUI | electrs | none | N/A |
+| zap | No | Desktop GUI | zap | lnd | N/A |
+| esplora | No | DC/web app | bitcoind, electrs | none | HTTP |
+| lightning-charge | No | DC | clightning | none | TBD |
+| liquid | No | DC | bitcoind | TBD | TBD |
+| [cachestack](./project/stacks/cachestack/README.md) | No | DC | tier underlay | none | none |
+
+`DC=data center`: processes that run in the "back-end"
 
 User-facing applications can be either GUI-based or web apps (see the AppType). Desktop GUI applications are fully integrated into an automatically deployed back-end infrastructure. Web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet) run as server-side data center workloads but are accessed through a web browser. 
 
