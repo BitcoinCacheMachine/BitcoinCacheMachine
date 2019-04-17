@@ -70,26 +70,34 @@ Feel free to change the directory in which you store the BCM repository on your 
 
 ## Deploying your own BCM Infrastructure
 
-After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other components you can deploy include:
+After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack deploy` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack deploy spark` command. Other components you can deploy either alone or in combination with other software include:
 
-```bash
-bcm stack deploy bitcoind
-bcm stack deploy clightning
-bcm stack deploy lnd
-bcm stack deploy btcpayserver
-# bcm stack deploy esplora
-bcm stack deploy electrum
-```
+| BCMStack | IsFunctional | AppType | DependsOn | InboundOutboundTor | AppServices |
+|---|---|---|---|---|---|---|
+| bitcoind | Yes | data center | bcm tier bitcoin | p2p (in/out) | bitcoind_rpc |
+| clightning | Yes | data center | bcm stack bitcoind | p2p (in/out) | TBD |
+| spark | Yes | data center/web app | bcm stack clightning | N/A | HTTP |
+| nbxplorer | Yes | data center | bcm stack bitcoind | N/A | None |
+| btcpayserver | Partially | data center/web app | bcm stack bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP |
+| lnd | Partially | data center | bcm stack bitcoind | p2p (in/out) | TBD |
+| ridethelightning | No | data center/web app | bcm stack lnd | N/A | HTTP |
+| electrs | Yes | data center | bcm stack bitcoind | none | none | ElectrumServerRPC |
+| electrum | Yes | Desktop GUI | bcm stack electrs | none | N/A |
+| zap | No | Desktop GUI | bcm stack zap | lnd | N/A |
+| esplora | No | data center/web app | bcm stack bitcoind, electrs | none | HTTP |
+| lightning-charge | No | data center | bcm stack clightning | none | TBD |
+| liquid | No | data center | bcm stack bitcoind | TBD | TBD |
+| [cachestack](./project/stacks/cachestack/README.md) | No | data center | bcm tier underlay | none | none |
 
-You can run GUI-based applications that are fully integrated into your automatically deployed back-end infrastructure. User-facing applications can also include web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet). Try running `bcm stack deploy electrum` to run a container-based Electrum wallet desktop application that's configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
+User-facing applications can be either GUI-based or web apps (see the AppType). Desktop GUI applications are fully integrated into an automatically deployed back-end infrastructure. Web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet) run as server-side data center workloads but are accessed through a web browser. 
 
-You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster under management, and target chain (i.e., mainnet, testnet, regtest), etc.. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI.
+Running `bcm stack deploy electrum` starts an Electrum wallet desktop application that's configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack deploy` command automatically deploys all required back-end infrastructure, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
 
-Want to switch to deploying `regtest` or `mainnet`? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications. BCM defines a [LXD Project](https://lxd.readthedocs.io/en/latest/projects/) for each Bitcoin chain (data-center isolation). Of course, the more software you deploy the more hardware resources will be required. BCM will automatically upload bitcoin blocks and (testnet) chainstate to you back-end datacenter if your SDN controller has a `$HOME/.bitcoin` directory.
+You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores as well as the current cluster under management, and target chain (i.e., mainnet, testnet, regtest), etc.. Want to switch to deploying `regtest` or `mainnet`? Run `bcm set-chain mainnet` to instruct your BCM cli to deploy mainnet applications.
 
 ## Documentation
 
-The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo.
+The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI. 
 
 ## How to contribute
 

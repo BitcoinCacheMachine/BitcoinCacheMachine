@@ -10,7 +10,8 @@ TOR_CONTROL="$LOCAL_GW_LXD_HOST_IP:9051"
 OVERLAY_NETWORK_IP=$(ip addr | grep "172.16.240." | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
 
 touch /root/.lnd/lnd-rtl.conf
-echo "restlisten=$OVERLAY_NETWORK_IP:8080" > /root/.lnd/lnd-rtl.conf
+echo "[Application Options]" > /root/.lnd/lnd-rtl.conf
+echo "restlisten=$OVERLAY_NETWORK_IP:8080" >> /root/.lnd/lnd-rtl.conf
 
 lnd --lnddir=/root/.lnd \
 --configfile=/root/.lnd/lnd.conf \

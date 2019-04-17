@@ -156,7 +156,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     
     # first check to ensure that the cluster doesn't already exist.
     if ! lxc remote list | grep -q "$CLUSTER_NAME"; then
-        export REMOTE_MOUNTPOINT="/tmp/provisioning"
+        export REMOTE_MOUNTPOINT="/tmp/bcm"
         
         # if the user override the keypath, we will use that instead.
         # the key already exists if it's a multipass VM. If we're provisioning a new
@@ -187,7 +187,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
             exit
         fi
         
-        
         # if the user is 'bcm' then we assume the user has been provisioned outside of this process.
         if [[ $BCM_SSH_USERNAME == "bcm" ]]; then
             REMOTE_MOUNTPOINT='/home/bcm/bcm'
@@ -196,7 +195,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         bash -c "$BCM_GIT_DIR/cluster/stub_env.sh --master --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR --driver=$BCM_DRIVER --cluster-name=$CLUSTER_NAME --macvlan-interface=$MACVLAN_INTERFACE"
         
         # generate Trezor-backed SSH keys for interactively login.
-        bcm ssh newkey --username="$BCM_SSH_USERNAME" --hostname="$BCM_SSH_HOSTNAME" --endpoint-dir="$ENDPOINT_DIR" --push --ssh-key-path="$SSH_KEY_PATH"
+        bash -c "$BCM_GIT_DIR/cli/commands/ssh/entrypoint.sh --username=$BCM_SSH_USERNAME --hostname=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR --push --ssh-key-path=$SSH_KEY_PATH"
         
         LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
         
@@ -206,9 +205,12 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
         ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
         ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+        ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" rm -rf "$REMOTE_MOUNTPOINT"
+        
+        
         wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
         
-        # if it's the cluster master add the LXC remote so we can manage it.
+        # ibcmf it's the cluster master add the LXC remote so we can manage it.
         if ! lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
             echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
             wait-for-it -t 10 "$BCM_SSH_HOSTNAME:8443"
@@ -240,9 +242,8 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 fi
 
 
-
+# this is where we implement 'bcm cluster destroy'
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    
     
     # TODO ITERATE OVER FOLDERS IN CLUSTER FOLDER AND DELETE BASED ON env.
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"

@@ -8,15 +8,15 @@ services:
     volumes:
       - lnd-macaroons:/lnd-macaroons
       - bitcoind-data:/root/.bitcoin
-        #- lnd-data:/root/.lnd
+      - lnd-data:/root/.lnd
     environment:
       PORT: ${SERVICE_PORT:-}
       MACAROON_PATH: ${MACAROON_PATH:-}
       NODE_AUTH_TYPE: CUSTOM
       LND_CONFIG_PATH: /root/.lnd/lnd-rtl.conf
       RTL_CONFIG_PATH: /root/.rtl/RTL.conf
-      #BITCOIND_CONFIG_PATH: /root/.bitcoin/bitcoin.conf
-      RTL_SSO: 1
+      BITCOIND_CONFIG_PATH: /root/.bitcoin/bitcoind-rtl.conf
+      RTL_SSO: 0
       RTL_COOKIE_PATH: /root/.rtl/cookie
       LOGOUT_REDIRECT_LINK: http://bcm
       RTL_PASS: ${RTL_PASSWORD:-}

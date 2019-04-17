@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -64,6 +64,12 @@ fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then
     PREFIX="-$BCM_ACTIVE_CHAIN"
+    
+    if lxc list --format csv --columns n,s | grep -q "$BCM_GATEWAY_HOST_NAME,STOPPED"; then
+        lxc start "$BCM_GATEWAY_HOST_NAME"
+        bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_GATEWAY_HOST_NAME"
+    fi
+    
     if lxc list --format csv -c=n | grep -q "$BCM_GATEWAY_HOST_NAME"; then
         CHAIN=$BCM_ACTIVE_CHAIN
         for STACK in $(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN")
