@@ -23,3 +23,5 @@ if [[ $BCM_DEPLOY_STACK_KAFKACONTROLCENTER == 1 ]]; then
 fi
 
 bash -c "$BCM_LXD_OPS/remove_tier.sh --tier-name=underlay"
+
+bash -c "$BCM_LXD_OPS/delete_lxc_network.sh --network-name=bcmLocalnet"

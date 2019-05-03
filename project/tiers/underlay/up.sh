@@ -11,12 +11,14 @@ fi
 
 # ensure the kafka tier is deployed
 if ! bcm tier list | grep -q "kafka"; then
+    echo "INFO SKIPPING KAFKA deployment -- REMOVE BEFORE PUBLISH"
     bcm tier create kafka
 fi
 
 # Let's provision the system containers to the cluster.
 export TIER_NAME=underlay
 bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=$TIER_NAME"
+
 
 # if we're in debug mode, some visual UIs will be deployed for kafka inspection
 if [[ $BCM_DEBUG == 1 ]]; then

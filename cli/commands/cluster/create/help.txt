@@ -2,7 +2,7 @@ Description:
   Create an LXD cluster so you can deploy your BCM workloads to it. Running `bcm cluster create`
   without any parameters will create a multipass/VM-based cluster on your localhost assuming it
   support hardware virtualization. If hardware virtualization is not supported, a BCM cluster will
-  be provisioned to your localhost (bare-metal).
+  be provisioned to your localhost.
 
 Example:
   bcm cluster create --driver=ssh --cluster-name="ExampleCluster" --ssh-username="bcm" --ssh-hostname="hostname.tld"

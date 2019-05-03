@@ -4,6 +4,7 @@ Description:
   and high bandwidth, such as a home or office LAN. BCM components (app containers like bitcoind) 
   are deployed to BCM-managed clusters.
 
+
 Usage:
   bcm cluster [command]
 
@@ -12,9 +13,7 @@ Available Commands:
                 all machines into basic operation.
   destroy       Destroys all LXD instances within a cluster. All data is 
                 destroyed.
-  list          List your cluster definitions.
-  stop          Performs a graceful shutdown of one or more instances in a cluster.
-  verify        Ping cluster members over the configured management port.
-  cull          Destroy nonresponsive machines using the underlying provider.
+  list          List your clusters under management by your BCM client.
+  switch        Set the CLI to target a particular BCM cluster.
 
 Use "bcm cluster [command]" to get help for that command.

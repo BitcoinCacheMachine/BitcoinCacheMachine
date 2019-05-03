@@ -1,7 +1,6 @@
-export DOCKERHUB_IMAGE="confluentinc/cp-kafka-connect:5.1.0"
+export DOCKERHUB_IMAGE="confluentinc/cp-kafka-connect:5.2.1"
 export IMAGE_NAME="bcm-kafka-connect"
 export IMAGE_TAG="5.1.0"
 export BCM_TIER_NAME="kafka"
-export STACK_FILE="kafka-connect.yml"
 export STACK_NAME="kafkaconnect"
 export SERVICE_NAME="kafka-connect"

@@ -43,8 +43,6 @@ RUN chmod +x /bcm/git_pull.sh
 ADD ./container_scripts/docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-#COPY ./51-trezor.rules /etc/udev/rules.d/51-trezor.rules
-
 RUN groupadd -r -g 1000 user 
 RUN adduser --disabled-login --system --shell /bin/false --uid 1000 --gid 1000 user
 

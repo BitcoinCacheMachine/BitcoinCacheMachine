@@ -11,7 +11,7 @@ fi
 
 # make sure the user has sent in a valid command; quit if not.
 if [[ $CHAIN != "regtest" && $CHAIN != "testnet" && $CHAIN != "mainnet" ]]; then
-    echo "ERROR: The valid commands for 'regtest', 'testnet', and 'mainnet'."
+    echo "Error: The valid commands for 'regtest', 'testnet', and 'mainnet'."
     exit
 fi
 

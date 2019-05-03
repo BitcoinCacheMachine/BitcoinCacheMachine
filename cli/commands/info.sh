@@ -69,18 +69,16 @@ echo "BCM_DEBUG:                  $BCM_DEBUG"
 if ! lxc remote get-default | grep -q "local"; then
     echo ""
     echo "Active BCM Cluster:         $(lxc remote get-default)"
+    echo "Active Chain:               $BCM_ACTIVE_CHAIN";
     
     # let's show some LXD cluster related stuff.
     if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
-        echo "LXD Image Cache:            $BCM_LXD_IMAGE_CACHE";
+        echo "Root LXD Image Cache:       $BCM_LXD_IMAGE_CACHE";
     fi
     
     if [ ! -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
-        echo "Docker Registry Mirror:     $BCM_DOCKER_IMAGE_CACHE";
+        echo "Root Registry Mirror:       $BCM_DOCKER_IMAGE_CACHE";
     fi
-    
-    echo "Active Chain:               $BCM_ACTIVE_CHAIN";
-    
 else
     echo "BCM_CLUSTER:                N/A"
 fi

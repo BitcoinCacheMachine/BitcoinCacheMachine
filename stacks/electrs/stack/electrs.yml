@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  electrs:
+    image: ${IMAGE_NAME}
+    ports:
+      - 50001:50001
+    hostname: electrs-${BCM_ACTIVE_CHAIN:-}
+    volumes:
+      - data:/root/.electrs
+      - bitcoin-data:/root/.bitcoin
+    environment:
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
+      ELECTRS_RPC_PORT: ${ELECTRS_RPC_PORT:-}
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
+    networks:
+      bitcoindrpcnet:
+      electrsnet:
+        aliases:
+          - electrsnet-${BCM_ACTIVE_CHAIN:-}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+volumes:
+  data:
+
+  bitcoin-data:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_data
+
+networks:
+  bitcoindrpcnet:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet
+
+  electrsnet:
+    driver: overlay
+    attachable: true

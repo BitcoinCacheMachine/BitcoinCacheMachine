@@ -3,8 +3,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-ZOOKEEPER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-zookeeper:3.4.13"
-SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.4.13"
+ZOOKEEPER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-zookeeper:$BCM_VERSION"
+SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.5"
 
 lxc exec "$BCM_KAFKA_HOST_NAME" -- docker pull "$SOURCE_ZOOKEEPER_IMAGE"
 lxc exec "$BCM_KAFKA_HOST_NAME" -- docker tag "$SOURCE_ZOOKEEPER_IMAGE" "$ZOOKEEPER_IMAGE"

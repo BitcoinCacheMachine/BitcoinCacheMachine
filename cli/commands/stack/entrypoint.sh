@@ -22,8 +22,8 @@ function validateStackParam(){
 
 
 # make sure the user has sent in a valid command; quit if not.
-if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "deploy" && $BCM_CLI_VERB != "remove" && $BCM_CLI_VERB != "clear" ]]; then
-    echo "ERROR: The valid commands for 'bcm stack' are 'list', 'deploy', 'remove', and 'clear'."
+if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "start" && $BCM_CLI_VERB != "stop" && $BCM_CLI_VERB != "clear" ]]; then
+    echo "Error: The valid commands for 'bcm stack' are 'list', 'start', 'stop', and 'clear'."
     exit
 fi
 
@@ -32,32 +32,44 @@ if [[ $(lxc remote get-default) == "local" ]]; then
     bcm cluster create
 fi
 
-if [[ $BCM_CLI_VERB == "deploy" ]]; then
+BCM_BACKUP_DIR="$BCM_WORKING_DIR/$(lxc remote get-default)/backups"
+export BACKUP_DIR="$BCM_BACKUP_DIR"
+
+if [[ $BCM_CLI_VERB == "start" ]]; then
     validateStackParam "$BCM_CLI_VERB";
     
     # running the stack up file.
     UP_FILE="$BCM_STACKS_DIR/$STACK_NAME/up.sh"
     if [[ -f "$UP_FILE" ]]; then
-        bash -c "$UP_FILE" "$@"
+        BCM_BACKUP_DIR="$BCM_BACKUP_DIR" bash -c "$UP_FILE" "$@"
     else
-        echo "ERROR: Could not find '$UP_FILE'."
+        echo "Error: Could not find '$UP_FILE'."
     fi
 fi
 
-if [[ $BCM_CLI_VERB == "remove"  ]]; then
+if [[ $BCM_CLI_VERB == "stop"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
     
-    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME-$BCM_ACTIVE_CHAIN"
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME"
     
-    # if the 'bck stack remove' command was executed with a '--volumes' flag, then we delete
+    # if the 'bck stack stop' command was executed with a '--delete' flag, then we delete
     # the associated docker volumes this will be defined in a destroy.sh script in each stack directory.
     if [[ $BCM_VOLUMES_FLAG == 1 ]]; then
-        # running the stack up file.
-        DOWN_FILE="$BCM_STACKS_DIR/$STACK_NAME/destroy.sh"
-        if [[ -f "$DOWN_FILE" ]]; then
-            bash -c "$DOWN_FILE"
+        # let's source the stack file so we can get a list of associated docker volumes.
+        STACK_ENV_FILE="$BCM_STACKS_DIR/$STACK_NAME/env.sh"
+        if [[ -f $STACK_ENV_FILE ]]; then
+            source "$STACK_ENV_FILE"
+            
+            # if there are some volumes defined, then we ca remove each one.
+            # however, some containers do not write persistent data.
+            if [ ! -z ${STACK_DOCKER_VOLUMES+x} ]; then
+                for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
+                    bash -c "$BCM_GIT_DIR/project/shared/delete_docker_volume.sh --tier-name=$TIER_NAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
+                done
+            fi
         else
-            echo "ERROR: Could not find '$DOWN_FILE'."
+            echo "ERROR: Stack '$STACK_NAME' does not exist in the BCM repository."
+            exit
         fi
     fi
 fi
@@ -83,7 +95,6 @@ fi
 if [[ $BCM_CLI_VERB == "clear" ]]; then
     for STACK in $(bcm stack list)
     do
-        bcm stack remove "$STACK"
-        sleep 5
+        bcm stack stop "$STACK" --delete
     done
 fi

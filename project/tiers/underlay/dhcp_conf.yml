@@ -3,7 +3,15 @@ network:
   ethernets:
     eth0: 
       dhcp4: yes
-      dhcp6: yes
+      dhcp6: no
     eth1:
       dhcp4: yes
-      dhcp6: yes
+      dhcp6: no
+    eth2:
+      dhcp4: yes
+      dhcp6: no
+
+# eth 2 is shared by underlay and the local host that's running the LXD
+# daemon; this allows users operating at the consoule to use BCM services
+# note that WE COULD just use the MACVLAN interface, but unfortunately MACVLAN
+# doesn't support traffic coming from the same Network interface on MACVLAN

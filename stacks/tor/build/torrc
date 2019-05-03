@@ -1,0 +1,7 @@
+SocksPort 0.0.0.0:9050
+DNSPort 0.0.0.0:9053
+ControlPort 0.0.0.0:9051
+CookieAuthentication 1
+
+# Log err to info
+Log info file /var/log/tor/tor.log

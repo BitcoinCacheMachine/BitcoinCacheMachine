@@ -1,28 +1,26 @@
 Description:
   Command line client for Bitcoin Cache Machine. BCM's features can be driven through the various 
-  commands below. In most cases, all you need to do is run "bcm stack deploy <STACK_NAME>" commands
+  commands below. In most cases, all you need to do is run "bcm stack start <STACK_NAME>" commands
   to deploy software to your active chain. Use "bcm info" to view your CLI Environment settings.
-  Your BCM files are stored at BCM_RUNTIME_DIR ("env | grep BCM").
+  Your BCM files are stored at BCM_RUNTIME_DIR 'echo $BCM_RUMTIME_DIR'.
 
 Usage:
   bcm [command] --help
 
 Available Commands:
   init         Initialize your management plane; create new Trezor-backed GPG certificates.
-  cluster      Create, destroy, and manage BCM clusters (i.e., LXD cluster). Add/remove new 
-               computers to an existing cluster.
-  deprovision  Deprovisions all LXC critical BCM data center components from active cluster.
-               TODO - Note: this command retains all user-level data on disk.
-  stack        Deploy and remove BCM software workloads (e.g., bitcoind, clightning, btcpayserver, etc.).
-               TODO - Note: this command retains all user-level data on disk.
+  cluster      Create, destroy, and manage BCM clusters.
+  deprovision  Deprovisions all BCM data center components from active cluster.
+  start        Start a BCM application-layer service, e.g., bitcoind, clightning, spark, etc.
+  stop         Stop a running BCM application-layer service.
   git          Sign git commits and git tags using your Trezor-backed GPG certificates.
   file         Create and verify file signatures, encrypt and decrypt files with your Trezor.
   ssh          Use your Trezor to issue SSH keys and perform SSH authentication.
   pass         Create and manage GPG-encrypted passwords protected by your Trezor.
   info         Display current and target environment variables related to BCM operations.
   show         Show detailed LXC-related information for your active BCM Cluster/LXD endpoint.
-  get-chain    Return the active Bitcoin chain: mainnet, testnet, regtest.
-  set-chain    Set your BCM CLI target chain: mainnet, testnet, or regtest.
+  get-chain    Return active chain: mainnet, testnet, regtest.
+  set-chain    Set target chain: mainnet, testnet, or regtest.
 
 Help
   Use "bcm [command] --help" to get help for that command.

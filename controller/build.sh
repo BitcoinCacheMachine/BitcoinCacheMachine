@@ -3,9 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# in case we're running this script outside of the bcm context
-source "$BCM_GIT_DIR/cli/env"
-
 if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then
     # if there's an issue resolving archive.ubuntu.com, follow these steps:
     #https://development.robinwinslow.uk/2016/06/23/fix-docker-networking-dns/#the-permanent-system-wide-fix

@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-BCM_HELP_FLAG=0
-
 VALUE=${2:-}
 if [ ! -z "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
@@ -14,7 +12,6 @@ else
     exit
 fi
 
-CLUSTER_NAME=$(lxc remote get-default)
 BCM_ENDPOINTS_FLAG=0
 BCM_DRIVER=
 BCM_SSH_HOSTNAME=
@@ -64,6 +61,22 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
     exit
 fi
 
+if [[ "$BCM_CLI_VERB" == "switch" ]]; then
+    CLUSTER_NAME="$3"
+    
+    if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
+        if [[ "$CLUSTER_NAME" != "$(lxc remote get-default)" ]]; then
+            lxc remote switch "$CLUSTER_NAME"
+            echo "Your active BCM cluster is now set to target '$CLUSTER_NAME'."
+        else
+            echo "BCM is already targeting cluster '$CLUSTER_NAME'."
+        fi
+    else
+        echo "Error: the LXC remote for BCM Cluster '$CLUSTER_NAME' is not defined."
+    fi
+    
+    exit
+fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
     MACVLAN_INTERFACE=
@@ -74,13 +87,16 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     # if the user didn't specify a driver, let's ask them how we want to proceed.
-    # find out if they want a bare-metal or multipass-based deployment.
+    # find out if they want a "local" or multipass-based deployment.
     if [[ -z $BCM_DRIVER ]]; then
         CONTINUE=0
         while [[ "$CONTINUE" == 0 ]]
         do
-            echo "Would you like to deploy BCM locally, a hardware-based VM (more secure), or to a remote SSH endpoint?"
-            read -rp "(vm/local/ssh):  "   CHOICE
+            echo "How would you like to deploy your backend? VM is good for testing and development, but can't"
+            echo "expose BCM services on your LAN. Local deployments are usually a good choice, but BCM does make"
+            echo "some modifications to your system. Usually the best option is ssh, which allows you to run BCM on"
+            echo "a dedicated set (one or more) of machines."
+            read -rp "Deployment method:  (vm/local/ssh):  "   CHOICE
             
             if [[ "$CHOICE" == "vm" ]]; then
                 CONTINUE=1
@@ -88,7 +104,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 # switch our driver to SSH.
                 if ! lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
                     echo "Your computer does NOT support hardware virtualization. You may need to turn this feature on in the BIOS."
-                    echo "Consider deploying BCM  in a bare-metal configuration."
+                    echo "Consider deploying BCM to a native Ubuntu installation (local or remote)."
                     exit
                 fi
                 
@@ -116,16 +132,14 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 read -rp "SSH Hostname:  "   BCM_SSH_HOSTNAME
                 wait-for-it -t 15 "$BCM_SSH_HOSTNAME:22"
                 
-                BCM_SSH_USERNAME=bcm
+                BCM_SSH_USERNAME=ubuntu
                 echo "Please enter the username that has administrative privilieges on $BCM_SSH_HOSTNAME"
-                read -rp "SSH username (default: bcm):  "   BCM_SSH_USERNAME
-                
-                
+                read -rp "SSH username (default: $BCM_SSH_USERNAME):  "   BCM_SSH_USERNAME
                 
                 CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
                 elif [[ "$CHOICE" == "local" ]]; then
                 CONTINUE=1
-                BCM_DRIVER=baremetal
+                BCM_DRIVER="local"
                 CLUSTER_NAME="bcm-$(hostname)"
                 BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
                 BCM_SSH_USERNAME="$(whoami)"
@@ -146,11 +160,19 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     CLUSTER_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME"
-    ENDPOINT_DIR="$CLUSTER_DIR/$BCM_SSH_HOSTNAME"
+    ENDPOINT_DIR_TEMP="$BCM_SSH_HOSTNAME"
     
-    if [[ "$ENDPOINT_DIR" != *-01 ]]; then
-        ENDPOINT_DIR="$ENDPOINT_DIR-01"
+    # make sure we convert the endpoint directory to proper naming conventions.
+    # this might be the case if we have an ssh endpoint.
+    if [[ "$ENDPOINT_DIR_TEMP" != *-01 ]]; then
+        ENDPOINT_DIR_TEMP="$ENDPOINT_DIR_TEMP-01"
     fi
+    
+    if [[ "$ENDPOINT_DIR_TEMP" != bcm* ]]; then
+        ENDPOINT_DIR_TEMP="bcm-$ENDPOINT_DIR_TEMP"
+    fi
+    
+    ENDPOINT_DIR="$CLUSTER_DIR/$ENDPOINT_DIR_TEMP"
     
     mkdir -p "$ENDPOINT_DIR"
     
@@ -174,7 +196,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         if [[ $BCM_DRIVER == multipass ]]; then
             # the multipass cloud-init process already has the bcm user provisioned
             bash -c "$BCM_GIT_DIR/cluster/new_multipass_vm.sh --vm-name=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR"
-            elif [[ $BCM_DRIVER == ssh || $BCM_DRIVER == baremetal ]]; then
+            elif [[ $BCM_DRIVER == ssh || $BCM_DRIVER == "local" ]]; then
             ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
         fi
         
@@ -183,7 +205,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         
         # first, let's ensure we have SSH access to the server.
         if ! wait-for-it -t 30 "$BCM_SSH_HOSTNAME:22"; then
-            echo "ERROR: Could not contact the remote machine."
+            echo "Error: Could not contact the remote machine."
             exit
         fi
         
@@ -205,10 +227,12 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
         ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
         ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
-        ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" rm -rf "$REMOTE_MOUNTPOINT"
-        
         
         wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
+        wait-for-it -t -30 "$BCM_SSH_HOSTNAME:22"
+        
+        ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" rm -rf "$REMOTE_MOUNTPOINT"
+        
         
         # ibcmf it's the cluster master add the LXC remote so we can manage it.
         if ! lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
@@ -231,12 +255,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         fi
         
         echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster."
-        echo "Consider adding hosts to your new cluster with 'bcm cluster add' (TODO). This helps achieve local high-availability."
-        echo ""
         echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"
         
     else
-        echo "ERROR: BCM cluster '$CLUSTER_NAME' already exists!"
+        echo "Error: BCM cluster '$CLUSTER_NAME' already exists!"
         exit
     fi
 fi
@@ -294,6 +316,17 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     # ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" env LXC_BCM_BASE_IMAGE_NAME="$LXC_BCM_BASE_IMAGE_NAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
                     
                     ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo snap remove lxd
+                    elif [[ $BCM_DRIVER == "local" ]]; then
+                    
+                    if [ -x "$(command -v lxc)" ]; then
+                        sudo lxd shutdown
+
+                        # we're not going to remove LXD since presumably we're running
+                        # locally and we need to keep the LXC CLI available for subsequent commands
+                        sudo lxd init --auto
+                    else
+                        echo "Info: lxd was not installed."
+                    fi
                     
                 fi
                 
@@ -309,10 +342,20 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         fi
     fi
     
-    if multipass list | grep -q "$CLUSTER_NAME-01"; then
-        multipass stop "$CLUSTER_NAME-01"
-        multipass delete "$CLUSTER_NAME-01"
-        multipass purge
+    # let's check to make sure we have multipass. This check to ensure we support
+    # virtualizatin, then check to see if multipass is installed; if not, we install it
+    if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
+        if [ ! -x "$(command -v multipass)" ]; then
+            echo "Looks like your machine supports multipass. Installing it now."
+            sudo snap install multipass --beta --classic
+            sleep 5
+        fi
+        
+        if multipass list | grep -q "$CLUSTER_NAME-01"; then
+            multipass stop "$CLUSTER_NAME-01"
+            multipass delete "$CLUSTER_NAME-01"
+            multipass purge
+        fi
     fi
     
     if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
@@ -326,4 +369,3 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         fi
     fi
 fi
-

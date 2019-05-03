@@ -3,6 +3,8 @@
 set -Eeu
 cd "$(dirname "$0")"
 
+apt-get update -y
+apt-get upgrade -y
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 sudo apt-get install tor wait-for-it -y

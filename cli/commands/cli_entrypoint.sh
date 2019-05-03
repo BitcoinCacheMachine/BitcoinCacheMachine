@@ -16,19 +16,15 @@ export BCM_CLI_COMMAND="$BCM_CLI_COMMAND"
 
 shopt -s expand_aliases
 
-BCM_HELP_FLAG=0
 BCM_FORCE_FLAG=0
 BCM_VOLUMES_FLAG=0
 
 for i in "$@"; do
     case $i in
-        --help)
-            BCM_HELP_FLAG=1
-        ;;
         --force)
             BCM_FORCE_FLAG=1
         ;;
-        --volumes)
+        --delete)
             BCM_VOLUMES_FLAG=1
         ;;
         *)
@@ -37,17 +33,13 @@ for i in "$@"; do
     esac
 done
 
-export BCM_HELP_FLAG="$BCM_HELP_FLAG"
 export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
 export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
+CLUSTER_NAME="$(lxc remote get-default)"
+export CLUSTER_NAME="$CLUSTER_NAME"
 
 if [[ "$BCM_CLI_COMMAND" == "get-chain" ]]; then
     ./chain/getchain.sh
-    exit
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
-    ./reset.sh "$@"
     exit
 fi
 
@@ -100,11 +92,25 @@ if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
     exit
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "restore" ]]; then
+    ./backuprestore/entrypoint.sh "$@" --restore
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "backup" ]]; then
+    ./backuprestore/entrypoint.sh "$@"
+    exit
+fi
+
 if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cli" || "$BCM_CLI_COMMAND" == "lncli" ]]; then
     ./stack_cli/entrypoint.sh "$@"
     exit
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "logs" ]]; then
+    ./stack_cli/entrypoint.sh "$@"
+    exit
+fi
 
 if [[ "$BCM_CLI_COMMAND" == "set-chain" ]]; then
     ./chain/setchain.sh "$@"
@@ -121,7 +127,6 @@ if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
     ./run/entrypoint.sh "$@"
     exit
 fi
-
 
 if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
     bash -c "$BCM_GIT_DIR/project/destroy.sh" "$@"

@@ -1,8 +1,0 @@
-export IMAGE_NAME="bcm-btcpayserver"
-export IMAGE_TAG="1.0.3.92"
-export DOCKER_HUB_IMAGE="btcpayserver/btcpayserver:$IMAGE_TAG"
-export TIER_NAME="bitcoin"
-export STACK_FILE="btcpayserver.yml"
-export STACK_NAME="btcpayserver"
-export SERVICE_NAME="btcpayserver"
-export SERVICE_PORT="49392"

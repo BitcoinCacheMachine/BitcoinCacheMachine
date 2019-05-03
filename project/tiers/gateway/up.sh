@@ -8,7 +8,7 @@ bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 
 # It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
 if lxc project list | grep "(current)" | grep -q "default"; then
-    bcm set-chain "$BCM_DEFAULT_CHAIN"
+    bcm set-chain "$BCM_ACTIVE_CHAIN"
 fi
 
 export TIER_NAME=gateway
@@ -74,14 +74,8 @@ lxc exec "$LXC_HOSTNAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:late
 # build and push the docker-base docker image.
 ./build_push_docker_base.sh
 
-TOR_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-tor:$BCM_VERSION"
-lxc exec "$LXC_HOSTNAME" -- docker build \
---build-arg BCM_DOCKER_BASE_TAG="$BCM_DOCKER_BASE_TAG" \
---build-arg BCM_PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY" \
--t "$TOR_IMAGE" "/root/gateway/build/tor/"
 
-lxc exec "$LXC_HOSTNAME" -- docker push "$TOR_IMAGE"
-lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/root/gateway/stacks/tor/torstack.yml" torstack
+
 
 # let's cycle through the other cluster members (other than the master)
 # and get their bcm-gateway host going.
@@ -130,3 +124,8 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
         fi
     fi
 done
+
+# if we're in debug mode, some visual UIs will be deployed for kafka inspection
+if [[ $BCM_DEBUG == 1 ]]; then
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/portainer/env --container-name=$BCM_GATEWAY_HOST_NAME"
+fi

@@ -46,7 +46,7 @@ for i in "$@"; do
 done
 
 if [[ -z $VM_NAME ]]; then
-    echo "ERROR: You MUST specify the VM name."
+    echo "Error: You MUST specify the VM name."
     exit
 fi
 
@@ -58,7 +58,7 @@ fi
 if [[ -f "$ENDPOINT_DIR/id_rsa" ]]; then
     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
 else
-    echo "ERROR: '$ENDPOINT_DIR/id_rsa' does not exist!"
+    echo "Error: '$ENDPOINT_DIR/id_rsa' does not exist!"
     exit
 fi
 

@@ -1,12 +1,9 @@
 Description:
-  Destroy an LXD cluster. This destroys all data on the cluster and is VERY DANGEROUS!!!
-  USE WITH CARE!
+  Destroy an LXD cluster. This destroys all data on the cluster that can only be recovered
+  if you have a BCM backup.
 
 Usage:
   bcm cluster destroy
 
 Parameters:
-  -c=<BCM_CLUSTER_NAME>   The name of the new cluster be destroyed. Existing cloud-based cluster members
-                          (e.g., multipass) will be destroyed and will not be recoverable. This command
-                          also deletes the $BCM_RUNTIME_DIR/clusters/<BCM_CLUSTER_NAME> directory. Note that $BCM_RUNTIME_DIR/ is
-                          an append-only git-repository.
+  --cluster-name=     The name of the new cluster be destroyed.

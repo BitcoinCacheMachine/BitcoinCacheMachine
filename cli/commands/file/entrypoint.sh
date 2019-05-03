@@ -13,7 +13,6 @@ else
     exit
 fi
 
-BCM_HELP_FLAG=0
 INPUT_FILE_PATH=
 OUTPUT_DIR=
 
@@ -25,10 +24,6 @@ for i in "$@"; do
         ;;
         --output-dir=*)
             OUTPUT_DIR="${i#*=}"
-            shift # past argument=value
-        ;;
-        --help)
-            BCM_HELP_FLAG=1
             shift # past argument=value
         ;;
         *)
@@ -60,12 +55,12 @@ if [[ ! -d "$OUTPUT_DIR" ]]; then
 fi
 
 if [[ ! -d "$GNUPGHOME" ]]; then
-    echo "ERROR: $GNUPGHOME doesn't exist. Exiting."
+    echo "Error: $GNUPGHOME doesn't exist. Exiting."
     exit
 fi
 
 if [[ ! -f "$GNUPGHOME/env" ]]; then
-    echo "ERROR: $GNUPGHOME/env does not exist. '$INPUT_FILE_NAME' cannot be encrypted."
+    echo "Error: $GNUPGHOME/env does not exist. '$INPUT_FILE_NAME' cannot be encrypted."
     exit
 fi
 

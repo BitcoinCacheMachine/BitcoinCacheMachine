@@ -3,13 +3,5 @@ ARG BCM_DOCKER_BASE_TAG
 FROM ubuntu:${BCM_DOCKER_BASE_TAG}
 
 RUN apt-get update \
-    && apt-get install -y wait-for-it git iproute2 curl dnsutils wait-for-it iputils-ping iproute2 \
+    && apt-get install -y wait-for-it git iproute2 curl dnsutils wait-for-it iputils-ping iproute2 duplicity \
     && rm -rf /var/lib/apt/lists/*
-
-# help scripts
-RUN mkdir /bcm
-ADD proxy_ip_determinant.sh /bcm/proxy_ip_determinant.sh
-RUN chmod 0755 /bcm/proxy_ip_determinant.sh
-
-ADD wait_for_gogo.sh /bcm/wait_for_gogo.sh
-RUN chmod 0755 /bcm/wait_for_gogo.sh

@@ -103,7 +103,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     "bcm-trezor:$BCM_VERSION" bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME > /home/user/.ssh/$KEY_NAME"
     
     if [[ ! -f "$TREZOR_PUB_KEY_PATH" ]]; then
-        echo "ERROR: SSH Key did not generate successfully!"
+        echo "Error: SSH Key did not generate successfully!"
         exit
     fi
     
@@ -161,17 +161,17 @@ if [[ $BCM_CLI_VERB == "add-onion" ]]; then
     fi
     
     if [[ -z $ONION_ADDRESS ]]; then
-        echo "ERROR: ONION_ADDRESS is not defined. Use --onion=<ONION_ADDRESS>"
+        echo "Error: ONION_ADDRESS is not defined. Use --onion=<ONION_ADDRESS>"
         exit
     fi
     
     if [[ -z $AUTH_TOKEN ]]; then
-        echo "ERROR: AUTH_TOKEN is not defined. Use --token=<AUTH_TOKEN>"
+        echo "Error: AUTH_TOKEN is not defined. Use --token=<AUTH_TOKEN>"
         exit
     fi
     
     if [[ -z $TITLE ]]; then
-        echo "ERROR: TITLE is not defined. Use --title=<TITLE>"
+        echo "Error: TITLE is not defined. Use --title=<TITLE>"
         exit
     fi
     
@@ -205,7 +205,7 @@ if [[ $BCM_CLI_VERB == "remove-onion" ]]; then
     fi
     
     if [[ -z $TITLE ]]; then
-        echo "ERROR: TITLE is not defined. Use --title=<TITLE>"
+        echo "Error: TITLE is not defined. Use --title=<TITLE>"
         exit
     fi
     

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 # this script preps a NEW server device (Ubuntu 18.04 >) to listen for incoming SSH
 # connections on all interfaces and at an onion site (for remote administration). The

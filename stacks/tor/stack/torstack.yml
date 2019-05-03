@@ -1,0 +1,26 @@
+version: '3.7'
+services:
+  torproxy:
+    image: ${DOCKER_IMAGE}
+    volumes:
+      - tor-data:/root/.tor
+    networks: 
+      torsocksnet:
+        aliases:
+          - torsocks
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+# we attach the tor daemon to the host networking stack
+# so the ports will be exposed ONLY on the gateway host
+# instead of an overlay network spanning all LXC hosts.
+networks:
+  torsocksnet:
+    driver: overlay
+    attachable: true
+
+volumes:
+  tor-data:

@@ -38,7 +38,7 @@ fi
 
 mkdir -p "$GNUPGHOME"
 if [[ -d "$GNUPGHOME/trezor" ]]; then
-    echo "ERROR: a BCM identity already exists at '$GNUPGHOME/trezor'. Please delete that directory or run 'bcm reset'."
+    echo "Error: a BCM identity already exists at '$GNUPGHOME/trezor'. Please delete that directory or run 'bcm reset'."
     exit
 else
     echo "Your Trezor-backed GPG certificates do not exist. Let's create them now. Make sure you have your Trezor handy."

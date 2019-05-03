@@ -17,7 +17,7 @@ for i in "$@"; do
 done
 
 if [[ -z $HOST_ENDING ]]; then
-    echo "ERROR: $HOST_ENDING is not defined."
+    echo "Error: $HOST_ENDING is not defined."
     exit
 fi
 

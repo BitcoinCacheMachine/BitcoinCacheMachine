@@ -11,7 +11,7 @@ fi
 
 # make sure the user has sent in a valid command; quit if not.
 if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "destroy" ]]; then
-    echo "ERROR: The valid commands for 'bcm tier' are 'list', 'create', and 'destroy'."
+    echo "Error: The valid commands for 'bcm tier' are 'list', 'create', and 'destroy'."
     exit
 fi
 
@@ -79,6 +79,6 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "destroy" && $BCM_CLI_VERB != "create" ]]; then
-    echo "ERROR: next command should be 'create', 'remove', or 'list'."
+    echo "Error: next command should be 'create', 'remove', or 'list'."
     cat ./help.txt
 fi

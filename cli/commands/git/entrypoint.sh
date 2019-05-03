@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE="${2:-}"
@@ -35,7 +35,7 @@ for i in "$@"; do
         ;;
         --branch-name=*)
             BCM_GIT_BRANCH="${i#*=}"
-            shift # past argument=value            
+            shift # past argument=value
         ;;
         *)
     esac
@@ -60,7 +60,7 @@ if [[ ! -d $GIT_REPO_DIR ]]; then
 fi
 
 if [[ ! -f "$GNUPGHOME/env" ]]; then
-    echo "ERROR: $GNUPGHOME/env does not exist.  Can't source."
+    echo "Error: $GNUPGHOME/env does not exist.  Can't source."
     exit
 fi
 

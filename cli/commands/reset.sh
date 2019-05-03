@@ -8,14 +8,8 @@ CHOICE=n
 
 while [[ "$CONTINUE" == 0 ]]
 do
-    echo "WARNING: Are you sure you want to delete following directories:"
-    echo ""
-    echo " - $BCM_WORKING_DIR"
-    echo " - $GNUPGHOME"
-    echo " - $PASSWORD_STORE_DIR"
-    echo " - $ELECTRUM_DIR"
-    echo ""
-    read -rp "Are you sure (y/n):  "   CHOICE
+    echo "WARNING: 'bcm reset' will delete the contents of '$BCM_RUNTIME_DIR' and will remove multipass, LXD, and docker from your localhost."
+    read -rp "Are you sure you want to continue? (y/n):  "   CHOICE
     
     if [[ "$CHOICE" == "y" ]]; then
         CONTINUE=1
@@ -87,10 +81,6 @@ if [[ -d "$BCM_WORKING_ENC_DIR" ]]; then
     rm -rf "$BCM_WORKING_ENC_DIR"
 fi
 
-
-
-
-
 if [[ -d "$BCM_SSH_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then
         if [ "$BCM_SSH_DIR" != "$HOME/.ssh" ]; then
@@ -123,3 +113,24 @@ fi
 
 echo "Removing all BCM-related entries from /etc/hosts"
 sudo sed -i "/bcm-/d" /etc/hosts
+
+if [ -x "$(command -v multipass)" ]; then
+    sudo snap remove multipass
+else
+    echo "Info: multipass was not installed."
+fi
+
+if [ -x "$(command -v lxc)" ]; then
+    sudo lxd shutdown
+    
+    #sudo lxd init --auto
+    sudo snap remove lxd
+else
+    echo "Info: lxd was not installed."
+fi
+
+if [ -x "$(command -v docker)" ]; then
+    sudo snap remove docker
+else
+    echo "Info: docker was not installed."
+fi

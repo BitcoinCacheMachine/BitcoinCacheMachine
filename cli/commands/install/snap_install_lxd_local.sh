@@ -14,4 +14,5 @@ fi
 
 if [ ! -x "$(command -v lxd)" ]; then
     sudo snap install lxd --channel=candidate
+    sudo lxd init --auto --network-address=127.0.1.1 --network-port=8443 --storage-backend=btrfs
 fi
