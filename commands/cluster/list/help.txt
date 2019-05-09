@@ -1,0 +1,11 @@
+Description:
+  Lists the BCM clusters under management.
+
+Usage:
+  bcm cluster list
+
+Parameters:
+  --cluster-name=   The name of the new cluster you want to endpoints for.
+  --endpoints       Flag. Optional. Returns the name of each member 
+                    (i.e., LXD endpoint) in specified cluster (-c).
+ 

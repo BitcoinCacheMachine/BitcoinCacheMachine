@@ -1,0 +1,53 @@
+#!/bin/bash
+
+set -Eeuo pipefail
+cd "$(dirname "$0")"
+
+if [[ -z $BCM_ACTIVE ]]; then
+    BCM_ACTIVE=1
+fi
+
+BCM_HELP_FLAG=0
+
+for i in "$@"; do
+    case $i in
+        --help)
+            BCM_HELP_FLAG=1
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
+export BCM_HELP_FLAG="$BCM_HELP_FLAG"
+
+if [[ ! -z ${1+x} ]]; then
+    BCM_CLI_COMMAND="$1"
+else
+    cat ./commands/help.txt
+    exit
+fi
+
+# shellcheck disable=1090
+source ./env
+
+if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
+    ./commands/reset.sh "$@"
+    exit
+fi
+
+if [ ! -x "$(command -v lxc)" ]; then
+    bash -c "$BCM_GIT_DIR/commands/install/snap_install_lxd_local.sh"
+fi
+
+if [ ! -x "$(command -v docker)" ]; then
+    bash -c "$BCM_GIT_DIR/commands/install/snap_install_docker.sh"
+fi
+
+if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then
+    bash -c "$BCM_GIT_DIR/controller/build.sh"
+fi
+
+# call the CLI entrypoint.
+./commands/cli_entrypoint.sh "$@"

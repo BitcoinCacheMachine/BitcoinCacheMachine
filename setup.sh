@@ -16,9 +16,9 @@ if [[ -z $(git config --get --local user.email) ]]; then
 fi
 
 # let's install all necessary software at the SDN controller.
-sudo apt-get install -y wait-for-it openssh-server netcat encfs avahi-discover
-bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
-bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+sudo apt-get install -y --no-install-recommends wait-for-it openssh-server netcat encfs avahi-discover
+bash -c "$BCM_GIT_DIR/commands/install/snap_install_docker.sh"
+bash -c "$BCM_GIT_DIR/commands/install/snap_install_lxd_local.sh"
 
 # let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already when the user initially
@@ -53,7 +53,7 @@ else
         echo "$BCM_BASHRC_START_FLAG"
         echo "export BCM_GIT_DIR=$BCM_GIT_DIR"
         # shellcheck disable=SC2016
-        echo "export PATH="'$PATH:'""'$BCM_GIT_DIR/cli'""
+        echo "export PATH="'$PATH:'""'$BCM_GIT_DIR'""
         echo "export BCM_ACTIVE=1"
         echo "export BCM_DEBUG=1"
         echo "export BCM_LXD_IMAGE_CACHE="
@@ -79,21 +79,23 @@ mkdir -p "$SSH_DIR"
 
 # configure sshd on the SDN controller. This allows you to install and
 # provision LXD on your localhost for testing or if you want BCM running
-# on your laptop/desktop.
+# on your laptop/desktop. It basically allows BCM to treat your localhost
+# like a remote ssh endpoint.
 BCM_SSHD_START_FLAG='###START_BCM###'
 SSH_CONFIG=/etc/ssh/sshd_config
 if [[ -f "$SSH_CONFIG" ]]; then
     if ! grep -Fxq "$BCM_SSHD_START_FLAG" "$SSH_CONFIG"; then
         echo "$BCM_SSHD_START_FLAG" | sudo tee -a "$SSH_CONFIG"
-        echo "ListenAddress 127.0.0.1" | sudo tee -a "$SSH_CONFIG"
         echo "ListenAddress 127.0.1.1" | sudo tee -a "$SSH_CONFIG"
         sudo systemctl restart ssh
     fi
 fi
 
-# this section configured the local SSH client on the Controller so it uses the local SOCKS5 proxy
-# for any SSH host that has a ".onion" address. We use SSH tunneling to expose the remote onion
-# server's LXD API and access it on the controller via a locally expose port (after SSH tunneling)
+# this section configured the local SSH client on the Controller
+# so it uses the local SOCKS5 proxy for any SSH host that has a
+# ".onion" address. We use SSH tunneling to expose the remote onion
+# server's LXD API and access it on the controller via a locally
+# expose port (after SSH tunneling)
 SSH_LOCAL_CONF="$SSH_DIR/config"
 
 # if the .ssh/config file doesn't exist, create it.
@@ -102,8 +104,8 @@ if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
     touch "$SSH_LOCAL_CONF"
 fi
 
-# Next, paste in the necessary .ssh/config settings for accessing remote LXD servers over TOR hidden
-# services.
+# Next, paste in the necessary .ssh/config settings for accessing
+# remote LXD servers over TOR hidden services.
 if [[ -f "$SSH_LOCAL_CONF" ]]; then
     SSH_ONION_TEXT="Host *.onion"
     if grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
@@ -117,5 +119,5 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
 fi
 
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI."
-echo " You may need to logout to refresh your group membership."
-echo "Afterwards, open a new terminal then type 'bcm --help'."
+echo "Log out and log back in to refresh your group membership then open "
+echo "a new terminal and type 'bcm --help'."

@@ -1,0 +1,5 @@
+Description:
+  Perform a backup of user data from a particular stack.
+
+Usage:
+  bcm backup [stack_name]

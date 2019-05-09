@@ -29,14 +29,15 @@ for i in "$@"; do
     esac
 done
 
-# shellcheck disable=2129
-bcm tier destroy bitcoin
 
-bcm tier destroy underlay
+bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/destroy.sh"
 
-bcm tier destroy kafka
+bash -c "$BCM_GIT_DIR/project/tiers/underlay/destroy.sh"
 
-bcm tier destroy gateway
+bash -c "$BCM_GIT_DIR/project/tiers/kafka/destroy.sh"
+
+bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
+
 
 source ./env
 
@@ -67,16 +68,16 @@ bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_privileged"
 # delete profile 'docker-unprivileged'
 bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_unprivileged"
 
-if lxc network list --format csv | grep -q "bcmbr0"; then
+if lxc network list --format csv | grep "bcmbr0" | grep -q ",0,"; then
     lxc network delete bcmbr0
 fi
 
-
 # ensure we have an LXD project defined for this deployment
 # you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)
-if lxc project list | grep -q "$BCM_PROJECT_NAME"; then
+CHAIN=$BCM_ACTIVE_CHAIN
+if lxc project list | grep -q "$CHAIN"; then
     lxc project switch default
-    lxc project delete "$BCM_PROJECT_NAME"
+    lxc project delete "$CHAIN"
 fi
 
 # clean up any hanging images

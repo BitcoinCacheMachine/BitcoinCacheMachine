@@ -1,0 +1,7 @@
+export DOCKERHUB_IMAGE="portainer/portainer:1.20.2"
+export IMAGE_NAME="bcm-portainer"
+export BCM_TIER_NAME="gateway"
+export STACK_NAME="portainer"
+export SERVICE_NAME="portainer"
+export BCM_SERVICE_PORT=3010
+export MAX_INSTANCES=1

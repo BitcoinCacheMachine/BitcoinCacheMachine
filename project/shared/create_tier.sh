@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -22,12 +22,6 @@ bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=
 
 # next, provision (but not start) all LXC system containers across the cluster.
 bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$TIER_NAME"
-
-# Now, let's fetch the docker swarm token so we can start the rest of the tier.
-# shellcheck disable=SC1090
-if [[ $TIER_NAME != "gateway" ]]; then
-    source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
-fi
 
 # configure and start the containers
 for ENDPOINT in $(bcm cluster list --endpoints); do
@@ -60,7 +54,8 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     if [[ $BCM_TIER_TYPE == 2 ]]; then
         # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
         ACTIVE_CLUSTER="$(lxc remote get-default)"
-        ACTIVE_ENDPOINT="$ACTIVE_CLUSTER-$(printf %02d "$HOST_ENDING")"
+        
+        ACTIVE_ENDPOINT="$ACTIVE_CLUSTER-01"
         ENDPOINT_ENV_PATH="$BCM_WORKING_DIR/$ACTIVE_CLUSTER/$ACTIVE_ENDPOINT/env"
         if [[ -f "$ENDPOINT_ENV_PATH" ]]; then
             source "$ENDPOINT_ENV_PATH"
@@ -68,13 +63,31 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
             # wire up the interface if the MACVLAN_INTERFACE variable is defined.
             if [[ ! -z "$MACVLAN_INTERFACE" ]]; then
                 if lxc network list --format csv | grep physical | grep -q "$MACVLAN_INTERFACE"; then
-                    lxc config device add "$LXC_HOSTNAME" eth1 nic nictype=macvlan name=eth1 parent="$MACVLAN_INTERFACE"
+                    lxc config device add "$LXC_HOSTNAME" eth2 nic nictype=macvlan name=eth2 parent="$MACVLAN_INTERFACE"
                 fi
             else
-                echo "ERROR: MACVLAN_INTERFACE was not specified."
+                echo "Error: MACVLAN_INTERFACE was not specified."
             fi
+            
         else
             echo "ERROR: The '$ACTIVE_ENDPOINT/env' does not exist. Can't wire up the macvlan interface."
+        fi
+        
+        # The above MACVLAN stuff allows us to expose services on the LAN, but we can't
+        # access those services from the same host due to limitations in
+        if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
+            # create the # localNet network across the cluster.
+            for ENDPOINT in $(bcm cluster list --endpoints); do
+                lxc network create --target "$ENDPOINT" bcmLocalnet
+            done
+        else
+            if ! lxc network list --format csv | grep -q bcmLocalnet; then
+                # but if it's just one node, we just create the network.
+                lxc network create bcmLocalnet ipv4.nat=false ipv6.nat=false ipv6.address=none
+            else
+                echo "ERROR: The bcmLocalnet network was not in the proper state or doesn't exist."
+                exit 1
+            fi
         fi
     fi
     
@@ -87,11 +100,10 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     # if TIER type is >=1 then we wait for gateway which is assumed to exist.
     # all nodes from this script are workers. Manager hosts are implemented
     # outside this script (see gateway).
+    source ./get_docker_swarm_tokens.sh
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
-        if lxc exec "$LXC_HOSTNAME" -- docker info | grep "Swarm: " | grep -q "inactive"; then
-            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":2377
-            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":5000
-            lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" "$BCM_GATEWAY_HOST_NAME":2377
-        fi
+        lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":2377
+        lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_GATEWAY_HOST_NAME":5000
+        lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" "$BCM_GATEWAY_HOST_NAME":2377
     fi
 done

@@ -27,26 +27,26 @@ source ./params.sh "$@"
 CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)
 export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
 
+echo "WARNING MUST UNCOMMENT BEFORE COMMIT"
+# source ./zookeeper/get_env.sh
+# bash -c "./zookeeper/up.sh"
 
-source ./zookeeper/get_env.sh
-bash -c "./zookeeper/up.sh"
-
-export ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT"
-export ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS"
+# export ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT"
+# export ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS"
 
 
-source ./broker/get_env.sh
-export KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS"
-bash -c "./broker/up_lxc_broker.sh"
+# source ./broker/get_env.sh
+# export KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS"
+# bash -c "./broker/up_lxc_broker.sh"
 
-if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaschemareg/env --container-name=$BCM_KAFKA_HOST_NAME"
-fi
+# if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY == 1 ]]; then
+#     bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaschemareg/env --container-name=$BCM_KAFKA_HOST_NAME"
+# fi
 
-if [[ $BCM_DEPLOY_STACK_KAFKA_REST == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkarest/env --container-name=$BCM_KAFKA_HOST_NAME"
-fi
+# if [[ $BCM_DEPLOY_STACK_KAFKA_REST == 1 ]]; then
+#     bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkarest/env --container-name=$BCM_KAFKA_HOST_NAME"
+# fi
 
-if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaconnect/env  --container-name=$BCM_KAFKA_HOST_NAME"
-fi
+# if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT == 1 ]]; then
+#     bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaconnect/env  --container-name=$BCM_KAFKA_HOST_NAME"
+# fi

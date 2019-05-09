@@ -5,11 +5,13 @@ cd "$(dirname "$0")"
 
 VM_NAME=
 
+# TODO make interactive.
+
 # DISK size is in GBs
-DISK_SIZE="150"
+DISK_SIZE="300"
 
 # MEM_SIZE is in MB. 4092 = 4GB
-MEM_SIZE="8196M"
+MEM_SIZE="8096M"
 
 # CPU_COUNT is cores.
 CPU_COUNT=4
@@ -44,7 +46,7 @@ for i in "$@"; do
 done
 
 if [[ -z $VM_NAME ]]; then
-    echo "ERROR: You MUST specify the VM name."
+    echo "Error: You MUST specify the VM name."
     exit
 fi
 
@@ -56,7 +58,7 @@ fi
 if [[ -f "$ENDPOINT_DIR/id_rsa" ]]; then
     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
 else
-    echo "ERROR: '$ENDPOINT_DIR/id_rsa' does not exist!"
+    echo "Error: '$ENDPOINT_DIR/id_rsa' does not exist!"
     exit
 fi
 

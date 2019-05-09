@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 LXC_HOST=
 DOCKER_HUB_IMAGE=
 IMAGE_NAME=
-IMAGE_TAG=latest
+IMAGE_TAG="$BCM_VERSION"
 BUILD_CONTEXT=
 
 for i in "$@"; do
@@ -21,10 +21,6 @@ for i in "$@"; do
         ;;
         --image-name=*)
             IMAGE_NAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --image-tag=*)
-            IMAGE_TAG="${i#*=}"
             shift # past argument=value
         ;;
         --build-context=*)
@@ -56,8 +52,10 @@ fi
 # no operations will be performed otherwise.
 if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
     lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
-    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
-    lxc exec "$LXC_HOST" -- docker push "$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    
+    FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
+    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$FULLY_QUALIFIED_IMAGE_NAME"
+    lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
     exit
 fi
 
@@ -95,7 +93,7 @@ if [[ $REBUILD == 1 ]]; then
     bash -c "$BCM_GIT_DIR/project/tiers/gateway/build_push_docker_base.sh"
     
     # let's build the image and push it to our private registry.
-    IMAGE_FQDN="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+    IMAGE_FQDN="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
     
     echo "Preparing the docker image '$IMAGE_FQDN'"
     lxc exec "$LXC_HOST" -- docker build --build-arg BCM_PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY" --build-arg BCM_DOCKER_BASE_TAG="$BCM_DOCKER_BASE_TAG" -t "$IMAGE_FQDN" /root/build/

@@ -2,19 +2,15 @@
 
 This folder contains all the scripts required for deploying Bitcoin and Lightning-related software to your cluster.
 
-All BCM data centers have a base workload containing criticial components such as a SOCKS5 TOR proxy, TOR-enabled DNS, Docker Registry Mirror and private registry, and a comprehensive [Kafka stack](https://kafka.apache.org/). Application-level containers like [bitcoind](https://github.com/bitcoin/bitcoin), [c-lightning](https://github.com/ElementsProject/lightning), (TODO) BTCPay, (TODO) web wallet interfaces, etc., are deployed using `bcm stack deploy` as discussed below. 
+All BCM data centers have a base workload containing criticial components such as a SOCKS5 TOR proxy, TOR-enabled DNS, Docker Registry Mirror and private registry, and a comprehensive [Kafka stack](https://kafka.apache.org/). Application-level containers like [bitcoind](https://github.com/bitcoin/bitcoin), [c-lightning](https://github.com/ElementsProject/lightning), (TODO) BTCPay, (TODO) web wallet interfaces, etc., are deployed using `bcm stack start` as discussed below. 
 
 In general, the steps you take to deploy your own infrastructure is as follows:
 
 1) Download BCM from github and run setup to configure your environment (done above).
 2) Run `bcm init`, which ensures you have Trezor-backed GPG certificates at your management host (i.e., [SDN Controller](https://www.sdxcentral.com/sdn/definitions/sdn-controllers/)). Your BCM data center uses this certificate to encrypt backups of user data, among other things.
-4) WORK IN PROGRESS:  Use `bcm stack deploy` to deploy supported software BCM cluster. When you deploy a component such as with `bcm stack deploy clightning`, clightning along with all its depedencies are provisioned to your active cluster (use `bcm info` and see `LXD_CLUSTER` or run `lxc remote get-default`). Essential BCM data center components that are common to ALL BCM deployments are also automatically provisioned. These services include TOR (SOCKS5 proxy, TOR-enabled DNS, & TOR Control), Docker Registry mirror and Private Registry (for docker image caching), and a Kafka logging stack which provides distributed event-driven messagaging for real-time streaming applications as well as some web interfaces that provide Kafka stack diagnostics ([topicsui](https://github.com/Landoop/kafka-topics-ui), schema-registry UI, Kafka-connect UI.
+4) WORK IN PROGRESS:  Use `bcm stack start` to deploy supported software BCM cluster. When you deploy a component such as with `bcm stack start clightning`, clightning along with all its depedencies are provisioned to your active cluster (use `bcm info` and see `LXD_CLUSTER` or run `lxc remote get-default`). Essential BCM data center components that are common to ALL BCM deployments are also automatically provisioned. These services include TOR (SOCKS5 proxy, TOR-enabled DNS, & TOR Control), Docker Registry mirror and Private Registry (for docker image caching), and a Kafka logging stack which provides distributed event-driven messagaging for real-time streaming applications as well as some web interfaces that provide Kafka stack diagnostics ([topicsui](https://github.com/Landoop/kafka-topics-ui), schema-registry UI, Kafka-connect UI.
 
 The commands above each have a reverse command, e.g., `bcm stack remove` (4), `bcm cluster destroy` (3), and `bcm reset` (2). Use `bcm info` to determine your active environment variables. `bcm show` provides an overview of your LXC containers, storage volumes, networks, images, remotes, etc..
-
-Technical
-
-TODO: DESCRIBE Ultimate goal: SSH direct to "bare-metal":22 then run BCM project-level commands FROM client on the remote server. This is an alternative approach than performing an SSH port-forward operation over TOR. BCM scripts over LXD over TOR too way too long to execute.
 
 BCM application components are deployed using the [LXD REST API](https://github.com/lxc/lxd/blob/master/doc/rest-api.md) and [Docker API](https://www.docker.com/). LXD is widely available on various free and open-source linux platforms. Don't worry too much about all the dependencies. The BCM CLI is designed to handle the installation and deployment of all software.
 

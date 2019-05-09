@@ -1,0 +1,64 @@
+version: '3.7'
+services:
+  bitcoind:
+    image: ${DOCKER_IMAGE}
+    hostname: bitcoind-${BCM_ACTIVE_CHAIN}
+    volumes:
+      - wallet:/bitcoin/wallet
+      - data:/root/.bitcoin
+      - old-blocks:/bitcoin/old_blocks
+      - cli:/usr/local/bin
+      - tor-data:/root/.tor
+    environment:
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
+      INITIAL_BLOCK_DOWNLOAD: ${INITIAL_BLOCK_DOWNLOAD:-1}
+    networks:
+      bitcoindrpcnet:
+        aliases:
+          - bitcoindrpc-${BCM_ACTIVE_CHAIN}
+      torsocksnet:
+    configs:
+      - source: bitcoin-config
+        target: /config/bitcoin.conf
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+configs:
+  bitcoin-config:
+    file: bitcoin.conf
+
+volumes:
+  wallet:
+
+  # TODO back old-blocks by a remote NFS share whnere
+  # backing host has access to TIER 2 (archival) storage.
+  old-blocks:
+  cli:
+  
+  # the data volume is defined OUTSIDE of the yml since we MAY pre-populate the volume.
+  data:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_data
+
+  tor-data:
+    external: true
+    name: torstack_tor-data
+
+networks:
+  bitcoindrpcnet:
+    driver: overlay
+    attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"
+
+  torsocksnet:
+    external: true
+    name: torstack_torsocksnet
+    

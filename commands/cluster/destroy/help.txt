@@ -1,0 +1,9 @@
+Description:
+  Destroy an LXD cluster. This destroys all data on the cluster that can only be recovered
+  if you have a BCM backup.
+
+Usage:
+  bcm cluster destroy
+
+Parameters:
+  --cluster-name=     The name of the new cluster be destroyed.

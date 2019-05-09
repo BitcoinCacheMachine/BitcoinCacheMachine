@@ -1,0 +1,73 @@
+version: '3.7'
+services:
+  clightning:
+    image: ${IMAGE_NAME}
+    hostname: clightning-${BCM_ACTIVE_CHAIN:-}
+    volumes:
+      - data:/root/.lightning
+      - logs:/var/log/clightning
+      - bitcoin-data:/root/.bitcoin:ro
+      - bitcoin-cli:/usr/local/bin:ro
+      - tor-data:/root/.tor:ro
+    environment:
+      BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
+      BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
+    networks:
+      torsocksnet:
+      bitcoindrpcnet:
+      clightningrpcnet:
+        aliases:
+          - clightningrpc-${BCM_ACTIVE_CHAIN}
+    secrets:
+      - source: clightning_conf
+        target: /root/.lightning/config
+        uid: '0'
+        gid: '0'
+        mode: 0444
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+volumes:
+  data:
+  logs:
+
+  tor-data:
+    external: true
+    name: torstack_tor-data
+
+  bitcoin-data:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_data
+
+  bitcoin-cli:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_cli
+  
+  bitcoin-rpc:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_rpc-clightning
+
+networks:
+  torsocksnet:
+    external: true
+    name: torstack_torsocksnet
+  
+  bitcoindrpcnet:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet
+  
+  clightningrpcnet:
+    driver: overlay
+    attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.239.0/24
+
+secrets:
+  clightning_conf:
+    file: clightning.conf

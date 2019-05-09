@@ -1,0 +1,16 @@
+Description:
+  Commit and GPG-sign a git repository using a Trezor for secure cryptographic 
+  operations. All signature operations against a given git repo use your GNUPGHOME
+  directory which can be viewed with 'bcm info'. '$GNUPGHOME/env' contains required 
+  environment variables related to git commits using BCM.
+
+Usage:
+  bcm git commit --git-repo-dir=$HOME/git/repo \
+                 --message='Git commit message.' 
+
+Parameters:
+  --git-repo-dir=    The path of the git repo you want to commit and sign. BCM_GIT_DIR by default.
+  --message=         The required message to be included in the git commit.
+
+ 
+ 

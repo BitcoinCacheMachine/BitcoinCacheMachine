@@ -17,14 +17,14 @@ for i in "$@"; do
 done
 
 if [[ -z $HOST_ENDING ]]; then
-    echo "ERROR: $HOST_ENDING is not defined."
+    echo "Error: $HOST_ENDING is not defined."
     exit
 fi
 
 VERSION=$(echo "$BCM_VERSION" | tr '.' '-')
-LXC_HOSTNAME="bcm-$TIER_NAME-$VERSION-$(printf %02d "$HOST_ENDING")"
+LXC_HOSTNAME="bcm-$TIER_NAME-$VERSION-$(printf %02d "$HOST_ENDING")-$BCM_ACTIVE_CHAIN"
 
 export LXC_HOSTNAME="$LXC_HOSTNAME"
-LXC_DOCKERVOL="$LXC_HOSTNAME-$(bcm get-chain)-docker"
+LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
 export LXC_DOCKERVOL="$LXC_DOCKERVOL"
 export PROFILE_NAME="bcm-$TIER_NAME-$BCM_VERSION"

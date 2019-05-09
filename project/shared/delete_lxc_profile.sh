@@ -17,6 +17,6 @@ for i in "$@"; do
 done
 
 # delete the profile if it exists.
-if lxc profile list | grep -q "$PROFILE_NAME"; then
+if lxc profile list --format csv | grep "$PROFILE_NAME" | grep -q ",0"; then
     lxc profile delete "$PROFILE_NAME"
 fi

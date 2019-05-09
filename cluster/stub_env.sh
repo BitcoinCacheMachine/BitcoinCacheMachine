@@ -43,17 +43,17 @@ for i in "$@"; do
 done
 
 if [[ -z "$BCM_SSH_USERNAME" ]]; then
-    echo "ERROR: BCM_SSH_USERNAME not passed correctly."
+    echo "Error: BCM_SSH_USERNAME not passed correctly."
     exit
 fi
 
 if [[ -z "$BCM_SSH_HOSTNAME" ]]; then
-    echo "ERROR: BCM_SSH_HOSTNAME not passed correctly."
+    echo "Error: BCM_SSH_HOSTNAME not passed correctly."
     exit
 fi
 
 if [[ ! -d "$ENDPOINT_DIR" ]]; then
-    echo "ERROR: ENDPOINT_DIR does not exist."
+    echo "Error: ENDPOINT_DIR does not exist."
     exit
 fi
 

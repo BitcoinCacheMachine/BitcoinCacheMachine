@@ -1,7 +1,0 @@
-export IMAGE_NAME="bcm-lightning-charge"
-export IMAGE_TAG="v0.4.7"
-export TIER_NAME="bitcoin"
-export STACK_FILE="lightning-charge.yml"
-export STACK_NAME="lightning-charge"
-export SERVICE_NAME="lightning-charge"
-export SERVICE_PORT="9112"

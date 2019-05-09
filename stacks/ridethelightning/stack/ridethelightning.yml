@@ -1,0 +1,64 @@
+version: '3.7'
+services:
+  ridethelightning:
+    image: ${IMAGE_NAME}
+    hostname: rtl-${BCM_ACTIVE_CHAIN:-testnet}
+    ports:
+      - "${SERVICE_PORT:-}:${SERVICE_PORT:-}"
+    volumes:
+      - data:/root/.rtl
+      - rtlcookie:/root/.rtl_cookie
+      - lnd-admin-macaroon:/root/.lnd_admin_macaroon
+      - bitcoin-data:/root/.bitcoin:ro
+      - lnd-data:/root/.lnd:ro
+    environment:
+      MACAROON_PATH: /root/.lnd_admin_macaroon
+      NODE_AUTH_TYPE: CUSTOM
+      LND_CONFIG_PATH: /root/.lnd/lnd-rtl.conf
+      RTL_CONFIG_PATH: /secrets/RTL.conf
+      BITCOIND_CONFIG_PATH: /root/.bitcoin/bitcoin.conf
+      RTL_SSO: 0
+      RTL_COOKIE_PATH: /root/.rtl_cookie/cookie
+      LOGOUT_REDIRECT_LINK: http://bcm
+      RTL_PASS: ${RTL_PASSWORD:-}
+      PORT: ${SERVICE_PORT:-}
+      LND_SERVER_URL: https://lndrpc-${BCM_ACTIVE_CHAIN}:8080/v1
+    networks:
+      lndrpcnet:
+    secrets:
+      - source: rtl-config
+        target: /secrets/RTL.conf
+        uid: '0'
+        gid: '0'
+        mode: 0444
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin == true
+
+networks:
+  lndrpcnet:
+    external: true
+    name: lnd-${BCM_ACTIVE_CHAIN:-}_lndrpcnet
+  
+secrets:
+  rtl-config:
+    file: rtl.conf
+
+volumes:
+  data:
+  rtlcookie:
+  
+  lnd-data:
+    external: true
+    name: lnd-${BCM_ACTIVE_CHAIN:-}_data
+  
+  bitcoin-data:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_data
+
+  lnd-admin-macaroon:
+    external: true
+    name: lnd-${BCM_ACTIVE_CHAIN:-}_admin-macaroon

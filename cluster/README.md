@@ -1,14 +1,29 @@
 # BCM Clusters
 
-A BCM Cluster is defined as a set (one or more) of machines that have been configured to operate in a [LXD Cluster](https://lxd.readthedocs.io/en/latest/clustering/). Endpoints operating in a BCM cluster are assumed to have private networking environment that is low latency and high bandwidth, such as a home or office LAN. By running a cluster of count three (3) or more, you can achieve local high availability (Local HA). However, you can still deploy BCM to a single machine including locally on your SDN Controller.
+A BCM Cluster is defined as a set (one or more) of machines that have been configured to operate in a [LXD Cluster](https://lxd.readthedocs.io/en/latest/clustering/). (Not that the BCM CLI does this on your behalf). Endpoints operating in a BCM cluster are assumed to have private networking environment that is low latency and high bandwidth, such as a home or office LAN. 
 
-Unless you specify otherwise, the BCM CLI will automatically provision a single-endpoint cluster for you on your localhost. If your localhost (e.g., SDN Controller) supports hardware virtualization, [multipass](https://github.com/CanonicalLtd/multipass) will be installed locally and BCM data-center components will be deployed to that. If your hardware doesn't support virtualization, BCM will be installed to your localhost (bare-metal). This is better for performance, but compromises on security due to the lack of hardware virtualization.
+The BCM CLI can provision a cluster running on your localhost. This cluster can exist as 
 
-Of course, you can always deploy BCM to one or more remote machines. The only assumption is that each machine is running Ubuntu 18.04 (Desktop or Server) and has SSH exposed on port 22. Each remote machine you provision MUST be DNS-resolvable by your SDN controller. Future versions of BCM will enable the capability to expose SSH endpoints via an authenticated TOR onion service.
+1) a fully-fledged KVM-based VM (running under multipass) that has a remote SSH endpoint typically on network interface `mpqemubr0`
+2) a native LXD process running on your local Ubuntu installation. 
 
-Clusters are created and destroyed using the `bcm cluster create` and `bcm cluster destroy` commands, respectively. Add the `--help` flag to determine how best to use `bcm cluster` commands.
+If your localhost (e.g., SDN Controller) supports hardware virtualization and you choose to deploy a `vm`, [multipass](https://github.com/CanonicalLtd/multipass) will be installed locally and BCM data-center components will be deployed to that. If your hardware doesn't support virtualization, BCM can still be installed using natively to your Ubuntu OS. VM is a good choice if you're just testing or developing BCM applications. You won't achieve any kind of local HA when deploying BCM in VMs, however. For that, you MUST install BCM to the native OS via 'local' or 'ssh' deployment methods.
 
-To facilitates bare-metal deployments to your SDN controller, `$BCM_GIT_DIR/setup.sh` installs `openssh-server` and configures it to listen locally at `hostname` (i.e., 127.0.1.1)). This allows the SDN Controller to treat your localhost similarly to a remote machine.
+The SSH deployment method allows you to run BCM data center workloads on one or more dedicated remote machines. The only assumptions that BCM makes is that each machine is running a fresh installation of Ubuntu 18.04 (Desktop or Server) and has SSH exposed on port 22. Each remote machine you provision MUST be DNS-resolvable by your SDN controller. Future versions of BCM will enable the capability to expose SSH endpoints via an authenticated TOR onion services for remote low-level management. To facilitate local deployments to your SDN controller, `$BCM_GIT_DIR/setup.sh` installs `openssh-server` and configures it to listen locally at 127.0.1.1. This allows the SDN Controller to treat your localhost similarly to a remote machine which simplifies the BCM codebase.
+
+Clusters are created and destroyed using the `bcm cluster create` and `bcm cluster destroy` commands, respectively. Add the `--help` flag to determine how best to use `bcm cluster` commands. Most users won't need to use these commands directly as they are automatically invoked when users start user-facing application using `bcm stack start` commands.
+
+## BCM Deployment Mode
+
+You back-end can be deployed in standalone mode or cluster mode. 
+
+### Standalone mode
+
+Standalone mode is when you run BCM data center (back-end) workloads in a single LXD instance. Standalone mode is good for testing and development or when you lack the ability to deploy BCM to more than one always-on servers.
+
+## Cluster mode
+
+Cluster mode is when you run BCM data center workloads on more than one LXD instance where each LXD instance is installed on two or more independent x86_64  commodity hardware. Each commodity x86_64 is considered a failure domain.
 
 # How to prepare a physical server for BCM workloads
 
