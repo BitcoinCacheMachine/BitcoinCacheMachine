@@ -1,6 +1,6 @@
 # Bitcoin Cache Machine CLI
 
-The only user interface to BCM is the Linux command line. BCM really is just a bunch of BASH scripts that are called by the program `./bcm` in this directory.  When you run `$BCM_GIT_DIR/setup.sh` as part of the [Getting Started Guide](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine#getting-started), several lines are added to your `~/.bashrc` file. These lines make it so that your default terminal environment can find the CLI entrypoint `$BCM_GIT_DIR/cli/bcm`. To verify that your default environment variables are defined, run `bcm info` or consult `~/.bashrc`; bcm-related items are appended. `env | grep "BCM"` may also yield results.
+The only user interface to BCM is the Linux command line. BCM really is just a bunch of BASH scripts that are called by the program `./bcm` in this directory.  When you run `$BCM_GIT_DIR/setup.sh` as part of the [Getting Started Guide](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine#getting-started), several lines are added to your `~/.bashrc` file. These lines make it so that your default terminal environment can find the CLI entrypoint `$BCM_GIT_DIR/bcm`. To verify that your default environment variables are defined, run `bcm info` or consult `~/.bashrc`; bcm-related items are appended. `env | grep "BCM"` may also yield results.
 
 ## Get an overview of your BCM CLI Environment
 

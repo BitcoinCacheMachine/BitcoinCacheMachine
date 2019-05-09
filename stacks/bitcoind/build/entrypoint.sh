@@ -84,11 +84,8 @@ bitcoind -conf=/root/.bitcoin/bitcoin.conf \
 -wallet="/bitcoin/wallet" \
 -dbcache="$BITCOIND_DBCACHE" \
 -assumevalid="$ASSUME_VALID_BLOCK_HASH" \
--bind="127.0.0.1" \
 -maxmempool="$MEM_POOL_SIZE" \
 -maxuploadtarget="$MAX_UPLOAD_TARGET" \
+-bind="$OVERLAY_NETWORK_IP" \
 -port="$P2P_PORT" \
 -debug=tor "$BITCOIND_CHAIN_TEXT"
-
-# "-$LND_RPC_CREDENTIALS" \
-# "-$CLIGHTNING_RPC_CREDENTIALS" \

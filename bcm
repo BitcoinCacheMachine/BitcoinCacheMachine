@@ -38,11 +38,11 @@ if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
 fi
 
 if [ ! -x "$(command -v lxc)" ]; then
-    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+    bash -c "$BCM_GIT_DIR/commands/install/snap_install_lxd_local.sh"
 fi
 
 if [ ! -x "$(command -v docker)" ]; then
-    bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
+    bash -c "$BCM_GIT_DIR/commands/install/snap_install_docker.sh"
 fi
 
 if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then

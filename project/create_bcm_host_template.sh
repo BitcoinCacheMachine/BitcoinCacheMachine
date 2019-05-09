@@ -92,10 +92,10 @@ if lxc list --format csv -c=ns | grep "$HOST_NAME" | grep -q STOPPED; then
     
     # docker.io is the only package that seems to work seamlessly with
     # storage backends. Using BTRFS since docker recognizes underlying file system
-    lxc exec "$HOST_NAME" -- apt-get install -y docker.io wait-for-it ifmetric jq
+    lxc exec "$HOST_NAME" -- apt-get install -y --no-install-recommends docker.io wait-for-it ifmetric jq
     
     if [[ $BCM_DEBUG == 1 ]]; then
-        lxc exec "$HOST_NAME" -- apt-get install -y nmap curl slurm tcptrack dnsutils tcpdump
+        lxc exec "$HOST_NAME" -- apt-get install --no-install-recommends -y nmap curl slurm tcptrack dnsutils tcpdump
     fi
     
     ## checking if this alleviates docker swarm troubles in lxc.

@@ -76,7 +76,8 @@ After the BCM CLI is available, you can deploy your own infrastructure using the
 
 | BCMStack | IsFunctional | AppType | DependsOn | InboundOutboundTor | AppServices | Backup | Restoration
 |---|---|---|---|---|---|---|---|
-| bitcoind | Yes | DC | tier bitcoin | p2p (in/out) | bitcoind_rpc | No | No |
+| tor | Yes | DC | tier bitcoin | n/a | n/a | na | No |
+| bitcoind | Yes | DC | tor | p2p (in/out) | bitcoind_rpc | No | No |
 | clightning | Yes | DC | bitcoind | p2p (in/out) | TBD | No | No |
 | spark | Yes | DC/web app | clightning | none | HTTP | no  | no |
 | nbxplorer | Yes | DC | bitcoind | N/A | none | no | no |
@@ -101,7 +102,7 @@ You can use the `bcm info` command to view your current BCM environment variable
 
 ## Documentation
 
-The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo. Consult [CLI README](./cli/README.md) for notes on how to use the BCM CLI.
+The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo. Consult [CLI README](./README.md) for notes on how to use the BCM CLI.
 
 ## How to contribute
 

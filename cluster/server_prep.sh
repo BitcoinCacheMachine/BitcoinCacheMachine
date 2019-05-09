@@ -8,7 +8,7 @@ set -e
 
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install -y tor openssh-server avahi-daemon iotop curl socat
+sudo apt-get install --no-install-recommends -y tor openssh-server avahi-daemon iotop curl socat
 # TODO dnscrypt-proxy
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y

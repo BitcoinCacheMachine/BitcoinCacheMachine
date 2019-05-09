@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 #BITCOIND_HOSTNAME="bitcoindrpc-$BCM_ACTIVE_CHAIN"
 

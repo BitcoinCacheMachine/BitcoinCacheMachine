@@ -16,9 +16,9 @@ if [[ -z $(git config --get --local user.email) ]]; then
 fi
 
 # let's install all necessary software at the SDN controller.
-sudo apt-get install -y wait-for-it openssh-server netcat encfs avahi-discover
-bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_docker.sh"
-bash -c "$BCM_GIT_DIR/cli/commands/install/snap_install_lxd_local.sh"
+sudo apt-get install -y --no-install-recommends wait-for-it openssh-server netcat encfs avahi-discover
+bash -c "$BCM_GIT_DIR/commands/install/snap_install_docker.sh"
+bash -c "$BCM_GIT_DIR/commands/install/snap_install_lxd_local.sh"
 
 # let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already when the user initially
@@ -53,7 +53,7 @@ else
         echo "$BCM_BASHRC_START_FLAG"
         echo "export BCM_GIT_DIR=$BCM_GIT_DIR"
         # shellcheck disable=SC2016
-        echo "export PATH="'$PATH:'""'$BCM_GIT_DIR/cli'""
+        echo "export PATH="'$PATH:'""'$BCM_GIT_DIR'""
         echo "export BCM_ACTIVE=1"
         echo "export BCM_DEBUG=1"
         echo "export BCM_LXD_IMAGE_CACHE="

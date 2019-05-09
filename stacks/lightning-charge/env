@@ -1,5 +1,5 @@
 export IMAGE_NAME="bcm-lightning-charge"
-export IMAGE_TAG="v0.4.7"
+#export IMAGE_TAG="v0.4.7"
 export TIER_NAME="bitcoin"
 export STACK_NAME="lightning-charge"
 export SERVICE_NAME="lightning-charge"

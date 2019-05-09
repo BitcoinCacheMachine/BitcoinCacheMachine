@@ -133,7 +133,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 wait-for-it -t 15 "$BCM_SSH_HOSTNAME:22"
                 
                 BCM_SSH_USERNAME=ubuntu
-                echo "Please enter the username that has administrative privilieges on $BCM_SSH_HOSTNAME"
+                echo "Please enter the username that has administrative privileges on $BCM_SSH_HOSTNAME"
                 read -rp "SSH username (default: $BCM_SSH_USERNAME):  "   BCM_SSH_USERNAME
                 
                 CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
@@ -148,6 +148,15 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 HOSTS_ENTRY="127.0.1.1    $BCM_SSH_HOSTNAME"
                 if ! grep -Fxq "$HOSTS_ENTRY" /etc/hosts; then
                     echo "$HOSTS_ENTRY" | sudo tee -a /etc/hosts
+                fi
+                
+                # since we're doing a local install; we can just connect our wirepoint
+                # endpoint listening service on the same interface being used for our
+                # default route. TODO; add CLI option to specify address.
+                MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
+                
+                if ! snap info lxd | grep "lxd.daemon:   simple, enabled, active"; then
+                    sudo snap enable lxd
                 fi
             fi
         done
@@ -217,14 +226,14 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         bash -c "$BCM_GIT_DIR/cluster/stub_env.sh --master --ssh-username=$BCM_SSH_USERNAME --ssh-hostname=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR --driver=$BCM_DRIVER --cluster-name=$CLUSTER_NAME --macvlan-interface=$MACVLAN_INTERFACE"
         
         # generate Trezor-backed SSH keys for interactively login.
-        bash -c "$BCM_GIT_DIR/cli/commands/ssh/entrypoint.sh --username=$BCM_SSH_USERNAME --hostname=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR --push --ssh-key-path=$SSH_KEY_PATH"
+        bash -c "$BCM_GIT_DIR/commands/ssh/entrypoint.sh --username=$BCM_SSH_USERNAME --hostname=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR --push --ssh-key-path=$SSH_KEY_PATH"
         
         LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
         
         # provision the machine by uploading the preseed and running the install script.
         ssh -i "$SSH_KEY_PATH" -t -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- mkdir -p "$REMOTE_MOUNTPOINT"
         scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
-        scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+        scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
         ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
         ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
         
@@ -311,7 +320,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     # LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
                     # export REMOTE_MOUNTPOINT="/tmp/provisioning"
                     
-                    # scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/cli/commands/install/endpoint_deprovision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
+                    # scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/commands/install/endpoint_deprovision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
                     # ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
                     # ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" env LXC_BCM_BASE_IMAGE_NAME="$LXC_BCM_BASE_IMAGE_NAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
                     
@@ -320,14 +329,12 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     
                     if [ -x "$(command -v lxc)" ]; then
                         sudo lxd shutdown
-
-                        # we're not going to remove LXD since presumably we're running
-                        # locally and we need to keep the LXC CLI available for subsequent commands
-                        sudo lxd init --auto
+                        
+                        # TODO see if we can remove just the daemon instead of CLI tools with the snap
+                        sudo snap disable lxd
                     else
                         echo "Info: lxd was not installed."
                     fi
-                    
                 fi
                 
                 # clearing all lines from /etc/hosts that contain "$BCM_SSH_HOSTNAME"

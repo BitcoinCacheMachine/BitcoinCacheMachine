@@ -49,7 +49,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     # This is where we will store our GPG-encrypted passwords.
     echo "PASSWORD_STORE_DIR: $PASSWORD_STORE_DIR"
     if [ ! -d "$PASSWORD_STORE_DIR" ]; then
-        bash -c "$BCM_GIT_DIR/cli/commands/git_init_dir.sh $PASSWORD_STORE_DIR"
+        bash -c "$BCM_GIT_DIR/commands/git_init_dir.sh $PASSWORD_STORE_DIR"
     fi
     
     # let's call bcm pass init to initialze the password store using our

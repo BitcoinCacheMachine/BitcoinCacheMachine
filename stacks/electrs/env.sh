@@ -1,7 +1,6 @@
 #!/bin/bash
 
 export IMAGE_NAME="bcm-electrs"
-export IMAGE_TAG="v0.5.0"
 export TIER_NAME="bitcoin"
 export STACK_NAME="electrs"
 export SERVICE_NAME="electrs"
@@ -11,7 +10,7 @@ ELECTRS_RPC_PORT=50001
 if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     ELECTRS_RPC_PORT=60001
     elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
-    ELECTRS_RPC_PORT=70001
+    ELECTRS_RPC_PORT=60401
 fi
 
 export ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT"

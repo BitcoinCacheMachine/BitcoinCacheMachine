@@ -56,7 +56,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: "172.16.238.0/27"
+        - subnet: "172.16.238.0/24"
 
   torsocksnet:
     external: true

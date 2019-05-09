@@ -9,9 +9,9 @@ RUN git clone https://github.com/ElementsProject/lightning-charge /opt/charged
 WORKDIR /opt/charged
 RUN git checkout tags/v0.4.7
 
-RUN apt-get install curl python-software-properties
+RUN apt-get install -y --no-install-recommends curl python-software-properties
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
-RUN apt-get install nodejs
+RUN apt-get install -y --no-install-recommends nodejs
 
 RUN npm install
 RUN npm run dist && rm -rf src 
