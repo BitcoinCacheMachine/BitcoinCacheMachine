@@ -68,18 +68,19 @@ else
 fi
 
 
-# now let;s unmount the temp directory and remove the folders.
-encfs -u "$BCM_WORKING_DIR">>/dev/null
-
 if [[ -d "$BCM_WORKING_DIR" ]]; then
+    # now let;s unmount the temp directory and remove the folders.
+    encfs -u "$BCM_WORKING_DIR">>/dev/null
+    
     echo "Removing $BCM_WORKING_DIR"
     rm -rf "$BCM_WORKING_DIR"
+    
+    if [[ -d "$BCM_WORKING_ENC_DIR" ]]; then
+        echo "Removing $BCM_WORKING_ENC_DIR"
+        rm -rf "$BCM_WORKING_ENC_DIR"
+    fi
 fi
 
-if [[ -d "$BCM_WORKING_ENC_DIR" ]]; then
-    echo "Removing $BCM_WORKING_ENC_DIR"
-    rm -rf "$BCM_WORKING_ENC_DIR"
-fi
 
 if [[ -d "$BCM_SSH_DIR" ]]; then
     if [[ "$CHOICE" == 'y' ]]; then

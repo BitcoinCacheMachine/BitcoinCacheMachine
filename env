@@ -72,6 +72,7 @@ if [ -z ${BCM_DOCKER_IMAGE_CACHE+x} ]; then
 fi
 export BCM_DOCKER_IMAGE_CACHE="$BCM_DOCKER_IMAGE_CACHE"
 
+BCM_LXD_IMAGE_CACHE=
 if [ -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
     BCM_LXD_IMAGE_CACHE="images"
 fi

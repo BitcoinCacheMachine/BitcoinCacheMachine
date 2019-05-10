@@ -96,6 +96,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
             echo "expose BCM services on your LAN. Local deployments are usually a good choice, but BCM does make"
             echo "some modifications to your system. Usually the best option is ssh, which allows you to run BCM on"
             echo "a dedicated set (one or more) of machines."
+            echo ""
             read -rp "Deployment method:  (vm/local/ssh):  "   CHOICE
             
             if [[ "$CHOICE" == "vm" ]]; then

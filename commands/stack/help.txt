@@ -5,7 +5,7 @@ Usage:
   bcm stack [COMMAND]
 
 Available Commands:
-  deploy    Deploy a BCM stack to the existing cluster.
+  start     Deploy and start a BCM stack on the existing bcm cluster.
   remove    Remove a deployed stack from a cluster. Note that this ONLY 
             removes the specified component and NOT any of its dependencies.
   list      List currently deployed stacks.
