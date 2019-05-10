@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
-
+set -Eeu
 
 if [[ -z $BCM_ACTIVE_CHAIN ]]; then
     echo "ERROR: BCM_ACTIVE_CHAIN was not passed."

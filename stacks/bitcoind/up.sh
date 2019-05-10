@@ -1,12 +1,9 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
-if ! bcm stack list | grep -q tor; then
-    bcm stack start tor
-fi
+bcm stack start tor
 
 source ./env.sh
 
@@ -64,9 +61,7 @@ fi
 # this is better because we won't have to bog the TOR network down.
 if [[ ! -d "$SRC_DIR/blocks" ]]; then
     # TODO, see if we can minimize the amount of blocks to be uploaded, eg., last 300 blocks.
-    echo "EHRE"
     UPLOAD_BLOCKS=0
-    sleep 10
 fi
 
 if [[ ! -d "$SRC_DIR/chainstate" ]]; then

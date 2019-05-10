@@ -42,7 +42,7 @@ services:
 networks:
   torsocksnet:
     external: true
-    name: torstack_torsocksnet
+    name: tor_torsocksnet
 
   lndrpcnet:
     driver: overlay
@@ -70,7 +70,7 @@ volumes:
 
   tor-data:
     external: true
-    name: torstack_tor-data
+    name: tor_data
 
   bitcoin-data:
     external: true

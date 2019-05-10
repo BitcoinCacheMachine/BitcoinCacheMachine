@@ -1,14 +1,11 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 source ./env.sh
 
-if ! bcm stack list | grep -q lnd; then
-    # first, let's make sure we deploy our direct dependencies.
-    bcm stack start lnd
-fi
+bcm stack start lnd
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
 source "$BCM_GIT_DIR/project/shared/env.sh"
@@ -22,7 +19,7 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
-RTL_PASSWORD="CHANGEME"
+RTL_PASSWORD="$BCM_ACTIVE_CHAIN"
 
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \

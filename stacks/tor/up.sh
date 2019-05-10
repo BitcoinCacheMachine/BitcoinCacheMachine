@@ -22,4 +22,4 @@ lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker push "$TOR_IMAGE"
 # push the stack files up tthere.
 lxc file push  -p -r ./stack/ "$BCM_GATEWAY_HOST_NAME"/root/tor
 
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/root/tor/stack/torstack.yml" torstack
+lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/root/tor/stack/tor.yml" tor
