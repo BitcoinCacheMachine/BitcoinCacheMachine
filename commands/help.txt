@@ -19,8 +19,7 @@ Available Commands:
   pass         Create and manage GPG-encrypted passwords protected by your Trezor.
   info         Display current and target environment variables related to BCM operations.
   show         Show detailed LXC-related information for your active BCM Cluster/LXD endpoint.
-  get-chain    Return active chain: mainnet, testnet, regtest.
-  set-chain    Set target chain: mainnet, testnet, or regtest.
+  config       Get and set BCM CLI options. Switch chain, set image caches, etc.
 
 Help
   Use "bcm [command] --help" to get help for that command.

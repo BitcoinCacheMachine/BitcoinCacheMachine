@@ -1,16 +1,14 @@
 Description:
-
-  Tag a git commit using SSH authentication backed by your Trezor. Git is configured
-  to use SSH push/pull operations, and SSH is configured to use TOR for internet backhaul.
+  Tag a git commit backed by your Trezor.
 
 Usage:
   bcm git tag --tag="v0.0.1" --message="Version 1"
 
 Parameters:
-  --tag=<BCM_GIT_TAG_NAME>                      The name of the tag. Typically indicated in version numbers.
-  --message=<GIT_COMMIT_MESSAGE>                 The annotation for the tag
+  --tag=                      The name of the tag. Typically indicated in version numbers.
+  --message=                  The annotation for the tag.
   
 Optional Flags:
-  --verify=<BCM_GIT_TAG_NAME>                   Verify tag signature
-  --delete=<BCM_GIT_TAG_NAME>                   Delete tags (local)
-  --git-repo-dir=<BCM_GIT_REPO_DIR>             The required path of the git repo you want to tag and sign.
+  --verify                   Verify tag signature
+  --delete                   Delete tags (local)
+ 

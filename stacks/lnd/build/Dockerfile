@@ -5,12 +5,15 @@ FROM golang:alpine as builder
 ENV GODEBUG netdns=cgo
 
 # Install dependencies and build the binaries.
-RUN apk add --no-cache --update alpine-sdk git make gcc \
-    &&  git clone https://github.com/lightningnetwork/lnd /go/src/github.com/lightningnetwork/lnd \
-    &&  cd /go/src/github.com/lightningnetwork/lnd \
-    && git checkout tags/v0.6-beta \
-    &&  make \
-    &&  make install
+RUN apk add --no-cache --update alpine-sdk git make gcc
+RUN git clone https://github.com/lightningnetwork/lnd /go/src/github.com/lightningnetwork/lnd
+WORKDIR /go/src/github.com/lightningnetwork/lnd
+RUN git checkout tags/v0.6.1-beta
+RUN make
+RUN make install
+
+# tags="signrpc walletrpc chainrpc invoicesrpc"
+#tags on make install is required by lightning loop
 
 # this is the final image
 FROM alpine as final

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo
+set -Eeu
 
 # torsocks is the network alias for the tor SOCKS proxy on the docker overlay network.
 TOR_HOST_IP="$(getent hosts torsocks | awk '{ print $1 }')"

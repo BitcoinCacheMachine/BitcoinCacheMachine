@@ -11,6 +11,7 @@ if ! bcm stack list | grep -q "bitcoind"; then
 fi
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
+# shellcheck source=../../project/shared/env.sh
 source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # prepare the image.
@@ -22,6 +23,7 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
+# shellcheck source=..bitcoind/env.sh
 source "$BCM_STACKS_DIR/bitcoind/env"
 source ./env
 

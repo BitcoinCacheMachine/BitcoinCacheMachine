@@ -1,0 +1,30 @@
+SocksPort 0
+HiddenServiceDir /var/lib/tor/bcmonion
+HiddenServiceVersion 3
+HiddenServicePort 8333 172.16.200.2:8333
+
+
+
+
+#HiddenServiceAuthorizeClient stealth bcmonion
+
+
+# bitcoind rpc
+#HiddenServicePort 8333 172.16.200.2:8333
+#HiddenServicePort 18333 172.16.200.2:18333
+#HiddenServicePort 28333 172.16.200.2:28333
+
+# lnd rpc
+#HiddenServicePort 8333 172.16.200.2:8333
+#HiddenServicePort 18333 172.16.200.2:18333
+#HiddenServicePort 28333 172.16.200.2:28333
+
+# electrs
+#HiddenServicePort 50001 172.16.200.14:50001
+#HiddenServicePort 60001 127.0.0.14:60001
+#HiddenServicePort 60401 127.0.0.14:60401
+
+#HiddenServiceAuthorizeClient stealth bcmonion
+
+# Log err to info
+Log info file /var/log/tor/tor.log

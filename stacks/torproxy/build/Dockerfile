@@ -18,9 +18,6 @@ RUN apt-get install -y tor deb.torproject.org-keyring
 # SOCKS5, Control Port, DNS
 EXPOSE 9050 9051 9053
 
-# COPY entrypoint.sh /entrypoint.sh
-# RUN chmod +x /entrypoint.sh
-
 COPY torrc /etc/tor/torrc
 RUN chmod 0644 /etc/tor/torrc
 

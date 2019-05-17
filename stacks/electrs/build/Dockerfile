@@ -16,7 +16,7 @@
 FROM rust:1.34.0-slim
 
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends clang cmake libsnappy-dev git
+RUN apt-get install -y clang cmake libsnappy-dev git
 
 #RUN adduser --disabled-login --system --shell /bin/false --uid 1000 user
 

@@ -5,7 +5,6 @@ services:
     hostname: lnd-${BCM_ACTIVE_CHAIN:-}
     volumes:
       - data:/root/.lnd
-      - certificate-data:/config
       - admin-macaroon:/root/.lnd_admin_macaroon
       - readonly-macaroon:/root/.lnd_readonly_macaroon
       - log-data:/var/logs/lnd
@@ -27,7 +26,7 @@ services:
           - lndrpc-${BCM_ACTIVE_CHAIN}
     secrets:
       - source: lnd-config
-        target: /root/.lnd/lnd.conf
+        target: /secrets/lnd.conf
         uid: '0'
         gid: '0'
         mode: 0444
@@ -42,7 +41,7 @@ services:
 networks:
   torsocksnet:
     external: true
-    name: torstack_torsocksnet
+    name: tor_torsocksnet
 
   lndrpcnet:
     driver: overlay
@@ -58,19 +57,18 @@ networks:
 
 secrets:
   lnd-config:
-    file: "lnd-${BCM_ACTIVE_CHAIN:-}.conf"
+    file: lnd.conf
 
 volumes:
   data:
   log-data:
   
-  certificate-data:  
   admin-macaroon:
   readonly-macaroon:
 
   tor-data:
     external: true
-    name: torstack_tor-data
+    name: tor_data
 
   bitcoin-data:
     external: true

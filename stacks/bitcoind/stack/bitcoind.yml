@@ -6,7 +6,7 @@ services:
     volumes:
       - wallet:/bitcoin/wallet
       - data:/root/.bitcoin
-      - old-blocks:/bitcoin/old_blocks
+      - blocks:/root/.blocks
       - cli:/usr/local/bin
       - tor-data:/root/.tor
     environment:
@@ -34,10 +34,7 @@ configs:
 
 volumes:
   wallet:
-
-  # TODO back old-blocks by a remote NFS share whnere
-  # backing host has access to TIER 2 (archival) storage.
-  old-blocks:
+  blocks:
   cli:
   
   # the data volume is defined OUTSIDE of the yml since we MAY pre-populate the volume.
@@ -47,7 +44,7 @@ volumes:
 
   tor-data:
     external: true
-    name: torstack_tor-data
+    name: tor_data
 
 networks:
   bitcoindrpcnet:
@@ -60,5 +57,5 @@ networks:
 
   torsocksnet:
     external: true
-    name: torstack_torsocksnet
+    name: tor_torsocksnet
     

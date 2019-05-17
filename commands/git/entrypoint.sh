@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE="${2:-}"
@@ -41,14 +41,6 @@ for i in "$@"; do
     esac
 done
 
-
-# if BCM_PROJECT_DIR is empty, we'll check to see if someone over-rode
-# the trezor directory. If so, we'll send that in instead.
-if [[ $BCM_HELP_FLAG == 1 ]]; then
-    cat ./commit/help.txt
-    exit
-fi
-
 if [[ ! -d $GNUPGHOME ]]; then
     echo "GNUPGHOME '$GNUPGHOME' doesn't exist."
     exit
@@ -83,8 +75,20 @@ export GIT_COMMIT_MESSAGE="$GIT_COMMIT_MESSAGE"
 export BCM_GIT_BRANCH="$BCM_GIT_BRANCH"
 export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
 
+if [[ "$#" -le 2 ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./help.txt
+        exit
+    fi
+fi
+
 # now call the appropritate script.
 if [[ $BCM_CLI_VERB == "commit" ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./commit/help.txt
+        exit
+    fi
+    
     if [[ -z $GIT_COMMIT_MESSAGE ]]; then
         echo "Required parameter GIT_COMMIT_MESSAGE not specified. Use '--message='"
         exit
@@ -115,6 +119,11 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "tag" ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./tag/help.txt
+        exit
+    fi
+    
     if [[ -z $BCM_GIT_TAG_NAME ]]; then
         echo "Required parameter BCM_GIT_TAG_NAME not specified. Use '--tag='"
         exit
@@ -152,6 +161,11 @@ if [[ $BCM_CLI_VERB == "tag" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "merge" ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./merge/help.txt
+        exit
+    fi
+    
     if [[ -z $BCM_GIT_BRANCH ]]; then
         echo "Required parameter BCM_GIT_BRANCH not specified. Use '--branch-name=<branch>'"
         exit

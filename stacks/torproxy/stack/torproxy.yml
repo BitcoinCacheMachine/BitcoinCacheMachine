@@ -3,7 +3,7 @@ services:
   torproxy:
     image: ${DOCKER_IMAGE}
     volumes:
-      - tor-data:/root/.tor
+      - data:/root/.tor
     networks: 
       torsocksnet:
         aliases:
@@ -23,4 +23,4 @@ networks:
     attachable: true
 
 volumes:
-  tor-data:
+  data:

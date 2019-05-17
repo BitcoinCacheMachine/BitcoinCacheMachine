@@ -86,6 +86,11 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         bcm init
     fi
     
+    DEPLOYMENT_METHODS="local/ssh"
+    if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
+        DEPLOYMENT_METHODS="$DEPLOYMENT_METHODS/vm"
+    fi
+    
     # if the user didn't specify a driver, let's ask them how we want to proceed.
     # find out if they want a "local" or multipass-based deployment.
     if [[ -z $BCM_DRIVER ]]; then
@@ -94,19 +99,13 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         do
             echo "How would you like to deploy your backend? VM is good for testing and development, but can't"
             echo "expose BCM services on your LAN. Local deployments are usually a good choice, but BCM does make"
-            echo "some modifications to your system. Usually the best option is ssh, which allows you to run BCM on"
-            echo "a dedicated set (one or more) of machines."
-            read -rp "Deployment method:  (vm/local/ssh):  "   CHOICE
+            echo "some modifications to your system. Usually the best option is ssh, which allows you to run BCM"
+            echo "on a dedicated machine."
+            echo ""
+            read -rp "Deployment method ($DEPLOYMENT_METHODS):  "   CHOICE
             
             if [[ "$CHOICE" == "vm" ]]; then
                 CONTINUE=1
-                # Check to see if the computer has hardware virtualization support. If not, then we
-                # switch our driver to SSH.
-                if ! lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
-                    echo "Your computer does NOT support hardware virtualization. You may need to turn this feature on in the BIOS."
-                    echo "Consider deploying BCM to a native Ubuntu installation (local or remote)."
-                    exit
-                fi
                 
                 # the cloud-init file for multipass uses 'bcm' as the username.
                 BCM_DRIVER=multipass
@@ -117,10 +116,21 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 
                 # Next make sure multipass is installed so we can run type-1 VMs
                 if [ ! -x "$(command -v multipass)" ]; then
-                    echo "Performing a local LXD installation using multipass. Note this provides no fault tolerance."
-                    
-                    sudo snap install multipass --beta --classic
-                    sleep 5
+                    # let's check to make sure we have multipass. This check to ensure we support
+                    # virtualizatin, then check to see if multipass is installed; if not, we install it
+                    if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
+                        if [ ! -x "$(command -v multipass)" ]; then
+                            echo "Looks like your machine supports multipass. Installing it now."
+                            sudo snap install multipass --beta --classic
+                            sleep 5
+                        fi
+                        
+                        if multipass list | grep -q "$CLUSTER_NAME-01"; then
+                            multipass stop "$CLUSTER_NAME-01"
+                            multipass delete "$CLUSTER_NAME-01"
+                            multipass purge
+                        fi
+                    fi
                 fi
                 elif [[ "$CHOICE" == "ssh" ]]; then
                 CONTINUE=1
@@ -135,6 +145,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 BCM_SSH_USERNAME=ubuntu
                 echo "Please enter the username that has administrative privileges on $BCM_SSH_HOSTNAME"
                 read -rp "SSH username (default: $BCM_SSH_USERNAME):  "   BCM_SSH_USERNAME
+                
+                if [[ -z $BCM_SSH_USERNAME ]]; then
+                    BCM_SSH_USERNAME=ubuntu
+                fi
                 
                 CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
                 elif [[ "$CHOICE" == "local" ]]; then
@@ -248,6 +262,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
             echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
             wait-for-it -t 10 "$BCM_SSH_HOSTNAME:8443"
             
+            # shellcheck source=$ENDPOINT_DIR/env
             source "$ENDPOINT_DIR/env"
             lxc remote add "$CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
             lxc remote switch "$CLUSTER_NAME"
@@ -329,9 +344,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     
                     if [ -x "$(command -v lxc)" ]; then
                         sudo lxd shutdown
-                        
-                        # TODO see if we can remove just the daemon instead of CLI tools with the snap
-                        sudo snap disable lxd
+                        sudo snap remove lxd
                     else
                         echo "Info: lxd was not installed."
                     fi
@@ -340,6 +353,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                 # clearing all lines from /etc/hosts that contain "$BCM_SSH_HOSTNAME"
                 sudo sed -i "/$BCM_SSH_HOSTNAME/d" /etc/hosts
                 sudo sed -i '/^$/d' /etc/hosts
+                
             fi
         done
         
@@ -349,15 +363,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         fi
     fi
     
-    # let's check to make sure we have multipass. This check to ensure we support
-    # virtualizatin, then check to see if multipass is installed; if not, we install it
-    if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
-        if [ ! -x "$(command -v multipass)" ]; then
-            echo "Looks like your machine supports multipass. Installing it now."
-            sudo snap install multipass --beta --classic
-            sleep 5
-        fi
-        
+    if [ -x "$(command -v multipass)" ]; then
         if multipass list | grep -q "$CLUSTER_NAME-01"; then
             multipass stop "$CLUSTER_NAME-01"
             multipass delete "$CLUSTER_NAME-01"
