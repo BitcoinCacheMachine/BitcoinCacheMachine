@@ -124,7 +124,6 @@ fi
 if [ -x "$(command -v lxc)" ]; then
     sudo lxd shutdown
     
-    #sudo lxd init --auto
     sudo snap remove lxd
 else
     echo "Info: lxd was not installed."

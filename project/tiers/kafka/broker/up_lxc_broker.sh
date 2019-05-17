@@ -26,6 +26,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     BROKER_HOSTNAME="broker-$(printf %02d "$HOST_ENDING")"
     
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
+    # shellcheck source=../../project/shared/env.sh
     source "$BCM_GIT_DIR/project/shared/env.sh" --host-ending="$HOST_ENDING"
     
     lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$BROKER_IMAGE" BROKER_HOSTNAME="$BROKER_HOSTNAME" KAFKA_BROKER_ID="$HOST_ENDING" KAFKA_ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT" TARGET_HOST="$LXC_HOSTNAME" docker stack deploy -c /root/stacks/kafka/broker.yml "$BROKER_HOSTNAME"

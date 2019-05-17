@@ -11,6 +11,4 @@ Options:
   --username    The username that will appear in the GPG certificate.
   --hostname    The FQDN that will appear in the GPG certificate.
   --cert-dir    Directory where public key material will be emitted.
-                The default directory is whatever GNUPGHOME is set to. Consider setting
-                BCM_ACTIVE=0 in your SHELL to direct your trezor to your home directory.
-
+                The default directory is whatever GNUPGHOME is set to.

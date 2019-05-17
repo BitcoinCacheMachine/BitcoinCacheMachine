@@ -4,9 +4,7 @@
 
 Sign up for a github.com account.
 
-Get the code by following the instructions in "Getting Started"
-
-Make a development branch to do your work
+Fork the BitcoinCacheMachine repository to your account. Clone the repo to your machine, then make a development branch to do your work
 
     git checkout -b branch-name
 
@@ -14,7 +12,7 @@ BCM is developed in Visual Studio Code by BCM's main authors. Feel free to use a
 
 ## Linters
 
-The authors of BCM ensures that BCM bash scripts are shellcheck compliant (with the exception of explicitly ignored errors, see [.vscode/settings.json](.vscode/settings.json)). Install shellcheck `sudo apt-get install shellcheck` then add any editor extensions you might want, such as Bash Beautify.
+The authors of BCM ensures that BCM bash scripts are shellcheck compliant. Install shellcheck `sudo apt-get install shellcheck` then add any editor extensions you might want, such as Bash Beautify.
 
 ## Pull Requests
 
@@ -30,7 +28,7 @@ push your branch (-f for *force* in the case you've rebased and squashed)
 
     git push origin branch-name -f
     
-create a [pull request](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/projects)
+create a [pull request](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/projects) into the BitcoinCacheMachine repo master branch.
 
 If you have fixes, you can amend them to the current commit rather than a new one with
 

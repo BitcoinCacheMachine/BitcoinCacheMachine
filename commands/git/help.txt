@@ -2,15 +2,15 @@ Description:
   Perform secure Trezor-backed GIT operations to sign git commits and tags.
 
 Usage:
-  bcm git [command] -n=<BCM_PROJECT_OVERRIDE_DIR> -g=<BCM_GIT_REPO_DIR> -m='<GIT_COMMIT_MESSAGE>'
+  bcm git [command]  --git-repo-dir=$HOME/git/repo
 
 Available Commands:
   commit        Stages and commits everything the chosen repository. The 
                 commit is GPG signed using the trezor backend.
-  push          Pushes the chosen repository over an SSH connection 
-                protected by TOR.
-  tag          Creates, deletes, annotates and signs tags
+  push          Pushes the chosen repository over an SSH connection protected by TOR.
+  tag           Creates, deletes, annotates and signs tags
 
+Parameters:
+  --git-repo-dir    The directory of the git repo you want that the command applies to.
 
 Use "bcm git [command]" to get help for that command.
-

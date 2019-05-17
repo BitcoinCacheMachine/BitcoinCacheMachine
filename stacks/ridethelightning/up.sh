@@ -1,13 +1,14 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 source ./env.sh
 
-bcm stack start lnd
+#bcm stack start lnd
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
+# shellcheck source=../../project/shared/env.sh
 source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # prepare the image.
@@ -19,16 +20,17 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 # push the stack and build files
 lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
-RTL_PASSWORD="$BCM_ACTIVE_CHAIN"
+RTL_PASS="Password1"
+ENDPOINT=$(bcm get-ip)
+
 
 lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
-LXC_HOSTNAME="$LXC_HOSTNAME" \
 SERVICE_PORT="$SERVICE_PORT" \
-RTL_PASSWORD="$RTL_PASSWORD" \
+RTL_PASS="$RTL_PASS" \
+REDIRECT_LINK="http://$ENDPOINT:$SERVICE_PORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
 
-ENDPOINT=$(bcm get-ip)
 wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
 
 # # let's the the pariing URL from the container output

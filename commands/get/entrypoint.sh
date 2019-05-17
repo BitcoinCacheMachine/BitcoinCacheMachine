@@ -30,19 +30,12 @@ if [[ $BCM_CLI_VERB == "get-ip" ]]; then
         
         source "$ENV_FILE"
         
-        LXC_NETWORK_INTERFACE=
+        LXC_NETWORK_INTERFACE=eth2
         if [[ $BCM_DRIVER == "local" ]]; then
             # valid for local deployment only.
             LXC_NETWORK_INTERFACE=eth1
-            elif [[ $BCM_DRIVER == "multipass" ]]; then
-            LXC_NETWORK_INTERFACE=eth2
-            elif [[ $BCM_DRIVER == "ssh" ]]; then
-            LXC_NETWORK_INTERFACE=eth2
-        else
-            echo "Error: $BCM_CLUSTER_DIR/env does not exist!"
-            exit 1
         fi
         
-        lxc info "$BCM_UNDERLAY_HOST_NAME" | grep "$LXC_NETWORK_INTERFACE:\\sinet\\s" | awk 'NF>1{print $NF}'
+        lxc info "$BCM_UNDERLAY_HOST_NAME" | grep "$LXC_NETWORK_INTERFACE:\\sinet\\s" | awk '{print $3}'
     fi
 fi

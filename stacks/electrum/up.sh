@@ -26,6 +26,8 @@ xauth nlist "$DISPLAY" | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 
 # let's check on our back end services.
 BACK_END_IP=$(bcm get-ip)
+
+# shellcheck source=../electrs/env.sh
 source "$BCM_STACKS_DIR/electrs/env.sh"
 
 wait-for-it -t 0 "$BACK_END_IP:$ELECTRS_RPC_PORT"

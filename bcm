@@ -3,10 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-if [[ -z $BCM_ACTIVE ]]; then
-    BCM_ACTIVE=1
-fi
-
 BCM_HELP_FLAG=0
 
 for i in "$@"; do
@@ -29,25 +25,129 @@ else
     exit
 fi
 
-# shellcheck disable=1090
-source ./env
+export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
+export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
+export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
+
+# see README.md for versioning scheme.
+export BCM_MAJOR_VERSION="0"
+export BCM_MINOR_VERSION="0"
+export BCM_PATCH_VERSION="3"
+
+export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION"
+export BCM_DOCKER_BASE_TAG="18.04"
+
+export BCM_RUNTIME_DIR="$HOME/.bcm"
 
 if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
     ./commands/reset.sh "$@"
     exit
 fi
 
+# install LXD if it doesn't exist.
 if [ ! -x "$(command -v lxc)" ]; then
-    bash -c "$BCM_GIT_DIR/commands/install/snap_install_lxd_local.sh"
+    # if the lxd groups doesn't exist, create it.
+    if ! grep -q lxd /etc/group; then
+        sudo addgroup --system lxd
+    fi
+    
+    if ! groups "$USER" | grep -q lxd; then
+        sudo adduser "${USER}" lxd
+        sudo gpasswd -a "${USER}" lxd
+    fi
+    
+    if [ ! -x "$(command -v lxd)" ]; then
+        sudo snap install lxd --channel=candidate
+        sudo lxd init --auto --network-address=127.0.1.1 --network-port=8443 --storage-backend=btrfs
+    fi
 fi
 
+# install docker if it doesn't exist.
 if [ ! -x "$(command -v docker)" ]; then
-    bash -c "$BCM_GIT_DIR/commands/install/snap_install_docker.sh"
+    if ! grep -q docker /etc/group; then
+        sudo addgroup docker
+    fi
+    
+    if ! groups "$USER" | grep -q docker; then
+        sudo usermod -aG docker "$USER"
+    fi
+    
+    if [ ! -x "$(command -v docker)" ]; then
+        sudo snap install docker --channel=candidate
+        
+        # next we need to determine the underlying file system so we can upload the correct daemon.json
+        DEVICE="$(df -h "$HOME" | grep ' /' | awk '{print $1}')"
+        FILESYSTEM="$(mount | grep "$DEVICE")"
+        DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/overlay_daemon.json"
+        
+        if echo "$FILESYSTEM" | grep -q "btrfs"; then
+            DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/btrfs_daemon.json"
+        fi
+        
+        sudo cp "$DAEMON_CONFIG" /var/snap/docker/current/config/daemon.json
+        sudo snap restart docker
+        sleep 5
+    fi
 fi
 
 if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then
     bash -c "$BCM_GIT_DIR/controller/build.sh"
 fi
+
+BCM_CONFIG_FILE="$HOME/.bcmconfig"
+if [[ ! -f $BCM_CONFIG_FILE ]]; then
+    touch "$BCM_CONFIG_FILE"
+    chmod 0755 "$BCM_CONFIG_FILE"
+    echo "#!/bin/bash" >> "$BCM_CONFIG_FILE"
+fi
+export BCM_CONFIG_FILE="$BCM_CONFIG_FILE"
+
+# the options in this file override any CLI options, such as which chahin
+# to target, where our files are located, whether we're in debug mode, etc.
+source "$BCM_CONFIG_FILE"
+
+export BCM_SSH_DIR="$BCM_RUNTIME_DIR/ssh"
+
+export ELECTRUM_DIR="$BCM_RUNTIME_DIR/.electrum"
+export ELECTRUM_ENC_DIR="$BCM_RUNTIME_DIR/.electrum_enc"
+
+export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/clusters"
+export BCM_WORKING_ENC_DIR="$BCM_RUNTIME_DIR/.clusters"
+
+GNUPGHOME="$BCM_RUNTIME_DIR/.gnupg"
+PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/.password_store"
+
+export BCM_DEFAULT_CHAIN="testnet"
+export GNUPGHOME="$GNUPGHOME"
+export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
+export ELECTRUM_DIR="$ELECTRUM_DIR"
+export LXC_BCM_BASE_IMAGE_NAME="bcm-template-$BCM_VERSION"
+
+CHAIN="$BCM_DEFAULT_CHAIN"
+
+# only run this stanza if we know LXD is installed.
+if [ -x "$(command -v lxd)" ]; then
+    if [ "$(lxc remote get-default)" != "local" ]; then
+        CHAIN="$(lxc project list | grep '(current)' | awk '{print $2}')"
+        if [[ $CHAIN == "default" ]]; then
+            CHAIN="$BCM_DEFAULT_CHAIN"
+        fi
+    fi
+fi
+
+export BCM_ACTIVE_CHAIN="$CHAIN"
+
+# these are the names of the LXC hosts that get provisioned on the first cluster
+# endpoint.  Subscript updates these variables to target a specific cluster endpoint.
+export BCM_GATEWAY_HOST_NAME="$(echo bcm-gateway-$BCM_VERSION-01 | tr '.' '-')-$BCM_ACTIVE_CHAIN"
+export BCM_KAFKA_HOST_NAME="$(echo bcm-kafka-$BCM_VERSION-01 | tr '.' '-')-$BCM_ACTIVE_CHAIN"
+export BCM_UNDERLAY_HOST_NAME="$(echo bcm-underlay-$BCM_VERSION-01 | tr '.' '-')-$BCM_ACTIVE_CHAIN"
+export BCM_BITCOIN_HOST_NAME="$(echo bcm-bitcoin-$BCM_VERSION-01 | tr '.' '-')-$BCM_ACTIVE_CHAIN"
+export BCM_PRIVATE_REGISTRY="$BCM_GATEWAY_HOST_NAME:5010"
+export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
+
+export BCM_DOCKER_IMAGE_CACHE="registry-1.docker.io"
+export BCM_LXD_IMAGE_CACHE=images
 
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

@@ -74,23 +74,22 @@ You will need to log out and log back (or restart) in for your group membership 
 
 After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack start` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack start spark` command. Other components you can deploy either alone or in combination with other software include:
 
-| BCMStack | IsFunctional | AppType | DependsOn | InboundOutboundTor | AppServices | Backup | Restoration
-|---|---|---|---|---|---|---|---|
-| tor | Yes | DC | tier bitcoin | n/a | n/a | na | No |
-| bitcoind | Yes | DC | tor | p2p (in/out) | bitcoind_rpc | No | No |
-| clightning | Yes | DC | bitcoind | p2p (in/out) | TBD | No | No |
-| spark | Yes | DC/web app | clightning | none | HTTP | no  | no |
-| nbxplorer | Yes | DC | bitcoind | N/A | none | no | no |
-| btcpayserver | Partially | DC/web app | bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP | no | no |
-| lnd | Partially | DC | bitcoind | p2p (in/out) | TBD | no | no |
-| ridethelightning | No | DC/web app | lnd | N/A | HTTP | no | no |
-| electrs | Yes | DC | bitcoind | none | ElectrumServerRPC | no | no |
-| electrum | Yes | Desktop GUI | electrs | none | N/A | no | no |
-| zap | No | Desktop GUI | zap | lnd | N/A | no | no |
-| esplora | No | DC/web app | bitcoind, electrs | none | HTTP | no | no |
-| lightning-charge | No | DC | clightning | none | TBD | no | no |
-| liquid | No | DC | bitcoind | TBD | TBD | no | no |
-| [cachestack](./stacks/cachestack/README.md) | No | DC | tier underlay | none | none | no | no |
+| BCMStack | IsFunctional | AppType | DependsOn | InboundOutboundTor | AppServices
+|---|---|---|---|---|---|
+| tor | Yes | DC | tier bitcoin | n/a | n/a |
+| bitcoind | Yes | DC | tor | p2p (in/out) | bitcoind_rpc |
+| clightning | Yes | DC | bitcoind | p2p (in/out) | TBD |
+| spark | Yes | DC/web app | clightning | none | HTTP |
+| nbxplorer | Yes | DC | bitcoind | N/A | none |
+| btcpayserver | Partially | DC/web app | bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP |
+| lnd | Partially | DC | bitcoind | p2p (in/out) | TBD |
+| ridethelightning | No | DC/web app | lnd | N/A | HTTP |
+| electrs | Yes | DC | bitcoind | none | ElectrumServerRPC |
+| electrum | Yes | Desktop GUI | electrs | none | N/A |
+| zap | No | Desktop GUI | zap | lnd | N/A |
+| esplora | No | DC/web app | bitcoind, electrs | none | HTTP |
+| lightning-charge | No | DC | clightning | none | TBD |
+| liquid | No | DC | bitcoind | TBD | TBD |
 
 `DC=data center`: processes that run in the "back-end" or "server-side". The back-end can run on a dedicated set Ubuntu machines (preferred for mainnet/production), or you can run the back-end on a user-facing desktop/laptop (useful for testnet/development). The back-end can run as a Type I VM or can be running under an LXD process installed on your localhost (local). There are trade-offs to using each approach (vm/local/ssh) which are discussed in more detail in the [Cluster directory](./cluster/README.md).
 
@@ -98,7 +97,7 @@ User-facing applications can be either GUI-based or web-based apps (AppType). De
 
 Running `bcm stack start electrum` starts an Electrum wallet desktop application that's configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack start` command automatically deploys all required back-end infrastructure to the active cluster, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/). If a cluster doesn't yet exist, BCM helps you provision one. 
 
-You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores, cluster under management, and target chain (i.e., mainnet, testnet, regtest). Run `bcm set-chain mainnet` to instruct the BCM cli to deploy mainnet applications to the active cluster. At this time BCM deploys a full archival node, so your hardware must be beefy enough. Future BCM versions will support pruned mode if all protocols support that.
+You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores, cluster under management, and target chain (i.e., mainnet, testnet, regtest). Run `bcm config set chain mainnet` to instruct the BCM cli to deploy mainnet applications to the active cluster. At this time BCM deploys a full archival node, so your hardware must be beefy enough. Future BCM versions will support pruned mode if all protocols support that.
 
 ## Documentation
 

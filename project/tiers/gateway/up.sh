@@ -8,10 +8,12 @@ bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 
 # It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
 if lxc project list | grep "(current)" | grep -q "default"; then
-    bcm set-chain "$BCM_ACTIVE_CHAIN"
+    bcm config set chain "$BCM_ACTIVE_CHAIN"
 fi
 
 export TIER_NAME=gateway
+
+# shellcheck source=../../project/shared/env.sh
 source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # first, create the profile that represents the tier.

@@ -38,11 +38,6 @@ export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
 CLUSTER_NAME="$(lxc remote get-default)"
 export CLUSTER_NAME="$CLUSTER_NAME"
 
-if [[ "$BCM_CLI_COMMAND" == "get-chain" ]]; then
-    ./chain/getchain.sh
-    exit
-fi
-
 if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
     ./init.sh "$@"
 fi
@@ -109,6 +104,12 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "logs" ]]; then
     ./stack_cli/entrypoint.sh "$@"
+    exit
+fi
+
+
+if [[ "$BCM_CLI_COMMAND" == "config" ]]; then
+    ./config/entrypoint.sh "$@"
     exit
 fi
 

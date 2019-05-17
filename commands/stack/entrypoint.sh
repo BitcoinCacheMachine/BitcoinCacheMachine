@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -29,7 +29,12 @@ fi
 
 # if the current cluster is not configured, let's bring it into existence.
 if [[ $(lxc remote get-default) == "local" ]]; then
-    bcm cluster create
+    if [[ $BCM_CLI_VERB != "list" ]]; then
+        bcm cluster create
+    else
+        echo "ERROR: A BCM cluster does not exist. To create one, run 'bcm cluster create' or 'bcm stack start' command."
+        exit
+    fi
 fi
 
 BCM_BACKUP_DIR="$BCM_WORKING_DIR/$(lxc remote get-default)/backups"
@@ -64,7 +69,7 @@ if [[ $BCM_CLI_VERB == "stop"  ]]; then
             # however, some containers do not write persistent data.
             if [ ! -z ${STACK_DOCKER_VOLUMES+x} ]; then
                 for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
-                    bash -c "$BCM_GIT_DIR/project/shared/delete_docker_volume.sh --tier-name=$TIER_NAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
+                    bash -c "$BCM_GIT_DIR/project/shared/delete_docker_volume.sh --lxc-hostname=$TIER_NAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
                 done
             fi
         else

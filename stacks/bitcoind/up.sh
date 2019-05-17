@@ -3,11 +3,12 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-bcm stack start tor
+bcm stack start torproxy
 
 source ./env.sh
 
 # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
+# shellcheck source=../../project/shared/env.sh
 source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # prepare the image.
@@ -40,8 +41,6 @@ if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     DEST_DIR="$DEST_DIR/regtest"
     UPLOAD_BLOCKS=0
 fi
-
-BLOCKS_DIR="$DEST_DIR/blocks"
 
 # let's make sure docker has the 'data' volume defined so we can do restore or preseed block/chainstate data
 NEW_INSTALL=0
