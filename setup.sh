@@ -63,7 +63,7 @@ else
 fi
 
 # configure encfs/FUSE mount settings.
-if ! dpkg-query -s encfs | grep -q "Status: install ok installed"; then
+if [[ -f /etc/fuse.conf ]]; then
     if grep -q "#user_allow_other" </etc/fuse.conf; then
         # update /etc/fuse.conf to allow non-root users to specify the allow_root mount option
         sudo sed -i -e 's/#user_allow_other/user_allow_other/g' /etc/fuse.conf
