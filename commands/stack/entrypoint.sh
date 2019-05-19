@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -76,20 +76,25 @@ if [[ $BCM_CLI_VERB == "stop"  ]]; then
             echo "ERROR: Stack '$STACK_NAME' does not exist in the BCM repository."
             exit
         fi
+        
+        STOP_SCRIPT="$BCM_STACKS_DIR/$STACK_NAME/stop.sh"
+        if [[ -f $STOP_SCRIPT ]]; then
+            bash -c "$STOP_SCRIPT"
+        fi
     fi
 fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then
     PREFIX="-$BCM_ACTIVE_CHAIN"
     
-    if lxc list --format csv --columns n,s | grep -q "$BCM_GATEWAY_HOST_NAME,STOPPED"; then
-        lxc start "$BCM_GATEWAY_HOST_NAME"
-        bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_GATEWAY_HOST_NAME"
+    if lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME,STOPPED"; then
+        lxc start "$BCM_MANAGER_HOST_NAME"
+        bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
     fi
     
-    if lxc list --format csv -c=n | grep -q "$BCM_GATEWAY_HOST_NAME"; then
+    if lxc list --format csv -c=n | grep -q "$BCM_MANAGER_HOST_NAME"; then
         CHAIN=$BCM_ACTIVE_CHAIN
-        for STACK in $(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN")
+        for STACK in $(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN")
         do
             STACK=${STACK%"$PREFIX"}
             echo "$STACK"
@@ -98,8 +103,7 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "clear" ]]; then
-    for STACK in $(bcm stack list)
-    do
-        bcm stack stop "$STACK" --delete
-    done
+    bcm stack stop bitcoind --delete
+    bcm stack stop torproxy --delete
+    bcm stack stop toronion --delete
 fi

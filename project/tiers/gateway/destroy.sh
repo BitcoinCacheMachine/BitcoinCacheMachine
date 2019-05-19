@@ -26,5 +26,5 @@ bash -c "$BCM_LXD_OPS/delete_lxc_network.sh --network-name=bcmNet"
 
 bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-gateway-template"
 
-PROFILE_NAME="bcm-gateway-$BCM_VERSION"
+PROFILE_NAME="bcm-gateway"
 bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=$PROFILE_NAME"

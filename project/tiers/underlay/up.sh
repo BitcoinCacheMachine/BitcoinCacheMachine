@@ -11,8 +11,10 @@ fi
 
 # ensure the kafka tier is deployed
 if ! bcm tier list | grep -q "kafka"; then
-    echo "INFO SKIPPING KAFKA deployment -- REMOVE BEFORE PUBLISH"
-    bcm tier create kafka
+    # TODO REMOVE THIS AT SOME POINT.
+    if [[ $BCM_DEBUG == 0 ]]; then
+        bcm tier create kafka
+    fi
 fi
 
 # Let's provision the system containers to the cluster.

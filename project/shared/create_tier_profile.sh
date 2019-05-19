@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -22,9 +22,12 @@ for i in "$@"; do
     esac
 done
 
-# first let's install the profile for the TIER.
-PROFILE_NAME="bcm-$TIER_NAME-$BCM_VERSION"
-if ! lxc profile list | grep -q "$PROFILE_NAME"; then
+PROFILE_NAME="bcm-$TIER_NAME"
+if [[ $TIER_NAME == bitcoin* ]]; then
+    PROFILE_NAME=bcm-bitcoin
+fi
+
+if lxc profile list | grep -q "$PROFILE_NAME"; then
     lxc profile create "$PROFILE_NAME"
     
     if [[ -f "$YAML_PATH" ]]; then

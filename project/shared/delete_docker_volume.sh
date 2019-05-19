@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
@@ -33,7 +33,7 @@ if [[ $TIER_NAME == bitcoin ]]; then
     elif [[ $TIER_NAME == underlay ]]; then
     LXC_HOST="$BCM_UNDERLAY_HOST_NAME"
     elif [[ $TIER_NAME == gateway ]]; then
-    LXC_HOST="$BCM_GATEWAY_HOST_NAME"
+    LXC_HOST="$BCM_MANAGER_HOST_NAME"
     elif [[ $TIER_NAME == kafka ]]; then
     LXC_HOST="$BCM_KAFKA_HOST_NAME"
 fi

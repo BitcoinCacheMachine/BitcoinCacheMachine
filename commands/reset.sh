@@ -1,10 +1,15 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 CONTINUE=0
 CHOICE=n
+
+if [[ $BCM_RUNTIME_DIR == "$HOME" ]]; then
+    echo "WARNING: BCM reset will NOT run when 'bcmruntimedir=$HOME'"
+    exit
+fi
 
 while [[ "$CONTINUE" == 0 ]]
 do

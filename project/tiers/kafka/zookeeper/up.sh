@@ -10,13 +10,13 @@ lxc exec "$BCM_KAFKA_HOST_NAME" -- docker pull "$SOURCE_ZOOKEEPER_IMAGE"
 lxc exec "$BCM_KAFKA_HOST_NAME" -- docker tag "$SOURCE_ZOOKEEPER_IMAGE" "$ZOOKEEPER_IMAGE"
 lxc exec "$BCM_KAFKA_HOST_NAME" -- docker push "$ZOOKEEPER_IMAGE"
 
-if ! lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker network list | grep -q "zookeepernet"; then
-    lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker network create --driver overlay --opt encrypted --attachable zookeepernet
+if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network list | grep -q "zookeepernet"; then
+    lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network create --driver overlay --opt encrypted --attachable zookeepernet
 fi
 
 NODE=1
 
-lxc file push -p ./zookeeper.yml "$BCM_GATEWAY_HOST_NAME"/root/stacks/kafka/zookeeper.yml
+lxc file push -p ./zookeeper.yml "$BCM_MANAGER_HOST_NAME"/root/stacks/kafka/zookeeper.yml
 
 for ENDPOINT in $(bcm cluster list --endpoints); do
     if [[ "$NODE" -ge "$MAX_ZOOKEEPER_NODES" ]]; then
@@ -29,7 +29,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     # shellcheck source=../../project/shared/env.sh
     source "$BCM_GIT_DIR/project/shared/env.sh" --host-ending="$HOST_ENDING"
     
-    lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d "$HOST_ENDING")" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")" TARGET_HOST="$LXC_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/kafka/zookeeper.yml "zookeeper-$(printf %02d "$HOST_ENDING")"
+    lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d "$HOST_ENDING")" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")" TARGET_HOST="$LXC_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/kafka/zookeeper.yml "zookeeper-$(printf %02d "$HOST_ENDING")"
     
     NODE=$(("$NODE" + 1))
 done

@@ -44,9 +44,9 @@ if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
         REPLICAS=$MAX_INSTANCES
     fi
     
-    SERVICE_MODE=$(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker service list --format "{{.Mode}}" --filter name="$STACK_NAME")
+    SERVICE_MODE=$(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service list --format "{{.Mode}}" --filter name="$STACK_NAME")
     if [[ $SERVICE_MODE == "replicated" ]]; then
-        lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
+        lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
     fi
 fi
 
@@ -59,8 +59,8 @@ fi
 #         REPLICAS=$MAX_INSTANCES
 #     fi
 
-#     SERVICE_MODE=$(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker service list --format "{{.Mode}}" --filter name="$STACK_NAME")
+#     SERVICE_MODE=$(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service list --format "{{.Mode}}" --filter name="$STACK_NAME")
 #     if [[ $SERVICE_MODE == "replicated" ]]; then
-#         lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
+#         lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
 #     fi
 # fi

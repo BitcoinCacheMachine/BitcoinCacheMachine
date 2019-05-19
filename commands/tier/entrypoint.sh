@@ -50,6 +50,7 @@ fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
     if [[ $TIER_NAME == "gateway" ]]; then
+        # let's make sure we have the LXD project set up correctly.
         bash -c "$BCM_GIT_DIR/project/tiers/gateway/up.sh"
     fi
     
@@ -74,7 +75,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
         elif [[ $TIER_NAME == "underlay" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/underlay/destroy.sh"
         elif  [[ $TIER_NAME == "bitcoin" ]]; then
-        bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/destroy.sh"
+        bash -c "$BCM_LXD_OPS/remove_tier.sh --tier-name=bitcoin"
     fi
 fi
 

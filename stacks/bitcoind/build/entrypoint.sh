@@ -11,7 +11,8 @@ fi
 TOR_HOST_IP="$(getent hosts torsocks | awk '{ print $1 }')"
 TOR_PROXY="$TOR_HOST_IP:9050"
 TOR_CONTROL="$TOR_HOST_IP:9051"
-OVERLAY_NETWORK_IP=$(ip addr | grep "172.16.238." | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+OVERLAY_NETWORK_IP="172.16.238.3"
+OVERLAY_ONION_IP="172.16.200.6"
 
 wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL"
@@ -34,7 +35,7 @@ MAX_UPLOAD_TARGET=10
 P2P_PORT=8333
 BITCOIND_ZMQ_BLOCK_PORT=9332
 BITCOIND_ZMQ_TX_PORT=9331
-ASSUME_VALID_BLOCK_HASH="0000000000000000001f0639d842b8d9bc767abd38e133c922bccf4903fff57d"
+ASSUME_VALID_BLOCK_HASH="000000000000000000200dae629d608a24fcaf4f564f9b39ea517858dabf2238"
 if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     BITCOIND_CHAIN_TEXT="-testnet"
     MEM_POOL_SIZE=300
@@ -42,7 +43,7 @@ if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     P2P_PORT=18333
     BITCOIND_ZMQ_BLOCK_PORT=19332
     BITCOIND_ZMQ_TX_PORT=19331
-    ASSUME_VALID_BLOCK_HASH="000000000000028c22cd6603c90294d0600755818ef4168dbf01f00b14b27cae"
+    ASSUME_VALID_BLOCK_HASH="000000000000018988103eae5d6b0ae47afcc444fc6ab93ee0cf6000512ed6aa"
     echo "testnet=1" >> /root/.bitcoin/bitcoin.conf
     elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
     BITCOIND_CHAIN_TEXT="-regtest"
@@ -77,9 +78,14 @@ bitcoind -conf=/root/.bitcoin/bitcoin.conf \
 -torcontrol="$TOR_CONTROL" \
 -proxyrandomize=1 \
 -zmqpubrawblock="tcp://$OVERLAY_NETWORK_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
+-zmqpubrawblock="tcp://$OVERLAY_ONION_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
 -zmqpubrawtx="tcp://$OVERLAY_NETWORK_IP:$BITCOIND_ZMQ_TX_PORT" \
--rpcbind="$OVERLAY_NETWORK_IP:$BITCOIND_RPC_PORT" \
+-zmqpubrawtx="tcp://$OVERLAY_ONION_IP:$BITCOIND_ZMQ_TX_PORT" \
+-rpcallowip="127.0.0.0/8" \
 -rpcallowip="172.16.238.0/24" \
+-rpcallowip="172.16.200.0/24" \
+-rpcbind="$OVERLAY_NETWORK_IP:$BITCOIND_RPC_PORT" \
+-rpcbind="$OVERLAY_ONION_IP:$BITCOIND_RPC_PORT" \
 -rpcbind="127.0.0.1:$BITCOIND_RPC_PORT" \
 -wallet="/bitcoin/wallet" \
 -dbcache="$BITCOIND_DBCACHE" \
@@ -87,5 +93,6 @@ bitcoind -conf=/root/.bitcoin/bitcoin.conf \
 -maxmempool="$MEM_POOL_SIZE" \
 -maxuploadtarget="$MAX_UPLOAD_TARGET" \
 -bind="$OVERLAY_NETWORK_IP" \
+-bind="$OVERLAY_ONION_IP" \
 -port="$P2P_PORT" \
 -debug=tor "$BITCOIND_CHAIN_TEXT"

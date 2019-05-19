@@ -5,59 +5,52 @@ services:
     volumes:
       - data:/root/.tor
       - logs:/var/log/tor
-    # networks: 
-    #   toronion-bitcoind-rpc:
-    #     ipv4_address: 172.16.200.1
-    #   toronion-lnd-rpc:
-    #     ipv4_address: 172.16.200.5
-    #   toronion-ridethelightning-http:
-    #     ipv4_address: 172.16.200.9
+    networks: 
+      bitcoindnet:
     configs:
       - source: torrc-config
         target: /etc/tor/torrc
         mode: 0640
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
       placement:
         constraints:
           - engine.labels.bcm-underlay == true
 
-# downstream services needing to be accessible over
-# the internet will attach to this overlay network.
-# note the torrc in the toronion stack needs to be updated
-# with the service ports.
-# networks:
-#   toronion-bitcoind-rpc:
-#     driver: overlay
-#     attachable: true
-#     ipam:
-#       driver: default
-#       config:
-#         - subnet: "172.16.200.0/30"
+networks:
+  bitcoindnet:
+    driver: overlay
+    attachable: true
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.200.0/24
 
-#   toronion-lnd-rpc:
-#     driver: overlay
-#     attachable: true
-#     ipam:
-#       driver: default
-#       config:
-#         - subnet: "172.16.200.4/30"
+  # toronion-lnd-rpc:
+  #   driver: overlay
+  #   attachable: true
+  #   ipam:
+  #     driver: default
+  #     config:
+  #       - subnet: "172.16.200.4/30"
 
-#   toronion-ridethelightning-http:
-#     driver: overlay
-#     attachable: true
-#     ipam:
-#       driver: default
-#       config:
-#         - subnet: "172.16.200.8/30"
+  # toronion-ridethelightning-http:
+  #   driver: overlay
+  #   attachable: true
+  #   ipam:
+  #     driver: default
+  #     config:
+  #       - subnet: "172.16.200.8/30"
 
-#   toronion-electrs-rpc:
-#     driver: overlay
-#     attachable: true
-#     ipam:
-#       driver: default
-#       config:
-#         - subnet: "172.16.200.12/30"
+  # toronion-electrs-rpc:
+  #   driver: overlay
+  #   attachable: true
+  #   ipam:
+  #     driver: default
+  #     config:
+  #       - subnet: "172.16.200.12/30"
 
 volumes:
   data:

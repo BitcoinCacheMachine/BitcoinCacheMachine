@@ -7,7 +7,7 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged once a stable proof-of-concept has been created. Currently, the default branch on github.com is `dev` which is the most up-to-date proof-of-concept version. Once a stable PoC has been created, changes will be pulled into the master branch which will represent the most up-to-date stable, and tested, version of BCM.
+**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM.
 
 Although the end-state of BCM is an operationally privacy-centric data center,
 

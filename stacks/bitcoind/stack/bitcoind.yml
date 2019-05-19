@@ -8,7 +8,7 @@ services:
       - data:/root/.bitcoin
       - blocks:/root/.blocks
       - cli:/usr/local/bin
-      - tor-data:/root/.tor
+      - tor-data:/root/.tor:ro
     environment:
       BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
       BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
@@ -17,7 +17,10 @@ services:
       bitcoindrpcnet:
         aliases:
           - bitcoindrpc-${BCM_ACTIVE_CHAIN}
+        ipv4_address: 172.16.238.3/24
       torsocksnet:
+      toronionnet:
+        ipv4_address: 172.16.200.6/24
     configs:
       - source: bitcoin-config
         target: /config/bitcoin.conf
@@ -37,25 +40,28 @@ volumes:
   blocks:
   cli:
   
-  # the data volume is defined OUTSIDE of the yml since we MAY pre-populate the volume.
   data:
     external: true
     name: bitcoind-${BCM_ACTIVE_CHAIN:-}_data
 
   tor-data:
     external: true
-    name: tor_data
+    name: torproxy-${BCM_ACTIVE_CHAIN:-}_data
 
 networks:
   bitcoindrpcnet:
     driver: overlay
     attachable: true
+    internal: true
     ipam:
       driver: default
       config:
-        - subnet: "172.16.238.0/24"
+        - subnet: 172.16.238.0/24
 
   torsocksnet:
     external: true
-    name: tor_torsocksnet
-    
+    name: torproxy-${BCM_ACTIVE_CHAIN:-}_torsocksnet
+
+  toronionnet:
+    external: true
+    name: toronion-${BCM_ACTIVE_CHAIN:-}_bitcoindnet

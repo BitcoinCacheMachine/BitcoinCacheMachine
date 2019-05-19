@@ -20,9 +20,9 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 --image-name="$IMAGE_NAME"
 
 # push the stack and build files
-lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
+lxc file push -p -r "$(pwd)/stack/" "$BCM_MANAGER_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
+lxc exec "$BCM_MANAGER_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
 SERVICE_PORT="$SERVICE_PORT" \

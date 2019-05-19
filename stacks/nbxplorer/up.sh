@@ -21,7 +21,7 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 --image-name="$IMAGE_NAME"
 
 # push the stack and build files
-lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
+lxc file push -p -r "$(pwd)/stack/" "$BCM_MANAGER_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
 BITCOIND_RPC_PORT="8332"
 BITCOIND_P2P_PORT="8333"
@@ -34,7 +34,7 @@ if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
 fi
 
 
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
+lxc exec "$BCM_MANAGER_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
 BITCOIND_RPCPORT="$BITCOIND_RPC_PORT" \

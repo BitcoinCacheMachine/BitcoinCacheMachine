@@ -1,11 +1,11 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# the base project
-source ./env
-
+if ! lxc project list | grep -q "default (current)"; then
+    lxc project switch default
+fi
 
 # first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
 # if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
@@ -25,6 +25,13 @@ if ! lxc profile list | grep -q "docker_privileged"; then
     lxc profile create docker_privileged
     cat ./lxd_profiles/docker_privileged.yml | lxc profile edit docker_privileged
 fi
+
+# create the docker_unprivileged profile
+if ! lxc profile list | grep -q "bcm_disk"; then
+    lxc profile create bcm_disk
+    cat ./lxd_profiles/bcm_disk.yml | lxc profile edit bcm_disk
+fi
+
 
 if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
     echo "The LXD image 'bcm-lxc-base' doesn't exist. Exiting."
@@ -75,58 +82,55 @@ if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     exit
 fi
 
-# get the HOST_NAME variable from external env
-source ./env
-if ! lxc list --format csv | grep -q "$HOST_NAME"; then
-    echo "Creating host '$HOST_NAME'."
-    lxc init bcm-lxc-base -p default -p docker_privileged -n bcmbr0 "$HOST_NAME"
+if ! lxc list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+    echo "Creating host '$LXC_BCM_BASE_IMAGE_NAME'."
+    lxc init bcm-lxc-base -p bcm_disk -p docker_privileged -n bcmbr0 "$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
-if lxc list --format csv -c=ns | grep "$HOST_NAME" | grep -q STOPPED; then
-    lxc start "$HOST_NAME"
-    
+if lxc list --format csv -c=ns | grep "$LXC_BCM_BASE_IMAGE_NAME" | grep -q STOPPED; then
+    lxc start "$LXC_BCM_BASE_IMAGE_NAME"
     sleep 5
     
-    echo "Installing required software on LXC host '$HOST_NAME'."
-    lxc exec "$HOST_NAME" -- apt-get update
+    echo "Installing required software on LXC host '$LXC_BCM_BASE_IMAGE_NAME'."
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- apt-get update
     
     # docker.io is the only package that seems to work seamlessly with
     # storage backends. Using BTRFS since docker recognizes underlying file system
-    lxc exec "$HOST_NAME" -- apt-get install -y --no-install-recommends docker.io wait-for-it ifmetric jq
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- apt-get install -y --no-install-recommends docker.io wait-for-it ifmetric jq
     
     if [[ $BCM_DEBUG == 1 ]]; then
-        lxc exec "$HOST_NAME" -- apt-get install --no-install-recommends -y nmap curl slurm tcptrack dnsutils tcpdump
+        lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- apt-get install --no-install-recommends -y nmap curl slurm tcptrack dnsutils tcpdump
     fi
     
     ## checking if this alleviates docker swarm troubles in lxc.
     #https://github.com/stgraber/lxd/commit/255b875c37c87572a09e864b4fe6dd05a78b4d01
-    lxc exec "$HOST_NAME" -- touch /.dockerenv
-    lxc exec "$HOST_NAME" -- mkdir -p /etc/docker
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- touch /.dockerenv
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- mkdir -p /etc/docker
     
     # clean up the image before publication
-    lxc exec "$HOST_NAME" -- apt-get autoremove -qq
-    lxc exec "$HOST_NAME" -- apt-get clean -qq
-    lxc exec "$HOST_NAME" -- rm -rf /tmp/*
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- apt-get autoremove -qq
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- apt-get clean -qq
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- rm -rf /tmp/*
     
-    lxc exec "$HOST_NAME" -- systemctl stop docker
-    lxc exec "$HOST_NAME" -- systemctl enable docker
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- systemctl stop docker
+    lxc exec "$LXC_BCM_BASE_IMAGE_NAME" -- systemctl enable docker
     
     #stop the template since we don't need it running anymore.
-    lxc stop "$HOST_NAME"
+    lxc stop "$LXC_BCM_BASE_IMAGE_NAME"
     
-    lxc profile remove "$HOST_NAME" docker_privileged
-    lxc network detach bcmbr0 "$HOST_NAME"
+    lxc profile remove "$LXC_BCM_BASE_IMAGE_NAME" docker_privileged
+    lxc network detach bcmbr0 "$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
 # Let's publish a snapshot. This will be the basis of our LXD image.
-lxc snapshot "$HOST_NAME" bcmHostSnapshot
+lxc snapshot "$LXC_BCM_BASE_IMAGE_NAME" bcmHostSnapshot
 
 # publish the resulting image
 # other members of the LXD cluster will be able to pull and run this image
-echo "Publishing $HOST_NAME""/bcmHostSnapshot" "'$LXC_BCM_BASE_IMAGE_NAME' on cluster '$(lxc remote get-default)'."
-lxc publish "$HOST_NAME""/bcmHostSnapshot" --alias "$LXC_BCM_BASE_IMAGE_NAME"
+echo "Publishing $LXC_BCM_BASE_IMAGE_NAME""/bcmHostSnapshot" "'$LXC_BCM_BASE_IMAGE_NAME' on cluster '$(lxc remote get-default)'."
+lxc publish "$LXC_BCM_BASE_IMAGE_NAME/bcmHostSnapshot" --alias "$LXC_BCM_BASE_IMAGE_NAME"
 
 
 if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    lxc delete "$HOST_NAME"
+    lxc delete "$LXC_BCM_BASE_IMAGE_NAME"
 fi

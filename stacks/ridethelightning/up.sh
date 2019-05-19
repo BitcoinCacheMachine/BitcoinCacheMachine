@@ -18,13 +18,13 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 --image-name="$IMAGE_NAME"
 
 # push the stack and build files
-lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
+lxc file push -p -r "$(pwd)/stack/" "$BCM_MANAGER_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
 RTL_PASS="Password1"
 ENDPOINT=$(bcm get-ip)
 
 
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
+lxc exec "$BCM_MANAGER_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 SERVICE_PORT="$SERVICE_PORT" \
 RTL_PASS="$RTL_PASS" \
@@ -34,7 +34,7 @@ docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.ym
 wait-for-it -t 0 "$ENDPOINT:$SERVICE_PORT"
 
 # # let's the the pariing URL from the container output
-# PAIRING_OUTPUT_URL=$(lxc exec "$BCM_GATEWAY_HOST_NAME" -- docker service logs "$STACK_NAME-$BCM_ACTIVE_CHAIN""_$SERVICE_NAME" | grep 'Pairing URL: ' | awk '{print $5}')
+# PAIRING_OUTPUT_URL=$(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service logs "$STACK_NAME-$BCM_ACTIVE_CHAIN""_$SERVICE_NAME" | grep 'Pairing URL: ' | awk '{print $5}')
 # RTL_URL=${PAIRING_OUTPUT_URL/0.0.0.0/$ENDPOINT}
 
 xdg-open "http://$ENDPOINT:$SERVICE_PORT"

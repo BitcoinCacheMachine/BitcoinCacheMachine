@@ -1,9 +1,11 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 bcm stack start torproxy
+
+bcm stack start toronion
 
 source ./env.sh
 
@@ -18,7 +20,7 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 --image-name="$IMAGE_NAME"
 
 # push the stack and build files
-lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
+lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" "$BCM_MANAGER_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
 # get bitcoind ENV vars. This file is also
 source ./env.sh --chain="$BCM_ACTIVE_CHAIN"
@@ -91,7 +93,7 @@ else
     fi
 fi
 
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
+lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
 INITIAL_BLOCK_DOWNLOAD="$INITIAL_BLOCK_DOWNLOAD" \

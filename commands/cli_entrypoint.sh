@@ -130,7 +130,12 @@ if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
 fi
 
 if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
-    bash -c "$BCM_GIT_DIR/project/destroy.sh" "$@"
+    bcm tier destroy bitcoin
+    bcm tier destroy underlay
+    bcm tier destroy kafka
+    bcm tier destroy gateway
+    bash -c "$BCM_PROJECT_DIR/destroy.sh"
+    
     exit
 fi
 
