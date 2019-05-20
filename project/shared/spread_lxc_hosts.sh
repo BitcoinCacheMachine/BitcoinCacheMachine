@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -25,11 +25,11 @@ fi
 PROFILE_NAME="bcm-$TIER_NAME"
 
 # if we are provisioning the bitcoin tier, let's go ahead and scope it to the active chain
-if [[ $TIER_NAME == "bitcoin" ]]; then
-    TIER_NAME="$TIER_NAME$BCM_ACTIVE_CHAIN"
+if [[ $TIER_NAME == bitcoin* ]]; then
+    PROFILE_NAME="bcm-bitcoin"
 fi
 
-# let's get a bcm-gateway LXC instance on each cluster endpoint.
+# let's get a bcm-manager LXC instance on each cluster endpoint.
 MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
 for ENDPOINT in $(bcm cluster list --endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
@@ -52,11 +52,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     
     # create the LXC host with the attached profiles.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
-        # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.  If not, we call $BCM_GIT_DIR/project/create_bcm_host_template.sh.sh
-        if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-            bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
-        fi
-        
+        # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists. 
         lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile=bcm_disk --profile=docker_privileged --profile="$PROFILE_NAME"
     else
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."

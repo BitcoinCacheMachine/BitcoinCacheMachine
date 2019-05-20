@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -105,9 +105,9 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
         bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$LXC_HOSTNAME"
     fi
     
-    # if TIER type is >=1 then we wait for gateway which is assumed to exist.
+    # if TIER type is >=1 then we wait for manager which is assumed to exist.
     # all nodes from this script are workers. Manager hosts are implemented
-    # outside this script (see gateway).
+    # outside this script (see manager).
     source ./get_docker_swarm_tokens.sh
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
         lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_MANAGER_HOST_NAME":2377

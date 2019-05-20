@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
+# don't even think about proceeding unless the manager BCM tier is up and running.
 if bcm tier list | grep -q "underlay"; then
     echo "The 'underlay' tier is already provisioned."
     exit

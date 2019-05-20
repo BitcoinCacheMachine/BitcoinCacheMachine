@@ -22,8 +22,8 @@ fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then
     LXC_LIST_OUTPUT=$(lxc list --format csv --columns ns | grep "RUNNING")
-    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-gateway"; then
-        echo "gateway"
+    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-manager"; then
+        echo "manager"
     fi
     
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-kafka"; then
@@ -49,9 +49,9 @@ if [ -z "${TIER_NAME}" ]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    if [[ $TIER_NAME == "gateway" ]]; then
+    if [[ $TIER_NAME == "manager" ]]; then
         # let's make sure we have the LXD project set up correctly.
-        bash -c "$BCM_GIT_DIR/project/tiers/gateway/up.sh"
+        bash -c "$BCM_GIT_DIR/project/tiers/manager/up.sh"
     fi
     
     if [[ $TIER_NAME == "kafka" ]]; then
@@ -68,8 +68,8 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    if [[ $TIER_NAME == "gateway" ]]; then
-        bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
+    if [[ $TIER_NAME == "manager" ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/manager/destroy.sh"
         elif [[ $TIER_NAME == "kafka" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/kafka/destroy.sh"
         elif [[ $TIER_NAME == "underlay" ]]; then

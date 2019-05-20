@@ -20,7 +20,7 @@ if ! lxc project list | grep -q "$BCM_PROJECT (current)"; then
     lxc project switch "$BCM_PROJECT"
 fi
 
-export TIER_NAME=gateway
+export TIER_NAME=manager
 
 # shellcheck source=../../project/shared/env.sh
 #source "$BCM_GIT_DIR/project/shared/env.sh"
@@ -28,11 +28,50 @@ export TIER_NAME=gateway
 # first, create the profile that represents the tier.
 bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=$(pwd)/tier_profile.yml"
 
-# create the networks for the gateway tier.
-bash -c "./create_lxc_gateway_networks.sh"
+# the way we provision a network on a cluster of count 1 is DIFFERENT
+# than one that's larger than 1.
+if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
+    # create and populate the required network
+    
+    # we have to do this for each cluster node
+    for endpoint in $(bcm cluster list --endpoints); do
+        lxc network create --target "$endpoint" bcmbrGWNat
+        lxc network create --target "$endpoint" bcmNet
+    done
+fi
 
-# get all the bcm-gateway-xx containers deployed to the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=gateway"
+function createBCMBRGW() {
+    if ! lxc network list --format csv | grep -q bcmbrGWNat; then
+        lxc network create bcmbrGWNat ipv4.nat=true ipv6.nat=false ipv6.address=none
+    fi
+}
+
+function createBCMNet() {
+    if ! lxc network list --format csv | grep -q bcmNet; then
+        lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
+    fi
+}
+
+#
+if lxc network list | grep bcmbrGWNat | grep -q PENDING; then
+    createBCMBRGW
+fi
+
+if ! lxc network list | grep -q bcmbrGWNat; then
+    createBCMBRGW
+fi
+
+#
+if lxc network list | grep bcmNet | grep -q PENDING; then
+    createBCMNet
+fi
+
+if ! lxc network list | grep -q bcmNet; then
+    createBCMNet
+fi
+
+# get all the bcm-manager-xx containers deployed to the cluster.
+bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=manager"
 
 # let's start the LXD container on the LXD cluster master.
 lxc file push ./dhcpd_conf.yml "$BCM_MANAGER_HOST_NAME/etc/netplan/10-lxc.yaml"
@@ -60,7 +99,7 @@ lxc restart "$BCM_MANAGER_HOST_NAME"
 bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
 
 # push the stack files up tthere.
-lxc file push  -p -r ./stacks/ "$BCM_MANAGER_HOST_NAME"/root/gateway/
+lxc file push  -p -r ./stacks/ "$BCM_MANAGER_HOST_NAME"/root/manager/
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="bcm-registry:latest" \
 TARGET_PORT=5000 \
@@ -73,7 +112,7 @@ lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:5
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="bcm-registry:latest" \
 TARGET_PORT=5010 \
 TARGET_HOST="$BCM_MANAGER_HOST_NAME" \
-docker stack deploy -c "/root/gateway/stacks/registry/privreg.yml" privateregistry
+docker stack deploy -c "/root/manager/stacks/registry/privreg.yml" privateregistry
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:5010"
 
@@ -89,19 +128,19 @@ lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-regi
 
 
 # let's cycle through the other cluster members (other than the master)
-# and get their bcm-gateway host going.
+# and get their bcm-manager host going.
 # shellcheck disable=SC1090
 source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 
-## TODO this probably doesn't work with multiple gateway containers at the moment.
-# todo need to update daemon.json to populate with hostname of gateway-01
+## TODO this probably doesn't work with multiple manager containers at the moment.
+# todo need to update daemon.json to populate with hostname of manager-01
 MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
 HOSTNAME=
 for ENDPOINT in $(bcm cluster list --endpoints); do
     if [[ $ENDPOINT != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
-        HOSTNAME="bcm-gateway-$(printf %02d "$HOST_ENDING")"
+        HOSTNAME="bcm-manager-$(printf %02d "$HOST_ENDING")"
         
         if [[ $HOST_ENDING -ge 2 ]]; then
             lxc file push ./daemon.json "$HOSTNAME/etc/docker/daemon.json"
@@ -111,7 +150,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
             
             bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
             
-            # make sure gateway and kafka hosts can reach the swarm master.
+            # make sure manager and kafka hosts can reach the swarm master.
             # this steps helps resolve networking before we issue any meaningful
             # commands.
             lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 -q "$BCM_MANAGER_HOST_NAME":2377
@@ -121,7 +160,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
             if [[ $HOST_ENDING -le 3 ]]; then
                 lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_MANAGER_JOIN_TOKEN" "$BCM_MANAGER_HOST_NAME":2377
             else
-                # All other LXD bcm-gateway-04 or greater will be workers in the swarm.
+                # All other LXD bcm-manager-04 or greater will be workers in the swarm.
                 lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" "$BCM_MANAGER_HOST_NAME":2377
             fi
             
@@ -129,7 +168,7 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
             # another registry mirror and private registry in case node1 goes offline.
             # We will only have 2 locations for docker image distribution.
             if [[ $HOST_ENDING == 2 ]]; then
-                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-gateway-01:5000" docker stack deploy -c "/root/gateway/stacks/registry/regmirror.yml" regmirror2
+                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-manager-01:5000" docker stack deploy -c "/root/manager/stacks/registry/regmirror.yml" regmirror2
             fi
         fi
     fi

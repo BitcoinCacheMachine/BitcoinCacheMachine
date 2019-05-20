@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-export TIER_NAME=gateway
+export TIER_NAME=manager
 
 # shellcheck source=../../project/shared/env.sh
 source "$BCM_GIT_DIR/project/shared/env.sh"
@@ -24,7 +24,7 @@ bash -c "$BCM_LXD_OPS/delete_lxc_network.sh --network-name=bcmbrGWNat"
 
 bash -c "$BCM_LXD_OPS/delete_lxc_network.sh --network-name=bcmNet"
 
-bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-gateway-template"
+bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=bcm-manager-template"
 
-PROFILE_NAME="bcm-gateway"
+PROFILE_NAME="bcm-manager"
 bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=$PROFILE_NAME"

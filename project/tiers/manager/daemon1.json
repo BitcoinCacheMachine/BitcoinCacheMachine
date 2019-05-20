@@ -1,12 +1,12 @@
 {
     "storage-driver": "btrfs",
     "registry-mirrors": [
-        "http://$BCM_MANAGER_HOST_NAME:5000"
+        "http://127.0.0.1:5000"
     ],
     "insecure-registries": [
-        "$BCM_MANAGER_HOST_NAME:5010"
+        "http://127.0.0.1:5010"
     ],
     "labels": [
-        "bcm-gateway=true"
+        "bcm-manager=true"
     ]
 }

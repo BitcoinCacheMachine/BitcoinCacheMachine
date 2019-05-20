@@ -133,7 +133,7 @@ if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
     bcm tier destroy bitcoin
     bcm tier destroy underlay
     bcm tier destroy kafka
-    bcm tier destroy gateway
+    bcm tier destroy manager
     bash -c "$BCM_PROJECT_DIR/destroy.sh"
     
     exit

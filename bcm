@@ -58,7 +58,7 @@ source "$BCM_CONFIG_FILE"
 export BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN"
 export BCM_SSH_DIR="$BCM_RUNTIME_DIR/ssh"
 
-export ELECTRUM_DIR="$BCM_RUNTIME_DIR/electrum"
+export ELECTRUM_DIR="$BCM_RUNTIME_DIR/.electrum"
 export ELECTRUM_ENC_DIR="$BCM_RUNTIME_DIR/.electrum_enc"
 
 export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/clusters"

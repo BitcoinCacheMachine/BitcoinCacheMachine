@@ -2,7 +2,6 @@ config:
   user.network-config: |
     version: 1
     config:  
-      # bcmnet
       - type: physical
         name: eth0
         subnets:

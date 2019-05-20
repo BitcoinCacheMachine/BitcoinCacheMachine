@@ -1,17 +1,17 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
+# don't even think about proceeding unless the manager BCM tier is up and running.
 if bcm tier list | grep -q kafka; then
     echo "The 'kafka' tier is already provisioned."
     exit
 fi
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
-if ! bcm tier list | grep -q gateway; then
-    bcm tier create gateway
+# don't even think about proceeding unless the manager BCM tier is up and running.
+if ! bcm tier list | grep -q manager; then
+    bcm tier create manager
 fi
 
 # Let's provision the system containers to the cluster.

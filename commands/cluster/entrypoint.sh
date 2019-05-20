@@ -344,7 +344,6 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     
                     if [ -x "$(command -v lxc)" ]; then
                         sudo lxd shutdown
-                        sudo snap remove lxd
                     else
                         echo "Info: lxd was not installed."
                     fi
@@ -379,6 +378,8 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
             
             echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
             lxc remote remove "$CLUSTER_NAME"
+        else
+            echo "WARNING: The active cluster is not set! Nothing to destroy. Consider adding --cluster-name= to specify a cluster."
         fi
     fi
 fi

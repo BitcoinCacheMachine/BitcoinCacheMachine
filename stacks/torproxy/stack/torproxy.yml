@@ -15,7 +15,7 @@ services:
           - engine.labels.bcm-bitcoin == true
 
 # we attach the tor daemon to the host networking stack
-# so the ports will be exposed ONLY on the gateway host
+# so the ports will be exposed ONLY on the manager host
 # instead of an overlay network spanning all LXC hosts.
 networks:
   torsocksnet:

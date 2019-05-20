@@ -42,6 +42,7 @@ fi
 
 echo "  client_version:            $BCM_VERSION";
 echo "  cli_debug:                 $BCM_DEBUG"
+echo "  active_chain:              $BCM_ACTIVE_CHAIN";
 
 
 echo "bcm_deployment:"
@@ -57,7 +58,6 @@ if ! lxc remote get-default | grep -q "local"; then
     fi
     echo "  data_center:               $BCM_DATACENTER";
     echo "  cluster_version:           $CLUSTER_VERSION"
-    echo "  active_chain:              $BCM_ACTIVE_CHAIN";
     
     # let's show some LXD cluster related stuff.
     if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
