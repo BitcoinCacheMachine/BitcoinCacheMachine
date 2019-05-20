@@ -1,2 +1,0 @@
-# the base project
-HOST_NAME="$(echo bcm-host-template-$BCM_VERSION | tr '.' '-')"

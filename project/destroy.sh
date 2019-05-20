@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-source ./env
-
 DELETE_BCM_IMAGE=1
 DELETE_LXC_BASE=0
 
@@ -29,29 +27,6 @@ for i in "$@"; do
     esac
 done
 
-
-bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/destroy.sh"
-
-bash -c "$BCM_GIT_DIR/project/tiers/underlay/destroy.sh"
-
-bash -c "$BCM_GIT_DIR/project/tiers/kafka/destroy.sh"
-
-bash -c "$BCM_GIT_DIR/project/tiers/gateway/destroy.sh"
-
-
-source ./env
-
-# stop $HOST_NAME
-if lxc list --format csv | grep "$HOST_NAME" | grep -q "RUNNING"; then
-    lxc stop "$HOST_NAME"
-fi
-
-# delete $HOST_NAME
-if lxc list --format csv | grep -q "$HOST_NAME"; then
-    echo "Deleting $HOST_NAME lxd host."
-    lxc delete "$HOST_NAME"
-fi
-
 if [[ $DELETE_BCM_IMAGE == 1 ]]; then
     # remove image bcm-template
     bash -c "$BCM_LXD_OPS/delete_lxc_image.sh --image-name=$LXC_BCM_BASE_IMAGE_NAME"
@@ -68,16 +43,17 @@ bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_privileged"
 # delete profile 'docker-unprivileged'
 bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_unprivileged"
 
+# delete profile 'bcm_disk'
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=bcm_disk"
+
 if lxc network list --format csv | grep "bcmbr0" | grep -q ",0,"; then
     lxc network delete bcmbr0
 fi
 
-# ensure we have an LXD project defined for this deployment
-# you can use lxd projects to deploy mutliple BCM instances on the same set of hardware (i.e., lxd cluster)
-CHAIN=$BCM_ACTIVE_CHAIN
-if lxc project list | grep -q "$CHAIN"; then
+#
+if ! lxc project list | grep -q "default (current)"; then
     lxc project switch default
-    lxc project delete "$CHAIN"
+    lxc project delete "$BCM_PROJECT"
 fi
 
 # clean up any hanging images

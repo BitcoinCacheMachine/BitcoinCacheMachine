@@ -185,10 +185,10 @@ if [[ $BCM_CLI_VERB == "add-onion" ]]; then
         # won't start due to duplicates.
         if ! grep -Fxq "$ONION_ADDRESS" "$TORRC"; then
             echo "$TOR_STRING" | sudo tee -a "$TORRC" >>/dev/null
-            sudo systemctl restart tor
+            sudo systemctl reload tor
             wait-for-it -t 15 --quiet 127.0.0.1:9050>>/dev/null
             
-            echo "$TITLE has been added to $TORRC and your local tor client has been restarted."
+            echo "$TITLE has been added to $TORRC and your local tor client has been reloaded."
         else
             echo "WARNING: you already have an onion endpoint with the same onion address! No changes were made."
         fi
@@ -216,10 +216,10 @@ if [[ $BCM_CLI_VERB == "remove-onion" ]]; then
         
         # restart tor daemon
         # TODO only restart if the line was in there in the first place
-        sudo systemctl restart tor >>/dev/null
+        sudo systemctl reload tor >>/dev/null
         wait-for-it -t 15 --quiet 127.0.0.1:9050>>/dev/null
         
-        echo "'$TITLE' has been removed from '$TORRC' and your local tor daemon has been restarted."
+        echo "'$TITLE' has been removed from '$TORRC' and your local tor daemon has been reloaded."
     else
         echo "'$TITLE' was not found in $TORRC"
     fi

@@ -3,15 +3,15 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
+# don't even think about proceeding unless the manager BCM tier is up and running.
 if bcm tier list | grep -q kafka; then
     echo "The 'kafka' tier is already provisioned."
     exit
 fi
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
-if ! bcm tier list | grep -q gateway; then
-    bcm tier create gateway
+# don't even think about proceeding unless the manager BCM tier is up and running.
+if ! bcm tier list | grep -q manager; then
+    bcm tier create manager
 fi
 
 # Let's provision the system containers to the cluster.
@@ -24,7 +24,7 @@ source ./params.sh "$@"
 # now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
 # 5 nodes (if we have a cluster of that size). 5 should be more than enough for
 # most deployments.
-CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" --endpoints | wc -l)
+CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" endpoints | wc -l)
 export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
 
 echo "WARNING MUST UNCOMMENT BEFORE COMMIT"

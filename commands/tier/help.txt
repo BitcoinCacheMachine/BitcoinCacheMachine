@@ -10,4 +10,4 @@ Available Commands:
 Usage:
   bcm tier create $TIER_NAME
 
-Note: TIER_NAME can be 'bitcoin', 'underlay', 'kafka', or 'gateway'.
+Note: TIER_NAME can be 'bitcoin', 'underlay', 'kafka', or 'manager'.

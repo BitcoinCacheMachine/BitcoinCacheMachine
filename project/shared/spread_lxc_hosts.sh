@@ -22,16 +22,22 @@ if [[ -z $TIER_NAME ]]; then
     exit
 fi
 
-# let's get a bcm-gateway LXC instance on each cluster endpoint.
-MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
-for ENDPOINT in $(bcm cluster list --endpoints); do
+PROFILE_NAME="bcm-$TIER_NAME"
+
+# if we are provisioning the bitcoin tier, let's go ahead and scope it to the active chain
+if [[ $TIER_NAME == bitcoin* ]]; then
+    PROFILE_NAME="bcm-bitcoin"
+fi
+
+# let's get a bcm-manager LXC instance on each cluster endpoint.
+MASTER_NODE=$(bcm cluster list endpoints | grep '01')
+for ENDPOINT in $(bcm cluster list endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
-    
-    # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
-    source ./env.sh --host-ending="$HOST_ENDING"
+    LXC_HOSTNAME="bcm-$TIER_NAME-$(printf %02d "$HOST_ENDING")"
+    LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
     
     # only create the new storage volume if it doesn't already exist
-    if ! lxc storage volume list default | grep -q "$LXC_DOCKERVOL"; then
+    if lxc storage volume list default | grep -q "$LXC_DOCKERVOL"; then
         # then this is normal behavior. Let's create the storage volume
         if [ "$ENDPOINT" != "$MASTER_NODE" ]; then
             echo "Creating volume '$LXC_DOCKERVOL' on the default storage pool on cluster member '$ENDPOINT'."
@@ -46,14 +52,8 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
     
     # create the LXC host with the attached profiles.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
-        PROFILE_NAME="bcm-$TIER_NAME-$BCM_VERSION"
-        
-        # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.  If not, we call $BCM_GIT_DIR/project/create_bcm_host_template.sh.sh
-        if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-            bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
-        fi
-        
-        lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile=default --profile=docker_privileged --profile="$PROFILE_NAME"
+        # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists. 
+        lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile=bcm_disk --profile=docker_privileged --profile="$PROFILE_NAME"
     else
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi

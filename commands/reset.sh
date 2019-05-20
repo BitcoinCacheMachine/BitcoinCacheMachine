@@ -6,6 +6,11 @@ cd "$(dirname "$0")"
 CONTINUE=0
 CHOICE=n
 
+if [[ $BCM_RUNTIME_DIR == "$HOME" ]]; then
+    echo "WARNING: BCM reset will NOT run when 'bcmruntimedir=$HOME'"
+    exit
+fi
+
 while [[ "$CONTINUE" == 0 ]]
 do
     echo "WARNING: 'bcm reset' will delete the contents of '$BCM_RUNTIME_DIR' and will remove multipass, LXD, and docker from your localhost."

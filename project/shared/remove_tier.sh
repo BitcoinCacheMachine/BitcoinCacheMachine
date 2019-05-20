@@ -22,19 +22,20 @@ if [[ -z $TIER_NAME ]]; then
     exit
 fi
 
-# env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
-# Get the $PROFILE_NAME from env.sh
-source ./env.sh
+PROFILE_NAME="bcm-$TIER_NAME"
+if [[ $TIER_NAME == bitcoin* ]]; then
+    PROFILE_NAME="bcm-bitcoin"
+fi
 
 # iterate over endpoints and delete actual LXC hosts.
-for LXD_ENDPOINT in $(bcm cluster list --endpoints); do
+for LXD_ENDPOINT in $(bcm cluster list endpoints); do
     HOST_ENDING=$(echo "$LXD_ENDPOINT" | tail -c 2)
     
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
     source ./env.sh --host-ending="$HOST_ENDING"
     
-    if [[ "$LXC_HOSTNAME" != "$BCM_GATEWAY_HOST_NAME" ]]; then
-        # we are only going to remove the node if it's not the "$BCM_GATEWAY_HOST_NAME" node, which is special.
+    if [[ "$LXC_HOSTNAME" != "$BCM_MANAGER_HOST_NAME" ]]; then
+        # we are only going to remove the node if it's not the "$BCM_MANAGER_HOST_NAME" node, which is special.
         bash -c "$BCM_LXD_OPS/remove_docker_node.sh --node-name=$LXC_HOSTNAME"
     fi
     

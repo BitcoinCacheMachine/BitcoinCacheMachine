@@ -17,17 +17,22 @@ if [[ "$#" -lt 3 ]]; then
     exit
 fi
 
-BCM_DIR=
+NEW_RUNTIME_DIR=
 BCM_CHAIN=
+NEW_DATACENTER_NAME=
 
 for i in "$@"; do
     case $i in
-        bcmdir=*)
-            BCM_DIR="${i#*=}"
+        runtime-dir=*)
+            NEW_RUNTIME_DIR="${i#*=}"
             shift # past argument=value
         ;;
         chain=*)
             BCM_CHAIN="${i#*=}"
+            shift # past argument=value
+        ;;
+        datacenter=*)
+            NEW_DATACENTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
         *) ;;
@@ -38,20 +43,11 @@ done
 if [[ $BCM_CLI_VERB == "get" ]]; then
     OBJECT="${3:-}"
     if [[ $OBJECT == chain ]]; then
-        if [ "$(lxc remote get-default)" != "local" ]; then
-            BCM_CHAIN=$(lxc project list | grep "(current)" | awk '{print $2}')
-            
-            if [[ $BCM_CHAIN != "default" ]]; then
-                echo "$BCM_CHAIN"
-            else
-                echo "$BCM_DEFAULT_CHAIN"
-            fi
-        else
-            echo "$BCM_DEFAULT_CHAIN"
-        fi
-        
+        echo "$BCM_ACTIVE_CHAIN"
         elif [[ $OBJECT == bcmdir ]]; then
         echo "$BCM_RUNTIME_DIR"
+        elif [[ $OBJECT == datacenter ]]; then
+        echo "$BCM_DATACENTER"
     fi
 fi
 
@@ -63,24 +59,23 @@ if [[ $BCM_CLI_VERB == "set" ]]; then
             exit
         fi
         
-        # only do something if the user is actually changing chains.
-        if ! lxc project list | grep "(current)" | awk '{print $2}' | grep -q "$BCM_CHAIN"; then
-            # make sure we're on the right remove
-            if ! lxc project list | grep -q "$BCM_CHAIN"; then
-                lxc project create "$BCM_CHAIN" -c features.images=false -c features.profiles=false
-            fi
-            
-            lxc project switch "$BCM_CHAIN"
-            echo "You are now targeting '$BCM_CHAIN'"
-        fi
+        echo "export BCM_ACTIVE_CHAIN=$BCM_CHAIN" >> "$BCM_CONFIG_FILE"
     fi
     
-    if [[ ! -z $BCM_DIR ]]; then
-        if [[ ! -d $BCM_DIR ]]; then
-            echo "ERROR: directory '$BCM_DIR' does not exist."
+    if [[ ! -z $NEW_RUNTIME_DIR ]]; then
+        if [[ ! -d $NEW_RUNTIME_DIR ]]; then
+            echo "ERROR: directory '$NEW_RUNTIME_DIR' does not exist."
             exit
         fi
         
-        echo "export BCM_RUNTIME_DIR=$BCM_DIR" >> "$BCM_CONFIG_FILE"
+        echo "export BCM_RUNTIME_DIR=$NEW_RUNTIME_DIR" >> "$BCM_CONFIG_FILE"
     fi
+    
+    if [[ ! -z $NEW_DATACENTER_NAME ]]; then
+        echo "export BCM_DATACENTER=$NEW_DATACENTER_NAME" >> "$BCM_CONFIG_FILE"
+    fi
+fi
+
+if [[ $BCM_CLI_VERB == "show" ]]; then
+    bcm info
 fi

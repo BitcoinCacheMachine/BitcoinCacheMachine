@@ -17,7 +17,7 @@ If the cli is configured correctly, you can run `bcm info` to get an overview of
 * BCM_CHAIN:      All `bcm stack` commands are deployed against the active chain: "testnet", "mainnet", or "regtest". BCM_CHAIN is used in defining [LXD projects](https://github.com/lxc/lxd/blob/master/doc/projects.md), which allows you to deploy distinct data centers on common hardware.
 * active_cluster:            Current cluster under management.
 * BCM_LXD_IMAGE_CACHE:    If set, BCM will pull LXD images from this host.
-* BCM_DOCKER_IMAGE_CACHE: If set, BCM will configure the Docker mirror cache to use this host instead of Docker Hub.
+* BCM_DOCKER_IMAGE_CACHE_FQDN: If set, BCM will configure the Docker mirror cache to use this host instead of Docker Hub.
 
 # BCM CLI Features
 

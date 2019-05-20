@@ -21,12 +21,12 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 --image-name="$IMAGE_NAME"
 
 # push the stack and build files
-lxc file push -p -r "$(pwd)/stack/" "$BCM_GATEWAY_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
+lxc file push -p -r "$(pwd)/stack/" "$BCM_MANAGER_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
 source "$BCM_STACKS_DIR/bitcoind/env.sh"
 source ./env.sh
 
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
+lxc exec "$BCM_MANAGER_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"

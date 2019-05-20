@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # first, let's make sure we deploy our direct dependencies.
-if ! bcm tier list | grep -q "bitcoin"; then
+if ! bcm tier list | grep -q "bitcoin$BCM_ACTIVE_CHAIN"; then
     bcm tier create bitcoin
 fi
 
@@ -20,6 +20,6 @@ lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker build \
 lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker push "$TOR_IMAGE"
 
 # push the stack files up tthere.
-lxc file push  -p -r ./stack/ "$BCM_GATEWAY_HOST_NAME"/root/torproxy
+lxc file push  -p -r ./stack/ "$BCM_MANAGER_HOST_NAME"/root/torproxy
 
-lxc exec "$BCM_GATEWAY_HOST_NAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/root/torproxy/stack/torproxy.yml" torproxy
+lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/root/torproxy/stack/torproxy.yml" "torproxy-$BCM_ACTIVE_CHAIN"

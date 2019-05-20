@@ -75,7 +75,7 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
 fi
 
 function docker_tag_exists() {
-    lxc exec "$BCM_GATEWAY_HOST_NAME" -- curl -s -f -lSL "http://127.0.0.1:5010/v2/$1/tags/list" | grep "$1" | grep "$2"
+    lxc exec "$BCM_MANAGER_HOST_NAME" -- curl -s -f -lSL "http://127.0.0.1:5010/v2/$1/tags/list" | grep "$1" | grep "$2"
 }
 
 REBUILD=1
@@ -90,7 +90,7 @@ if [[ $REBUILD == 1 ]]; then
     fi
     
     # refresh the docker-base image
-    bash -c "$BCM_GIT_DIR/project/tiers/gateway/build_push_docker_base.sh"
+    bash -c "$BCM_GIT_DIR/project/tiers/manager/build_push_docker_base.sh"
     
     # let's build the image and push it to our private registry.
     IMAGE_FQDN="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"

@@ -7,6 +7,6 @@
         "http://127.0.0.1:5010"
     ],
     "labels": [
-        "bcm-gateway=true"
+        "bcm-manager=true"
     ]
 }

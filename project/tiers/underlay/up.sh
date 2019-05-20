@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# don't even think about proceeding unless the gateway BCM tier is up and running.
+# don't even think about proceeding unless the manager BCM tier is up and running.
 if bcm tier list | grep -q "underlay"; then
     echo "The 'underlay' tier is already provisioned."
     exit
@@ -11,8 +11,10 @@ fi
 
 # ensure the kafka tier is deployed
 if ! bcm tier list | grep -q "kafka"; then
-    echo "INFO SKIPPING KAFKA deployment -- REMOVE BEFORE PUBLISH"
-    bcm tier create kafka
+    # TODO REMOVE THIS AT SOME POINT.
+    if [[ $BCM_DEBUG == 0 ]]; then
+        bcm tier create kafka
+    fi
 fi
 
 # Let's provision the system containers to the cluster.
