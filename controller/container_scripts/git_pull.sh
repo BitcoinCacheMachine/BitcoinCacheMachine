@@ -12,8 +12,6 @@ service tor start
 
 wait-for-it -t 10 127.0.0.1:9050
 
-sleep 10
-
 git config --global "http.$BCM_REMOTE_REPO.proxy" socks5://127.0.0.1:9050
 
 echo "git config --global http.$BCM_REMOTE_REPO.proxy:  $(git config --global --get "http.$BCM_REMOTE_REPO.proxy")"

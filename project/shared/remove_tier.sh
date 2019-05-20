@@ -23,12 +23,12 @@ if [[ -z $TIER_NAME ]]; then
 fi
 
 PROFILE_NAME="bcm-$TIER_NAME"
-if [[ $TIER_NAME == bitcoin ]]; then
-    TIER_NAME="$TIER_NAME$BCM_ACTIVE_CHAIN"
+if [[ $TIER_NAME == bitcoin* ]]; then
+    PROFILE_NAME="bcm-bitcoin"
 fi
 
 # iterate over endpoints and delete actual LXC hosts.
-for LXD_ENDPOINT in $(bcm cluster list --endpoints); do
+for LXD_ENDPOINT in $(bcm cluster list endpoints); do
     HOST_ENDING=$(echo "$LXD_ENDPOINT" | tail -c 2)
     
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.

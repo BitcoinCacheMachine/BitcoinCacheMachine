@@ -56,13 +56,13 @@ export BCM_CONFIG_FILE="$BCM_CONFIG_FILE"
 source "$BCM_CONFIG_FILE"
 
 export BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN"
-export BCM_SSH_DIR="$BCM_RUNTIME_DIR/ssh"
+export BCM_SSH_DIR="$BCM_RUNTIME_DIR/.ssh"
 
 export ELECTRUM_DIR="$BCM_RUNTIME_DIR/.electrum"
 export ELECTRUM_ENC_DIR="$BCM_RUNTIME_DIR/.electrum_enc"
 
 export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/clusters"
-export BCM_WORKING_ENC_DIR="$BCM_RUNTIME_DIR/.clusters"
+export BCM_WORKING_ENC_DIR="$BCM_RUNTIME_DIR/.clusters_enc"
 
 GNUPGHOME="$BCM_RUNTIME_DIR/.gnupg"
 PASSWORD_STORE_DIR="$BCM_RUNTIME_DIR/.password_store"
@@ -86,8 +86,8 @@ export BCM_BITCOIN_HOST_NAME="$BCM_BITCOIN_HOST_NAME"
 export BCM_PRIVATE_REGISTRY="$BCM_MANAGER_HOST_NAME:5010"
 export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 
-export BCM_DOCKER_IMAGE_CACHE="registry-1.docker.io"
-export BCM_LXD_IMAGE_CACHE=images
+export BCM_DOCKER_IMAGE_CACHE_FQDN="registry-1.docker.io"
+export BCM_LXD_IMAGE_CACHE="images.linuxcontainers.org"
 
 if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
     ./commands/reset.sh "$@"

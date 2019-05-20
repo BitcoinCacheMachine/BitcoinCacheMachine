@@ -12,6 +12,8 @@ lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker pull "$TOR_IMAGE"
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$TOR_IMAGE" docker stack deploy -c "/root/toronion/stack/toronion.yml" "toronion-$BCM_ACTIVE_CHAIN"
 
+sleep 10
+
 # now we wait for the service to start, then we grab the new onion site and token
 # then we add it to our config using bcm ssh add-onion
 DOCKER_CONTAINER_ID=$(lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker ps | grep toronion | awk '{print $1}')

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 if ! lxc project list | grep -q "default (current)"; then
@@ -41,25 +41,26 @@ fi
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
 if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
-    # 'images' is the publicly avaialb e image server. Used whenever there's no LXD image cache specified.
-    IMAGE_REMOTE="images"
-    if [[ ! -z $BCM_LXD_IMAGE_CACHE ]]; then
-        IMAGE_REMOTE="$BCM_LXD_IMAGE_CACHE"
-        if ! lxc remote list --format csv | grep -q "$IMAGE_REMOTE"; then
-            lxc remote add "$IMAGE_REMOTE" "$IMAGE_REMOTE:8443"
+    # 'images' is the publicly avaialb e image server.
+    # we will use it if the default of images.linuxcontainers.org is set in BCM_LXD_IMAGE_CACHE
+    LXD_IMAGE_REMOTE="images"
+    if [[ $BCM_LXD_IMAGE_CACHE != "images.linuxcontainers.org" ]]; then
+        LXD_IMAGE_REMOTE="$BCM_LXD_IMAGE_CACHE"
+        if ! lxc remote list --format csv | grep -q "$LXD_IMAGE_REMOTE"; then
+            lxc remote add "$LXD_IMAGE_REMOTE" "$BCM_LXD_IMAGE_CACHE:8443"
         fi
     fi
     
-    echo "Copying the ubuntu/18.04 lxc image from LXD image server '$IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
-    lxc image copy "$IMAGE_REMOTE:ubuntu/18.04" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
+    echo "Copying the ubuntu/18.04 lxc image from LXD image server '$LXD_IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
+    lxc image copy "$LXD_IMAGE_REMOTE:ubuntu/18.04" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
 fi
 
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
-if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
+if [[ $(bcm cluster list endpoints | wc -l) -gt 1 ]]; then
     # we run the following command if it's a cluster having more than 1 LXD node.
-    for ENDPOINT in $(bcm cluster list --endpoints); do
+    for ENDPOINT in $(bcm cluster list endpoints); do
         lxc network create --target "$ENDPOINT" bcmbr0
     done
 else

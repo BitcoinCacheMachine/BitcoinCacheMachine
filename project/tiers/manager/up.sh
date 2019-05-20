@@ -1,10 +1,14 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
 bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
+
+if bcm tier list | grep -q bcm-manager; then
+    exit
+fi
 
 # It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
 if ! lxc project list | grep -q "$BCM_PROJECT"; then
@@ -30,11 +34,11 @@ bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
-if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
+if [[ $(bcm cluster list endpoints | wc -l) -gt 1 ]]; then
     # create and populate the required network
     
     # we have to do this for each cluster node
-    for endpoint in $(bcm cluster list --endpoints); do
+    for endpoint in $(bcm cluster list endpoints); do
         lxc network create --target "$endpoint" bcmbrGWNat
         lxc network create --target "$endpoint" bcmNet
     done
@@ -104,7 +108,7 @@ lxc file push  -p -r ./stacks/ "$BCM_MANAGER_HOST_NAME"/root/manager/
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="bcm-registry:latest" \
 TARGET_PORT=5000 \
 TARGET_HOST="$BCM_MANAGER_HOST_NAME" \
-REGISTRY_PROXY_REMOTEURL="https://$BCM_DOCKER_IMAGE_CACHE" \
+REGISTRY_PROXY_REMOTEURL="https://$BCM_DOCKER_IMAGE_CACHE_FQDN" \
 docker stack deploy -c "/root/$TIER_NAME/stacks/registry/regmirror.yml" regmirror
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:5000"
@@ -135,9 +139,9 @@ source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
 
 ## TODO this probably doesn't work with multiple manager containers at the moment.
 # todo need to update daemon.json to populate with hostname of manager-01
-MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
+MASTER_NODE=$(bcm cluster list endpoints | grep '01')
 HOSTNAME=
-for ENDPOINT in $(bcm cluster list --endpoints); do
+for ENDPOINT in $(bcm cluster list endpoints); do
     if [[ $ENDPOINT != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
         HOSTNAME="bcm-manager-$(printf %02d "$HOST_ENDING")"

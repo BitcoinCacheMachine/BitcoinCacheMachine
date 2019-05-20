@@ -9,8 +9,6 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 **IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM.
 
-Although the end-state of BCM is an operationally privacy-centric data center,
-
 ```YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!```
 
 ## Why Bitcoin Cache Machine Exists
@@ -91,7 +89,7 @@ After the BCM CLI is available, you can deploy your own infrastructure using the
 | lightning-charge | No | DC | clightning | none | TBD |
 | liquid | No | DC | bitcoind | TBD | TBD |
 
-`DC=data center`: processes that run in the "back-end" or "server-side". The back-end can run on a dedicated set Ubuntu machines (preferred for mainnet/production), or you can run the back-end on a user-facing desktop/laptop (useful for testnet/development). The back-end can run as a Type I VM or can be running under an LXD process installed on your localhost (local). There are trade-offs to using each approach (vm/local/ssh) which are discussed in more detail in the [Cluster directory](./cluster/README.md).
+`DC=data center`: processes that run in the "back-end" or "server-side". The back-end can run on a dedicated set Ubuntu machines (preferred for mainnet/production), or you can run the back-end on a user-facing desktop/laptop (useful for testnet/development). The back-end can run as a Type I VM or can be running under an LXD process installed on your localhost (local). There are trade-offs to using each approach (local/ssh/vm) which are discussed in more detail in the [Cluster directory](./cluster/README.md).
 
 User-facing applications can be either GUI-based or web-based apps (AppType). Desktop GUI applications are fully integrated into an automatically deployed back-end infrastructure. Web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet) run as server-side data center workloads but are accessed through a web browser. The eventual goal is to expose BCM application-level services locally (console), over the local network using a Wireguard VPN, and through authenticated TOR onion services when accessing BCM services over the Internet.
 

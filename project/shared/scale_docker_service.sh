@@ -36,7 +36,7 @@ if [[ -z $SERVICE_NAME ]]; then
 fi
 
 # let's scale the schema registry count to UP TO 3.
-CLUSTER_NODE_COUNT=$(bcm cluster list --endpoints | wc -l)
+CLUSTER_NODE_COUNT=$(bcm cluster list endpoints | wc -l)
 if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
     REPLICAS=$CLUSTER_NODE_COUNT
     
@@ -49,18 +49,3 @@ if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
         lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
     fi
 fi
-
-# # let's scale the schema registry count to UP TO 3.
-# CLUSTER_NODE_COUNT=$(bcm cluster list --endpoints | wc -l)
-# if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
-#     REPLICAS=$CLUSTER_NODE_COUNT
-
-#     if [[ $CLUSTER_NODE_COUNT -ge $MAX_INSTANCES ]]; then
-#         REPLICAS=$MAX_INSTANCES
-#     fi
-
-#     SERVICE_MODE=$(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service list --format "{{.Mode}}" --filter name="$STACK_NAME")
-#     if [[ $SERVICE_MODE == "replicated" ]]; then
-#         lxc exec "$BCM_MANAGER_HOST_NAME" -- docker service scale "$STACK_NAME""_""$SERVICE_NAME=$REPLICAS"
-#     fi
-# fi

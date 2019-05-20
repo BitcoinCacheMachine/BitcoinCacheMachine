@@ -36,7 +36,7 @@ for i in "$@"; do
             BCM_SSH_USERNAME="${i#*=}"
             shift # past argument=value
         ;;
-        --endpoints)
+        endpoints)
             BCM_ENDPOINTS_FLAG=1
             shift # past argument=value
         ;;
@@ -87,8 +87,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     DEPLOYMENT_METHODS="local/ssh"
+    SUPPORTS_VIRTUALIZATION=0
     if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
         DEPLOYMENT_METHODS="$DEPLOYMENT_METHODS/vm"
+        SUPPORTS_VIRTUALIZATION=1
     fi
     
     # if the user didn't specify a driver, let's ask them how we want to proceed.
@@ -118,9 +120,9 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 if [ ! -x "$(command -v multipass)" ]; then
                     # let's check to make sure we have multipass. This check to ensure we support
                     # virtualizatin, then check to see if multipass is installed; if not, we install it
-                    if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
+                    if [[ $SUPPORTS_VIRTUALIZATION == 1 ]]; then
                         if [ ! -x "$(command -v multipass)" ]; then
-                            echo "Looks like your machine supports multipass. Installing it now."
+                            echo "Installing multipass locally."
                             sudo snap install multipass --beta --classic
                             sleep 5
                         fi
@@ -168,10 +170,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 # endpoint listening service on the same interface being used for our
                 # default route. TODO; add CLI option to specify address.
                 MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
-                
-                if ! snap info lxd | grep "lxd.daemon:   simple, enabled, active"; then
-                    sudo snap enable lxd
-                fi
             fi
         done
     fi
@@ -332,12 +330,6 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     elif [[ $BCM_DRIVER == ssh ]]; then
                     
                     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
-                    # LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
-                    # export REMOTE_MOUNTPOINT="/tmp/provisioning"
-                    
-                    # scp -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/commands/install/endpoint_deprovision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
-                    # ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
-                    # ssh -i "$SSH_KEY_PATH"  -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" env LXC_BCM_BASE_IMAGE_NAME="$LXC_BCM_BASE_IMAGE_NAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_deprovision.sh"
                     
                     ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo snap remove lxd
                     elif [[ $BCM_DRIVER == "local" ]]; then

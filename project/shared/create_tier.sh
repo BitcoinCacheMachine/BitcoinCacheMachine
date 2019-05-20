@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -29,7 +29,7 @@ bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=
 bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$TIER_NAME"
 
 # configure and start the containers
-for ENDPOINT in $(bcm cluster list --endpoints); do
+for ENDPOINT in $(bcm cluster list endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
@@ -83,9 +83,9 @@ for ENDPOINT in $(bcm cluster list --endpoints); do
         
         # The above MACVLAN stuff allows us to expose services on the LAN, but we can't
         # access those services from the same host due to limitations in
-        if [[ $(bcm cluster list --endpoints | wc -l) -gt 1 ]]; then
+        if [[ $(bcm cluster list endpoints | wc -l) -gt 1 ]]; then
             # create the # localNet network across the cluster.
-            for ENDPOINT in $(bcm cluster list --endpoints); do
+            for ENDPOINT in $(bcm cluster list endpoints); do
                 lxc network create --target "$ENDPOINT" bcmLocalnet
             done
         else

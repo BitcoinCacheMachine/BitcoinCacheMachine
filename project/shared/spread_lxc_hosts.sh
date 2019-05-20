@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -30,14 +30,14 @@ if [[ $TIER_NAME == bitcoin* ]]; then
 fi
 
 # let's get a bcm-manager LXC instance on each cluster endpoint.
-MASTER_NODE=$(bcm cluster list --endpoints | grep '01')
-for ENDPOINT in $(bcm cluster list --endpoints); do
+MASTER_NODE=$(bcm cluster list endpoints | grep '01')
+for ENDPOINT in $(bcm cluster list endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     LXC_HOSTNAME="bcm-$TIER_NAME-$(printf %02d "$HOST_ENDING")"
     LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
     
     # only create the new storage volume if it doesn't already exist
-    if ! lxc storage volume list default | grep -q "$LXC_DOCKERVOL"; then
+    if lxc storage volume list default | grep -q "$LXC_DOCKERVOL"; then
         # then this is normal behavior. Let's create the storage volume
         if [ "$ENDPOINT" != "$MASTER_NODE" ]; then
             echo "Creating volume '$LXC_DOCKERVOL' on the default storage pool on cluster member '$ENDPOINT'."
