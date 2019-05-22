@@ -58,7 +58,7 @@ if ! lxc remote get-default | grep -q "local"; then
         CLUSTER_VERSION=$(echo "$CLUSTER_PROJECT" | awk '{print $2}' | cut -d "_" -f 2)
     fi
     echo "  data_center:               $BCM_DATACENTER";
-    echo "  cluster_version:           $CLUSTER_VERSION"
+    echo "  data_center_version:       $CLUSTER_VERSION"
     
     # let's show some LXD cluster related stuff.
     if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then

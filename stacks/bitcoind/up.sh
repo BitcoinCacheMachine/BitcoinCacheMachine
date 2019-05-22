@@ -1,11 +1,15 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-bcm stack start torproxy
+if ! bcm stack list | grep -q torproxy; then
+    bcm stack start torproxy
+fi
 
-bcm stack start toronion
+if ! bcm stack list | grep -q toronion; then
+    bcm stack start toronion
+fi
 
 source ./env.sh
 
@@ -46,6 +50,7 @@ fi
 
 # let's make sure docker has the 'data' volume defined so we can do restore or preseed block/chainstate data
 NEW_INSTALL=0
+LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
 if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "$DOCKER_VOLUME_NAME"; then
     lxc exec "$LXC_HOSTNAME" -- docker volume create "$DOCKER_VOLUME_NAME"
     
@@ -98,4 +103,9 @@ BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
 INITIAL_BLOCK_DOWNLOAD="$INITIAL_BLOCK_DOWNLOAD" \
 BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
+BITCOIND_RPCNET_SUBNET="$BITCOIND_RPCNET_SUBNET" \
+BITCOIND_RPCNET_IP="$BITCOIND_RPCNET_IP" \
+BITCOIND_ONIONNET_IP="$BITCOIND_ONIONNET_IP" \
+BITCOIND_ZMQ_BLOCK_PORT="$BITCOIND_ZMQ_BLOCK_PORT" \
+BITCOIND_ZMQ_TX_PORT="$BITCOIND_ZMQ_TX_PORT" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"

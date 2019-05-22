@@ -34,8 +34,8 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
         echo "underlay"
     fi
     
-    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-bitcoin"; then
-        echo "bitcoin"
+    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-bitcoin$BCM_ACTIVE_CHAIN"; then
+        echo "bitcoin$BCM_ACTIVE_CHAIN"
     fi
     
     exit

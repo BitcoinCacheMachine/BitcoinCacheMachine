@@ -4,23 +4,22 @@ HiddenServiceDir /var/lib/tor/bcmonion
 # todo move to v3 and use client authorization https://2019.www.torproject.org/docs/tor-manual-dev.html.en#_client_authorization
 HiddenServiceVersion 2
 
-#bitcoind rpc
-HiddenServicePort 8332 172.16.200.6:8332
-HiddenServicePort 18332 172.16.200.6:18332
-HiddenServicePort 28332 172.16.200.6:28332
+# bitcoind mainnet: rpc; ZMQ block, ZMQ tx
+HiddenServicePort 8332 172.16.101.6:8332
+HiddenServicePort 9332 172.16.101.6:9332
+HiddenServicePort 9331 172.16.101.6:9331
+
+# bitcoind testnet: rpc; ZMQ block, ZMQ tx
+HiddenServicePort 18332 172.17.101.6:18332
+HiddenServicePort 19332 172.17.101.6:19332
+HiddenServicePort 19331 172.17.101.6:19331
+
+# bitcoind regtest: rpc; ZMQ block, ZMQ tx
+HiddenServicePort 18332 172.18.101.6:28332
+HiddenServicePort 19332 172.18.101.6:29332
+HiddenServicePort 19331 172.18.101.6:29331
 
 HiddenServiceAuthorizeClient stealth bcm
-
-#ZMQ BLOCK
-#HiddenServicePort 9332 172.16.200.6:9332
-#HiddenServicePort 19332 172.16.200.6:19332
-#HiddenServicePort 29332 172.16.200.6:29332
-
-#ZMQ TX
-#HiddenServicePort 9331 172.16.200.6:9331
-#HiddenServicePort 19331 172.16.200.6:19331
-#HiddenServicePort 29331 172.16.200.6:29331
-
 
 # Log err to info
 Log info file /var/log/tor/tor.log

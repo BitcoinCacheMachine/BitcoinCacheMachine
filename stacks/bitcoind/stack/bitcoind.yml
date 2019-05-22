@@ -13,14 +13,16 @@ services:
       BCM_ACTIVE_CHAIN: ${BCM_ACTIVE_CHAIN:-}
       BITCOIND_RPC_PORT: ${BITCOIND_RPC_PORT:-}
       INITIAL_BLOCK_DOWNLOAD: ${INITIAL_BLOCK_DOWNLOAD:-1}
+      BITCOIND_ZMQ_BLOCK_PORT: ${BITCOIND_ZMQ_BLOCK_PORT:-}
+      BITCOIND_ZMQ_TX_PORT: ${BITCOIND_ZMQ_TX_PORT:-}
     networks:
       bitcoindrpcnet:
         aliases:
           - bitcoindrpc-${BCM_ACTIVE_CHAIN}
-        ipv4_address: 172.16.238.3/24
+        ipv4_address: ${BITCOIND_RPCNET_IP:-}
       torsocksnet:
       toronionnet:
-        ipv4_address: 172.16.200.6/24
+        ipv4_address: ${BITCOIND_ONIONNET_IP:-}
     configs:
       - source: bitcoin-config
         target: /config/bitcoin.conf
@@ -29,7 +31,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - engine.labels.bcm-bitcoin == true
+          - engine.labels.bcm-bitcoin${BCM_ACTIVE_CHAIN:-} == true
 
 configs:
   bitcoin-config:
@@ -56,7 +58,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.16.238.0/24
+        - subnet: ${BITCOIND_RPCNET_SUBNET:-}
 
   torsocksnet:
     external: true

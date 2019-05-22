@@ -5,8 +5,10 @@ services:
     volumes:
       - data:/root/.tor
       - logs:/var/log/tor
-    networks: 
-      bitcoindnet:
+    networks:
+      bitcoindnet-mainnet:
+      # bitcoindnet-testnet:
+      # bitcoindnet-regtest:
     configs:
       - source: torrc-config
         target: /etc/tor/torrc
@@ -19,38 +21,29 @@ services:
           - engine.labels.bcm-underlay == true
 
 networks:
-  bitcoindnet:
+  bitcoindnet-mainnet:
     driver: overlay
     attachable: true
-    internal: true
     ipam:
       driver: default
       config:
-        - subnet: 172.16.200.0/24
+        - subnet: 172.16.101.0/24
 
-  # toronion-lnd-rpc:
-  #   driver: overlay
-  #   attachable: true
-  #   ipam:
-  #     driver: default
-  #     config:
-  #       - subnet: "172.16.200.4/30"
+  bitcoindnet-testnet:
+    driver: overlay
+    attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.17.101.0/24
 
-  # toronion-ridethelightning-http:
-  #   driver: overlay
-  #   attachable: true
-  #   ipam:
-  #     driver: default
-  #     config:
-  #       - subnet: "172.16.200.8/30"
-
-  # toronion-electrs-rpc:
-  #   driver: overlay
-  #   attachable: true
-  #   ipam:
-  #     driver: default
-  #     config:
-  #       - subnet: "172.16.200.12/30"
+  bitcoindnet-regtest:
+    driver: overlay
+    attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.101.0/24
 
 volumes:
   data:

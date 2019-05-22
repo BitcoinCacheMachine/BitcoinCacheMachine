@@ -8,11 +8,16 @@ services:
       torsocksnet:
         aliases:
           - torsocks
+    configs:
+      - source: torrc-config
+        target: /etc/tor/torrc
+        mode: 0640
     deploy:
-      mode: global
+      mode: replicated
+      replicas: 1
       placement:
         constraints:
-          - engine.labels.bcm-bitcoin == true
+          - engine.labels.bcm-bitcoin${BCM_ACTIVE_CHAIN:-} == true
 
 # we attach the tor daemon to the host networking stack
 # so the ports will be exposed ONLY on the manager host
@@ -24,3 +29,7 @@ networks:
 
 volumes:
   data:
+
+configs:
+  torrc-config:
+    file: torrc

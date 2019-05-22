@@ -55,6 +55,11 @@ fi
 if [[ $BCM_CLI_VERB == "stop"  ]]; then
     validateStackParam "$BCM_CLI_VERB";
     
+    STOP_SCRIPT="$BCM_STACKS_DIR/$STACK_NAME/stop.sh"
+    if [[ -f $STOP_SCRIPT ]]; then
+        bash -c "$STOP_SCRIPT"
+    fi
+    
     bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$STACK_NAME"
     
     # if the 'bck stack stop' command was executed with a '--delete' flag, then we delete
@@ -69,7 +74,12 @@ if [[ $BCM_CLI_VERB == "stop"  ]]; then
             # however, some containers do not write persistent data.
             if [ ! -z ${STACK_DOCKER_VOLUMES+x} ]; then
                 for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
-                    bash -c "$BCM_GIT_DIR/project/shared/delete_docker_volume.sh --lxc-hostname=$TIER_NAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
+                    LXC_HOSTNAME="$TIER_NAME"
+                    if [[ $TIER_NAME == bitcoin* ]]; then
+                        LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
+                    fi
+                    
+                    bash -c "$BCM_GIT_DIR/project/shared/delete_docker_volume.sh --lxc-hostname=$LXC_HOSTNAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
                 done
             fi
         else
@@ -77,10 +87,6 @@ if [[ $BCM_CLI_VERB == "stop"  ]]; then
             exit
         fi
         
-        STOP_SCRIPT="$BCM_STACKS_DIR/$STACK_NAME/stop.sh"
-        if [[ -f $STOP_SCRIPT ]]; then
-            bash -c "$STOP_SCRIPT"
-        fi
     fi
 fi
 
@@ -103,7 +109,6 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "clear" ]]; then
-    bcm stack stop bitcoind --delete
     bcm stack stop torproxy --delete
     bcm stack stop toronion --delete
 fi
