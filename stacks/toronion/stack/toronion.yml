@@ -7,8 +7,8 @@ services:
       - logs:/var/log/tor
     networks:
       bitcoindnet-mainnet:
-      # bitcoindnet-testnet:
-      # bitcoindnet-regtest:
+      bitcoindnet-testnet:
+      bitcoindnet-regtest:
     configs:
       - source: torrc-config
         target: /etc/tor/torrc
@@ -27,7 +27,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.16.101.0/24
+        - subnet: 172.16.100.0/27
 
   bitcoindnet-testnet:
     driver: overlay
@@ -35,7 +35,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.17.101.0/24
+        - subnet: 172.16.100.32/27
 
   bitcoindnet-regtest:
     driver: overlay
@@ -43,7 +43,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.18.101.0/24
+        - subnet: 172.16.100.64/27
 
 volumes:
   data:

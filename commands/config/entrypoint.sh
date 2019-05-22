@@ -20,6 +20,7 @@ fi
 NEW_RUNTIME_DIR=
 BCM_CHAIN=
 NEW_DATACENTER_NAME=
+NEW_DEBUG_VAL=
 
 for i in "$@"; do
     case $i in
@@ -35,6 +36,10 @@ for i in "$@"; do
             NEW_DATACENTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
+        debug=*)
+            NEW_DEBUG_VAL="${i#*=}"
+            shift # past argument=value
+        ;;
         *) ;;
         
     esac
@@ -48,6 +53,8 @@ if [[ $BCM_CLI_VERB == "get" ]]; then
         echo "$BCM_RUNTIME_DIR"
         elif [[ $OBJECT == datacenter ]]; then
         echo "$BCM_DATACENTER"
+        elif [[ $OBJECT == debug ]]; then
+        echo "$BCM_DEBUG"
     fi
 fi
 
@@ -73,6 +80,10 @@ if [[ $BCM_CLI_VERB == "set" ]]; then
     
     if [[ ! -z $NEW_DATACENTER_NAME ]]; then
         echo "export BCM_DATACENTER=$NEW_DATACENTER_NAME" >> "$BCM_CONFIG_FILE"
+    fi
+    
+    if [[ ! -z $NEW_DEBUG_VAL ]]; then
+        echo "export BCM_DEBUG=$NEW_DEBUG_VAL" >> "$BCM_CONFIG_FILE"
     fi
 fi
 
