@@ -3,11 +3,6 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# first, let's make sure we deploy our direct dependencies.
-if ! bcm tier list | grep -q "bitcoin$BCM_ACTIVE_CHAIN"; then
-    bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
-fi
-
 # push the stack files up tthere.
 lxc file push  -p -r ./stack/ "$BCM_MANAGER_HOST_NAME"/root/torproxy
 

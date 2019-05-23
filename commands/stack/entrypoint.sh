@@ -109,6 +109,7 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "clear" ]]; then
+    bcm stack stop bitcoind --delete
     bcm stack stop torproxy --delete
     bcm stack stop toronion --delete
 fi

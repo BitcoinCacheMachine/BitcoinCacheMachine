@@ -10,7 +10,6 @@ Usage:
 Available Commands:
   init         Initialize your management plane; create new Trezor-backed GPG certificates.
   cluster      Create, destroy, and manage BCM clusters.
-  deprovision  Deprovisions all BCM data center components from active cluster.
   start        Start a BCM application-layer service, e.g., bitcoind, clightning, spark, etc.
   stop         Stop a running BCM application-layer service.
   git          Sign git commits and git tags using your Trezor-backed GPG certificates.

@@ -24,7 +24,7 @@ NEW_DEBUG_VAL=
 
 for i in "$@"; do
     case $i in
-        runtime-dir=*)
+        bcmdir=*)
             NEW_RUNTIME_DIR="${i#*=}"
             shift # past argument=value
         ;;

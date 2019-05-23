@@ -43,4 +43,4 @@ Use the `bcm show` command to get an overview of your LXD container configuation
 
 When you deploy BCM stacks using the `bcm stack start` command, certain commands MAY become available. For example, after you run `bcm stack start bitcoind`, the `bcm bitcoin-cli` command will become available. The BCM CLI automatically routes your CLI request to the appropriate app-level container. Trying running `bcm bitcoin-cli getnetworkinfo` to view bitcoind network output, or trying the `getblockchaininfo` to see where you are in the chain!  All commands are confined to your current bcm CLI CHAIN (`bcm config get chain`. 
 
-If you want to start deploying mainnet infrastructure, you can run `bcm config set chain`, and all subsequent bcm commands will target that chain. Note that currently, there is total data-center separation between regtest, testnet, and mainnet modes of operation.
+If you want to start deploying mainnet infrastructure, you can run `bcm config set chain=<chain>`, and all subsequent bcm commands will target that chain. Note that currently, there is total data-center separation between regtest, testnet, and mainnet modes of operation.

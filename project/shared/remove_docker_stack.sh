@@ -31,6 +31,7 @@ if lxc list --format csv | grep -q "$BCM_MANAGER_HOST_NAME"; then
         
         if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack ls --format "{{.Name}}" | grep -q "$STACK_NAME-$BCM_ACTIVE_CHAIN"; then
             lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack remove "$STACK_NAME-$BCM_ACTIVE_CHAIN"
+            sleep 20
         fi
         
         if [ -f "$BCM_STACKS_DIR/$STACK_NAME/env.sh" ]; then

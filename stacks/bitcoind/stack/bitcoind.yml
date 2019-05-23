@@ -15,14 +15,14 @@ services:
       INITIAL_BLOCK_DOWNLOAD: ${INITIAL_BLOCK_DOWNLOAD:-1}
       BITCOIND_ZMQ_BLOCK_PORT: ${BITCOIND_ZMQ_BLOCK_PORT:-}
       BITCOIND_ZMQ_TX_PORT: ${BITCOIND_ZMQ_TX_PORT:-}
+      BITCOIND_RPCNET_SUBNET: ${BITCOIND_RPCNET_SUBNET:-}
+      BITCOIND_ONIONNET_SUBNET: ${BITCOIND_ONIONNET_SUBNET:-}
     networks:
       bitcoindrpcnet:
         aliases:
           - bitcoindrpc-${BCM_ACTIVE_CHAIN}
-        ipv4_address: ${BITCOIND_RPCNET_IP:-}
       torsocksnet:
       toronionnet:
-        ipv4_address: ${BITCOIND_ONIONNET_IP:-}
     configs:
       - source: bitcoin-config
         target: /config/bitcoin.conf
@@ -66,4 +66,4 @@ networks:
 
   toronionnet:
     external: true
-    name: toronion-${BCM_ACTIVE_CHAIN:-}_bitcoindnet
+    name: toronion_bitcoindnet-${BCM_ACTIVE_CHAIN:-}

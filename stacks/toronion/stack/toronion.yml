@@ -24,6 +24,7 @@ networks:
   bitcoindnet-mainnet:
     driver: overlay
     attachable: true
+    internal: true
     ipam:
       driver: default
       config:
@@ -32,6 +33,7 @@ networks:
   bitcoindnet-testnet:
     driver: overlay
     attachable: true
+    internal: true
     ipam:
       driver: default
       config:
@@ -40,6 +42,7 @@ networks:
   bitcoindnet-regtest:
     driver: overlay
     attachable: true
+    internal: true
     ipam:
       driver: default
       config:

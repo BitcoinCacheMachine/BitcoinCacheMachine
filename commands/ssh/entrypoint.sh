@@ -186,7 +186,7 @@ if [[ $BCM_CLI_VERB == "add-onion" ]]; then
         if ! grep -Fxq "$ONION_ADDRESS" "$TORRC"; then
             echo "$TOR_STRING" | sudo tee -a "$TORRC" >>/dev/null
             sudo systemctl reload tor
-            wait-for-it -t 15 --quiet 127.0.0.1:9050>>/dev/null
+            wait-for-it -t 15 127.0.0.1:9050
             
             echo "$TITLE has been added to $TORRC and your local tor client has been reloaded."
         else
