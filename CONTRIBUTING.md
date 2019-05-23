@@ -4,9 +4,7 @@
 
 Sign up for a github.com account.
 
-Fork the BitcoinCacheMachine repository to your account. Clone the repo to your machine, then make a development branch to do your work
-
-    git checkout -b branch-name
+Fork the BitcoinCacheMachine repository to your account. Clone the repo to your machine, then make some changes to your local repo.
 
 BCM is developed in Visual Studio Code by BCM's main authors. Feel free to use any editor you want, just be sure to .gitignore any editor manifests.
 
@@ -16,19 +14,15 @@ The authors of BCM ensures that BCM bash scripts are shellcheck compliant. Insta
 
 ## Pull Requests
 
-When you are done, rebase squash any multiple commits you have into one
+When you are done, sign your work with your trezor using the following command:
 
-    git rebase -i master
+    bcm git commit --message="Git commit message."
 
-Run BCM's test suite (TODO):
+push your changes to your forked repo.
 
-    ./tests/tests.sh (TODO)
-
-push your branch (-f for *force* in the case you've rebased and squashed)
-
-    git push origin branch-name -f
+    git push origin
     
-create a [pull request](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/projects) into the BitcoinCacheMachine repo master branch.
+Next, create a [pull request](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/projects) into the BitcoinCacheMachine repo master branch.
 
 If you have fixes, you can amend them to the current commit rather than a new one with
 

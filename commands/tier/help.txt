@@ -6,6 +6,7 @@ Available Commands:
   destroy   Destroy a BCM system container tier. Removes all LXD-related objects
             related to a particular tier: system containers, lxc profiles, btrfs volumes.
   list      Lists BCM tiers that are currently provisioned to your data center.
+  clear     Removes all BCM tiers from your active cluster.
 
 Usage:
   bcm tier create $TIER_NAME

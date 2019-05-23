@@ -336,6 +336,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     
                     if [ -x "$(command -v lxc)" ]; then
                         sudo lxd shutdown
+                        sudo lxd init --auto --network-address=127.0.0.1 --network-port=8443
                     else
                         echo "Info: lxd was not installed."
                     fi
@@ -344,7 +345,6 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                 # clearing all lines from /etc/hosts that contain "$BCM_SSH_HOSTNAME"
                 sudo sed -i "/$BCM_SSH_HOSTNAME/d" /etc/hosts
                 sudo sed -i '/^$/d' /etc/hosts
-                
             fi
         done
         

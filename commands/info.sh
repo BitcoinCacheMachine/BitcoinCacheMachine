@@ -50,7 +50,8 @@ echo "bcm_deployment:"
 
 # remove any legacy lxd software and install install lxd via snap
 if ! lxc remote get-default | grep -q "local"; then
-    echo "  active_cluster:            $(lxc remote get-default)"
+    CLUSTER_NAME="$(lxc remote get-default)"
+    echo "  active_cluster:            $CLUSTER_NAME"
     
     CLUSTER_PROJECT="$(lxc project list | grep "(current)")"
     CLUSTER_VERSION="$BCM_VERSION"
@@ -58,7 +59,15 @@ if ! lxc remote get-default | grep -q "local"; then
         CLUSTER_VERSION=$(echo "$CLUSTER_PROJECT" | awk '{print $2}' | cut -d "_" -f 2)
     fi
     echo "  data_center:               $BCM_DATACENTER";
-    echo "  cluster_version:           $CLUSTER_VERSION"
+    echo "  data_center_version:       $CLUSTER_VERSION"
+    
+    ENV_FILE="$BCM_RUNTIME_DIR/clusters/$CLUSTER_NAME/$CLUSTER_NAME-01/env"
+    if [[ -f $ENV_FILE ]]; then
+        source "$ENV_FILE"
+        if [[ ! -z $BCM_DRIVER ]]; then
+            echo "  deployment_type:           $BCM_DRIVER"
+        fi
+    fi
     
     # let's show some LXD cluster related stuff.
     if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then

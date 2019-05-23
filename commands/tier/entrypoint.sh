@@ -10,8 +10,8 @@ if [ -z "${BCM_CLI_VERB}" ]; then
 fi
 
 # make sure the user has sent in a valid command; quit if not.
-if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "destroy" ]]; then
-    echo "Error: The valid commands for 'bcm tier' are 'list', 'create', and 'destroy'."
+if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "destroy" && $BCM_CLI_VERB != "clear" ]]; then
+    echo "Error: invalid 'bcm tier' command"
     exit
 fi
 
@@ -34,9 +34,19 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
         echo "underlay"
     fi
     
-    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-bitcoin"; then
-        echo "bitcoin"
+    if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-bitcoin$BCM_ACTIVE_CHAIN"; then
+        echo "bitcoin$BCM_ACTIVE_CHAIN"
     fi
+    
+    exit
+fi
+
+if [[ "$BCM_CLI_VERB" == "clear" ]]; then
+    bcm tier destroy bitcoin
+    bcm tier destroy underlay
+    bcm tier destroy kafka
+    bcm tier destroy manager
+    bash -c "$BCM_PROJECT_DIR/destroy.sh"
     
     exit
 fi
@@ -47,6 +57,8 @@ if [ -z "${TIER_NAME}" ]; then
     cat ./help.txt
     exit
 fi
+
+
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
     if [[ $TIER_NAME == "manager" ]]; then

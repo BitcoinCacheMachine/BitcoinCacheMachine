@@ -129,16 +129,6 @@ if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
     exit
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "deprovision" ]]; then
-    bcm tier destroy bitcoin
-    bcm tier destroy underlay
-    bcm tier destroy kafka
-    bcm tier destroy manager
-    bash -c "$BCM_PROJECT_DIR/destroy.sh"
-    
-    exit
-fi
-
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./help.txt
 fi

@@ -1,11 +1,24 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-bcm stack start torproxy
+# first, let's make sure we deploy our direct dependencies.
+if ! bcm tier list | grep -q "bitcoin$BCM_ACTIVE_CHAIN"; then
+    bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
+fi
 
-bcm stack start toronion
+# this brings up the onion site that exposes all our
+# services to users having the onion token.
+if ! bcm stack list | grep -q toronion; then
+    bcm stack start toronion
+fi
+
+# this is so services like bitcoind and lightningd, etc.
+# have a SOCKS5 proxy to TOR.
+if ! bcm stack list | grep -q torproxy; then
+    bcm stack start torproxy
+fi
 
 source ./env.sh
 
@@ -46,6 +59,7 @@ fi
 
 # let's make sure docker has the 'data' volume defined so we can do restore or preseed block/chainstate data
 NEW_INSTALL=0
+LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
 if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "$DOCKER_VOLUME_NAME"; then
     lxc exec "$LXC_HOSTNAME" -- docker volume create "$DOCKER_VOLUME_NAME"
     
@@ -93,9 +107,17 @@ else
     fi
 fi
 
+
+
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 LXC_HOSTNAME="$LXC_HOSTNAME" \
 INITIAL_BLOCK_DOWNLOAD="$INITIAL_BLOCK_DOWNLOAD" \
 BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
+BITCOIND_RPCNET_SUBNET="$BITCOIND_RPCNET_SUBNET" \
+BITCOIND_RPCNET_IP="$BITCOIND_RPCNET_IP" \
+BITCOIND_ONIONNET_IP="$BITCOIND_ONIONNET_IP" \
+BITCOIND_ZMQ_BLOCK_PORT="$BITCOIND_ZMQ_BLOCK_PORT" \
+BITCOIND_ZMQ_TX_PORT="$BITCOIND_ZMQ_TX_PORT" \
+BITCOIND_ONIONNET_SUBNET="$BITCOIND_ONIONNET_SUBNET" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"

@@ -27,7 +27,7 @@ if [[ $TIER_NAME == bitcoin* ]]; then
     PROFILE_NAME=bcm-bitcoin
 fi
 
-if ! lxc profile list | grep -q "$PROFILE_NAME"; then
+if ! lxc profile list --format csv | grep -q "$PROFILE_NAME"; then
     lxc profile create "$PROFILE_NAME"
     
     if [[ -f "$YAML_PATH" ]]; then
