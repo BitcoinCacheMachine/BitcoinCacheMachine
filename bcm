@@ -30,8 +30,14 @@ export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
 export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
 
 # see README.md for versioning scheme.
+
+# major version change requires reinstallation & disaster recovery of data
 export BCM_MAJOR_VERSION="0"
+
+# minor version requires update to LXC system containers
 export BCM_MINOR_VERSION="0"
+
+# Represents update on one or more docker (app images)
 export BCM_PATCH_VERSION="3"
 
 export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION"
@@ -141,10 +147,10 @@ if [ ! -x "$(command -v docker)" ]; then
     fi
 fi
 
+# ensure we have our front-end docker images built. Subequent CLI commands assumes they are all built.
 if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then
     bash -c "$BCM_GIT_DIR/controller/build.sh"
 fi
-
 
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

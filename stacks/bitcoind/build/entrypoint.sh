@@ -15,7 +15,6 @@ TOR_CONTROL="$TOR_HOST_IP:9051"
 wait-for-it -t 10 "$TOR_PROXY"
 wait-for-it -t 10 "$TOR_CONTROL"
 
-
 # let's copy the base config from the stack.
 # We can then append runtime-specific values.
 cp /config/bitcoin.conf /root/.bitcoin/bitcoin.conf
@@ -50,16 +49,11 @@ if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     echo "regtest=1" >> /root/.bitcoin/bitcoin.conf
 fi
 
-
-ip route
-
-ip addr
-
 RPCNET_SUBNET_PREFIX="${BITCOIND_RPCNET_SUBNET%.*}"
-BITCOIND_RPCNET_IP="$(ip addr | grep "$RPCNET_SUBNET_PREFIX" | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")"
+BITCOIND_RPCNET_IP="$(ip addr | grep "$RPCNET_SUBNET_PREFIX" | grep -oE -m 1 "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | head -1)"
 
 ONIONNET_SUBNET_PREFIX="${BITCOIND_ONIONNET_SUBNET%.*}"
-BITCOIND_ONIONNET_IP="$(ip addr | grep "$ONIONNET_SUBNET_PREFIX" | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")"
+BITCOIND_ONIONNET_IP="$(ip addr | grep "$ONIONNET_SUBNET_PREFIX" | grep -oE -m 1 "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | head -1)"
 
 {
     echo "rpcbind=$BITCOIND_RPCNET_IP:$BITCOIND_RPC_PORT"
@@ -76,28 +70,54 @@ if [[ $INITIAL_BLOCK_DOWNLOAD == 1 ]]; then
     BITCOIND_DBCACHE=2048
 fi
 
-
-exec bitcoind -conf=/root/.bitcoin/bitcoin.conf \
--datadir=/root/.bitcoin \
--proxy="$TOR_PROXY" \
--torcontrol="$TOR_CONTROL" \
--proxyrandomize=1 \
--zmqpubrawblock="tcp://$BITCOIND_RPCNET_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
--zmqpubrawblock="tcp://$BITCOIND_ONIONNET_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
--zmqpubrawtx="tcp://$BITCOIND_RPCNET_IP:$BITCOIND_ZMQ_TX_PORT" \
--zmqpubrawtx="tcp://$BITCOIND_ONIONNET_IP:$BITCOIND_ZMQ_TX_PORT" \
--rpcallowip="127.0.0.0/8" \
--rpcallowip="$BITCOIND_RPCNET_SUBNET" \
--rpcallowip="$BITCOIND_ONIONNET_SUBNET" \
--rpcbind="$BITCOIND_RPCNET_IP:$BITCOIND_RPC_PORT" \
--rpcbind="$BITCOIND_ONIONNET_IP:$BITCOIND_RPC_PORT" \
--rpcbind="127.0.0.1:$BITCOIND_RPC_PORT" \
--wallet="/bitcoin/wallet" \
--dbcache="$BITCOIND_DBCACHE" \
--assumevalid="$ASSUME_VALID_BLOCK_HASH" \
--maxmempool="$MEM_POOL_SIZE" \
--maxuploadtarget="$MAX_UPLOAD_TARGET" \
--bind="$BITCOIND_RPCNET_IP" \
--bind="$BITCOIND_ONIONNET_IP" \
--port="$P2P_PORT" \
--debug=tor "$BITCOIND_CHAIN_TEXT"
+if [[ $BCM_ACTIVE_CHAIN == "mainnet" ]]; then
+    bitcoind -conf=/root/.bitcoin/bitcoin.conf \
+    -datadir=/root/.bitcoin \
+    -proxy="$TOR_PROXY" \
+    -torcontrol="$TOR_CONTROL" \
+    -proxyrandomize=1 \
+    -zmqpubrawblock="tcp://$BITCOIND_RPCNET_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
+    -zmqpubrawblock="tcp://$BITCOIND_ONIONNET_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
+    -zmqpubrawtx="tcp://$BITCOIND_RPCNET_IP:$BITCOIND_ZMQ_TX_PORT" \
+    -zmqpubrawtx="tcp://$BITCOIND_ONIONNET_IP:$BITCOIND_ZMQ_TX_PORT" \
+    -rpcallowip="127.0.0.0/8" \
+    -rpcallowip="$BITCOIND_RPCNET_SUBNET" \
+    -rpcallowip="$BITCOIND_ONIONNET_SUBNET" \
+    -rpcbind="$BITCOIND_RPCNET_IP:$BITCOIND_RPC_PORT" \
+    -rpcbind="$BITCOIND_ONIONNET_IP:$BITCOIND_RPC_PORT" \
+    -rpcbind="127.0.0.1:$BITCOIND_RPC_PORT" \
+    -wallet="/bitcoin/wallet" \
+    -dbcache="$BITCOIND_DBCACHE" \
+    -assumevalid="$ASSUME_VALID_BLOCK_HASH" \
+    -maxmempool="$MEM_POOL_SIZE" \
+    -maxuploadtarget="$MAX_UPLOAD_TARGET" \
+    -bind="$BITCOIND_RPCNET_IP" \
+    -bind="$BITCOIND_ONIONNET_IP" \
+    -port="$P2P_PORT" \
+    -debug=tor
+else
+    bitcoind -conf=/root/.bitcoin/bitcoin.conf \
+    -datadir=/root/.bitcoin \
+    -proxy="$TOR_PROXY" \
+    -torcontrol="$TOR_CONTROL" \
+    -proxyrandomize=1 \
+    -zmqpubrawblock="tcp://$BITCOIND_RPCNET_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
+    -zmqpubrawblock="tcp://$BITCOIND_ONIONNET_IP:$BITCOIND_ZMQ_BLOCK_PORT" \
+    -zmqpubrawtx="tcp://$BITCOIND_RPCNET_IP:$BITCOIND_ZMQ_TX_PORT" \
+    -zmqpubrawtx="tcp://$BITCOIND_ONIONNET_IP:$BITCOIND_ZMQ_TX_PORT" \
+    -rpcallowip="127.0.0.0/8" \
+    -rpcallowip="$BITCOIND_RPCNET_SUBNET" \
+    -rpcallowip="$BITCOIND_ONIONNET_SUBNET" \
+    -rpcbind="$BITCOIND_RPCNET_IP:$BITCOIND_RPC_PORT" \
+    -rpcbind="$BITCOIND_ONIONNET_IP:$BITCOIND_RPC_PORT" \
+    -rpcbind="127.0.0.1:$BITCOIND_RPC_PORT" \
+    -wallet="/bitcoin/wallet" \
+    -dbcache="$BITCOIND_DBCACHE" \
+    -assumevalid="$ASSUME_VALID_BLOCK_HASH" \
+    -maxmempool="$MEM_POOL_SIZE" \
+    -maxuploadtarget="$MAX_UPLOAD_TARGET" \
+    -bind="$BITCOIND_RPCNET_IP" \
+    -bind="$BITCOIND_ONIONNET_IP" \
+    -port="$P2P_PORT" \
+    -debug=tor "$BITCOIND_CHAIN_TEXT"
+fi
