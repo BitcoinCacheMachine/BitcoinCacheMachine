@@ -5,27 +5,8 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# let's set the local git client user and email settings to prevent error messages
-# related to an unconfigured git client. Test
-if [[ -z $(git config --get --local user.name) ]]; then
-    git config --local user.name "bcm"
-fi
-
-if [[ -z $(git config --get --local user.email) ]]; then
-    git config --local user.email "bcm@$(hostname)"
-fi
-
 # let's install all necessary software at the SDN controller.
 sudo apt-get install -y --no-install-recommends wait-for-it openssh-server netcat encfs avahi-discover
-
-# let's make sure the local git client is using TOR for git pull operations.
-# this should have been configured on a global level already when the user initially
-# downloaded BCM from github
-BCM_TOR_PROXY="socks5://localhost:9050"
-if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
-    echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
-    git config --local http.proxy "$BCM_TOR_PROXY"
-fi
 
 # get the current directory where this script is so we can set ENVs in ~/.bashrc
 echo "Setting BCM_GIT_DIR environment variable in current shell to '$(pwd)'"

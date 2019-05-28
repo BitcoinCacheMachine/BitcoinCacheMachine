@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack remove toronion

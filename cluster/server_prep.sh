@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 # this script preps a NEW server device (Ubuntu 18.04 >) to listen for incoming SSH
 # connections on all interfaces and at an onion site (for remote administration). The
@@ -8,7 +8,7 @@ set -e
 
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install --no-install-recommends -y tor openssh-server avahi-daemon iotop curl socat
+sudo apt-get install --no-install-recommends -y openssh-server avahi-daemon iotop curl socat inotify-tools wait-for-it
 # TODO dnscrypt-proxy
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
@@ -76,21 +76,44 @@ fi
 sudo touch /etc/sudoers.d/bcm
 echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
 
+
+
+######## Install TOR apt package.
+echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list
+echo "deb-src https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list
+
+curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import
+gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
+
+sudo apt-get update
+sudo apt-get install -y tor deb.torproject.org-keyring
+
 # update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
 if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
-    echo "ListenAddress 0.0.0.0" | sudo tee -a /etc/ssh/sshd_config
+    {
+        echo "ListenAddress 127.0.0.1"
+        echo "ListenAddress 0.0.0.0"
+    } | sudo tee -a /etc/ssh/sshd_config
+    
     sudo systemctl restart ssh
+    
+    wait-for-it -t 15 127.0.0.1:22
 fi
 
 if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
-    echo "HiddenServiceDir /var/lib/tor/ssh/" | sudo tee -a /etc/tor/torrc
-    echo "HiddenServicePort 22 127.0.0.1:22" | sudo tee -a /etc/tor/torrc
-    echo "HiddenServiceAuthorizeClient stealth $(hostname)_ssh" | sudo tee -a /etc/tor/torrc
-    sudo systemctl restart tor
-    sleep 5
-fi
+    
+    {
+        echo "SocksPort 0"
+        echo "HiddenServiceDir /var/lib/tor/ssh/"
+        echo "HiddenServiceVersion 3"
+        echo "HiddenServicePort 22 127.0.0.1:22"
+        #echo "HiddenServiceAuthorizeClient stealth $(hostname)-ssh"
+    } | sudo tee /etc/tor/torrc
+    
+    sudo systemctl reload tor
 
-if [[ -f /var/lib/tor/ssh/hostname ]]; then
-    echo "SSH ONION SITE & AUTH TOKEN:"
+    # wait for /var/lib/tor/ssh/hostname to appear
+    while read -r i; do if [ "$i" = hostname ]; then break; fi; done \
+    < <(sudo inotifywait  -e create,open --format '%f' --quiet /var/lib/tor/ssh --monitor)
     echo "  $(sudo cat /var/lib/tor/ssh/hostname)"
 fi
