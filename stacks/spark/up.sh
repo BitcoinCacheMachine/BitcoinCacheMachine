@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 source ./env.sh
@@ -22,9 +22,16 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 
 lxc file push -p -r "$(pwd)/stack/" "$BCM_MANAGER_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
 
+# defualt username and password; see if we can get password reset feature
+# in upstream project.
+SPARK_USERNAME="bcm"
+SPARK_PASSWORD="password"
+
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
 BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
 SERVICE_PORT="$SERVICE_PORT" \
+SPARK_USERNAME="$SPARK_USERNAME" \
+SPARK_PASSWORD="$SPARK_PASSWORD" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
 
 bash -c ./open.sh

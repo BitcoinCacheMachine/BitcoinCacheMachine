@@ -1,9 +1,10 @@
-FROM node
+FROM node:latest
 
 RUN npm install -g spark-wallet
 
-WORKDIR /root/.lightning
 ADD ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN chmod 0755 /entrypoint.sh
+
+WORKDIR /root/.lightning
 
 ENTRYPOINT [ "/entrypoint.sh" ]

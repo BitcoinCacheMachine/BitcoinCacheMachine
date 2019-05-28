@@ -37,7 +37,7 @@ volumes:
 
   tor-data:
     external: true
-    name: tor_data
+    name: torproxy-${BCM_ACTIVE_CHAIN:-}_data
 
   bitcoin-data:
     external: true
@@ -54,8 +54,12 @@ volumes:
 networks:
   torsocksnet:
     external: true
-    name: tor_torsocksnet
-  
+    name: torproxy-${BCM_ACTIVE_CHAIN:-}_torsocksnet
+
+  toronionnet:
+    external: true
+    name: toronion_bitcoindnet-${BCM_ACTIVE_CHAIN:-}
+
   bitcoindrpcnet:
     external: true
     name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet

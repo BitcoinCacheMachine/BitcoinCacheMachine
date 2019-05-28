@@ -115,5 +115,4 @@ if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
     # wait for /var/lib/tor/ssh/hostname to appear
     while read -r i; do if [ "$i" = hostname ]; then break; fi; done \
     < <(sudo inotifywait  -e create,open --format '%f' --quiet /var/lib/tor/ssh --monitor)
-    echo "  $(sudo cat /var/lib/tor/ssh/hostname)"
 fi

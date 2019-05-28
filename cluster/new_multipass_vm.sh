@@ -84,15 +84,18 @@ envsubst <./cloud_init_template.yml >"$ENDPOINT_DIR/cloud-init.yml"
 multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$ENDPOINT_DIR/cloud-init.yml" bionic
 
 multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
+
 multipass exec "$VM_NAME"  -- chmod 0755 /home/multipass/server_prep.sh
 multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
 
 # let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.
-ONION_CREDENTIALS="$(multipass exec "$VM_NAME" -- sudo cat /var/lib/tor/ssh/hostname)"
-if [[ ! -z $ONION_CREDENTIALS ]]; then
-    ONION_URL="$(echo "$ONION_CREDENTIALS" | awk '{print $1;}')"
-    ONION_TOKEN="$(echo "$ONION_CREDENTIALS" | awk '{print $2;}')"
-    bcm ssh add-onion --onion="$ONION_URL" --token="$ONION_TOKEN" --title="$(lxc remote get-default)"
+MGMT_PLANE_ONION_ADDRESS="$(multipass exec "$VM_NAME" -- sudo cat /var/lib/tor/ssh/hostname)"
+if [[ ! -z $MGMT_PLANE_ONION_ADDRESS ]]; then
+    touch "$ENDPOINT_DIR/mgmt-onion.env"
+    {
+        echo "#!/bin/bash"
+        echo "$MGMT_PLANE_ONION_ADDRESS"
+    } >> "$ENDPOINT_DIR/mgmt-onion.env"
 fi
 
 multipass restart "$VM_NAME"
