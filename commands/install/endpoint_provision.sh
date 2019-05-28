@@ -11,7 +11,9 @@ sudo apt-get install --no-install-recommends tor wait-for-it -y
 
 # install lxd via snap
 if [ ! -x "$(command -v lxd)" ]; then
+    # unless this is modified, we get snapshot creation in snap when removing lxd.
     sudo snap install lxd --channel=candidate
+    sudo snap set system snapshots.automatic.retention=no
 fi
 
 # if the 'bcm' user doesn't exist, let's create it and add it

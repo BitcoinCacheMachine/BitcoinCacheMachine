@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VM_NAME=
@@ -87,8 +87,15 @@ multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
 multipass exec "$VM_NAME"  -- chmod 0755 /home/multipass/server_prep.sh
 multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
 
-multipass restart "$VM_NAME"
+# let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.
+ONION_CREDENTIALS="$(multipass exec "$VM_NAME" -- sudo cat /var/lib/tor/ssh/hostname)"
+if [[ ! -z $ONION_CREDENTIALS ]]; then
+    ONION_URL="$(echo "$ONION_CREDENTIALS" | awk '{print $1;}')"
+    ONION_TOKEN="$(echo "$ONION_CREDENTIALS" | awk '{print $2;}')"
+    bcm ssh add-onion --onion="$ONION_URL" --token="$ONION_TOKEN" --title="$(lxc remote get-default)"
+fi
 
+multipass restart "$VM_NAME"
 
 IPV4_ADDRESS=$(multipass list --format csv | grep $VM_NAME | awk -F "\"*,\"*" '{print $3}')
 if [[ ! -z $IPV4_ADDRESS && ! -z $VM_NAME ]]; then

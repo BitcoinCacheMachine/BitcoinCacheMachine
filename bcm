@@ -115,6 +115,7 @@ if [ ! -x "$(command -v lxc)" ]; then
     
     if [ ! -x "$(command -v lxd)" ]; then
         sudo snap install lxd --channel=candidate
+        sudo snap set system snapshots.automatic.retention=no
         sudo lxd init --auto --network-address=127.0.1.1 --network-port=8443 --storage-backend=btrfs
     fi
 fi
@@ -151,6 +152,17 @@ fi
 if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then
     bash -c "$BCM_GIT_DIR/controller/build.sh"
 fi
+
+
+# let's make sure the local git client is using TOR for git pull operations.
+# this should have been configured on a global level already when the user initially
+# downloaded BCM from github
+BCM_TOR_PROXY="socks5://localhost:9050"
+if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
+    echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
+    git config --local http.proxy "$BCM_TOR_PROXY"
+fi
+
 
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"

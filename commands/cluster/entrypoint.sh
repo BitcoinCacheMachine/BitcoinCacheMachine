@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -331,6 +331,7 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
                     
                     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
                     
+                    ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo lxd shutdown
                     ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo snap remove lxd
                     elif [[ $BCM_DRIVER == "local" ]]; then
                     
