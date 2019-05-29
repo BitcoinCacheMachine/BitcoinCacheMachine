@@ -34,12 +34,6 @@ TOR_SOCKS5_PROXY_HOSTNAME="$BCM_MANAGER_HOST_NAME" \
 docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
 
 # wait for the REST API to come online.
-#lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker run --rm "$IMAGE_NAME" --network "lnd-$BCM_ACTIVE_CHAIN""_lndrpcnet" wait-for-it -t 30 "lndrpc-$BCM_ACTIVE_CHAIN:8080"
-sleep 20
+lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker run --rm "$IMAGE_NAME" --network "lnd-$BCM_ACTIVE_CHAIN""_lndrpcnet" wait-for-it -t 30 "lndrpc-$BCM_ACTIVE_CHAIN:8080"
 
-# check for the wallet.db file; if it doesn't exist, then we run lncli create
-if lxc exec "$BCM_BITCOIN_HOST_NAME" -- [ ! -d "/var/lib/docker/volumes/lnd-$BCM_ACTIVE_CHAIN""_data/_data/data/chain" ]; then
-    bcm lncli create
-else
-    echo "Info: existing lnd wallet exists."
-fi
+# we require upstream apps (e.g., RTL) to perform wallet initialization.

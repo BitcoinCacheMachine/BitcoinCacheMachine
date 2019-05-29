@@ -65,7 +65,7 @@ cd "$BCM_GIT_DIR"
 source ~/.bashrc
 ```
 
-You will need to log out and log back (or restart) in for your group membership to refresh. Feel free to change the directory in which you store the BCM repository on your machine. Just update the `BCM_GIT_DIR` variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Since `setup.sh` modifies group membership, you will have to log out and log back in before the BCM CLI operates correctly. Running `bcm` at the terminal builds the docker images needed to run bcm commands. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
+You will need to log out and log back (or restart) in for your group membership to refresh. Feel free to change the directory in which you store the BCM repository on your machine. Just update the `BCM_GIT_DIR` variable. `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Running `bcm` at the terminal ensures that all necessary dependencies are made avaible (LXD client, dockerd) and builds the docker images needed to run bcm commands. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
 
 ## Deploying your own BCM Infrastructure
 
