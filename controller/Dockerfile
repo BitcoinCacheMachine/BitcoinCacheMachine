@@ -12,13 +12,13 @@ RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 #RUN apt-get install -y python-setuptools
 
 # 2. Install the TREZOR agent
-RUN pip3 install Cython hidapi
-RUN pip3 install trezor_agent
+#RUN pip3 install Cython hidapi
+#RUN pip3 install trezor_agent
 
 RUN mkdir /tmp/trezor
 RUN git clone https://github.com/romanz/trezor-agent /tmp/trezor
 WORKDIR /tmp/trezor
-RUN git checkout latest-trezorlib
+RUN git checkout master
 RUN pip3 install -e /tmp/trezor/agents/trezor
 
 WORKDIR /gitrepo

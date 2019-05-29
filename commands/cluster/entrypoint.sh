@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -57,23 +57,6 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
     fi
     
     lxc remote list --format csv | grep "bcm-" | awk -F "," '{print $1}' | awk '{print $1}'
-    
-    exit
-fi
-
-if [[ "$BCM_CLI_VERB" == "switch" ]]; then
-    CLUSTER_NAME="$3"
-    
-    if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
-        if [[ "$CLUSTER_NAME" != "$(lxc remote get-default)" ]]; then
-            lxc remote switch "$CLUSTER_NAME"
-            echo "Your active BCM cluster is now set to target '$CLUSTER_NAME'."
-        else
-            echo "BCM is already targeting cluster '$CLUSTER_NAME'."
-        fi
-    else
-        echo "Error: the LXC remote for BCM Cluster '$CLUSTER_NAME' is not defined."
-    fi
     
     exit
 fi

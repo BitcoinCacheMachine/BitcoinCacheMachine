@@ -21,11 +21,16 @@ NEW_RUNTIME_DIR=
 BCM_CHAIN=
 NEW_DATACENTER_NAME=
 NEW_DEBUG_VAL=
+NEW_CLUSTER_NAME=
 
 for i in "$@"; do
     case $i in
         bcmdir=*)
             NEW_RUNTIME_DIR="${i#*=}"
+            shift # past argument=value
+        ;;
+        cluster=*)
+            NEW_CLUSTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
         chain=*)
@@ -56,6 +61,10 @@ if [[ $BCM_CLI_VERB == "get" ]]; then
         elif [[ $OBJECT == debug ]]; then
         echo "$BCM_DEBUG"
     fi
+    
+    if [[ $OBJECT == cluster ]]; then
+        lxc remote get-default
+    fi
 fi
 
 if [[ $BCM_CLI_VERB == "set" ]]; then
@@ -84,6 +93,17 @@ if [[ $BCM_CLI_VERB == "set" ]]; then
     
     if [[ ! -z $NEW_DEBUG_VAL ]]; then
         echo "export BCM_DEBUG=$NEW_DEBUG_VAL" >> "$BCM_CONFIG_FILE"
+    fi
+    
+    if lxc remote list --format csv | grep -q "$NEW_CLUSTER_NAME"; then
+        if [[ "$NEW_CLUSTER_NAME" != "$(lxc remote get-default)" ]]; then
+            lxc remote switch "$NEW_CLUSTER_NAME"
+            echo "Your active BCM cluster is now set to target '$NEW_CLUSTER_NAME'."
+        else
+            echo "BCM is already targeting cluster '$NEW_CLUSTER_NAME'."
+        fi
+    else
+        echo "Error: the LXC remote for BCM Cluster '$NEW_CLUSTER_NAME' is not defined."
     fi
 fi
 

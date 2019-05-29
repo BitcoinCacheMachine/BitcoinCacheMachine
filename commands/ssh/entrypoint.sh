@@ -165,11 +165,6 @@ if [[ $BCM_CLI_VERB == "add-onion" ]]; then
         exit
     fi
     
-    if [[ -z $AUTH_TOKEN ]]; then
-        echo "Error: AUTH_TOKEN is not defined. Use --token=<AUTH_TOKEN>"
-        exit
-    fi
-    
     if [[ -z $TITLE ]]; then
         echo "Error: TITLE is not defined. Use --title=<TITLE>"
         exit
@@ -200,7 +195,7 @@ fi
 
 if [[ $BCM_CLI_VERB == "remove-onion" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
-        cat ./removeonion/help.txt
+        cat ./removeonion-help.txt
         exit
     fi
     

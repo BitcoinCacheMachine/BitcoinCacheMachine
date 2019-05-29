@@ -1,15 +1,15 @@
 # BCM Clusters
 
-A BCM Cluster is defined as a set (one or more) of machines that have been configured to operate in a [LXD Cluster](https://lxd.readthedocs.io/en/latest/clustering/). (Not that the BCM CLI does this on your behalf). Endpoints operating in a BCM cluster are assumed to have private networking environment that is low latency and high bandwidth, such as a home or office LAN. 
+A BCM Cluster is defined as a set (one or more) of machines that have been configured to operate in a [LXD Cluster](https://lxd.readthedocs.io/en/latest/clustering/). (Note that the BCM CLI does this on your behalf). Endpoints operating in a BCM cluster are assumed to have private networking environment that is low latency and high bandwidth, such as a home or office LAN. 
 
 The BCM CLI can provision a cluster running on your localhost. This cluster can exist as 
 
 1) a fully-fledged KVM-based VM (running under multipass) that has a remote SSH endpoint typically on network interface `mpqemubr0`
 2) a native LXD process running on your local Ubuntu installation. 
 
-If your localhost (e.g., SDN Controller) supports hardware virtualization and you choose to deploy a `vm`, [multipass](https://github.com/CanonicalLtd/multipass) will be installed locally and BCM data-center components will be deployed to that. If your hardware doesn't support virtualization, BCM can still be installed using natively to your Ubuntu OS. VM is a good choice if you're just testing or developing BCM applications. You won't achieve any kind of local HA when deploying BCM in VMs, however. For that, you MUST install BCM to the native OS via 'local' or 'ssh' deployment methods.
+If your localhost (e.g., SDN Controller) supports hardware virtualization and you choose to deploy a `vm`, [multipass](https://github.com/CanonicalLtd/multipass) will be installed locally and BCM data-center components will be deployed to that. If your hardware doesn't support virtualization, BCM can still be installed using directly to your Ubuntu OS. VM is a good choice if you're just testing or developing BCM applications. You won't achieve any kind of local HA when deploying BCM in VMs (since the VMs run on the same hardware), however. For that, you MUST install BCM to the native OS via 'local' or 'ssh' deployment methods. Since 'local' and 'ssh' avoid hardware virtualization, they are generally more performant.
 
-The SSH deployment method allows you to run BCM data center workloads on one or more dedicated remote machines. The only assumptions that BCM makes is that each machine is running a fresh installation of Ubuntu 18.04 (Desktop or Server) and has SSH exposed on port 22. Each remote machine you provision MUST be DNS-resolvable by your SDN controller. Future versions of BCM will enable the capability to expose SSH endpoints via an authenticated TOR onion services for remote low-level management. To facilitate local deployments to your SDN controller, `$BCM_GIT_DIR/setup.sh` installs `openssh-server` and configures it to listen locally at 127.0.1.1. This allows the SDN Controller to treat your localhost similarly to a remote machine which simplifies the BCM codebase.
+The only assumptions that BCM makes is that each machine is running a fresh installation of Ubuntu 18.04 (Desktop or Server) and has SSH exposed on port 22. Each remote machine you provision MUST be DNS-resolvable by your SDN controller. Future versions of BCM will enable the capability to expose SSH endpoints via an TOR (v3) onion service for the management plane (i.e., SSH, LXD). To facilitate installation to your localhost SDN controller, `$BCM_GIT_DIR/setup.sh` installs `openssh-server` and configures it to listen locally at 127.0.1.1. This allows the SDN Controller to treat your localhost similarly to a remote machine which simplifies the BCM codebase.
 
 Clusters are created and destroyed using the `bcm cluster create` and `bcm cluster destroy` commands, respectively. Add the `--help` flag to determine how best to use `bcm cluster` commands. Most users won't need to use these commands directly as they are automatically invoked when users start user-facing application using `bcm stack start` commands.
 
@@ -67,3 +67,7 @@ Finish the process by restarting the computer:
 ```bash
 sudo shutdown -r now
 ```
+
+# BCM Cluster CLI
+
+You can destroy your currently deployed back-end by running the `bcm cluster destroy` command. Any subsequent commands will redeploy your back-end from scratch. Check `bcm info` to see your active cluster. Use `bcm cluster

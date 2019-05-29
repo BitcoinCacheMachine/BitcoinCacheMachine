@@ -24,8 +24,8 @@ RPC_IP=$(</root/.bitcoin/rpcip.txt)
     echo "bitcoin.active=1"
     
     echo "[Bitcoind]"
-    echo "bitcoin.rpchost=$RPC_IP"
-    echo "bitcoin.dir=/root/.bitcoin"
+    echo "bitcoind.rpchost=$RPC_IP"
+    echo "bitcoind.dir=/root/.bitcoin"
     
     echo "[tor]"
     echo "tor.active=1"

@@ -153,7 +153,6 @@ if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor
     bash -c "$BCM_GIT_DIR/controller/build.sh"
 fi
 
-
 # let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already when the user initially
 # downloaded BCM from github

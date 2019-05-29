@@ -20,6 +20,7 @@ services:
       CHAIN_TEXT: ${CHAIN_TEXT}
     networks:
       torsocksnet:
+      #toronionnet:
       bitcoindrpcnet:
       lndrpcnet:
         aliases:
@@ -41,7 +42,11 @@ services:
 networks:
   torsocksnet:
     external: true
-    name: tor_torsocksnet
+    name: torproxy-${BCM_ACTIVE_CHAIN:-}_torsocksnet
+
+  # toronionnet:
+  #   external: true
+  #   name: toronion_lndnet-${BCM_ACTIVE_CHAIN:-}
 
   lndrpcnet:
     driver: overlay
@@ -68,7 +73,7 @@ volumes:
 
   tor-data:
     external: true
-    name: tor_data
+    name: torproxy-${BCM_ACTIVE_CHAIN:-}_data
 
   bitcoin-data:
     external: true
