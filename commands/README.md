@@ -23,7 +23,7 @@ If the cli is configured correctly, you can run `bcm info` to get an overview of
 
 The BCM CLI provides several entrypoints into interacting with your Trezor. The `bcm --help` menu is the authoritative documentation for the CLI and is kept most up-to-date.
 
-You can switch your identity by setting changing your bcmdir using the `bcm config set --bcmdir=PATH` command. The BCM CLI then uses the folders found under $PATH to look for certificate and password stores. This allows you to generate multiple Trezor-backed public key GPG certificates and switch between them as needed. It is recommended that each identity be confined to a distinct [BIP032 path](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) (i.e., Trezor passphrase).
+You can switch your identity by setting changing your runtime-dir using the `bcm config set --runtime-dir=PATH` command. The BCM CLI then uses the folders found under $PATH to look for certificate and password stores. This allows you to generate multiple Trezor-backed public key GPG certificates and switch between them as needed. It is recommended that each identity be confined to a distinct [BIP032 path](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) (i.e., Trezor passphrase).
 
 ## Get an overview of your LXD configuration
 
