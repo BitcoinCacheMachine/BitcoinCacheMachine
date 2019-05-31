@@ -41,14 +41,21 @@ BCM_BACKUP_DIR="$BCM_WORKING_DIR/$(lxc remote get-default)/backups"
 export BACKUP_DIR="$BCM_BACKUP_DIR"
 
 if [[ $BCM_CLI_VERB == "start" ]]; then
-    validateStackParam "$BCM_CLI_VERB";
+    STACK_NAME=
+    if [ -z "${3:-}" ]; then
+        echo "Please provide a BCM stack name."
+        cat "./help.txt"
+        exit
+    else
+        STACK_NAME="$3"
+    fi
     
     # running the stack up file.
     UP_FILE="$BCM_STACKS_DIR/$STACK_NAME/up.sh"
     if [[ -f "$UP_FILE" ]]; then
         BCM_BACKUP_DIR="$BCM_BACKUP_DIR" bash -c "$UP_FILE" "$@"
     else
-        echo "Error: Could not find '$UP_FILE'."
+        echo "Error: BCM does not support this stack name."
     fi
 fi
 

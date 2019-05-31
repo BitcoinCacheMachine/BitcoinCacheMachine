@@ -25,7 +25,7 @@ NEW_CLUSTER_NAME=
 
 for i in "$@"; do
     case $i in
-        bcmdir=*)
+        runtime-dir=*)
             NEW_RUNTIME_DIR="${i#*=}"
             shift # past argument=value
         ;;
@@ -54,7 +54,7 @@ if [[ $BCM_CLI_VERB == "get" ]]; then
     OBJECT="${3:-}"
     if [[ $OBJECT == chain ]]; then
         echo "$BCM_ACTIVE_CHAIN"
-        elif [[ $OBJECT == bcmdir ]]; then
+        elif [[ $OBJECT == "runtime-dir" ]]; then
         echo "$BCM_RUNTIME_DIR"
         elif [[ $OBJECT == datacenter ]]; then
         echo "$BCM_DATACENTER"

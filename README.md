@@ -98,7 +98,7 @@ You can use the `bcm info` command to view your current BCM environment variable
 
 ## Documentation
 
-The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo. Consult [CLI README](./README.md) for notes on how to use the BCM CLI.
+The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo. Consult [CLI README](./commands/README.md) for notes on how to use the BCM CLI.
 
 ## How to contribute
 

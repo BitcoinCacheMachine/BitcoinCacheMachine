@@ -95,7 +95,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 # the cloud-init file for multipass uses 'bcm' as the username.
                 BCM_DRIVER=multipass
                 BCM_SSH_USERNAME="bcm"
-                CLUSTER_NAME="bcm-$(hostname)"
+                CLUSTER_NAME="bcm-multipass"
                 BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
                 MACVLAN_INTERFACE="ens3"
                 

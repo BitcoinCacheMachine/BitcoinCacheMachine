@@ -7,7 +7,7 @@ CONTINUE=0
 CHOICE=n
 
 if [[ $BCM_RUNTIME_DIR == "$HOME" ]]; then
-    echo "WARNING: BCM reset will NOT run when 'bcmdir=$HOME'"
+    echo "WARNING: BCM reset will NOT run when 'runtime-dir=$HOME'"
     exit
 fi
 
