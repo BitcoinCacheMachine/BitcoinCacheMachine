@@ -1,8 +1,7 @@
 Description:
   Command line client for Bitcoin Cache Machine. BCM's features can be driven through the various 
-  commands below. In most cases, all you need to do is run "bcm stack start <STACK_NAME>" commands
+  commands below. In most cases, all you need to do is run 'bcm stack start stackname' commands
   to deploy software to your active chain. Use "bcm info" to view your CLI Environment settings.
-  Your BCM files are stored at BCM_RUNTIME_DIR 'echo $BCM_RUMTIME_DIR'.
 
 Usage:
   bcm [command] --help
@@ -18,7 +17,7 @@ Available Commands:
   pass         Create and manage GPG-encrypted passwords protected by your Trezor.
   info         Display current and target environment variables related to BCM operations.
   show         Show detailed LXC-related information for your active BCM Cluster/LXD endpoint.
-  config       Get and set BCM CLI options. Switch chain, set image caches, etc.
+  config       Get and set BCM CLI options. Switch chain, set image caches, active cluster, etc.
 
 Help
   Use "bcm [command] --help" to get help for that command.
