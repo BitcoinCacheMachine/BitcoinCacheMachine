@@ -1,7 +1,12 @@
 SocksPort 0.0.0.0:9050
 DNSPort 0.0.0.0:9053
 ControlPort 0.0.0.0:9051
+
+# needed by bitcoind, clightning, lnd
 CookieAuthentication 1
+
+# added by clightning
+CookieAuthFileGroupReadable 1
 
 # allow group read permission so downstream services can read the auth file
 #ExtORPortCookieAuthFileGroupReadable 1

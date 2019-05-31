@@ -129,8 +129,6 @@ lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-regi
 ./build_push_docker_base.sh
 
 
-
-
 # let's cycle through the other cluster members (other than the master)
 # and get their bcm-manager host going.
 # shellcheck disable=SC1090
