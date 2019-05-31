@@ -2,6 +2,9 @@
 
 set -e
 
+# this script does a trezor-backed GPG signing operation on a git commit
+# Note that the git repository mounted into /gitrepo MUST have some staged changes.
+
 cd /gitrepo
 
 echo "GNUPGHOME: '$GNUPGHOME'"
@@ -25,9 +28,6 @@ echo "git config --global user.name set to '$(git config --global --get user.nam
 # email must be passed in since a certificate can have many emails (uids)
 git config --global user.email "$BCM_EMAIL_ADDRESS"
 echo "git config --global user.email set to '$(git config --global --get user.email)'"
-
-echo "Staging all outstanding changes."
-git add "*"
 
 echo "Committing and signing. Get ready to check your Trezor."
 git commit -S -m "$GIT_COMMIT_MESSAGE"
