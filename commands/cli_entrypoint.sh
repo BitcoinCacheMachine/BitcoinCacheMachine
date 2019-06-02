@@ -38,6 +38,21 @@ export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
 CLUSTER_NAME="$(lxc remote get-default)"
 export CLUSTER_NAME="$CLUSTER_NAME"
 
+# commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
+if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
+    ./info.sh "$@"
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
+    ./controller/entrypoint.sh "$@"
+    exit
+fi
+
+# ensure we have all the controller docker images built.
+# all subsequent commands require these images.
+bash -c "$BCM_GIT_DIR/controller/build.sh"
+
 if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
     ./init.sh "$@"
 fi
@@ -54,11 +69,6 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "file" ]]; then
     ./file/entrypoint.sh "$@"
-    exit
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
-    ./info.sh "$@"
     exit
 fi
 

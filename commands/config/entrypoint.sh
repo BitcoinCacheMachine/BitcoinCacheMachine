@@ -95,15 +95,17 @@ if [[ $BCM_CLI_VERB == "set" ]]; then
         echo "export BCM_DEBUG=$NEW_DEBUG_VAL" >> "$BCM_CONFIG_FILE"
     fi
     
-    if lxc remote list --format csv | grep -q "$NEW_CLUSTER_NAME"; then
-        if [[ "$NEW_CLUSTER_NAME" != "$(lxc remote get-default)" ]]; then
-            lxc remote switch "$NEW_CLUSTER_NAME"
-            echo "Your active BCM cluster is now set to target '$NEW_CLUSTER_NAME'."
+    if [[ ! -z $NEW_CLUSTER_NAME ]]; then
+        if lxc remote list --format csv | grep -q "$NEW_CLUSTER_NAME"; then
+            if [[ "$NEW_CLUSTER_NAME" != "$(lxc remote get-default)" ]]; then
+                lxc remote switch "$NEW_CLUSTER_NAME"
+                echo "Your active BCM cluster is now set to target '$NEW_CLUSTER_NAME'."
+            else
+                echo "BCM is already targeting cluster '$NEW_CLUSTER_NAME'."
+            fi
         else
-            echo "BCM is already targeting cluster '$NEW_CLUSTER_NAME'."
+            echo "Error: the LXC remote for BCM Cluster '$NEW_CLUSTER_NAME' is not defined."
         fi
-    else
-        echo "Error: the LXC remote for BCM Cluster '$NEW_CLUSTER_NAME' is not defined."
     fi
 fi
 

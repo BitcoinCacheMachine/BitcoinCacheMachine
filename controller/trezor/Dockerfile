@@ -12,37 +12,32 @@ RUN apt-get install -y wait-for-it openssh-client git tor usbutils curl gnupg2
 #RUN apt-get install -y python-setuptools
 
 # 2. Install the TREZOR agent
-#RUN pip3 install Cython hidapi
-#RUN pip3 install trezor_agent
+RUN pip3 install Cython hidapi
+RUN pip3 install trezor_agent
 
-RUN mkdir /tmp/trezor
-RUN git clone https://github.com/romanz/trezor-agent /tmp/trezor
-WORKDIR /tmp/trezor
-RUN git checkout master
-RUN pip3 install -e /tmp/trezor/agents/trezor
+RUN git clone https://github.com/romanz/trezor-agent /trezor-agent
+WORKDIR /trezor-agent
+RUN git checkout latest-trezorlib
+RUN pip3 install -e /trezor-agent/agents/trezor
 
 WORKDIR /gitrepo
 
 # run this script to quickly configure and commit and sign a repo
 RUN mkdir /bcm
-ADD ./container_scripts/commit_sign_git_repo.sh /bcm/commit_sign_git_repo.sh
-RUN chmod +x /bcm/commit_sign_git_repo.sh
+ADD ./scripts/commit_sign_git_repo.sh /bcm/commit_sign_git_repo.sh
+RUN chmod 0755 /bcm/commit_sign_git_repo.sh
 
 # run this script to quickly configure and tag and sign a repo
-ADD ./container_scripts/tag_sign_git_repo.sh /bcm/tag_sign_git_repo.sh
-RUN chmod +x /bcm/tag_sign_git_repo.sh
+ADD ./scripts/tag_sign_git_repo.sh /bcm/tag_sign_git_repo.sh
+RUN chmod 0755 /bcm/tag_sign_git_repo.sh
 
 # run this script to quickly configure verify branches and merge them with a signature
-ADD ./container_scripts/merge_sign_git_repo.sh /bcm/merge_sign_git_repo.sh
-RUN chmod +x /bcm/merge_sign_git_repo.sh
+ADD ./scripts/merge_sign_git_repo.sh /bcm/merge_sign_git_repo.sh
+RUN chmod 0755 /bcm/merge_sign_git_repo.sh
 
 # run this script to quickly configure and commit and sign a repo
-ADD ./container_scripts/git_pull.sh /bcm/git_pull.sh
-RUN chmod +x /bcm/git_pull.sh
-
-# run this script to quickly configure and commit and sign a repo
-ADD ./container_scripts/docker-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+ADD ./scripts/docker-entrypoint.sh /entrypoint.sh
+RUN chmod 0755 /entrypoint.sh
 
 RUN groupadd -r -g 1000 user 
 RUN adduser --disabled-login --system --shell /bin/false --uid 1000 --gid 1000 user

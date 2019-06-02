@@ -1,0 +1,10 @@
+Description:
+    Manage your SDN Controller
+
+Usage:
+    bcm controller [command]
+
+Available Commands:
+    destroy      Destroys all controller docker images (docker image list).
+    build        Builds any docker images needed at the controller.
+    reset        Alias for 'bcm controller destroy' && 'bcm controller build'.

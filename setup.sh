@@ -93,6 +93,11 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
     fi
 fi
 
+# ensure the lxc and docker clients are installed. This helps avoid installation
+# of this software when running 'bcm' commands.
+bash -c "$BCM_GIT_DIR/controller/install_lxc_client.sh"
+bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
+
 echo "Done setting up your machine to use the Bitcoin Cache Machine CLI."
 echo "Log out and log back in to refresh your group membership then open "
 echo "a new terminal and type 'bcm --help'."

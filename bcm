@@ -52,7 +52,10 @@ BCM_CONFIG_FILE="$HOME/.bcmconfig"
 if [[ ! -f $BCM_CONFIG_FILE ]]; then
     touch "$BCM_CONFIG_FILE"
     chmod 0755 "$BCM_CONFIG_FILE"
-    echo "#!/bin/bash" >> "$BCM_CONFIG_FILE"
+    {
+        echo "#!/bin/bash"
+        echo "export BCM_DEBUG=0"
+    } >> "$BCM_CONFIG_FILE"
 fi
 
 export BCM_CONFIG_FILE="$BCM_CONFIG_FILE"
@@ -100,58 +103,10 @@ if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
     exit
 fi
 
+# ensure the lxc and docker clients are installed.
+bash -c "$BCM_GIT_DIR/controller/install_lxc_client.sh"
 
-# install LXD if it doesn't exist.
-if [ ! -x "$(command -v lxc)" ]; then
-    # if the lxd groups doesn't exist, create it.
-    if ! grep -q lxd /etc/group; then
-        sudo addgroup --system lxd
-    fi
-    
-    if ! groups "$USER" | grep -q lxd; then
-        sudo adduser "${USER}" lxd
-        sudo gpasswd -a "${USER}" lxd
-    fi
-    
-    if [ ! -x "$(command -v lxd)" ]; then
-        sudo snap install lxd --channel=candidate
-        sudo snap set system snapshots.automatic.retention=no
-        sudo lxd init --auto --network-address=127.0.1.1 --network-port=8443 --storage-backend=btrfs
-    fi
-fi
-
-# install docker if it doesn't exist.
-if [ ! -x "$(command -v docker)" ]; then
-    if ! grep -q docker /etc/group; then
-        sudo addgroup docker
-    fi
-    
-    if ! groups "$USER" | grep -q docker; then
-        sudo usermod -aG docker "$USER"
-    fi
-    
-    if [ ! -x "$(command -v docker)" ]; then
-        sudo snap install docker --channel=candidate
-        
-        # next we need to determine the underlying file system so we can upload the correct daemon.json
-        DEVICE="$(df -h "$HOME" | grep ' /' | awk '{print $1}')"
-        FILESYSTEM="$(mount | grep "$DEVICE")"
-        DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/overlay_daemon.json"
-        
-        if echo "$FILESYSTEM" | grep -q "btrfs"; then
-            DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/btrfs_daemon.json"
-        fi
-        
-        sudo cp "$DAEMON_CONFIG" /var/snap/docker/current/config/daemon.json
-        sudo snap restart docker
-        sleep 5
-    fi
-fi
-
-# ensure we have our front-end docker images built. Subequent CLI commands assumes they are all built.
-if ! docker image list --format "{{.Repository}},{{.Tag}}" | grep -q "bcm-trezor,$BCM_VERSION"; then
-    bash -c "$BCM_GIT_DIR/controller/build.sh"
-fi
+bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
 
 # let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already when the user initially
@@ -161,7 +116,6 @@ if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
     echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
     git config --local http.proxy "$BCM_TOR_PROXY"
 fi
-
 
 # call the CLI entrypoint.
 ./commands/cli_entrypoint.sh "$@"
