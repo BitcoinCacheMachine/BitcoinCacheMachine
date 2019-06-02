@@ -8,6 +8,7 @@ Usage:
 
 Available Commands:
   init         Initialize your management plane; create new Trezor-backed GPG certificates.
+  controller   Manage your SDN controller.
   cluster      Create, destroy, and manage BCM clusters.
   start        Start a BCM application-layer service, e.g., bitcoind, clightning, spark, etc.
   stop         Stop a running BCM application-layer service.

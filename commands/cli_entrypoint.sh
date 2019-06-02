@@ -67,6 +67,11 @@ if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
     exit
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
+    ./controller/entrypoint.sh "$@"
+    exit
+fi
+
 if [[ "$BCM_CLI_COMMAND" == "ssh" ]]; then
     ./ssh/entrypoint.sh "$@"
     exit
