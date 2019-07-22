@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # first, let's make sure we deploy our direct dependencies.
@@ -28,9 +28,9 @@ source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
---build-context="$(pwd)/build/" \
---container-name="$LXC_HOSTNAME" \
---image-name="$IMAGE_NAME"
+    --build-context="$(pwd)/build/" \
+    --container-name="$LXC_HOSTNAME" \
+    --image-name="$IMAGE_NAME"
 
 # push the stack and build files
 lxc file push -p -r "$BCM_STACKS_DIR/bitcoind/stack" "$BCM_MANAGER_HOST_NAME/root/stacks/$TIER_NAME/$STACK_NAME"
@@ -51,7 +51,7 @@ if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     SRC_DIR="$HOME/.bitcoin/testnet3"
     DEST_DIR="$DEST_DIR/testnet3"
     UPLOAD_CHAINSTATE=1
-    elif [[ $BCM_ACTIVE_CHAIN == 'regtest' ]]; then
+elif [[ $BCM_ACTIVE_CHAIN == 'regtest' ]]; then
     SRC_DIR="$HOME/.bitcoin/regtest"
     DEST_DIR="$DEST_DIR/regtest"
     UPLOAD_BLOCKS=0
@@ -62,7 +62,7 @@ NEW_INSTALL=0
 LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
 if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "$DOCKER_VOLUME_NAME"; then
     lxc exec "$LXC_HOSTNAME" -- docker volume create "$DOCKER_VOLUME_NAME"
-    
+
     # if we just now created the docker volume in this script run, then we need
     # to indicate downstream that preseeding should take place. If the volume
     # already exists we assume preseeding has already taken place. The node should
@@ -99,7 +99,7 @@ else
         if [[ "$UPLOAD_BLOCKS" == 1 ]]; then
             lxc file push -r -p "$SRC_DIR/blocks" "$LXC_HOSTNAME/$DEST_DIR"
         fi
-        
+
         if [[ "$UPLOAD_CHAINSTATE" == 1 ]]; then
             lxc file push -r -p "$SRC_DIR/chainstate" "$LXC_HOSTNAME/$DEST_DIR"
             INITIAL_BLOCK_DOWNLOAD=0
@@ -107,17 +107,15 @@ else
     fi
 fi
 
-
-
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION" \
-BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
-LXC_HOSTNAME="$LXC_HOSTNAME" \
-INITIAL_BLOCK_DOWNLOAD="$INITIAL_BLOCK_DOWNLOAD" \
-BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
-BITCOIND_RPCNET_SUBNET="$BITCOIND_RPCNET_SUBNET" \
-BITCOIND_RPCNET_IP="$BITCOIND_RPCNET_IP" \
-BITCOIND_ONIONNET_IP="$BITCOIND_ONIONNET_IP" \
-BITCOIND_ZMQ_BLOCK_PORT="$BITCOIND_ZMQ_BLOCK_PORT" \
-BITCOIND_ZMQ_TX_PORT="$BITCOIND_ZMQ_TX_PORT" \
-BITCOIND_ONIONNET_SUBNET="$BITCOIND_ONIONNET_SUBNET" \
-docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
+    BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN" \
+    LXC_HOSTNAME="$LXC_HOSTNAME" \
+    INITIAL_BLOCK_DOWNLOAD="$INITIAL_BLOCK_DOWNLOAD" \
+    BITCOIND_RPC_PORT="$BITCOIND_RPC_PORT" \
+    BITCOIND_RPCNET_SUBNET="$BITCOIND_RPCNET_SUBNET" \
+    BITCOIND_RPCNET_IP="$BITCOIND_RPCNET_IP" \
+    BITCOIND_ONIONNET_IP="$BITCOIND_ONIONNET_IP" \
+    BITCOIND_ZMQ_BLOCK_PORT="$BITCOIND_ZMQ_BLOCK_PORT" \
+    BITCOIND_ZMQ_TX_PORT="$BITCOIND_ZMQ_TX_PORT" \
+    BITCOIND_ONIONNET_SUBNET="$BITCOIND_ONIONNET_SUBNET" \
+    docker stack deploy -c "/root/stacks/$TIER_NAME/$STACK_NAME/stack/$STACK_NAME.yml" "$STACK_NAME-$BCM_ACTIVE_CHAIN"
