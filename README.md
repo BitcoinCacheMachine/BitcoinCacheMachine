@@ -7,7 +7,7 @@ Bitcoin Cache Machine is open-source software that allows you to create a self-h
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged using [GPG.asc](./GPG.asc) once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM.
+**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged using [GPG.asc](./GPG.asc) once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM. BCM HAS NOT undergone formal security evaluation and should be considered for TESTING PURPOSES ONLY.
 
 ```YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!```
 
@@ -99,6 +99,15 @@ You can use the `bcm info` command to view your current BCM environment variable
 ## Documentation
 
 The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo. Consult [CLI README](./commands/README.md) for notes on how to use the BCM CLI.
+
+## Related Projects
+
+Click the following link to view projects that are related to BCM:
+
+NodeLauncher
+CipherNode
+Nodl.it
+Casa
 
 ## How to contribute
 

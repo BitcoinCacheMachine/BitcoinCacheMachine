@@ -4,17 +4,17 @@
 
 Sign up for a github.com account.
 
-Fork the BitcoinCacheMachine repository to your account. Clone the repo to your machine, then make some changes to your local repo.
+Fork the BitcoinCacheMachine repository to your account. Clone your forked repo to your machine then make some changes to your local repo. Feel free to make your changes on a branch of your making.
 
 BCM is developed in Visual Studio Code by BCM's main authors. Feel free to use any editor you want, just be sure to .gitignore any editor manifests.
 
 ## Linters
 
-The authors of BCM ensures that BCM bash scripts are shellcheck compliant. Install shellcheck `sudo apt-get install shellcheck` then add any editor extensions you might want, such as Bash Beautify.
+The authors of BCM works toward making BCM bash scripts [shellcheck](https://github.com/koalaman/shellcheck) compliant. Install shellcheck on your development machine by running `sudo apt-get install shellcheck` then add any editor extensions you might want, such as [Bash Beautify]().
 
 ## Pull Requests
 
-When you are done, sign your work with your trezor using the following command:
+When you are done, sign your staged changes with your trezor using the following command:
 
     bcm git commit --message="Git commit message."
 
