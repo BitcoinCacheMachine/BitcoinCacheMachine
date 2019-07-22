@@ -8,7 +8,7 @@ ENV GODEBUG netdns=cgo
 RUN apk add --no-cache --update alpine-sdk git make gcc
 RUN git clone https://github.com/lightningnetwork/lnd /go/src/github.com/lightningnetwork/lnd
 WORKDIR /go/src/github.com/lightningnetwork/lnd
-RUN git checkout master
+RUN git checkout tags/v0.7.0-beta
 RUN make
 RUN make install
 

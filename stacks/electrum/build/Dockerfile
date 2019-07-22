@@ -25,14 +25,14 @@ ENV GNUPGHOME=/home/user/.gnupg
 
 COPY ThomasV.asc ThomasV.asc
 RUN gpg --import ThomasV.asc
-RUN wget https://download.electrum.org/3.3.6/Electrum-3.3.6.tar.gz
-RUN wget https://download.electrum.org/3.3.6/Electrum-3.3.6.tar.gz.asc
-RUN gpg --verify Electrum-3.3.6.tar.gz.asc
+RUN wget https://download.electrum.org/3.3.8/Electrum-3.3.8.tar.gz
+RUN wget https://download.electrum.org/3.3.8/Electrum-3.3.8.tar.gz.asc
+RUN gpg --verify Electrum-3.3.8.tar.gz.asc
 
-RUN tar -xvf Electrum-3.3.6.tar.gz
+RUN tar -xvf Electrum-3.3.8.tar.gz
 
-RUN rm Electrum-3.3.6.tar.gz
-RUN rm Electrum-3.3.6.tar.gz.asc
+RUN rm Electrum-3.3.8.tar.gz
+RUN rm Electrum-3.3.8.tar.gz.asc
 
 #ENV XDG_RUNTIME_DIR=/run/user/1000
 
