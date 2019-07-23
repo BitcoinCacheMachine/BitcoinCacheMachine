@@ -1,12 +1,32 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# This stack run as a desktop GUI application on the SDN Controller. As such, it runs directly in
-# dockerd and not expected to be within an LXC context.
-if ! bcm stack list | grep -q "electrs"; then
-    bcm stack start electrs
+MODE=trustminimized
+
+for i in "$@"; do
+    case $i in
+    --mode=*)
+        MODE="${i#*=}"
+        shift # past argument=value
+        ;;
+    *)
+        # unknown option
+        ;;
+    esac
+done
+
+if [[ $MODE != "trustminimized" && $MODE != "tor" ]]; then
+    echo "ERROR: Valid modes are 'tm' for trust minimized and 'tor' to connect electrum wallet to remote untrusted servers using tor."
+fi
+
+if [[ $MODE != "trustminimzed" ]]; then
+    # This stack run as a desktop GUI application on the SDN Controller. As such, it runs directly in
+    # dockerd and not expected to be within an LXC context.
+    if ! bcm stack list | grep -q "electrs"; then
+        bcm stack start electrs
+    fi
 fi
 
 # Using Electrum Wallet 3.3.5
@@ -35,19 +55,19 @@ wait-for-it -t 0 "$BACK_END_IP:$ELECTRS_RPC_PORT"
 ELECTRUM_CMD_TXT=""
 if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     ELECTRUM_CMD_TXT="--testnet"
-    elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
+elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
     ELECTRUM_CMD_TXT="--regtest"
 fi
 
 # todo review permissions on this app running.
 docker run -it --rm --net=host \
--e DISPLAY="$DISPLAY" \
--e XAUTHORITY="${XAUTH}" \
--e BACK_END_IP="$BACK_END_IP" \
--e ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT" \
--e ELECTRUM_CMD_TXT="$ELECTRUM_CMD_TXT" \
--v "$XSOCK":"$XSOCK":rw \
--v "$XAUTH":"$XAUTH":rw \
--v "$ELECTRUM_DIR":/home/user/.electrum \
---privileged \
-bcm-electrum:"$BCM_VERSION"
+    -e DISPLAY="$DISPLAY" \
+    -e XAUTHORITY="${XAUTH}" \
+    -e BACK_END_IP="$BACK_END_IP" \
+    -e ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT" \
+    -e ELECTRUM_CMD_TXT="$ELECTRUM_CMD_TXT" \
+    -v "$XSOCK":"$XSOCK":rw \
+    -v "$XAUTH":"$XAUTH":rw \
+    -v "$ELECTRUM_DIR":/home/user/.electrum \
+    --privileged \
+    bcm-electrum:"$BCM_VERSION"
