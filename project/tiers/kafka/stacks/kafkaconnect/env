@@ -1,4 +1,4 @@
-export DOCKERHUB_IMAGE="confluentinc/cp-kafka-connect:5.2.1"
+export DOCKERHUB_IMAGE="confluentinc/cp-kafka-connect:5.2.2"
 export IMAGE_NAME="bcm-kafka-connect"
 export IMAGE_TAG="5.1.0"
 export BCM_TIER_NAME="kafka"

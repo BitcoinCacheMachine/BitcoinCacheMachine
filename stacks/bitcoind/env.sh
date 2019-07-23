@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 export IMAGE_NAME="bcm-bitcoin-core"
 
@@ -8,7 +8,7 @@ export TIER_NAME="bitcoin$BCM_ACTIVE_CHAIN"
 export STACK_NAME="bitcoind"
 export SERVICE_NAME="bitcoind"
 
-export STACK_DOCKER_VOLUMES="cli wallet cookie blocks"
+# export STACK_DOCKER_VOLUMES="cli wallet cookie data blocks"
 export DOCKER_VOLUME_NAME="bitcoind-$BCM_ACTIVE_CHAIN""_data"
 
 # defaults are for mainnet
@@ -27,7 +27,7 @@ if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     BITCOIND_RPC_PORT=18332
     BITCOIND_ZMQ_BLOCK_PORT=19332
     BITCOIND_ZMQ_TX_PORT=19331
-    elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
+elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
     BITCOIND_RPCNET_SUBNET="172.16.50.64/27"
     BITCOIND_RPCNET_IP="172.16.50.67"
     BITCOIND_ONIONNET_SUBNET="172.16.100.64/27"

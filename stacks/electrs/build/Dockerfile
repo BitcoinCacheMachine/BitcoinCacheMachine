@@ -25,7 +25,7 @@ RUN apt-get install -y clang cmake libsnappy-dev git
 
 RUN git clone https://github.com/romanz/electrs /root/electrs
 WORKDIR /root/electrs 
-RUN git checkout tags/v0.6.2
+RUN git checkout tags/v0.7.0
 
 RUN cargo build --release
 RUN cargo install --path .

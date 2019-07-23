@@ -9,7 +9,7 @@ RUN apt-get install -y --no-install-recommends autoconf automake build-essential
 
 RUN git clone https://github.com/ElementsProject/lightning.git /root/lightning
 WORKDIR /root/lightning
-RUN git checkout tags/v0.7.0
+RUN git checkout tags/v0.7.1
 
 RUN ./configure
 RUN make

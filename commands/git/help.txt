@@ -7,7 +7,7 @@ Usage:
 Available Commands:
   commit        Stages and commits everything the chosen repository. The 
                 commit is GPG signed using the trezor backend.
-  push          Pushes the chosen repository over an SSH connection protected by TOR.
+  merge         Merge a branch into another branch.
   tag           Creates, deletes, annotates and signs tags
 
 Parameters:
