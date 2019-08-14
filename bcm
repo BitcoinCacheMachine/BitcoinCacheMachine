@@ -3,7 +3,18 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+export BCM_GIT_DIR="$(pwd)"
+export BCM_LXD_OPS="$BCM_GIT_DIR/project/shared"
+export BCM_MAJOR_VERSION="0"
+export BCM_MINOR_VERSION="0"
+export BCM_PATCH_VERSION="1"
+export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION"
+export BCM_DOCKER_BASE_TAG="18.10"
+export BCM_RUNTIME_DIR="$HOME/.bcm" && mkdir -p "$BCM_RUNTIME_DIR"
 BCM_HELP_FLAG=0
+export BCM_DATACENTER="default"
+export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
+export BCM_CONFIG_FILE="$HOME/.bcmconfig"
 
 for i in "$@"; do
     case $i in
@@ -18,36 +29,6 @@ done
 
 export BCM_HELP_FLAG="$BCM_HELP_FLAG"
 
-if [[ ! -z ${1+x} ]]; then
-    BCM_CLI_COMMAND="$1"
-else
-    cat ./commands/help.txt
-    exit
-fi
-
-export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
-export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
-export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
-
-# see README.md for versioning scheme.
-
-# major version change requires reinstallation & disaster recovery of data
-export BCM_MAJOR_VERSION="0"
-
-# minor version requires update to LXC system containers
-export BCM_MINOR_VERSION="0"
-
-# Represents update on one or more docker (app images)
-export BCM_PATCH_VERSION="1"
-
-export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION"
-export BCM_DOCKER_BASE_TAG="18.04"
-export BCM_RUNTIME_DIR="$HOME/.bcm"
-export BCM_DATACENTER="default"
-export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
-BCM_ACTIVE_CHAIN="testnet"
-
-BCM_CONFIG_FILE="$HOME/.bcmconfig"
 if [[ ! -f $BCM_CONFIG_FILE ]]; then
     touch "$BCM_CONFIG_FILE"
     chmod 0755 "$BCM_CONFIG_FILE"
@@ -58,23 +39,32 @@ if [[ ! -f $BCM_CONFIG_FILE ]]; then
     } >>"$BCM_CONFIG_FILE"
 fi
 
-export BCM_CONFIG_FILE="$BCM_CONFIG_FILE"
+# commands in ~/.bashrc are delimited by these literals.
+BASHRC_FILE="$HOME/.bashrc"
+if [[ ! -f $BASHRC_FILE ]]; then
+    touch "$BASHRC_FILE"
+    sudo chmod 0644 "$BASHRC_FILE"
+fi
+
+BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"
+source "$BASHRC_FILE"
+if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
+    echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
+fi
 
 # the options in this file override any CLI options, such as which chahin
 # to target, where our files are located, whether we're in debug mode, etc.
 source "$BCM_CONFIG_FILE"
 
-export BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN"
-export BCM_SSH_DIR="$BCM_RUNTIME_DIR/.ssh" && mkdir -p "$BCM_SSH_DIR"
+export BCM_ACTIVE_CHAIN="testnet"
+export BCM_SSH_DIR="$HOME/.ssh" && mkdir -p "$BCM_SSH_DIR"
 
-export ELECTRUM_DIR="$BCM_RUNTIME_DIR/.electrum" && mkdir -p "$ELECTRUM_DIR"
-export ELECTRUM_ENC_DIR="$BCM_RUNTIME_DIR/.electrum_enc"
-
-export BCM_WORKING_DIR="$BCM_RUNTIME_DIR/clusters"
-export BCM_WORKING_ENC_DIR="$BCM_RUNTIME_DIR/.clusters_enc"
+export ELECTRUM_DIR="$BCM_RUNTIME_DIR/electrum" && mkdir -p "$ELECTRUM_DIR"
+export BCM_CLUSTERS_DIR="$BCM_RUNTIME_DIR/clusters" && mkdir -p "$BCM_CLUSTERS_DIR"
+export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
 
 GNUPGHOME="$HOME/.gnupg"
-PASSWORD_STORE_DIR="$HOME/.password_store"
+PASSWORD_STORE_DIR="$HOME/.password_store" && mkdir -p "$PASSWORD_STORE_DIR"
 
 export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
@@ -97,11 +87,6 @@ export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 export BCM_DOCKER_IMAGE_CACHE_FQDN="registry-1.docker.io"
 export BCM_LXD_IMAGE_CACHE="images.linuxcontainers.org"
 
-if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
-    ./commands/reset.sh "$@"
-    exit
-fi
-
 # ensure the lxc and docker clients are installed.
 bash -c "$BCM_GIT_DIR/controller/install_lxc_client.sh"
 
@@ -114,6 +99,30 @@ BCM_TOR_PROXY="socks5://localhost:9050"
 if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
     echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
     git config --local http.proxy "$BCM_TOR_PROXY"
+fi
+
+# this section configured the local SSH client on the Controller
+# so it uses the local SOCKS5 proxy for any SSH host that has a
+# ".onion" address. We use SSH tunneling to expose the remote onion
+# server's LXD API and access it on the controller via a locally
+# expose port (after SSH tunneling)
+SSH_LOCAL_CONF="$HOME/.ssh/config"
+if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
+    # if the .ssh/config file doesn't exist, create it.
+    mkdir -p "$HOME/.ssh"
+    touch "$SSH_LOCAL_CONF"
+fi
+
+# Next, paste in the necessary .ssh/config settings for accessing
+# remote LXD servers over TOR hidden services.
+if [[ -f "$SSH_LOCAL_CONF" ]]; then
+    SSH_ONION_TEXT="Host *.onion"
+    if ! grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
+        {
+            echo "$SSH_ONION_TEXT"
+            echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p"
+        } >>"$SSH_LOCAL_CONF"
+    fi
 fi
 
 # call the CLI entrypoint.

@@ -107,21 +107,3 @@ else
     echo "ERROR: $PASSWORD_STORE_DIR already exists."
     exit
 fi
-
-mkdir -p "$BCM_SSH_DIR"
-if ! grep -qs "$BCM_WORKING_DIR" /proc/mounts; then
-    mkdir -p "$BCM_WORKING_ENC_DIR"
-    mkdir -p "$BCM_WORKING_DIR"
-    echo "p" | encfs -o allow_root "$BCM_WORKING_ENC_DIR" "$BCM_WORKING_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN"
-fi
-
-if ! grep -qs "$ELECTRUM_DIR" /proc/mounts; then
-    mkdir -p "$ELECTRUM_ENC_DIR"
-    mkdir -p "$ELECTRUM_DIR"
-    echo "p" | encfs -o allow_root "$ELECTRUM_ENC_DIR" "$ELECTRUM_DIR" -i=10 --extpass="apg -n 1 -m 30 -M CN"
-    
-    #  TODO make MACVLAN interface accessible somehow...
-    #sudo route add -4 "$(bcm get-ip)"/32 dev wlp3s0 metric 50
-    mkdir -p "$ELECTRUM_DIR/testnet"
-    mkdir -p "$ELECTRUM_DIR/regtest"
-fi

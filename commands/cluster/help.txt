@@ -14,6 +14,8 @@ Related Command:
 Available Commands:
   create        Creates a new cluster definition and attempts to bring
                 all machines into basic operation.
+  clear         Removes all LXD resources (containers, profiles, storage volumes, etc)
+                from the current cluster project.
   destroy       Destroys all LXD instances within a cluster. All data is 
                 destroyed.
   list          List your clusters under management by your BCM client.

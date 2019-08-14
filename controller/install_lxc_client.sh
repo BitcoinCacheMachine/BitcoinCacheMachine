@@ -16,8 +16,9 @@ if [ ! -x "$(command -v lxc)" ]; then
     fi
     
     if [ ! -x "$(command -v lxd)" ]; then
-        sudo snap install lxd --channel=candidate
+        echo "Info: 'lxd' is not installed."
+        sudo snap install lxd --channel=stable
         sudo snap set system snapshots.automatic.retention=no
-        sudo lxd init --auto --network-address=127.0.1.1 --network-port=8443 --storage-backend=btrfs
+        sudo lxd init --auto --storage-backend=btrfs
     fi
 fi

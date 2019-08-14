@@ -37,33 +37,30 @@ for ENDPOINT in $(bcm cluster list endpoints); do
     LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
     
     # only create the new storage volume if it doesn't already exist
-    if lxc storage volume list default | grep -q "$LXC_DOCKERVOL"; then
+    if lxc storage volume list bcm --format csv | grep -q "$LXC_DOCKERVOL"; then
         # then this is normal behavior. Let's create the storage volume
         if [ "$ENDPOINT" != "$MASTER_NODE" ]; then
-            echo "Creating volume '$LXC_DOCKERVOL' on the default storage pool on cluster member '$ENDPOINT'."
-            lxc storage volume create default "$LXC_DOCKERVOL" block.filesystem=ext4 --target "$ENDPOINT"
+            echo "Creating volume '$LXC_DOCKERVOL' on the 'bcm' storage pool on cluster member '$ENDPOINT'."
+            lxc storage volume create bcm "$LXC_DOCKERVOL" block.filesystem=ext4 --target "$ENDPOINT"
         else
-            lxc storage volume create default "$LXC_DOCKERVOL" block.filesystem=ext4
+            lxc storage volume create bcm "$LXC_DOCKERVOL" block.filesystem=ext4
         fi
     else
         # but if it does exist, emit a WARNING that one already exists and will be used
-        echo "WARNING: LXC storage volume '$LXC_DOCKERVOL' in the default storage pool already exists."
+        echo "WARNING: LXC storage volume '$LXC_DOCKERVOL' in the 'bcm' storage pool already exists."
     fi
     
     # create the LXC host with the attached profiles.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
-        # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists. 
+        # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.
         lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile=bcm_disk --profile=docker_privileged --profile="$PROFILE_NAME"
     else
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi
     
-    if lxc storage volume list default | grep "$LXC_DOCKERVOL" | grep -q "| 0 "; then
-        if lxc storage volume show default "$LXC_DOCKERVOL" | grep -q "location: $ENDPOINT"; then
-            # let's attach the lxc storage volume 'dockervol' to the new LXC host for the docker backing.
-            # only so long as its not already attached.
-            
-            lxc storage volume attach default "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker
+    if lxc storage volume list bcm --format csv | grep "$LXC_DOCKERVOL" | grep -q "| 0 "; then
+        if lxc storage volume show bcm "$LXC_DOCKERVOL" | grep -q "location: $ENDPOINT"; then
+            lxc storage volume attach bcm "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker
         fi
     else
         echo "WARNING: Your dockervol was already attached to '$LXC_HOSTNAME'."

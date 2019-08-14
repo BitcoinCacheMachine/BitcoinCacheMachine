@@ -2,7 +2,8 @@
 
 set -Eeuo pipefail
 
-if [[ $(lxc remote get-default) == "local" ]]; then
+# if the current cluster is not configured, let's bring it into existence.
+if lxc info | grep -q "server_clustered: false"; then
     bcm cluster create
 fi
 
@@ -14,11 +15,13 @@ echo ""
 echo "LXD networks:"
 lxc network list
 
-
 echo ""
-echo "BTRFS volumes:"
-lxc storage volume list default
-
+if lxc storage list --format csv | grep -q "bcm"; then
+    echo "BTRFS volumes:"
+    lxc storage volume list bcm
+else
+    echo "INFO:  Storage volume 'bcm' does not exist."
+fi
 
 echo ""
 echo "LXD profiles:"

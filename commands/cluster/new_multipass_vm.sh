@@ -62,8 +62,6 @@ else
     exit
 fi
 
-
-
 echo "Creating a new multipass VM with the following resources:"
 
 echo "VM_NAME:  $VM_NAME"

@@ -18,7 +18,7 @@ export RUST_BACKTRACE=1
 
 BITCOIND_RPC_IP_PORT=
 if [[ -f /root/.bitcoin/rpcip.txt ]]; then
-    BITCOIND_RPC_IP_PORT=$(</root/.bitcoin/rpcip.txt)
+    BITCOIND_RPC_IP_PORT="$(</root/.bitcoin/rpcip.txt)"
 fi
 
 #/root/.cargo/bin/cargo run --release -- help

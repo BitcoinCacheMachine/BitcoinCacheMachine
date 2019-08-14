@@ -51,7 +51,7 @@ if lxc network list --format csv | grep "bcmbr0" | grep -q ",0,"; then
 fi
 
 #
-if ! lxc project list | grep -q "default (current)"; then
+if ! lxc project list --format csv | grep -q "default (current)"; then
     lxc project switch default
     lxc project delete "$BCM_PROJECT"
 fi

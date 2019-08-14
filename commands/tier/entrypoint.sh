@@ -16,7 +16,7 @@ if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "
 fi
 
 # if the current cluster is not configured, let's bring it into existence.
-if [[ $(lxc remote get-default) == "local" ]]; then
+if lxc info | grep -q "server_clustered: false"; then
     bcm cluster create
 fi
 
