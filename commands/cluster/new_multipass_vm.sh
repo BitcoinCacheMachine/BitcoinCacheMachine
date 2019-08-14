@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VM_NAME=
@@ -61,8 +61,6 @@ else
     echo "Error: '$ENDPOINT_DIR/id_rsa' does not exist!"
     exit
 fi
-
-
 
 echo "Creating a new multipass VM with the following resources:"
 

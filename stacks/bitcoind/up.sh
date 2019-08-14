@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # first, let's make sure we deploy our direct dependencies.
@@ -86,7 +86,7 @@ fi
 # if an existing bcm backup exists, then we will restore THAT first. This helps
 # avoid IDB using your Internet connection. If there's no backup, we can try uploading blocks
 # manually if they're in ~/.bitcoin. If all else fails, we will do IDB over Internet.
-BACKUP_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME/backups/$STACK_NAME"
+BACKUP_DIR="$BCM_CLUSTERS_DIR/$CLUSTER_NAME/backups/$STACK_NAME"
 INITIAL_BLOCK_DOWNLOAD=1
 if [[ -d $BACKUP_DIR ]]; then
     if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "bitcoind-$BCM_ACTIVE_CHAIN""-data"; then

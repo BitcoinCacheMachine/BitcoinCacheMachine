@@ -12,7 +12,6 @@ else
     exit
 fi
 
-
 LXC_HOST="$BCM_BITCOIN_HOST_NAME"
 
 # if BACKUP=0, then we assume a restore operation.
@@ -20,18 +19,18 @@ BACKUP=1
 
 for i in "$@"; do
     case $i in
-        --stack=*)
-            STACK_NAME="${i#*=}"
-            shift # past argument=value
+    --stack=*)
+        STACK_NAME="${i#*=}"
+        shift # past argument=value
         ;;
-        --lxc-host=*)
-            LXC_HOST="${i#*=}"
-            shift # past argument=value
+    --lxc-host=*)
+        LXC_HOST="${i#*=}"
+        shift # past argument=value
         ;;
-        --restore)
-            BACKUP=0
+    --restore)
+        BACKUP=0
         ;;
-        *) ;;
+    *) ;;
     esac
 done
 
@@ -53,33 +52,30 @@ if [[ ! -f "$STACK_ENV_FILE" ]]; then
     exit 1
 fi
 
-
 # source the file so we get bitcoind-specific info
 source "$STACK_ENV_FILE"
-
 
 BACKUP_DESTINATION_DIR="$BCM_WORKING_DIR/$CLUSTER_NAME/backups/$STACK_NAME"
 mkdir -p "$BACKUP_DESTINATION_DIR"
 
-for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES
-do
+for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
     echo "$DOCKER_VOLUME"
     BCM_DESTINATION_DIR="$BACKUP_DESTINATION_DIR/$DOCKER_VOLUME"
     mkdir -p "$BCM_DESTINATION_DIR"
-    
+
     echo "CHECK HERE"
     CONTAINER_DIR="$LXC_HOST""/var/lib/docker/volumes/$STACK_NAME-$BCM_ACTIVE_CHAIN""_""$DOCKER_VOLUME/_data"
     if [[ $BACKUP == 1 ]]; then
-        
+
         # if the stack is running, we stop immediately.  These scripts are only intended for manual backups
         # and services are ASSUMED To be OFF.
         if bcm stack list | grep -q bitcoind; then
             echo "Error: Can't perform a manual backup when 'bitcoind' is running. Use 'bcm stack remove bitcoind' to stop bitcoind services."
             exit 1
         fi
-        
+
         lxc file pull "$CONTAINER_DIR" "$BCM_DESTINATION_DIR" -r
-        elif [[ $BACKUP == 0 ]]; then
+    elif [[ $BACKUP == 0 ]]; then
         lxc file push "$BCM_DESTINATION_DIR/_data" "$CONTAINER_DIR" -r
     fi
 done

@@ -61,10 +61,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
     # using MACVLAN to expose services on the physical network underlay network.
     if [[ $BCM_TIER_TYPE == 2 ]]; then
         # if this tier is of type 2, then we need to source the endpoint tier .env then wire up the MACVLAN interface.
-        ACTIVE_CLUSTER="$(lxc remote get-default)"
-        
-        ACTIVE_ENDPOINT="$ACTIVE_CLUSTER-01"
-        ENDPOINT_ENV_PATH="$BCM_WORKING_DIR/$ACTIVE_CLUSTER/$ACTIVE_ENDPOINT/env"
+        ENDPOINT_ENV_PATH="$BCM_ENDPOINT_DIR/env"
         if [[ -f "$ENDPOINT_ENV_PATH" ]]; then
             source "$ENDPOINT_ENV_PATH"
             
@@ -78,7 +75,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
             fi
             
         else
-            echo "ERROR: The '$ACTIVE_ENDPOINT/env' does not exist. Can't wire up the macvlan interface."
+            echo "ERROR: The '$ENDPOINT_ENV_PATH' does not exist. Can't wire up the macvlan interface."
         fi
         
         # The above MACVLAN stuff allows us to expose services on the LAN, but we can't

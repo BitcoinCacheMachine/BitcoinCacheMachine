@@ -33,10 +33,22 @@ for i in "$@"; do
     esac
 done
 
+if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
+    ./reset.sh "$@"
+    exit
+fi
+
 export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
 export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
 CLUSTER_NAME="$(lxc remote get-default)"
 export CLUSTER_NAME="$CLUSTER_NAME"
+ENDPOINT_NAME="$(lxc info | grep "server_name: " | awk 'NF>1{print $NF}')"
+export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$CLUSTER_NAME"
+export BCM_ENDPOINT_DIR="$BCM_CLUSTER_DIR/$ENDPOINT_NAME"
+
+
+# ensure we have all the controller docker images built.
+bash -c "$BCM_GIT_DIR/controller/build.sh"
 
 # commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
 if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
@@ -48,10 +60,6 @@ if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
     ./controller/entrypoint.sh "$@"
     exit
 fi
-
-# ensure we have all the controller docker images built.
-# all subsequent commands require these images.
-bash -c "$BCM_GIT_DIR/controller/build.sh"
 
 if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
     ./init.sh "$@"

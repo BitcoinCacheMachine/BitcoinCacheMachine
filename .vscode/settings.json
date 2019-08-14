@@ -4,5 +4,20 @@
     "editor.cursorWidth": 3,
     "editor.formatOnSave": true,
     "shellcheck.useWSL": false,
-    "terminal.integrated.fontFamily": "monospace"
+    "terminal.integrated.fontFamily": "monospace",
+    "peacock.color": "#800080",
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#b300b3",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#9f9f00",
+        "activityBarBadge.foreground": "#15202b",
+        "titleBar.activeBackground": "#800080",
+        "titleBar.inactiveBackground": "#80008099",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveForeground": "#e7e7e799",
+        "statusBar.background": "#800080",
+        "statusBarItem.hoverBackground": "#b300b3",
+        "statusBar.foreground": "#e7e7e7"
+    }
 }

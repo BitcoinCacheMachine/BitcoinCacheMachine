@@ -3,6 +3,6 @@ description: Default BCM profile consisting of root BTRFS backend.
 devices:
   root:
     path: /
-    pool: default
+    pool: bcm
     type: disk
 name: default

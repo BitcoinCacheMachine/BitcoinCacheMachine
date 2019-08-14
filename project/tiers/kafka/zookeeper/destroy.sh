@@ -14,7 +14,7 @@ for endpoint in $(bcm cluster list endpoints); do
 done
 
 # remove the network
-if lxc list | grep -q "$BCM_MANAGER_HOST_NAME"; then
+if lxc list --format csv -c=n | grep -q "$BCM_MANAGER_HOST_NAME"; then
     if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network ls | grep -q zookeepernet; then
         lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network remove zookeepernet
     fi

@@ -1,10 +1,23 @@
 #!/bin/bash
 
-set -Eeu
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-apt-get update -y
-apt-get upgrade -y
+PRESEED_PATH="/home/bcm/bcm"
+
+for i in "$@"; do
+    case $i in
+        --preseed-path=*)
+            PRESEED_PATH="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
+sudo apt-get update -y
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 sudo apt-get install --no-install-recommends tor wait-for-it -y
@@ -12,7 +25,8 @@ sudo apt-get install --no-install-recommends tor wait-for-it -y
 # install lxd via snap
 if [ ! -x "$(command -v lxd)" ]; then
     # unless this is modified, we get snapshot creation in snap when removing lxd.
-    sudo snap install lxd --channel=candidate
+    echo "Info: 'lxd' is not installed."
+    sudo snap install lxd --channel=stable
     sudo snap set system snapshots.automatic.retention=no
 fi
 
@@ -23,9 +37,5 @@ if groups "$USER" | grep -q lxd; then
     sudo gpasswd -a "${USER}" lxd
 fi
 
-sudo snap restart lxd
-
 # run lxd init using the prepared preseed.
-cat "./lxd_preseed.yml" | sudo lxd init --preseed
-
-wait-for-it -t 30 127.0.0.1:8443
+cat "$PRESEED_PATH" | sudo lxd init --preseed

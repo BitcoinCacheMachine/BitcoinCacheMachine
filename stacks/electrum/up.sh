@@ -3,27 +3,28 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-MODE=trustminimized
+MODE=tm
 
 for i in "$@"; do
     case $i in
-    --mode=*)
-        MODE="${i#*=}"
-        shift # past argument=value
+        --mode=*)
+            MODE="${i#*=}"
+            shift # past argument=value
         ;;
-    *)
-        # unknown option
+        *)
+            # unknown option
         ;;
     esac
 done
 
-if [[ $MODE != "trustminimized" && $MODE != "tor" ]]; then
-    echo "ERROR: Valid modes are 'tm' for trust minimized and 'tor' to connect electrum wallet to remote untrusted servers using tor."
+if [[ $MODE != "tm" && $MODE != "tor" ]]; then
+    echo "ERROR: Valid modes are 'tm' for trust minimized (meaning you consult a self-hosted back-end) and 'tor' to connect electrum wallet to remote untrusted servers using tor."
+    echo "Note that 'tor' allows an untrusted third party to know all UTXOs belonging to your wallet, but will NOT necessarily know who owns those UTXOs."
+    exit -1
 fi
 
-if [[ $MODE != "trustminimzed" ]]; then
-    # This stack run as a desktop GUI application on the SDN Controller. As such, it runs directly in
-    # dockerd and not expected to be within an LXC context.
+if [[ $MODE == "tm" ]]; then
+    # ensure the back end is provisioned.
     if ! bcm stack list | grep -q "electrs"; then
         bcm stack start electrs
     fi
@@ -45,7 +46,7 @@ touch $XAUTH
 xauth nlist "$DISPLAY" | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 
 # let's check on our back end services.
-BACK_END_IP=$(bcm get-ip)
+BACK_END_IP="$(bcm get-ip)"
 
 # shellcheck source=../electrs/env.sh
 source "$BCM_STACKS_DIR/electrs/env.sh"
@@ -55,19 +56,19 @@ wait-for-it -t 0 "$BACK_END_IP:$ELECTRS_RPC_PORT"
 ELECTRUM_CMD_TXT=""
 if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     ELECTRUM_CMD_TXT="--testnet"
-elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
+    elif [[ $BCM_ACTIVE_CHAIN == "regtest" ]]; then
     ELECTRUM_CMD_TXT="--regtest"
 fi
 
 # todo review permissions on this app running.
 docker run -it --rm --net=host \
-    -e DISPLAY="$DISPLAY" \
-    -e XAUTHORITY="${XAUTH}" \
-    -e BACK_END_IP="$BACK_END_IP" \
-    -e ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT" \
-    -e ELECTRUM_CMD_TXT="$ELECTRUM_CMD_TXT" \
-    -v "$XSOCK":"$XSOCK":rw \
-    -v "$XAUTH":"$XAUTH":rw \
-    -v "$ELECTRUM_DIR":/home/user/.electrum \
-    --privileged \
-    bcm-electrum:"$BCM_VERSION"
+-e DISPLAY="$DISPLAY" \
+-e XAUTHORITY="${XAUTH}" \
+-e BACK_END_IP="$BACK_END_IP" \
+-e ELECTRS_RPC_PORT="$ELECTRS_RPC_PORT" \
+-e ELECTRUM_CMD_TXT="$ELECTRUM_CMD_TXT" \
+-v "$XSOCK":"$XSOCK":rw \
+-v "$XAUTH":"$XAUTH":rw \
+-v "$ELECTRUM_DIR":/home/user/.electrum \
+--privileged \
+bcm-electrum:"$BCM_VERSION"

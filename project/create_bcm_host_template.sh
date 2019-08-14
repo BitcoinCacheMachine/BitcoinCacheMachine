@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-if ! lxc project list | grep -q "default (current)"; then
+if ! lxc project list --format csv | grep -q "default (current)"; then
     lxc project switch default
 fi
 
@@ -15,23 +15,27 @@ if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
 fi
 
 # create the docker_unprivileged profile
-if ! lxc profile list | grep -q "docker_unprivileged"; then
+if ! lxc profile list --format csv | grep -q "docker_unprivileged"; then
     lxc profile create docker_unprivileged
     cat ./lxd_profiles/docker_unprivileged.yml | lxc profile edit docker_unprivileged
 fi
 
 # create the docker_privileged profile
-if ! lxc profile list | grep -q "docker_privileged"; then
+if ! lxc profile list --format csv | grep -q "docker_privileged"; then
     lxc profile create docker_privileged
     cat ./lxd_profiles/docker_privileged.yml | lxc profile edit docker_privileged
 fi
 
+# if the default storage driver doesn't exist, create it.
+if ! lxc storage list --format csv | grep -q "bcm"; then
+    lxc storage create bcm btrfs
+fi
+
 # create the docker_unprivileged profile
-if ! lxc profile list | grep -q "bcm_disk"; then
+if ! lxc profile list  --format csv | grep -q "bcm_disk"; then
     lxc profile create bcm_disk
     cat ./lxd_profiles/bcm_disk.yml | lxc profile edit bcm_disk
 fi
-
 
 if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
     echo "The LXD image 'bcm-lxc-base' doesn't exist. Exiting."
@@ -51,8 +55,9 @@ if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
         fi
     fi
     
-    echo "Copying the ubuntu/18.04 lxc image from LXD image server '$LXD_IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
-    lxc image copy "$LXD_IMAGE_REMOTE:ubuntu/18.04" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
+    LXC_BASE_VERSION="18.10"
+    echo "Copying the ubuntu/$LXC_BASE_VERSION lxc image from LXD image server '$LXD_IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
+    lxc image copy "$LXD_IMAGE_REMOTE:ubuntu/$LXC_BASE_VERSION" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
 fi
 
 
@@ -73,7 +78,7 @@ fi
 # If there was more than one node, this is the last command we need
 # to run to initiailze the network across the cluster. This isn't
 # executed when we have a cluster of size 1.
-if lxc network list | grep bcmbr0 | grep -q PENDING; then
+if lxc network list --format csv | grep bcmbr0 | grep -q PENDING; then
     lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
 fi
 

@@ -12,7 +12,7 @@ fi
 
 STACK_NAME=${3:-}
 
-function validateStackParam(){
+function validateStackParam() {
     if [ -z "${STACK_NAME}" ]; then
         echo "Please provide a BCM stack name."
         cat "./$1/help.txt"
@@ -20,24 +20,13 @@ function validateStackParam(){
     fi
 }
 
-
 # make sure the user has sent in a valid command; quit if not.
 if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "start" && $BCM_CLI_VERB != "stop" && $BCM_CLI_VERB != "clear" ]]; then
     echo "Error: The valid commands for 'bcm stack' are 'list', 'start', 'stop', and 'clear'."
     exit
 fi
 
-# if the current cluster is not configured, let's bring it into existence.
-if [[ $(lxc remote get-default) == "local" ]]; then
-    if [[ $BCM_CLI_VERB != "list" ]]; then
-        bcm cluster create
-    else
-        echo "ERROR: A BCM cluster does not exist. To create one, run 'bcm cluster create' or 'bcm stack start' command."
-        exit
-    fi
-fi
-
-BCM_BACKUP_DIR="$BCM_WORKING_DIR/$(lxc remote get-default)/backups"
+BCM_BACKUP_DIR="$BCM_CLUSTER_DIR/$(lxc remote get-default)/backups"
 export BACKUP_DIR="$BCM_BACKUP_DIR"
 
 if [[ $BCM_CLI_VERB == "start" ]]; then
@@ -59,8 +48,8 @@ if [[ $BCM_CLI_VERB == "start" ]]; then
     fi
 fi
 
-if [[ $BCM_CLI_VERB == "stop"  ]]; then
-    validateStackParam "$BCM_CLI_VERB";
+if [[ $BCM_CLI_VERB == "stop" ]]; then
+    validateStackParam "$BCM_CLI_VERB"
     
     STOP_SCRIPT="$BCM_STACKS_DIR/$STACK_NAME/stop.sh"
     if [[ -f $STOP_SCRIPT ]]; then
@@ -107,8 +96,7 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
     
     if lxc list --format csv -c=n | grep -q "$BCM_MANAGER_HOST_NAME"; then
         CHAIN=$BCM_ACTIVE_CHAIN
-        for STACK in $(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN")
-        do
+        for STACK in $(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN"); do
             STACK=${STACK%"$PREFIX"}
             echo "$STACK"
         done

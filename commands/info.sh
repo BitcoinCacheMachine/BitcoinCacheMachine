@@ -12,7 +12,7 @@ echo "  client_version:            $BCM_VERSION"
 
 if [[ -d $GNUPGHOME ]]; then
     echo "  cert_dir:                  $GNUPGHOME"
-
+    
     if [[ -f "$GNUPGHOME/env" ]]; then
         # shellcheck disable=SC1090
         source "$GNUPGHOME/env"
@@ -43,35 +43,32 @@ echo "  active_chain:              $BCM_ACTIVE_CHAIN"
 echo "bcm_deployment:"
 
 # remove any legacy lxd software and install install lxd via snap
-if ! lxc remote get-default | grep -q "local"; then
-    CLUSTER_NAME="$(lxc remote get-default)"
-    echo "  active_cluster:            $CLUSTER_NAME"
 
-    CLUSTER_PROJECT="$(lxc project list | grep "(current)")"
-    CLUSTER_VERSION="$BCM_VERSION"
-    if ! echo "$CLUSTER_PROJECT" | grep -q "default"; then
-        CLUSTER_VERSION=$(echo "$CLUSTER_PROJECT" | awk '{print $2}' | cut -d "_" -f 2)
-    fi
-    echo "  data_center:               $BCM_DATACENTER"
-    echo "  data_center_version:       $CLUSTER_VERSION"
-    echo "  logging_facility:          $(bcm config get logging)"
+CLUSTER_NAME="$(lxc remote get-default)"
+echo "  active_cluster:            $CLUSTER_NAME"
 
-    ENV_FILE="$BCM_RUNTIME_DIR/clusters/$CLUSTER_NAME/$CLUSTER_NAME-01/env"
-    if [[ -f $ENV_FILE ]]; then
-        source "$ENV_FILE"
-        if [[ ! -z $BCM_DRIVER ]]; then
-            echo "  deployment_type:           $BCM_DRIVER"
-        fi
-    fi
+CLUSTER_PROJECT="$(lxc project list | grep "(current)")"
+CLUSTER_VERSION="$BCM_VERSION"
+if ! echo "$CLUSTER_PROJECT" | grep -q "default"; then
+    CLUSTER_VERSION=$(echo "$CLUSTER_PROJECT" | awk '{print $2}' | cut -d "_" -f 2)
+fi
+echo "  data_center:               $BCM_DATACENTER"
+echo "  data_center_version:       $CLUSTER_VERSION"
+echo "  logging_facility:          $(bcm config get logging)"
 
-    # let's show some LXD cluster related stuff.
-    if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
-        echo "  lxd_image_cache:           $BCM_LXD_IMAGE_CACHE"
+ENV_FILE="$BCM_RUNTIME_DIR/clusters/$CLUSTER_NAME/$CLUSTER_NAME-01/env"
+if [[ -f $ENV_FILE ]]; then
+    source "$ENV_FILE"
+    if [[ ! -z $BCM_DRIVER ]]; then
+        echo "  deployment_type:           $BCM_DRIVER"
     fi
+fi
 
-    if [ ! -z ${BCM_DOCKER_IMAGE_CACHE_FQDN+x} ]; then
-        echo "  registry_mirror_host:      $BCM_DOCKER_IMAGE_CACHE_FQDN"
-    fi
-else
-    echo "  active_cluster:            N/A"
+# let's show some LXD cluster related stuff.
+if [ ! -z ${BCM_LXD_IMAGE_CACHE+x} ]; then
+    echo "  lxd_image_cache:           $BCM_LXD_IMAGE_CACHE"
+fi
+
+if [ ! -z ${BCM_DOCKER_IMAGE_CACHE_FQDN+x} ]; then
+    echo "  registry_mirror_host:      $BCM_DOCKER_IMAGE_CACHE_FQDN"
 fi

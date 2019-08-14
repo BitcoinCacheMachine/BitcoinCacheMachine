@@ -14,6 +14,8 @@ if [ ! -x "$(command -v docker)" ]; then
     fi
     
     if [ ! -x "$(command -v docker)" ]; then
+        echo "Info: 'docker' is not installed."
+        
         sudo snap install docker --channel=candidate
         
         # next we need to determine the underlying file system so we can upload the correct daemon.json

@@ -95,7 +95,13 @@ if [ $IS_MASTER -eq 1 ]; then
     fi
     
     export LXD_SERVER_NAME="$LXD_SERVER_NAME"
-    envsubst <./lxd_preseed/lxd_master_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
+    
+    if [[ $BCM_DRIVER == "ssh" ]]; then
+        envsubst <./lxd_preseed/lxd_master_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
+        elif [[ $BCM_DRIVER == "local" ]]; then
+        envsubst <./lxd_preseed/lxd_master_preseed_local.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
+    fi
+    
     elif [ $IS_MASTER -ne 1 ]; then
     envsubst <./lxd_preseed/lxd_member_preseed.yml >"$ENDPOINT_DIR/lxd_preseed.yml"
 else

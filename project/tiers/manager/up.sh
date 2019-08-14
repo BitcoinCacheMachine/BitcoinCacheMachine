@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
@@ -11,7 +11,7 @@ if bcm tier list | grep -q bcm-manager; then
 fi
 
 # It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
-if ! lxc project list | grep -q "$BCM_PROJECT"; then
+if ! lxc project list --format csv  | grep -q "$BCM_PROJECT"; then
     lxc project create "$BCM_PROJECT"
     
     # these two commands means that each project will
@@ -20,7 +20,7 @@ if ! lxc project list | grep -q "$BCM_PROJECT"; then
     lxc project set "$BCM_PROJECT" features.profiles false
 fi
 
-if ! lxc project list | grep -q "$BCM_PROJECT (current)"; then
+if ! lxc project list --format csv | grep -q "$BCM_PROJECT (current)"; then
     lxc project switch "$BCM_PROJECT"
 fi
 
@@ -57,20 +57,20 @@ function createBCMNet() {
 }
 
 #
-if lxc network list | grep bcmbrGWNat | grep -q PENDING; then
+if lxc network list --format csv | grep bcmbrGWNat | grep -q PENDING; then
     createBCMBRGW
 fi
 
-if ! lxc network list | grep -q bcmbrGWNat; then
+if ! lxc network list --format csv | grep -q bcmbrGWNat; then
     createBCMBRGW
 fi
 
 #
-if lxc network list | grep bcmNet | grep -q PENDING; then
+if lxc network list --format csv | grep bcmNet | grep -q PENDING; then
     createBCMNet
 fi
 
-if ! lxc network list | grep -q bcmNet; then
+if ! lxc network list --format csv | grep -q bcmNet; then
     createBCMNet
 fi
 
