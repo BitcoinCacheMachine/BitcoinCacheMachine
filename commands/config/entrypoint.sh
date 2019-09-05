@@ -17,7 +17,6 @@ if [[ "$#" -lt 3 ]]; then
     exit
 fi
 
-NEW_RUNTIME_DIR=
 BCM_CHAIN=
 NEW_DATACENTER_NAME=
 NEW_DEBUG_VAL=
@@ -26,32 +25,28 @@ NEW_BCM_LOGGING_FACILITY=
 
 for i in "$@"; do
     case $i in
-    runtime-dir=*)
-        NEW_RUNTIME_DIR="${i#*=}"
-        shift # past argument=value
+        cluster=*)
+            NEW_CLUSTER_NAME="${i#*=}"
+            shift # past argument=value
         ;;
-    cluster=*)
-        NEW_CLUSTER_NAME="${i#*=}"
-        shift # past argument=value
+        chain=*)
+            BCM_CHAIN="${i#*=}"
+            shift # past argument=value
         ;;
-    chain=*)
-        BCM_CHAIN="${i#*=}"
-        shift # past argument=value
+        datacenter=*)
+            NEW_DATACENTER_NAME="${i#*=}"
+            shift # past argument=value
         ;;
-    datacenter=*)
-        NEW_DATACENTER_NAME="${i#*=}"
-        shift # past argument=value
+        logging=*)
+            NEW_BCM_LOGGING_FACILITY="${i#*=}"
+            shift # past argument=value
         ;;
-    logging=*)
-        NEW_BCM_LOGGING_FACILITY="${i#*=}"
-        shift # past argument=value
+        debug=*)
+            NEW_DEBUG_VAL="${i#*=}"
+            shift # past argument=value
         ;;
-    debug=*)
-        NEW_DEBUG_VAL="${i#*=}"
-        shift # past argument=value
-        ;;
-    *) ;;
-
+        *) ;;
+        
     esac
 done
 
@@ -59,20 +54,20 @@ if [[ $BCM_CLI_VERB == "get" ]]; then
     OBJECT="${3:-}"
     if [[ $OBJECT == chain ]]; then
         echo "$BCM_ACTIVE_CHAIN"
-    elif [[ $OBJECT == "runtime-dir" ]]; then
+        elif [[ $OBJECT == "runtime-dir" ]]; then
         echo "$BCM_RUNTIME_DIR"
-    elif [[ $OBJECT == datacenter ]]; then
+        elif [[ $OBJECT == datacenter ]]; then
         echo "$BCM_DATACENTER"
-    elif [[ $OBJECT == debug ]]; then
+        elif [[ $OBJECT == debug ]]; then
         echo "$BCM_DEBUG"
     fi
-
+    
     if [[ $OBJECT == cluster ]]; then
         lxc remote get-default
     fi
-
+    
     if [[ $OBJECT == logging ]]; then
-        echo "$BCM_LOGGING"
+        echo "none"
     fi
 fi
 
@@ -83,31 +78,23 @@ if [[ $BCM_CLI_VERB == "set" ]]; then
             echo "Error: The valid commands for 'regtest', 'testnet', and 'mainnet'."
             exit
         fi
-
-        echo "export BCM_ACTIVE_CHAIN=$BCM_CHAIN" >>"$BCM_CONFIG_FILE"
+        
+        # TODO REPLACE WITH ENV update toe BCM_MANAGER_HOSTNAME.
+        # echo "export BCM_ACTIVE_CHAIN=$BCM_CHAIN" >>"$BCM_CONFIG_FILE"
     fi
+    
+    # if lxc list --format csv | grep -q "$BCM_MANAGER_HOST_NAME"; then
+    #     if [[ ! -z $NEW_DATACENTER_NAME ]]; then
+    #         echo "export BCM_DATACENTER=$NEW_DATACENTER_NAME" >>"$BCM_CONFIG_FILE"
+    #     fi
+    
+    #     if [[ ! -z $NEW_DEBUG_VAL ]]; then
+    #         echo "export BCM_DEBUG=$NEW_DEBUG_VAL" >>"$BCM_CONFIG_FILE"
+    #     fi
 
-    if [[ ! -z $NEW_RUNTIME_DIR ]]; then
-        if [[ ! -d $NEW_RUNTIME_DIR ]]; then
-            echo "ERROR: directory '$NEW_RUNTIME_DIR' does not exist."
-            exit
-        fi
-
-        echo "export BCM_RUNTIME_DIR=$NEW_RUNTIME_DIR" >>"$BCM_CONFIG_FILE"
-    fi
-
-    if [[ ! -z $NEW_DATACENTER_NAME ]]; then
-        echo "export BCM_DATACENTER=$NEW_DATACENTER_NAME" >>"$BCM_CONFIG_FILE"
-    fi
-
-    if [[ ! -z $NEW_DEBUG_VAL ]]; then
-        echo "export BCM_DEBUG=$NEW_DEBUG_VAL" >>"$BCM_CONFIG_FILE"
-    fi
-
-    if [[ ! -z $NEW_BCM_LOGGING_FACILITY ]]; then
-        echo "export BCM_LOGGING=$NEW_BCM_LOGGING_FACILITY" >>"$BCM_CONFIG_FILE"
-    fi
-
+    
+    # fi
+    
     if [[ ! -z $NEW_CLUSTER_NAME ]]; then
         if lxc remote list --format csv | grep -q "$NEW_CLUSTER_NAME"; then
             if [[ "$NEW_CLUSTER_NAME" != "$(lxc remote get-default)" ]]; then

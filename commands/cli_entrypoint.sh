@@ -40,19 +40,59 @@ fi
 
 export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
 export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
-CLUSTER_NAME="$(lxc remote get-default)"
-export CLUSTER_NAME="$CLUSTER_NAME"
+BCM_CLUSTER_NAME="$(lxc remote get-default)"
+export BCM_CLUSTER_NAME="$BCM_CLUSTER_NAME"
 ENDPOINT_NAME="$(lxc info | grep "server_name: " | awk 'NF>1{print $NF}')"
-export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$CLUSTER_NAME"
+export BCM_CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
 export BCM_ENDPOINT_DIR="$BCM_CLUSTER_DIR/$ENDPOINT_NAME"
 
-
-# ensure we have all the controller docker images built.
-bash -c "$BCM_GIT_DIR/controller/build.sh"
 
 # commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
 if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
     ./info.sh "$@"
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
+    ./cluster/entrypoint.sh "$@"
+    exit
+fi
+
+
+if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
+    ./show.sh
+    exit
+fi
+
+
+if [[ "$BCM_CLI_COMMAND" == "start" ||  "$BCM_CLI_COMMAND" == "stop" || "$BCM_CLI_COMMAND" == "restart"  ]]; then
+    ./operations/start_stop_restart.sh
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
+    ./stack/entrypoint.sh "$@"
+    exit
+fi
+
+
+if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
+    ./tier/entrypoint.sh "$@"
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "restore" ]]; then
+    ./backuprestore/entrypoint.sh "$@" --restore
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "backup" ]]; then
+    ./backuprestore/entrypoint.sh "$@"
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cli" || "$BCM_CLI_COMMAND" == "lncli" ]]; then
+    ./stack_cli/entrypoint.sh "$@"
     exit
 fi
 
@@ -80,45 +120,11 @@ if [[ "$BCM_CLI_COMMAND" == "file" ]]; then
     exit
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
-    ./cluster/entrypoint.sh "$@"
-    exit
-fi
-
 if [[ "$BCM_CLI_COMMAND" == "ssh" ]]; then
     ./ssh/entrypoint.sh "$@"
     exit
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
-    ./show.sh
-    exit
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
-    ./tier/entrypoint.sh "$@"
-    exit
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
-    ./stack/entrypoint.sh "$@"
-    exit
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "restore" ]]; then
-    ./backuprestore/entrypoint.sh "$@" --restore
-    exit
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "backup" ]]; then
-    ./backuprestore/entrypoint.sh "$@"
-    exit
-fi
-
-if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cli" || "$BCM_CLI_COMMAND" == "lncli" ]]; then
-    ./stack_cli/entrypoint.sh "$@"
-    exit
-fi
 
 if [[ "$BCM_CLI_COMMAND" == "logs" ]]; then
     ./stack_cli/entrypoint.sh "$@"
@@ -147,6 +153,10 @@ if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
     exit
 fi
 
-if [[ $BCM_HELP_FLAG == 1 ]]; then
-    cat ./help.txt
+# run is for running docker containers AT the SDN controller (not in LXC)
+if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
+    ./run/entrypoint.sh "$@"
+    exit
 fi
+
+cat ./help.txt

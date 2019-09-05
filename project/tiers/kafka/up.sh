@@ -24,7 +24,7 @@ source ./params.sh "$@"
 # now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
 # 5 nodes (if we have a cluster of that size). 5 should be more than enough for
 # most deployments.
-CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$(lxc remote get-default)" endpoints | wc -l)
+CLUSTER_NODE_COUNT=$(bcm cluster list --cluster-name="$BCM_CLUSTER_NAME" endpoints | wc -l)
 export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
 
 source ./zookeeper/get_env.sh

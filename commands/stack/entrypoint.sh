@@ -89,6 +89,12 @@ fi
 if [[ $BCM_CLI_VERB == "list" ]]; then
     PREFIX="-$BCM_ACTIVE_CHAIN"
     
+    
+    if ! lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME"; then
+        echo "Warning! '$BCM_MANAGER_HOST_NAME' does not exist. Considering running 'bcm stack start' command."
+        exit
+    fi
+    
     if lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME,STOPPED"; then
         lxc start "$BCM_MANAGER_HOST_NAME"
         bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"

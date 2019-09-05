@@ -76,10 +76,12 @@ echo "CPU_COUNT: $CPU_COUNT"
 # generate the custom cloud-init file.
 SSH_AUTHORIZED_KEY=$(<"$SSH_KEY_PATH.pub")
 export SSH_AUTHORIZED_KEY="$SSH_AUTHORIZED_KEY"
-envsubst <./cloud_init_template.yml >"$ENDPOINT_DIR/cloud-init.yml"
+mkdir -p /tmp/bcm
+envsubst <./cloud_init_template.yml >"/tmp/bcm/cloud-init.yml"
 
 # launch the new VM with the custom cloud-init.
-multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$ENDPOINT_DIR/cloud-init.yml" bionic
+multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "/tmp/bcm/cloud-init.yml" bionic
+rm /tmp/bcm/cloud-init.yml
 
 multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
 

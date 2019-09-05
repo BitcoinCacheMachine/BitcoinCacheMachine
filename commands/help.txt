@@ -7,11 +7,11 @@ Usage:
   bcm [command] --help
 
 Available Commands:
-  init         Initialize your management plane; create new Trezor-backed GPG certificates.
+  init         Create new Trezor-backed GPG certificates stored in 'cert_dir' (run 'bcm info'.
   controller   Manage your SDN controller.
   cluster      Create, destroy, and manage BCM clusters.
-  start        Start a BCM application-layer service, e.g., bitcoind, clightning, spark, etc.
-  stop         Stop a running BCM application-layer service.
+  start        Starts all your BCM services (LXC containers).
+  stop         Stops (shuts down) your BCM services (LXC containers shutdown).
   git          Sign git commits and git tags using your Trezor-backed GPG certificates.
   file         Create and verify file signatures, encrypt and decrypt files with your Trezor.
   ssh          Use your Trezor to issue SSH keys and perform SSH authentication.

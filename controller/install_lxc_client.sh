@@ -16,7 +16,7 @@ if [ ! -x "$(command -v lxc)" ]; then
     fi
     
     if [ ! -x "$(command -v lxd)" ]; then
-        echo "Info: 'lxd' is not installed."
+        echo "Info: installing 'lxd'."
         sudo snap install lxd --channel=stable
         sudo snap set system snapshots.automatic.retention=no
         sudo lxd init --auto --storage-backend=btrfs

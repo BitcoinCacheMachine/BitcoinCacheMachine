@@ -25,8 +25,7 @@ fi
 
 wait-for-it -t 300 "bitcoindrpc-$BCM_ACTIVE_CHAIN:$BITCOIND_RPC_PORT"
 
-/root/lightning/lightningd/lightningd \
---conf=/root/.lightning/config \
+/root/lightning/lightningd/lightningd --conf=/root/.lightning/config \
 --lightning-dir=/root/.lightning \
 --proxy="$TOR_PROXY" \
 --addr="autotor:$TOR_CONTROL" \
