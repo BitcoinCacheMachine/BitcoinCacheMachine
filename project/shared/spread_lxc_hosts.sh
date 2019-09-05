@@ -58,7 +58,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi
     
-    if lxc storage volume list bcm --format csv | grep "$LXC_DOCKERVOL" | grep -q "| 0 "; then
+    if lxc storage volume list bcm --format csv | grep "$LXC_DOCKERVOL" | grep -q ",0, "; then
         if lxc storage volume show bcm "$LXC_DOCKERVOL" | grep -q "location: $ENDPOINT"; then
             lxc storage volume attach bcm "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker
         fi

@@ -3,7 +3,7 @@ FROM node:10-alpine
 RUN apk add --no-cache tini git
 RUN git clone https://github.com/ShahanaFarooqui/RTL /root/rtl
 WORKDIR /root/rtl
-RUN git checkout tags/v0.4.2
+RUN git checkout tags/v0.4.7
 
 RUN mkdir /RTL
 RUN cp package.json /RTL/package.json

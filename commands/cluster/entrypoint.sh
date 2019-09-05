@@ -25,7 +25,7 @@ for i in "$@"; do
             shift # past argument=value
         ;;
         --cluster-name=*)
-            CLUSTER_NAME="${i#*=}"
+            BCM_CLUSTER_NAME="${i#*=}"
             shift # past argument=value
         ;;
         --ssh-hostname=*)
@@ -52,7 +52,7 @@ fi
 
 if [[ "$BCM_CLI_VERB" == "list" ]]; then
     if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
-        lxc cluster list | grep "$CLUSTER_NAME" | awk '{print $2}'
+        lxc cluster list | grep "$BCM_CLUSTER_NAME" | awk '{print $2}'
         exit
     fi
     
@@ -93,8 +93,8 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 # the cloud-init file for multipass uses 'bcm' as the username.
                 BCM_DRIVER=multipass
                 BCM_SSH_USERNAME="bcm"
-                CLUSTER_NAME="bcm-multipass"
-                BCM_SSH_HOSTNAME="$CLUSTER_NAME-01"
+                BCM_CLUSTER_NAME="bcm-multipass"
+                BCM_SSH_HOSTNAME="$BCM_CLUSTER_NAME-01"
                 MACVLAN_INTERFACE="ens3"
                 
                 # Next make sure multipass is installed so we can run type-1 VMs
@@ -103,14 +103,14 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                     # virtualizatin, then check to see if multipass is installed; if not, we install it
                     if [[ $SUPPORTS_VIRTUALIZATION == 1 ]]; then
                         if [ ! -x "$(command -v multipass)" ]; then
-                            echo "Info: multipass is not installed."
+                            echo "Info: installing multipass."
                             sudo snap install multipass --beta --classic
                             sleep 5
                         fi
                         
-                        if multipass list | grep -q "$CLUSTER_NAME-01"; then
-                            multipass stop "$CLUSTER_NAME-01"
-                            multipass delete "$CLUSTER_NAME-01"
+                        if multipass list | grep -q "$BCM_CLUSTER_NAME-01"; then
+                            multipass stop "$BCM_CLUSTER_NAME-01"
+                            multipass delete "$BCM_CLUSTER_NAME-01"
                             multipass purge
                         fi
                     fi
@@ -133,11 +133,11 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                     BCM_SSH_USERNAME=ubuntu
                 fi
                 
-                CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
+                BCM_CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
                 elif [[ "$CHOICE" == "local" ]]; then
                 CONTINUE=1
                 BCM_DRIVER="local"
-                CLUSTER_NAME="local"
+                BCM_CLUSTER_NAME="local"
                 BCM_SSH_HOSTNAME="local"
                 BCM_SSH_USERNAME="$(whoami)"
                 
@@ -177,18 +177,18 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     --ssh-hostname="$BCM_SSH_HOSTNAME" \
     --endpoint-dir="$ENDPOINT_DIR" \
     --driver="$BCM_DRIVER" \
-    --cluster-name="$CLUSTER_NAME" \
+    --cluster-name="$BCM_CLUSTER_NAME" \
     --macvlan-interface="$MACVLAN_INTERFACE"
     
     LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
     if [[ $BCM_DRIVER == "local" ]]; then
-        echo "Updating your system and installing necessary prerequisities."
+        echo "Updating your system and installing prerequisities."
         sudo bash -c "$BCM_GIT_DIR/commands/install/endpoint_provision.sh --preseed-path=$LXD_PRESEED_FILE"
-        lxc remote set-default local
+        lxc remote set-default "local"
     fi
     
     # # first check to ensure that the cluster doesn't already exist.
-    # if ! lxc remote list | grep -q "$CLUSTER_NAME"; then
+    # if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
     #     export REMOTE_MOUNTPOINT="/tmp/bcm"
     
     #     # if the user override the keypath, we will use that instead.
@@ -243,20 +243,20 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     #     ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" rm -rf "$REMOTE_MOUNTPOINT"
     
     #     # ibcmf it's the cluster master add the LXC remote so we can manage it.
-    #     if ! lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
+    #     if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
     #         echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
     #         wait-for-it -t 10 "$BCM_SSH_HOSTNAME:8443"
     
     #         # shellcheck source=$ENDPOINT_DIR/env
     #         source "$ENDPOINT_DIR/env"
-    #         lxc remote add "$CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
-    #         lxc remote switch "$CLUSTER_NAME"
+    #         lxc remote add "$BCM_CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
+    #         lxc remote switch "$BCM_CLUSTER_NAME"
     
     #         # since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
     #         LXD_CERT_FILE="$ENDPOINT_DIR/lxd.cert"
     
     #         # make sure we're on the correct LXC remote
-    #         if [[ $(lxc remote get-default) == "$CLUSTER_NAME" ]]; then
+    #         if [[ $(lxc remote get-default) == "$BCM_CLUSTER_NAME" ]]; then
     #             # get the cluster master certificate using LXC.
     #             touch "$LXD_CERT_FILE"
     #             lxc info | awk '/    -----BEGIN CERTIFICATE-----/{p=1}p' | sed '1,/    -----END CERTIFICATE-----/!d' | sed "s/^[ \\t]*//" >>"$LXD_CERT_FILE"
@@ -267,72 +267,34 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     #     echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"
     
     # else
-    #     echo "Error: BCM cluster '$CLUSTER_NAME' already exists!"
+    #     echo "Error: BCM cluster '$BCM_CLUSTER_NAME' already exists!"
     #     exit
     # fi
 fi
 
 # this is where we implement 'bcm cluster destroy'
 if [[ $BCM_CLI_VERB == "clear" ]]; then
+    # TODO convert this to git and reference the upstream repo script. https://github.com/lxc/lxd/blob/master/scripts/empty-lxd.sh
     CONTINUE=0
     while [[ "$CONTINUE" == 0 ]]; do
-        echo "WARNING: Are you sure you want to delete all LXD objects from cluster '$CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
+        echo "WARNING: Are you sure you want to delete all LXD objects from cluster '$BCM_CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
         read -rp "Are you sure (y/n):  " CHOICE
         
         if [[ "$CHOICE" == "y" ]]; then
             CONTINUE=1
-            if ! which jq >/dev/null 2>&1; then
-                echo "This tool requires: jq"
-                exit 1
-            fi
+            # let's ensure our remote git repo is updated.
+            # TODO move this over a TOR connection via PROXY switch/config.
+            # TODO ensure we're using an encrypted storage backend for all /tmp/bcm files
             
-            ## Delete anything that's tied to a project
-            for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
-                echo "==> Deleting all containers for project: ${project}"
-                for container in $(lxc query "/1.0/containers?recursion=1&project=${project}" | jq .[].name -r); do
-                    lxc delete --project "${project}" -f "${container}"
-                done
-                
-                echo "==> Deleting all images for project: ${project}"
-                for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
-                    lxc image delete --project "${project}" "${image}"
-                done
-            done
+            mkdir -p /tmp/bcm
+            rm -f /tmp/bcm/empty-lxd.sh
+            wget -O /tmp/bcm/empty-lxd.sh https://raw.githubusercontent.com/lxc/lxd/master/scripts/empty-lxd.sh
+            chmod 0755 /tmp/bcm/empty-lxd.sh
+            bash -c /tmp/bcm/empty-lxd.sh
+            rm -f /tmp/bcm/empty-lxd.sh
             
-            for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
-                echo "==> Deleting all profiles for project: ${project}"
-                for profile in $(lxc query "/1.0/profiles?recursion=1&project=${project}" | jq .[].name -r); do
-                    if [ "${profile}" = "default" ]; then
-                        printf 'config: {}\ndevices: {}' | lxc profile edit --project "${project}" default
-                        continue
-                    fi
-                    lxc profile delete --project "${project}" "${profile}"
-                done
-                
-                if [ "${project}" != "default" ]; then
-                    echo "==> Deleting project: ${project}"
-                    lxc project delete "${project}"
-                fi
-            done
-            
-            ## Delete the networks
-            echo "==> Deleting all networks"
-            for network in $(lxc query "/1.0/networks?recursion=1" | jq '.[] | select(.managed) | .name' -r); do
-                lxc network delete "${network}"
-            done
-            
-            ## Delete the storage pools
-            echo "==> Deleting all storage pools"
-            for storage_pool in $(lxc query "/1.0/storage-pools?recursion=1" | jq .[].name -r); do
-                for volume in $(lxc query "/1.0/storage-pools/${storage_pool}/volumes/custom?recursion=1" | jq .[].name -r); do
-                    echo "==> Deleting storage volume ${volume} on ${storage_pool}"
-                    lxc storage volume delete "${storage_pool}" "${volume}"
-                done
-                
-                ## Delete the custom storage volumes
-                lxc storage delete "${storage_pool}"
-            done
             elif [[ "$CHOICE" == "n" ]]; then
+            echo "Info:  Aborted 'bcm cluster clear' command."
             exit
         else
             echo "Invalid entry. Please try again."
@@ -344,12 +306,12 @@ fi
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
     
     # TODO ITERATE OVER FOLDERS IN CLUSTER FOLDER AND DELETE BASED ON env.
-    CLUSTER_DIR="$BCM_CLUSTERS_DIR/$CLUSTER_NAME"
+    CLUSTER_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME"
     
     if [[ -d $CLUSTER_DIR ]]; then
         CONTINUE=0
         while [[ "$CONTINUE" == 0 ]]; do
-            echo "WARNING: Are you sure you want to delete the current cluster '$CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
+            echo "WARNING: Are you sure you want to delete the current cluster '$BCM_CLUSTER_NAME'? This will DESTROY ALL DATA!!!"
             read -rp "Are you sure (y/n):  " CHOICE
             
             if [[ "$CHOICE" == "y" ]]; then
@@ -407,23 +369,23 @@ if [[ $BCM_CLI_VERB == "destroy" ]]; then
     fi
     
     if [ -x "$(command -v multipass)" ]; then
-        if multipass list | grep -q "$CLUSTER_NAME-01"; then
-            multipass stop "$CLUSTER_NAME-01"
-            multipass delete "$CLUSTER_NAME-01"
+        if multipass list | grep -q "$BCM_CLUSTER_NAME-01"; then
+            multipass stop "$BCM_CLUSTER_NAME-01"
+            multipass delete "$BCM_CLUSTER_NAME-01"
             multipass purge
         fi
     fi
     
-    if lxc remote list --format csv | grep -q "$CLUSTER_NAME"; then
+    if lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
         bcm cluster clear
         
         # if it's the cluster master add the LXC remote so we can manage it.
         echo "Switching lxd remote to local."
         lxc remote switch "local"
         
-        if [[ $CLUSTER_NAME != "local" ]]; then
-            echo "Removing lxd remote for cluster '$CLUSTER_NAME'."
-            lxc remote remove "$CLUSTER_NAME"
+        if [[ $BCM_CLUSTER_NAME != "local" ]]; then
+            echo "Removing lxd remote for cluster '$BCM_CLUSTER_NAME'."
+            lxc remote remove "$BCM_CLUSTER_NAME"
         else
             sudo snap remove lxd
         fi

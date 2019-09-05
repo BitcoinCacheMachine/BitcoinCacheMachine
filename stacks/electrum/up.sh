@@ -31,6 +31,7 @@ if [[ $MODE == "tm" ]]; then
 fi
 
 # Using Electrum Wallet 3.3.5
+bash -c "$BCM_GIT_DIR/controller/build.sh"
 docker build -t bcm-electrum:"$BCM_VERSION" --build-arg BCM_VERSION="$BCM_VERSION" ./build/
 
 mkdir -p "$ELECTRUM_DIR"

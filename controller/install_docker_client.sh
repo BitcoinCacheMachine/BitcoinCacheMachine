@@ -14,7 +14,7 @@ if [ ! -x "$(command -v docker)" ]; then
     fi
     
     if [ ! -x "$(command -v docker)" ]; then
-        echo "Info: 'docker' is not installed."
+        echo "Info: installing 'docker' locally."
         
         sudo snap install docker --channel=candidate
         
