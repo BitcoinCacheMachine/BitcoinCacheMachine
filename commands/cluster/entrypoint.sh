@@ -285,13 +285,7 @@ if [[ $BCM_CLI_VERB == "clear" ]]; then
             # let's ensure our remote git repo is updated.
             # TODO move this over a TOR connection via PROXY switch/config.
             # TODO ensure we're using an encrypted storage backend for all /tmp/bcm files
-            
-            mkdir -p /tmp/bcm
-            rm -f /tmp/bcm/empty-lxd.sh
-            wget -O /tmp/bcm/empty-lxd.sh https://raw.githubusercontent.com/lxc/lxd/master/scripts/empty-lxd.sh
-            chmod 0755 /tmp/bcm/empty-lxd.sh
-            bash -c /tmp/bcm/empty-lxd.sh
-            rm -f /tmp/bcm/empty-lxd.sh
+            bash -c ./clear_lxd.sh
             
             elif [[ "$CHOICE" == "n" ]]; then
             echo "Info:  Aborted 'bcm cluster clear' command."

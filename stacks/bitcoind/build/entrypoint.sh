@@ -73,6 +73,7 @@ fi
 if [[ $BCM_ACTIVE_CHAIN == "mainnet" ]]; then
     bitcoind -conf=/root/.bitcoin/bitcoin.conf \
     -datadir=/root/.bitcoin \
+    -blocksdir=/root/.blocks \
     -proxy="$TOR_PROXY" \
     -torcontrol="$TOR_CONTROL" \
     -proxyrandomize=1 \
@@ -98,6 +99,7 @@ if [[ $BCM_ACTIVE_CHAIN == "mainnet" ]]; then
 else
     bitcoind -conf=/root/.bitcoin/bitcoin.conf \
     -datadir=/root/.bitcoin \
+    -blocksdir=/root/.blocks \
     -proxy="$TOR_PROXY" \
     -torcontrol="$TOR_CONTROL" \
     -proxyrandomize=1 \

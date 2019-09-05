@@ -19,18 +19,18 @@ BACKUP=1
 
 for i in "$@"; do
     case $i in
-    --stack=*)
-        STACK_NAME="${i#*=}"
-        shift # past argument=value
+        --stack=*)
+            STACK_NAME="${i#*=}"
+            shift # past argument=value
         ;;
-    --lxc-host=*)
-        LXC_HOST="${i#*=}"
-        shift # past argument=value
+        --lxc-host=*)
+            LXC_HOST="${i#*=}"
+            shift # past argument=value
         ;;
-    --restore)
-        BACKUP=0
+        --restore)
+            BACKUP=0
         ;;
-    *) ;;
+        *) ;;
     esac
 done
 
@@ -55,27 +55,38 @@ fi
 # source the file so we get bitcoind-specific info
 source "$STACK_ENV_FILE"
 
-BACKUP_DESTINATION_DIR="$BCM_WORKING_DIR/$BCM_CLUSTER_NAME/backups/$STACK_NAME"
-mkdir -p "$BACKUP_DESTINATION_DIR"
+BACKUP_DIR=/tmp/bcm/backup
+mkdir -p "$BACKUP_DIR"
+BACKUP_DESTINATION_DIR="$BACKUP_DIR/$BCM_CLUSTER_NAME/$BCM_ACTIVE_CHAIN/$STACK_NAME/$(date +%s)"
 
-for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
-    echo "$DOCKER_VOLUME"
-    BCM_DESTINATION_DIR="$BACKUP_DESTINATION_DIR/$DOCKER_VOLUME"
-    mkdir -p "$BCM_DESTINATION_DIR"
+if [[ $(wc -w <<< "$BACKUP_DOCKER_VOLUMES") > 0 ]]; then
+    for DOCKER_VOLUME in $BACKUP_DOCKER_VOLUMES; do
+        BCM_DESTINATION_DIR="$BACKUP_DESTINATION_DIR/$DOCKER_VOLUME"
+        CONTAINER_DIR="$LXC_HOST""/var/lib/docker/volumes/$STACK_NAME-$BCM_ACTIVE_CHAIN""_""$DOCKER_VOLUME/_data"
 
-    echo "CHECK HERE"
-    CONTAINER_DIR="$LXC_HOST""/var/lib/docker/volumes/$STACK_NAME-$BCM_ACTIVE_CHAIN""_""$DOCKER_VOLUME/_data"
-    if [[ $BACKUP == 1 ]]; then
+        if lxc exec "$LXC_HOST" -- docker volume list | grep -q "$STACK_NAME-$BCM_ACTIVE_CHAIN""_""$DOCKER_VOLUME"; then
+            if [[ $BACKUP == 1 ]]; then
+                # if the stack is running, we stop immediately.  These scripts are only intended for manual backups
+                # and services are ASSUMED To be OFF.
+                if bcm stack list | grep -q "$STACK_NAME"; then
+                    echo "WARNING: Can't perform a manual backup when '$STACK_NAME' is running. Remove running bcm stacks using the 'bcm stack remove [stack_name]' to stop relevant services."
+                    exit 1
+                fi
 
-        # if the stack is running, we stop immediately.  These scripts are only intended for manual backups
-        # and services are ASSUMED To be OFF.
-        if bcm stack list | grep -q bitcoind; then
-            echo "Error: Can't perform a manual backup when 'bitcoind' is running. Use 'bcm stack remove bitcoind' to stop bitcoind services."
-            exit 1
+                mkdir -p "$BCM_DESTINATION_DIR"
+
+                echo "Attempting to backup docker volume '$DOCKER_VOLUME' to local directory '$BACKUP_DESTINATION_DIR'."
+
+                lxc file pull -r "$CONTAINER_DIR" "$BCM_DESTINATION_DIR"
+                echo "Your backup was successful."
+                elif [[ $BACKUP == 0 ]]; then
+                lxc file push "$BCM_DESTINATION_DIR/_data" "$CONTAINER_DIR" -r -p
+            fi
+        else
+            echo "WARNING: source directory (files to be backed up) was not found. Have you run the stack before?"
+            exit
         fi
-
-        lxc file pull "$CONTAINER_DIR" "$BCM_DESTINATION_DIR" -r
-    elif [[ $BACKUP == 0 ]]; then
-        lxc file push "$BCM_DESTINATION_DIR/_data" "$CONTAINER_DIR" -r
-    fi
-done
+    done
+else
+    echo "INFO: Stack '$STACK_NAME' didn't have any docker volumes specified for backup. It's possible this stack produces deterministic data."
+fi

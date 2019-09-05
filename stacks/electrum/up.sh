@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 MODE=tm
@@ -16,6 +16,11 @@ for i in "$@"; do
         ;;
     esac
 done
+
+if docker ps | grep -q "bcm_electrum_$BCM_ACTIVE_CHAIN"; then
+    echo "WARNING: The electrum docker container 'bcm_electrum_$BCM_ACTIVE_CHAIN' appears to be running! Exiting."
+    exit
+fi
 
 if [[ $MODE != "tm" && $MODE != "tor" ]]; then
     echo "ERROR: Valid modes are 'tm' for trust minimized (meaning you consult a self-hosted back-end) and 'tor' to connect electrum wallet to remote untrusted servers using tor."
@@ -62,7 +67,7 @@ if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
 fi
 
 # todo review permissions on this app running.
-docker run -it --rm --net=host \
+docker run -it --rm --net=host --name="bcm_electrum_$BCM_ACTIVE_CHAIN" \
 -e DISPLAY="$DISPLAY" \
 -e XAUTHORITY="${XAUTH}" \
 -e BACK_END_IP="$BACK_END_IP" \

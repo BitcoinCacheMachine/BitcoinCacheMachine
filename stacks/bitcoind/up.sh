@@ -46,7 +46,7 @@ UPLOAD_BLOCKS=1
 UPLOAD_CHAINSTATE=0
 
 SRC_DIR="$HOME/.bitcoin"
-DEST_DIR="/var/lib/docker/volumes/bitcoind-$BCM_ACTIVE_CHAIN""_data/_data"
+DEST_DIR="/var/lib/docker/volumes/bitcoind-$BCM_ACTIVE_CHAIN""_blocks/_data"
 if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     SRC_DIR="$HOME/.bitcoin/testnet3"
     DEST_DIR="$DEST_DIR/testnet3"
