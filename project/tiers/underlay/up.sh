@@ -3,29 +3,28 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+if ! bcm tier list | grep -q "kafka"; then
+    echo "Info: The kafka tier is missing. Provisioning."
+    bcm tier create kafka --logging="$BCM_LOGGING_METHOD"
+fi
+
 # don't even think about proceeding unless the manager BCM tier is up and running.
 if bcm tier list | grep -q "underlay"; then
-    echo "The 'underlay' tier is already provisioned."
+    echo "INFO: The 'underlay' tier is already provisioned. If there is an error, it may need to be redeployed."
     exit
 fi
 
-# ensure the kafka tier is deployed
-BCM_LOGGING=lxd
 if ! bcm tier list | grep -q "kafka"; then
-    # TODO REMOVE THIS AT SOME POINT.
-    if [[ $BCM_LOGGING == kafka ]]; then
-        bcm tier create kafka --logging=kafka
-        elif [[ $BCM_LOGGING == lxd ]]; then
-        bcm tier create kafka --logging=lxd
-    fi
+    echo "ERROR: Could not find the kafka tier. Exiting"
+    exit 1
 fi
 
 # Let's provision the system containers to the cluster.
 export TIER_NAME=underlay
-bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=$TIER_NAME"
+../create_tier.sh --tier-name="$TIER_NAME"
 
 # if we're in debug mode, some visual UIs will be deployed for kafka inspection
-if [[ $BCM_DEBUG == 1 ]]; then
+if [[ $BCM_LOGGING_METHOD == kafka ]]; then
     source ./env
     
     # bring up the docker UI STACKS.

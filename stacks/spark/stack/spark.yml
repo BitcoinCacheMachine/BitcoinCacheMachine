@@ -9,9 +9,6 @@ services:
       - clightning-data:/root/.lightning:ro
     networks:
       clightningrpcnet:
-    environment:
-      SPARK_USERNAME: ${SPARK_USERNAME:-}
-      SPARK_PASSWORD: ${SPARK_PASSWORD:-}
     deploy:
       mode: replicated
       replicas: 1

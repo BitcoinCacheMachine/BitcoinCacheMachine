@@ -17,7 +17,7 @@ if [ ! -x "$(command -v lxc)" ]; then
     
     if [ ! -x "$(command -v lxd)" ]; then
         echo "Info: installing 'lxd'."
-        sudo snap install lxd --channel=stable
+        sudo snap install lxd --channel=3.17/candidate
         sudo snap set system snapshots.automatic.retention=no
         sudo lxd init --auto --storage-backend=btrfs
     fi

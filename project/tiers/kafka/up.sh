@@ -4,19 +4,14 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # don't even think about proceeding unless the manager BCM tier is up and running.
-if bcm tier list | grep -q kafka; then
-    echo "The 'kafka' tier is already provisioned."
-    exit
-fi
-
-# don't even think about proceeding unless the manager BCM tier is up and running.
 if ! bcm tier list | grep -q manager; then
+    echo "INFO: the 'manager' tier does not exist. Provisioning it now."
     bcm tier create manager
 fi
 
 # Let's provision the system containers to the cluster.
 export TIER_NAME=kafka
-bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=$TIER_NAME"
+../create_tier.sh --tier-name="$TIER_NAME"
 
 # shellcheck disable=1091
 source ./params.sh "$@"

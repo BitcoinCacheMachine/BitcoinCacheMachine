@@ -5,19 +5,19 @@
     "editor.formatOnSave": true,
     "shellcheck.useWSL": false,
     "terminal.integrated.fontFamily": "monospace",
-    "peacock.color": "#800080",
+    "peacock.color": "#029727",
     "workbench.colorCustomizations": {
-        "activityBar.background": "#b300b3",
+        "activityBar.background": "#03c934",
         "activityBar.foreground": "#e7e7e7",
         "activityBar.inactiveForeground": "#e7e7e799",
-        "activityBarBadge.background": "#9f9f00",
-        "activityBarBadge.foreground": "#15202b",
-        "titleBar.activeBackground": "#800080",
-        "titleBar.inactiveBackground": "#80008099",
+        "activityBarBadge.background": "#7143fc",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "titleBar.activeBackground": "#029727",
+        "titleBar.inactiveBackground": "#02972799",
         "titleBar.activeForeground": "#e7e7e7",
         "titleBar.inactiveForeground": "#e7e7e799",
-        "statusBar.background": "#800080",
-        "statusBarItem.hoverBackground": "#b300b3",
+        "statusBar.background": "#029727",
+        "statusBarItem.hoverBackground": "#03c934",
         "statusBar.foreground": "#e7e7e7"
     }
 }

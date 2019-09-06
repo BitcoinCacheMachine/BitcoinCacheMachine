@@ -15,4 +15,4 @@ if ! bcm tier list | grep -q "underlay"; then
 fi
 
 # Let's provision the system containers to the cluster.
-bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=bitcoin$BCM_ACTIVE_CHAIN"
+../create_tier.sh --tier-name=bitcoin"$BCM_ACTIVE_CHAIN"

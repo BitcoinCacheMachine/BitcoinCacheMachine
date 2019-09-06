@@ -9,6 +9,19 @@ if [ -z "${BCM_CLI_VERB}" ]; then
     exit
 fi
 
+LOGGING_METHOD=kafka
+
+for i in "$@"; do
+    case $i in
+        --logging=*)
+            LOGGING_METHOD="${i#*=}"
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
 # make sure the user has sent in a valid command; quit if not.
 if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "destroy" && $BCM_CLI_VERB != "clear" ]]; then
     echo "Error: invalid 'bcm tier' command"
@@ -57,8 +70,6 @@ if [ -z "${TIER_NAME}" ]; then
     cat ./help.txt
     exit
 fi
-
-
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
     if [[ $TIER_NAME == "manager" ]]; then

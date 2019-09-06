@@ -26,7 +26,7 @@ sudo apt-get install --no-install-recommends tor wait-for-it -y
 if [ ! -x "$(command -v lxd)" ]; then
     # unless this is modified, we get snapshot creation in snap when removing lxd.
     echo "Info: installing 'lxd' locally."
-    sudo snap install lxd --channel=stable
+    sudo snap install lxd --channel=3.17/candidate
     sudo snap set system snapshots.automatic.retention=no
 fi
 

@@ -57,6 +57,9 @@ export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export ELECTRUM_DIR="$ELECTRUM_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template"
 
+# todo allow environment override.
+export BCM_LOGGING_METHOD=lxd
+
 BCM_MANAGER_HOST_NAME="bcm-manager-01"
 BCM_KAFKA_HOST_NAME="bcm-kafka-01"
 BCM_UNDERLAY_HOST_NAME="bcm-underlay-01"

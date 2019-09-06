@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 # open.sh opens the app for the end user.
 

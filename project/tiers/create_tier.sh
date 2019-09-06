@@ -23,10 +23,10 @@ if [[ $TIER_NAME == bitcoin* ]]; then
 fi
 
 # first, create the profile that represents the tier.
-bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=$BCM_GIT_DIR/project/tiers/$STACK_NAME/tier_profile.yml"
+./create_tier_profile.sh --tier-name=$TIER_NAME
 
 # next, provision (but not start) all LXC system containers across the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=$TIER_NAME"
+./spread_lxc_hosts.sh --tier-name="$TIER_NAME"
 
 # configure and start the containers
 for ENDPOINT in $(bcm cluster list endpoints); do

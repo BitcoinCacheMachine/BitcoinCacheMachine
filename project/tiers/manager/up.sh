@@ -30,7 +30,7 @@ export TIER_NAME=manager
 #source "$BCM_GIT_DIR/project/shared/env.sh"
 
 # first, create the profile that represents the tier.
-bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=$(pwd)/tier_profile.yml"
+../create_tier_profile.sh --tier-name="$TIER_NAME"
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
@@ -75,7 +75,7 @@ if ! lxc network list --format csv | grep -q bcmNet; then
 fi
 
 # get all the bcm-manager-xx containers deployed to the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=manager"
+../spread_lxc_hosts.sh --tier-name="manager"
 
 # let's start the LXD container on the LXD cluster master.
 lxc file push ./dhcpd_conf.yml "$BCM_MANAGER_HOST_NAME/etc/netplan/10-lxc.yaml"
