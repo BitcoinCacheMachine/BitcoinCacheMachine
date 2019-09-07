@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -ex
+set -Eeuo pipefail
+cd "$(dirname "$0")"
 
 sudo apt-get update
 sudo apt-get install -y tor git
@@ -17,4 +18,5 @@ else
     git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 fi
 
-exit
+# we executed .bcm the first time so it'll updated ~/.bashrc
+./bcm

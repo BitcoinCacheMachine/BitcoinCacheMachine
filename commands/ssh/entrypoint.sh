@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -172,15 +172,26 @@ if [[ $BCM_CLI_VERB == "prepare" ]]; then
     
     docker system prune -f
     
-    docker run -d \
+    docker run -it \
     --name=ssher \
     --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/ssh \
+    -v "$BCM_SSH_DIR":/home/user/.ssh \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- wget 
+    "bcm-trezor:$BCM_VERSION" trezor-agent "$SSH_USERNAME@$SSH_HOSTNAME" -c
+    
+    # TODO UNFORTUNATELY I HAVEN"T FIGURED OUT HOW TO GET THIS TO PROPERLY PROVISION YET
+    # the following COmmand MUST be entered manually.
+    # curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/commands/controller/provision_controller_env.sh > $HOME/provision.sh && chmod 0700 $HOME/provision.sh && sudo bash -c $HOME/provision.sh
+    
+    #echo "Sarting Command"
+    #docker exec -it ssher trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- screen
+    
+    
+    # 'curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/commands/controller/provision_controller_env.sh > $HOME/provision.sh && chmod 0700 $HOME/provision.sh && sudo bash -c $HOME/provision.sh'
+    
 fi
 
 
