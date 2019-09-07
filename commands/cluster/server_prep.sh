@@ -1,10 +1,15 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 # this script preps a NEW server device (Ubuntu 18.04 >) to listen for incoming SSH
 # connections on all interfaces and at an onion site (for remote administration). The
 # server SHOULD exist BEHIND a NAT device with no port forwarding.
+
+
+# we executed .bcm the first time so it'll update ~/.bashrc
+./bcm
+
 
 sudo apt-get update
 sudo apt-get upgrade -y
@@ -87,14 +92,14 @@ if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
         echo "ListenAddress 127.0.0.1"
         echo "ListenAddress 0.0.0.0"
     } | sudo tee -a /etc/ssh/sshd_config
-
+    
     sudo systemctl restart ssh
-
+    
     wait-for-it -t 15 127.0.0.1:22
 fi
 
 if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
-
+    
     {
         echo "SocksPort 0"
         echo "HiddenServiceDir /var/lib/tor/ssh/"
@@ -102,6 +107,22 @@ if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
         echo "HiddenServicePort 22 127.0.0.1:22"
         #echo "HiddenServiceAuthorizeClient stealth $(hostname)-ssh"
     } | sudo tee /etc/tor/torrc
-
+    
     sudo systemctl reload tor
+fi
+
+# wait for the local tor proxy to come online, then configure the system to get the
+# latest bcm commits from github.
+wait-for-it -t 30 127.0.0.1:9050
+BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
+git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
+
+export BCM_GIT_DIR="$HOME/git/github/bcm"
+mkdir -p "$BCM_GIT_DIR"
+cd "$BCM_GIT_DIR"
+
+if [ -d $BCM_GIT_DIR/.git ]; then
+    git pull
+else
+    git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 fi

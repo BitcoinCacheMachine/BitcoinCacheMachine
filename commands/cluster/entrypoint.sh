@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -61,8 +61,6 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    MACVLAN_INTERFACE=
-    
     DEPLOYMENT_METHODS="local/ssh"
     SUPPORTS_VIRTUALIZATION=0
     if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
@@ -113,6 +111,10 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
                 elif [[ "$CHOICE" == "ssh" ]]; then
                 CONTINUE=1
                 BCM_DRIVER=ssh
+                
+                # remote AWS instance defaults to eth0 for default route.
+                # TODO add support for additional cloud platforms.
+                MACVLAN_INTERFACE="eth0"
                 BCM_SSH_HOSTNAME=
                 BCM_SSH_USERNAME=
                 
@@ -144,6 +146,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         done
     fi
     
+    echo "MACVLAN_INTERFACE:  $MACVLAN_INTERFACE"
     # let's ask the user which network interface they want to expose BCM services on
     if [[ -z $MACVLAN_INTERFACE ]]; then
         echo "Please enter the network interface you want to expose BCM services on: "

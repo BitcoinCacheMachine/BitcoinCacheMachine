@@ -146,6 +146,8 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
 fi
 
 
+
+
 # prepares a remote server to use BCM.
 if [[ $BCM_CLI_VERB == "prepare" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
@@ -172,7 +174,7 @@ if [[ $BCM_CLI_VERB == "prepare" ]]; then
     
     docker system prune -f
     
-    docker run -it \
+    docker run -d \
     --name=ssher \
     --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
@@ -181,6 +183,10 @@ if [[ $BCM_CLI_VERB == "prepare" ]]; then
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" trezor-agent "$SSH_USERNAME@$SSH_HOSTNAME" -c
+    
+    # now let's provision the cluster on the remote SSH endpoint.
+    bcm cluster create --driver=ssh --ssh-hostname="$SSH_HOSTNAME" --ssh-username="$SSH_USERNAME"
+    
     
     # TODO UNFORTUNATELY I HAVEN"T FIGURED OUT HOW TO GET THIS TO PROPERLY PROVISION YET
     # the following COmmand MUST be entered manually.
