@@ -134,26 +134,34 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     fi
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
-    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/ssh \
+    CONTAINER_NAME="bcm_ssh"
+    docker system prune -f 
+    
+    if ! docker ps | grep -q "$CONTAINER_NAME"; then
+        echo "Spinning up SSH client daemon ($CONTAINER_NAME)."
+        docker run -d --name="$CONTAINER_NAME" --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+        -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+        -v "$BCM_SSH_DIR":/home/user/.ssh \
+        --device="$BCM_TREZOR_USB_PATH" \
+        "bcm-trezor:$BCM_VERSION" sleep 600 &>/dev/null &
+        sleep 2
+    fi
+    
+    docker exec -it \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
-    --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" trezor-agent $SSH_USERNAME@$SSH_HOSTNAME --connect --verbose
-    
-    exit
+    "$CONTAINER_NAME" trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME && return
 fi
 
 
-
-
-# prepares a remote server to use BCM.
-if [[ $BCM_CLI_VERB == "prepare" ]]; then
+# Creates a docker container running at the controller that logins into the remote
+# host and keeps the terminal session alive for a specified period of time (should be configurable)
+if [[ $BCM_CLI_VERB == "shell" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
         cat ./prepare/help.txt
         exit
     fi
+    
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
     if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
@@ -184,7 +192,7 @@ if [[ $BCM_CLI_VERB == "prepare" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" trezor-agent "$SSH_USERNAME@$SSH_HOSTNAME" -c
     
- 
+    
     
     # TODO UNFORTUNATELY I HAVEN"T FIGURED OUT HOW TO GET THIS TO PROPERLY PROVISION YET
     # the following COmmand MUST be entered manually.

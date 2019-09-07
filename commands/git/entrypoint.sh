@@ -19,6 +19,7 @@ BCM_GIT_TAG_NAME=
 BCM_GIT_BRANCH=
 DEFAULT_KEY_ID=
 BCM_GIT_PUSH=0
+STAGE_OUTSTANDING=0
 
 for i in "$@"; do
     case $i in
@@ -32,6 +33,10 @@ for i in "$@"; do
         ;;
         --tag=*)
             BCM_GIT_TAG_NAME="${i#*=}"
+            shift # past argument=value
+        ;;
+        --stage)
+            STAGE_OUTSTANDING=1
             shift # past argument=value
         ;;
         --branch-name=*)
@@ -110,6 +115,11 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
     if ! docker ps | grep -q "gitter"; then
         # shellcheck disable=SC1090
         source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+        
+        if [[ $STAGE_OUTSTANDING == 1 ]]; then
+            cd "$GIT_REPO_DIR" && git add * && cd -
+        fi
+                
         docker run -it --rm --name gitter \
         -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
         -v "$GNUPGHOME":/home/user/.gnupg \

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
@@ -74,7 +74,6 @@ if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
     ./stack/entrypoint.sh "$@"
     exit
 fi
-
 
 if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
     ./tier/entrypoint.sh "$@"

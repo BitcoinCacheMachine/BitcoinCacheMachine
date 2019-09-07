@@ -126,3 +126,8 @@ if [ -d $BCM_GIT_DIR/.git ]; then
 else
     git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 fi
+
+cd "$BCM_GIT_DIR"
+
+# this sets thhe shell environment $BCM_GIT_DIR
+./bcm

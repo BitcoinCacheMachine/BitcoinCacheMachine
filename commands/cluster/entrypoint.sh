@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -13,7 +13,7 @@ else
 fi
 
 BCM_ENDPOINTS_FLAG=0
-BCM_DRIVER=
+BCM_DRIVER=local
 BCM_SSH_HOSTNAME=
 BCM_SSH_USERNAME=
 MACVLAN_INTERFACE=
@@ -45,6 +45,8 @@ for i in "$@"; do
     esac
 done
 
+
+echo "ARGUMENTS: ""$@"
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./help.txt
     exit
@@ -61,16 +63,14 @@ if [[ "$BCM_CLI_VERB" == "list" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    DEPLOYMENT_METHODS="local/ssh"
     SUPPORTS_VIRTUALIZATION=0
     if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
-        DEPLOYMENT_METHODS="$DEPLOYMENT_METHODS/vm"
         SUPPORTS_VIRTUALIZATION=1
     fi
     
     # if the user didn't specify a driver, let's ask them how we want to proceed.
     # find out if they want a "local" or multipass-based deployment.
-    if [[ ! -z $BCM_DRIVER ]]; then
+    if [[ -z "$BCM_DRIVER" ]]; then
         echo "ERROR: BCM Driver (local, ssh, vm) was not specified. Quitting"
         exit 1
     fi
@@ -108,7 +108,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         # TODO add support for additional cloud platforms.
         MACVLAN_INTERFACE="eth0"
         if [[ -z $BCM_SSH_HOSTNAME ]]; then
-            echo "ERROR: SSH_HOSTNAME host specified."
+            echo "ERROR: BCM_SSH_HOSTNAME host specified."
             exit 1
         fi
         
@@ -117,22 +117,13 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
             exit 1
         fi
         
-        echo "Please enter the DNS-resolveable hostname of the remote SSH endpoint you want to deploy BCM to:  "
-        read -rp "SSH Hostname:  " BCM_SSH_HOSTNAME
         wait-for-it -t 15 "$BCM_SSH_HOSTNAME:22"
-        
         BCM_SSH_USERNAME=ubuntu
-        echo "Please enter the username that has administrative privileges on $BCM_SSH_HOSTNAME"
-        read -rp "SSH username (default: $BCM_SSH_USERNAME):  " BCM_SSH_USERNAME
-        
-        if [[ -z $BCM_SSH_USERNAME ]]; then
-            BCM_SSH_USERNAME=ubuntu
-        fi
-        
+        MACVLAN_INTERFACE=eth0
         BCM_CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
     fi
     
-    if [[ "$CHOICE" == "local" ]]; then
+    if [[ "$BCM_DRIVER" == "local" ]]; then
         BCM_CLUSTER_NAME="local"
         BCM_SSH_HOSTNAME="local"
         BCM_SSH_USERNAME="$(whoami)"
@@ -141,13 +132,6 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         # endpoint listening service on the same interface being used for our
         # default route. TODO; add CLI option to specify address.
         MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
-    fi    
-    
-    echo "MACVLAN_INTERFACE:  $MACVLAN_INTERFACE"
-    # let's ask the user which network interface they want to expose BCM services on
-    if [[ -z $MACVLAN_INTERFACE ]]; then
-        echo "Please enter the network interface you want to expose BCM services on: "
-        read -rp "Network Interface:  " MACVLAN_INTERFACE
     fi
     
     ENDPOINT_DIR_TEMP="$BCM_SSH_HOSTNAME"
@@ -182,89 +166,89 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         lxc remote set-default "local"
     fi
     
-    # # first check to ensure that the cluster doesn't already exist.
-    # if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
-    #     export REMOTE_MOUNTPOINT="/tmp/bcm"
-    
-    #     # if the user override the keypath, we will use that instead.
-    #     # the key already exists if it's a multipass VM. If we're provisioning a new
-    #     # remote SSH host, we would have to generate a new one.
-    #     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
-    #     if [[ ! -f $SSH_KEY_PATH ]]; then
-    #         # this key is for temporary use and used only during initial provisioning.
-    #         ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_PATH" -N ""
-    #         chmod 400 "$SSH_KEY_PATH.pub"
-    #     fi
-    
-    #     # if the BCM_DRIVER is multipass, then we assume the remote endpoint doesn't
-    #     # exist and we need to create it via multipass. Once there's an SSH service available
-    #     # on that endpoint, we can continue.
-    #     if [[ $BCM_DRIVER == multipass ]]; then
-    #         # the multipass cloud-init process already has the bcm user provisioned
-    #         ./new_multipass_vm.sh --vm-name="$BCM_SSH_HOSTNAME" --endpoint-dir="$ENDPOINT_DIR"
-    #         elif [[ $BCM_DRIVER == ssh || $BCM_DRIVER == "local" ]]; then
-    #         ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
-    #     fi
-    
-    #     # let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
-    #     ssh-keyscan -H "$BCM_SSH_HOSTNAME" >>"$BCM_KNOWN_HOSTS_FILE"
-    
-    #     # first, let's ensure we have SSH access to the server.
-    #     if ! wait-for-it -t 30 "$BCM_SSH_HOSTNAME:22"; then
-    #         echo "Error: Could not contact the remote machine."
-    #         exit
-    #     fi
-    
-    #     # if the user is 'bcm' then we assume the user has been provisioned outside of this process.
-    #     if [[ $BCM_SSH_USERNAME == "bcm" ]]; then
-    #         REMOTE_MOUNTPOINT='/home/bcm/bcm'
-    #     fi
-    
-    #     # generate Trezor-backed SSH keys for interactively login.
-    #     bash -c "$BCM_GIT_DIR/commands/ssh/entrypoint.sh --username=$BCM_SSH_USERNAME --hostname=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR --push --ssh-key-path=$SSH_KEY_PATH"
-    
-    #     LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
-    
-    #     # provision the machine by uploading the preseed and running the install script.
-    #     ssh -i "$SSH_KEY_PATH" -t -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- mkdir -p "$REMOTE_MOUNTPOINT"
-    #     scp -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
-    #     scp -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
-    #     ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
-    #     ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
-    
-    #     wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
-    #     wait-for-it -t -30 "$BCM_SSH_HOSTNAME:22"
-    
-    #     ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" rm -rf "$REMOTE_MOUNTPOINT"
-    
-    #     # ibcmf it's the cluster master add the LXC remote so we can manage it.
-    #     if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
-    #         echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
-    #         wait-for-it -t 10 "$BCM_SSH_HOSTNAME:8443"
-    
-    #         # shellcheck source=$ENDPOINT_DIR/env
-    #         source "$ENDPOINT_DIR/env"
-    #         lxc remote add "$BCM_CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
-    #         lxc remote switch "$BCM_CLUSTER_NAME"
-    
-    #         # since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
-    #         LXD_CERT_FILE="$ENDPOINT_DIR/lxd.cert"
-    
-    #         # make sure we're on the correct LXC remote
-    #         if [[ $(lxc remote get-default) == "$BCM_CLUSTER_NAME" ]]; then
-    #             # get the cluster master certificate using LXC.
-    #             touch "$LXD_CERT_FILE"
-    #             lxc info | awk '/    -----BEGIN CERTIFICATE-----/{p=1}p' | sed '1,/    -----END CERTIFICATE-----/!d' | sed "s/^[ \\t]*//" >>"$LXD_CERT_FILE"
-    #         fi
-    #     fi
-    
-    #     echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster."
-    #     echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"
-    
-    # else
-    #     echo "Error: BCM cluster '$BCM_CLUSTER_NAME' already exists!"
-    #     exit
-    # fi
+    # first check to ensure that the cluster doesn't already exist.
+    if ! lxc remote list | grep -q "$BCM_CLUSTER_NAME"; then
+        export REMOTE_MOUNTPOINT="/tmp/bcm"
+        
+        # if the user override the keypath, we will use that instead.
+        # the key already exists if it's a multipass VM. If we're provisioning a new
+        # remote SSH host, we would have to generate a new one.
+        SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
+        if [[ ! -f $SSH_KEY_PATH ]]; then
+            # this key is for temporary use and used only during initial provisioning.
+            ssh-keygen -t rsa -b 4096 -C "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -f "$SSH_KEY_PATH" -N ""
+            chmod 400 "$SSH_KEY_PATH.pub"
+        fi
+        
+        # if the BCM_DRIVER is multipass, then we assume the remote endpoint doesn't
+        # exist and we need to create it via multipass. Once there's an SSH service available
+        # on that endpoint, we can continue.
+        if [[ $BCM_DRIVER == multipass ]]; then
+            # the multipass cloud-init process already has the bcm user provisioned
+            ./new_multipass_vm.sh --vm-name="$BCM_SSH_HOSTNAME" --endpoint-dir="$ENDPOINT_DIR"
+            elif [[ $BCM_DRIVER == ssh || $BCM_DRIVER == "local" ]]; then
+            ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+        fi
+        
+        # let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
+        ssh-keyscan -H "$BCM_SSH_HOSTNAME" >>"$BCM_KNOWN_HOSTS_FILE"
+        
+        # first, let's ensure we have SSH access to the server.
+        if ! wait-for-it -t 30 "$BCM_SSH_HOSTNAME:22"; then
+            echo "Error: Could not contact the remote machine."
+            exit
+        fi
+        
+        # if the user is 'bcm' then we assume the user has been provisioned outside of this process.
+        if [[ $BCM_SSH_USERNAME == "bcm" ]]; then
+            REMOTE_MOUNTPOINT='/home/bcm/bcm'
+        fi
+        
+        # generate Trezor-backed SSH keys for interactively login.
+        bash -c "$BCM_GIT_DIR/commands/ssh/entrypoint.sh --username=$BCM_SSH_USERNAME --hostname=$BCM_SSH_HOSTNAME --endpoint-dir=$ENDPOINT_DIR --push --ssh-key-path=$SSH_KEY_PATH"
+        
+        LXD_PRESEED_FILE="$ENDPOINT_DIR/lxd_preseed.yml"
+        
+        # provision the machine by uploading the preseed and running the install script.
+        ssh -i "$SSH_KEY_PATH" -t -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- mkdir -p "$REMOTE_MOUNTPOINT"
+        scp -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$LXD_PRESEED_FILE" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/lxd_preseed.yml"
+        scp -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$BCM_GIT_DIR/commands/install/endpoint_provision.sh" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME:$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+        ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" chmod 0755 "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+        ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" sudo bash -c "$REMOTE_MOUNTPOINT/endpoint_provision.sh"
+        
+        wait-for-it -t -30 "$BCM_SSH_HOSTNAME:8443"
+        wait-for-it -t -30 "$BCM_SSH_HOSTNAME:22"
+        
+        ssh -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" -t "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" rm -rf "$REMOTE_MOUNTPOINT"
+        
+        # ibcmf it's the cluster master add the LXC remote so we can manage it.
+        if ! lxc remote list --format csv | grep -q "$BCM_CLUSTER_NAME"; then
+            echo "Waiting for the remote lxd daemon to become available at $BCM_SSH_HOSTNAME."
+            wait-for-it -t 10 "$BCM_SSH_HOSTNAME:8443"
+            
+            # shellcheck source=$ENDPOINT_DIR/env
+            source "$ENDPOINT_DIR/env"
+            lxc remote add "$BCM_CLUSTER_NAME" "$BCM_SSH_HOSTNAME:8443" --accept-certificate --password="$BCM_LXD_SECRET"
+            lxc remote switch "$BCM_CLUSTER_NAME"
+            
+            # since it's the master, let's grab the certificate so we can use it in subsequent lxd_preseed files.
+            LXD_CERT_FILE="$ENDPOINT_DIR/lxd.cert"
+            
+            # make sure we're on the correct LXC remote
+            if [[ $(lxc remote get-default) == "$BCM_CLUSTER_NAME" ]]; then
+                # get the cluster master certificate using LXC.
+                touch "$LXD_CERT_FILE"
+                lxc info | awk '/    -----BEGIN CERTIFICATE-----/{p=1}p' | sed '1,/    -----END CERTIFICATE-----/!d' | sed "s/^[ \\t]*//" >>"$LXD_CERT_FILE"
+            fi
+        fi
+        
+        echo "Your new BCM cluster has been created. Your local LXD client is currently configured to target your new cluster."
+        echo "You can get a remote SSH session by running 'bcm ssh connect --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME'"
+        
+    else
+        echo "Error: BCM cluster '$BCM_CLUSTER_NAME' already exists!"
+        exit
+    fi
 fi
 
 # this is where we implement 'bcm cluster destroy'
