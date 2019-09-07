@@ -63,11 +63,6 @@ fi
 if [[ $BCM_CLI_VERB == "create" ]]; then
     MACVLAN_INTERFACE=
     
-    if [[ ! -d "$GNUPGHOME/trezor" ]]; then
-        # ensure we have trezor-backed certificates and password store
-        bcm init
-    fi
-    
     DEPLOYMENT_METHODS="local/ssh"
     SUPPORTS_VIRTUALIZATION=0
     if lscpu | grep "Virtualization:" | cut -d ":" -f 2 | xargs | grep -q "VT-x"; then
