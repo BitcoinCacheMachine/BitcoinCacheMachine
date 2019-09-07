@@ -184,9 +184,7 @@ if [[ $BCM_CLI_VERB == "prepare" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" trezor-agent "$SSH_USERNAME@$SSH_HOSTNAME" -c
     
-    # now let's provision the cluster on the remote SSH endpoint.
-    bcm cluster create --driver=ssh --ssh-hostname="$SSH_HOSTNAME" --ssh-username="$SSH_USERNAME"
-    
+ 
     
     # TODO UNFORTUNATELY I HAVEN"T FIGURED OUT HOW TO GET THIS TO PROPERLY PROVISION YET
     # the following COmmand MUST be entered manually.

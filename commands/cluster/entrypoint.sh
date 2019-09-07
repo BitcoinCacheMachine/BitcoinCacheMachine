@@ -70,81 +70,78 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     
     # if the user didn't specify a driver, let's ask them how we want to proceed.
     # find out if they want a "local" or multipass-based deployment.
-    if [[ -z $BCM_DRIVER ]]; then
-        CONTINUE=0
-        while [[ "$CONTINUE" == 0 ]]; do
-            echo "How would you like to deploy your backend? VM is good for testing and development, but can't"
-            echo "expose BCM services on your LAN. Local deployments are usually a good choice, but BCM does make"
-            echo "some modifications to your system. Usually the best option is ssh, which allows you to run BCM"
-            echo "on a dedicated machine."
-            echo ""
-            read -rp "Deployment method ($DEPLOYMENT_METHODS):  " CHOICE
-            
-            if [[ "$CHOICE" == "vm" ]]; then
-                CONTINUE=1
-                
-                # the cloud-init file for multipass uses 'bcm' as the username.
-                BCM_DRIVER=multipass
-                BCM_SSH_USERNAME="bcm"
-                BCM_CLUSTER_NAME="bcm-multipass"
-                BCM_SSH_HOSTNAME="$BCM_CLUSTER_NAME-01"
-                MACVLAN_INTERFACE="ens3"
-                
-                # Next make sure multipass is installed so we can run type-1 VMs
-                if [ ! -x "$(command -v multipass)" ]; then
-                    # let's check to make sure we have multipass. This check to ensure we support
-                    # virtualizatin, then check to see if multipass is installed; if not, we install it
-                    if [[ $SUPPORTS_VIRTUALIZATION == 1 ]]; then
-                        if [ ! -x "$(command -v multipass)" ]; then
-                            echo "Info: installing multipass."
-                            sudo snap install multipass --beta --classic
-                            sleep 5
-                        fi
-                        
-                        if multipass list | grep -q "$BCM_CLUSTER_NAME-01"; then
-                            multipass stop "$BCM_CLUSTER_NAME-01"
-                            multipass delete "$BCM_CLUSTER_NAME-01"
-                            multipass purge
-                        fi
-                    fi
-                fi
-                elif [[ "$CHOICE" == "ssh" ]]; then
-                CONTINUE=1
-                BCM_DRIVER=ssh
-                
-                # remote AWS instance defaults to eth0 for default route.
-                # TODO add support for additional cloud platforms.
-                MACVLAN_INTERFACE="eth0"
-                BCM_SSH_HOSTNAME=
-                BCM_SSH_USERNAME=
-                
-                echo "Please enter the DNS-resolveable hostname of the remote SSH endpoint you want to deploy BCM to:  "
-                read -rp "SSH Hostname:  " BCM_SSH_HOSTNAME
-                wait-for-it -t 15 "$BCM_SSH_HOSTNAME:22"
-                
-                BCM_SSH_USERNAME=ubuntu
-                echo "Please enter the username that has administrative privileges on $BCM_SSH_HOSTNAME"
-                read -rp "SSH username (default: $BCM_SSH_USERNAME):  " BCM_SSH_USERNAME
-                
-                if [[ -z $BCM_SSH_USERNAME ]]; then
-                    BCM_SSH_USERNAME=ubuntu
-                fi
-                
-                BCM_CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
-                elif [[ "$CHOICE" == "local" ]]; then
-                CONTINUE=1
-                BCM_DRIVER="local"
-                BCM_CLUSTER_NAME="local"
-                BCM_SSH_HOSTNAME="local"
-                BCM_SSH_USERNAME="$(whoami)"
-                
-                # since we're doing a local install; we can just connect our wirepoint
-                # endpoint listening service on the same interface being used for our
-                # default route. TODO; add CLI option to specify address.
-                MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
-            fi
-        done
+    if [[ ! -z $BCM_DRIVER ]]; then
+        echo "ERROR: BCM Driver (local, ssh, vm) was not specified. Quitting"
+        exit 1
     fi
+    
+    if [[ "$BCM_DRIVER" == "vm" ]]; then
+        # the cloud-init file for multipass uses 'bcm' as the username.
+        BCM_DRIVER=multipass
+        BCM_SSH_USERNAME="bcm"
+        BCM_CLUSTER_NAME="bcm-multipass"
+        BCM_SSH_HOSTNAME="$BCM_CLUSTER_NAME-01"
+        MACVLAN_INTERFACE="ens3"
+        
+        # Next make sure multipass is installed so we can run type-1 VMs
+        if [ ! -x "$(command -v multipass)" ]; then
+            # let's check to make sure we have multipass. This check to ensure we support
+            # virtualizatin, then check to see if multipass is installed; if not, we install it
+            if [[ $SUPPORTS_VIRTUALIZATION == 1 ]]; then
+                if [ ! -x "$(command -v multipass)" ]; then
+                    echo "Info: installing multipass."
+                    sudo snap install multipass --beta --classic
+                    sleep 5
+                fi
+                
+                if multipass list | grep -q "$BCM_CLUSTER_NAME-01"; then
+                    multipass stop "$BCM_CLUSTER_NAME-01"
+                    multipass delete "$BCM_CLUSTER_NAME-01"
+                    multipass purge
+                fi
+            fi
+        fi
+    fi
+    
+    if [[ "$BCM_DRIVER" == "ssh" ]]; then
+        # remote AWS instance defaults to eth0 for default route.
+        # TODO add support for additional cloud platforms.
+        MACVLAN_INTERFACE="eth0"
+        if [[ -z $BCM_SSH_HOSTNAME ]]; then
+            echo "ERROR: SSH_HOSTNAME host specified."
+            exit 1
+        fi
+        
+        if [[ -z $BCM_SSH_USERNAME ]]; then
+            echo "ERROR: SSH_USERNAME not specified."
+            exit 1
+        fi
+        
+        echo "Please enter the DNS-resolveable hostname of the remote SSH endpoint you want to deploy BCM to:  "
+        read -rp "SSH Hostname:  " BCM_SSH_HOSTNAME
+        wait-for-it -t 15 "$BCM_SSH_HOSTNAME:22"
+        
+        BCM_SSH_USERNAME=ubuntu
+        echo "Please enter the username that has administrative privileges on $BCM_SSH_HOSTNAME"
+        read -rp "SSH username (default: $BCM_SSH_USERNAME):  " BCM_SSH_USERNAME
+        
+        if [[ -z $BCM_SSH_USERNAME ]]; then
+            BCM_SSH_USERNAME=ubuntu
+        fi
+        
+        BCM_CLUSTER_NAME="bcm-$BCM_SSH_HOSTNAME"
+    fi
+    
+    if [[ "$CHOICE" == "local" ]]; then
+        BCM_CLUSTER_NAME="local"
+        BCM_SSH_HOSTNAME="local"
+        BCM_SSH_USERNAME="$(whoami)"
+        
+        # since we're doing a local install; we can just connect our wirepoint
+        # endpoint listening service on the same interface being used for our
+        # default route. TODO; add CLI option to specify address.
+        MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
+    fi    
     
     echo "MACVLAN_INTERFACE:  $MACVLAN_INTERFACE"
     # let's ask the user which network interface they want to expose BCM services on

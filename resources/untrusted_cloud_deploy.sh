@@ -10,8 +10,11 @@ bcm ssh newkey --hostname="$HOST_NAME" --username="$USER_NAME"
 # push that key to the remote host using the e
 bcm ssh push --hostname="$HOST_NAME" --username="$USER_NAME" --ssh-key-path="$REMOTE_HOST_SSH_PRIVATE_KEY_PATH"
 
+#bcm ssh prepare --hostname="$HOST_NAME" --username="$USER_NAME"
 
-bcm ssh prepare --hostname="$HOST_NAME" --username="$USER_NAME"
+# now let's provision the cluster on the remote SSH endpoint.
+bcm cluster create --driver=ssh --ssh-hostname="$SSH_HOSTNAME" --ssh-username="$SSH_USERNAME"
+
 
 # SSH connect to the remote host using Trezor for back end authentication
 bcm ssh connect --hostname="$HOST_NAME" --username="$USER_NAME"
