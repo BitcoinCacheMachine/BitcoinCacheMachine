@@ -18,6 +18,7 @@ GIT_CLIENT_USERNAME=
 BCM_GIT_TAG_NAME=
 BCM_GIT_BRANCH=
 DEFAULT_KEY_ID=
+BCM_GIT_PUSH=0
 
 for i in "$@"; do
     case $i in
@@ -35,6 +36,10 @@ for i in "$@"; do
         ;;
         --branch-name=*)
             BCM_GIT_BRANCH="${i#*=}"
+            shift # past argument=value
+        ;;
+        --push)
+            BCM_GIT_PUSH=1
             shift # past argument=value
         ;;
         *)
@@ -115,6 +120,11 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
         -e GIT_COMMIT_MESSAGE="$GIT_COMMIT_MESSAGE" \
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
         "bcm-gpgagent:$BCM_VERSION" /bcm/commit_sign_git_repo.sh
+    fi
+    
+    # if the user set the push flag, then let's run git push
+    if [ $BCM_GIT_PUSH == 1 ]; then
+        cd "$GIT_REPO_DIR" && git push && cd --
     fi
 fi
 
