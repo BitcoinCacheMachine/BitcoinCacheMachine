@@ -158,5 +158,3 @@ if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
     ./run/entrypoint.sh "$@"
     exit
 fi
-
-cat ./help.txt
