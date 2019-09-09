@@ -140,6 +140,8 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
     bcm-trezor:$BCM_VERSION trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- 'set -e && sudo apt-get update && sudo apt-get install -y  && echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && echo "deb-src https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import && gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add - && sudo apt-get update && sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring && wait-for-it -t 30 127.0.0.1:9050 && git config --global http.https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.proxy socks5://127.0.0.1:9050 && mkdir -p "$HOME/git/github/bcm" && if [[ ! -d "$HOME/git/github/bcm/.git" ]]; then git clone --quiet --single-branch --branch dev "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" "$HOME/git/github/bcm"; fi && cd "$HOME/git/github/bcm" && git fetch && git checkout dev && git pull && bash -c "$HOME/git/github/bcm/commands/cluster/server_prep.sh" && bash -c "$HOME/git/github/bcm/bcm" && echo "Restarting SSH endpoint." && sudo shutdown -r now'
     
+    sleep 10 
+    
     echo "Waiting for remote host to restart."
     wait-for-it -t 30 "$SSH_HOSTNAME:22"
 fi
