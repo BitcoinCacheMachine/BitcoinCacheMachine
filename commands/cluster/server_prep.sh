@@ -65,8 +65,8 @@ if [[ ! -f $HOME/.ssh/authorized_keys ]]; then
 fi
 
 # TODO verify where we need this.
-#sudo touch /etc/sudoers.d/bcm
-#echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
+sudo touch /etc/sudoers.d/bcm
+echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
 
 ######## Install TOR apt package.
 echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list

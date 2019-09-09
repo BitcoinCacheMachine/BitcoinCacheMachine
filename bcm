@@ -41,6 +41,8 @@ if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
 fi
 
+# switch to 'master' for formal versions.
+export BCM_DEFAULT_GIT_BRANCH="dev"
 export BCM_ACTIVE_CHAIN="testnet"
 export BCM_SSH_DIR="$HOME/.ssh" && mkdir -p "$BCM_SSH_DIR"
 
