@@ -11,7 +11,7 @@ sudo apt-get install --no-install-recommends -y openssh-server iotop curl socat 
 # note that we remove the basic tor client in lieu of the distributed binary
 # which tends to be more up-to-date and have more v3 features and reliability.
 # and we prefer snap-based lxd.
-sudo apt-get remove lxd lxd-client tor -y
+sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 
 # sudo -s
