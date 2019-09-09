@@ -138,7 +138,7 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
-    bcm-trezor:$BCM_VERSION trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- 'set -x && sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y wait-for-it git tor && wait-for-it -t 30 127.0.0.1:9050 && git config --global http.https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.proxy socks5://127.0.0.1:9050 && mkdir -p "$HOME/git/github/bcm" && if [[ ! -d "$HOME/git/github/bcm/.git" ]]; then git clone --quiet "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" "$HOME/git/github/bcm"; else cd "$HOME/git/github/bcm" && git pull "$HOME/git/github/bcm" && cd -; fi && sudo bash -c "$HOME/git/github/bcm/commands/cluster/server_prep.sh" && sudo shutdown -r now'
+    bcm-trezor:$BCM_VERSION trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- 'set -x && sudo apt-get update && sudo apt-get install -y wait-for-it git tor && wait-for-it -t 30 127.0.0.1:9050 && git config --global http.https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.proxy socks5://127.0.0.1:9050 && mkdir -p "$HOME/git/github/bcm" && if [[ ! -d "$HOME/git/github/bcm/.git" ]]; then git clone --quiet "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" "$HOME/git/github/bcm"; else cd "$HOME/git/github/bcm" && git pull "$HOME/git/github/bcm" && cd -; fi && sudo bash -c "$HOME/git/github/bcm/commands/cluster/server_prep.sh" && sudo shutdown -r now'
     
     # allow host to shut-off
     sleep 5

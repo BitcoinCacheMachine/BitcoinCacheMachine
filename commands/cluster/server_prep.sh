@@ -1,21 +1,16 @@
 #!/bin/bash
 
-set -ex
-
-# this script preps a NEW server device (Ubuntu 18.04 >) to listen for incoming SSH
-# connections on all interfaces and at an onion site (for remote administration). The
-# server SHOULD exist BEHIND a NAT device with no port forwarding.
-
-
-# we executed .bcm the first time so it'll update ~/.bashrc
-./bcm
+set -Eeuox pipefail
+cd "$(dirname "$0")"
 
 
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install --no-install-recommends -y openssh-server avahi-daemon iotop curl socat inotify-tools wait-for-it
-# TODO dnscrypt-proxy
-sudo apt-get remove lxd lxd-client -y
+
+# note that we remove the basic tor client in lieu of the distributed binary
+# which tends to be more up-to-date and have more v3 features and reliability.
+sudo apt-get remove lxd lxd-client tor -y
 sudo apt-get autoremove -y
 
 # sudo -s
@@ -64,17 +59,14 @@ if ! groups bcm | grep -q lxd; then
     sudo useradd -g lxd -g sudo -m bcm
 fi
 
-if [[ ! -d /home/bcm/.ssh ]]; then
-    sudo mkdir -p /home/bcm/.ssh
+if [[ ! -f $HOME/.ssh/authorized_keys ]]; then
+    sudo touch $HOME/.ssh/authorized_keys
+    sudo chown $(whoami):lxd -R $HOME/.ssh
 fi
 
-if [[ ! -f /home/bcm/.ssh/authorized_keys ]]; then
-    sudo touch /home/bcm/.ssh/authorized_keys
-    sudo chown bcm:lxd -R /home/bcm/.ssh
-fi
-
-sudo touch /etc/sudoers.d/bcm
-echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
+# TODO verify where we need this.
+#sudo touch /etc/sudoers.d/bcm
+#echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
 
 ######## Install TOR apt package.
 echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list
@@ -110,21 +102,3 @@ if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
     
     sudo systemctl reload tor
 fi
-
-# wait for the local tor proxy to come online, then configure the system to get the
-# latest bcm commits from github.
-wait-for-it -t 30 127.0.0.1:9050
-BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
-git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
-
-export BCM_GIT_DIR="$HOME/git/github/bcm"
-mkdir -p "$BCM_GIT_DIR"
-cd "$BCM_GIT_DIR"
-
-if [ -d $BCM_GIT_DIR/.git ]; then
-    git pull
-else
-    git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
-fi
-
-cd "$BCM_GIT_DIR"
