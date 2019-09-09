@@ -80,16 +80,19 @@ fi
 sudo systemctl restart ssh
 wait-for-it -t 15 127.0.0.1:22
 
+
+# if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
+#     echo ""  | sudo tee /etc/tor/torrc
+#     # {
+#     #     echo "SocksPort 9050"
+#     #     echo "HiddenServiceDir /var/lib/tor/ssh/"
+#     #     echo "HiddenServiceVersion 3"
+#     #     echo "HiddenServicePort 22 127.0.0.1:22"
+#     # } | sudo tee /etc/tor/torrc
+# fi
+
 sudo systemctl stop tor
-if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
-    echo ""  | sudo tee /etc/tor/torrc
-    # {
-    #     echo "SocksPort 9050"
-    #     echo "HiddenServiceDir /var/lib/tor/ssh/"
-    #     echo "HiddenServiceVersion 3"
-    #     echo "HiddenServicePort 22 127.0.0.1:22"
-    # } | sudo tee /etc/tor/torrc
-fi
+echo ""  | sudo tee /etc/tor/torrc
 
 sudo systemctl unmask tor
 sudo systemctl start tor
