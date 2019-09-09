@@ -3,7 +3,8 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-PRESEED_PATH="/home/bcm/bcm"
+echo "IN ENDPOINT_PROVISION"
+PRESEED_PATH="/home/$USERNAME/bcm"
 
 for i in "$@"; do
     case $i in
