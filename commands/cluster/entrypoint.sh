@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuoc pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
