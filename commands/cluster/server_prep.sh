@@ -66,8 +66,8 @@ if [[ ! -f "$HOME/.ssh/authorized_keys" ]]; then
 fi
 
 # TODO verify where we need this.
-sudo touch /etc/sudoers.d/$USERNAME
-echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$USERNAME"
+sudo touch /etc/sudoers.d/$(whoami)
+echo "$(whoami) ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$(whoami)"
 
 # update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
 if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
