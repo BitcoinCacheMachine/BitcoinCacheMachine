@@ -37,4 +37,4 @@ sudo systemctl restart ssh
 wait-for-it -t 15 127.0.0.1:22
 
 # call bcm and it'll install lxd.
-./bcm
+bash -c "$BCM_GIT_DIR./bcm"
