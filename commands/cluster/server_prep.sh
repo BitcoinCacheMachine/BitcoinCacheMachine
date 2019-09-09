@@ -94,6 +94,8 @@ wait-for-it -t 15 127.0.0.1:22
 # install LXD if it doesn't exist.
 
 echo "Info: installing 'lxd' on $HOSTNAME."
+source bcm
+echo "INFO: Installing $BCM_LXD_SNAP_CHANNEL of LXD via snap."
 sudo snap install lxd --channel="$BCM_LXD_SNAP_CHANNEL"
 sudo snap set system snapshots.automatic.retention=no
 sudo lxd init --auto --storage-backend=btrfs --network-address=127.0.0.1 --network-port=8443
