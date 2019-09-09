@@ -116,11 +116,18 @@ if [[ $BCM_CLI_VERB == "push" ]]; then
     exit
 fi
 
-if [[ $BCM_CLI_VERB == "connect" ]]; then
+if [[ $BCM_CLI_VERB == "provision" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
         cat ./connect/help.txt
         exit
     fi
+    
+    if [[ -z $SSH_USERNAME ]]; then
+        echo "ERROR: SSH username not specified."
+        cat ./connect/help.txt
+        exit 1
+    fi
+    
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
     if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
@@ -128,14 +135,9 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
         exit
     fi
     
-    if [[ -z $SSH_USERNAME ]]; then
-        echo "ERROR: SSH username not specified."
-        exit 1
-    fi
-    
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
     CONTAINER_NAME="bcm_ssh"
-    docker system prune -f 
+    docker system prune -f
     
     if ! docker ps | grep -q "$CONTAINER_NAME"; then
         echo "Spinning up SSH client daemon ($CONTAINER_NAME)."
@@ -150,8 +152,41 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     docker exec -it \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
-    "$CONTAINER_NAME" trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME && return
+    "$CONTAINER_NAME" trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- sudo apt update && sudo apt upgrade -y && sudo apt install wait-for-it git tor && wait-for-it -t 30 127.0.0.1:9050 && git config --global http.https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.proxy socks5://127.0.0.1:9050 && mkdir -p "$HOME/git/github/bcm" && if [[ ! -d "$HOME/git/github/bcm" ]]; then git clone "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" "$HOME/git/github/bcm"; else git pull "$HOME/git/github/bcm"; fi && bash -c "$HOME/git/github/bcm/bcm"
 fi
+
+
+if [[ $BCM_CLI_VERB == "connect" ]]; then
+    if [[ $BCM_HELP_FLAG == 1 ]]; then
+        cat ./connect/help.txt
+        exit
+    fi
+    
+    if [[ -z $SSH_USERNAME ]]; then
+        echo "ERROR: SSH username not specified."
+        cat ./connect/help.txt
+        exit 1
+    fi
+    
+    # shellcheck disable=SC1090
+    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+    if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
+        echo "Could not determine Trezor USB PATH."
+        exit
+    fi
+    
+    IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
+    CONTAINER_NAME="bcm_ssh"
+    docker system prune -f
+    
+    echo "Spinning up SSH client daemon ($CONTAINER_NAME)."
+    docker run -it --name="$CONTAINER_NAME" --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$BCM_SSH_DIR":/home/user/.ssh \
+    --device="$BCM_TREZOR_USB_PATH" \
+    "bcm-trezor:$BCM_VERSION" trezor-agent --connect $SSH_USERNAME@$SSH_HOSTNAME
+fi
+
 
 
 # Creates a docker container running at the controller that logins into the remote
@@ -162,6 +197,11 @@ if [[ $BCM_CLI_VERB == "shell" ]]; then
         exit
     fi
     
+    if [[ -z $SSH_USERNAME ]]; then
+        echo "ERROR: SSH username not specified."
+        exit 1
+    fi
+    
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
     if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
@@ -169,10 +209,6 @@ if [[ $BCM_CLI_VERB == "shell" ]]; then
         exit
     fi
     
-    if [[ -z $SSH_USERNAME ]]; then
-        echo "ERROR: SSH username not specified."
-        exit 1
-    fi
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
     
