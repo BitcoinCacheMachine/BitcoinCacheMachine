@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install --no-install-recommends -y openssh-server avahi-daemon iotop curl socat inotify-tools wait-for-it
+sudo apt-get install --no-install-recommends -y openssh-server iotop curl socat wait-for-it
 
 # note that we remove the basic tor client in lieu of the distributed binary
 # which tends to be more up-to-date and have more v3 features and reliability.
@@ -91,10 +91,4 @@ wait-for-it -t 15 127.0.0.1:22
 #     # } | sudo tee /etc/tor/torrc
 # fi
 
-sudo systemctl stop tor
-echo ""  | sudo tee /etc/tor/torrc
-
-sudo systemctl unmask tor
-sudo systemctl start tor
-sleep 5
 wait-for-it -t 30 127.0.0.1:9050
