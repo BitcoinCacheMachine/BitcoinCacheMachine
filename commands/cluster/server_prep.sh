@@ -80,6 +80,7 @@ fi
 sudo systemctl restart ssh
 wait-for-it -t 15 127.0.0.1:22
 
+sudo systemctl stop tor
 if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
     {
         echo "SocksPort 9050"
@@ -90,5 +91,5 @@ if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
 fi
 
 sudo systemctl unmask tor
-sudo systemctl restart tor
+sudo systemctl start tor
 wait-for-it -t 30 127.0.0.1:9050
