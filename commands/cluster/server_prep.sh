@@ -75,21 +75,19 @@ if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
         echo "ListenAddress 127.0.0.1"
         echo "ListenAddress 0.0.0.0"
     } | sudo tee -a /etc/ssh/sshd_config
-    
-    sudo systemctl restart ssh
-    
-    wait-for-it -t 15 127.0.0.1:22
 fi
 
+sudo systemctl restart ssh
+wait-for-it -t 15 127.0.0.1:22
+
 if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
-    
     {
         echo "SocksPort 9050"
         echo "HiddenServiceDir /var/lib/tor/ssh/"
         echo "HiddenServiceVersion 3"
         echo "HiddenServicePort 22 127.0.0.1:22"
     } | sudo tee /etc/tor/torrc
-    
-    sudo systemctl reload tor
 fi
 
+sudo systemctl restart tor
+wait-for-it -t 30 127.0.0.1:9050
