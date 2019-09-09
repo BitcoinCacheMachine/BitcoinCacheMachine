@@ -71,7 +71,7 @@ export BCM_MANAGER_HOST_NAME="$BCM_MANAGER_HOST_NAME"
 export BCM_KAFKA_HOST_NAME="$BCM_KAFKA_HOST_NAME"
 export BCM_UNDERLAY_HOST_NAME="$BCM_UNDERLAY_HOST_NAME"
 export BCM_BITCOIN_HOST_NAME="$BCM_BITCOIN_HOST_NAME"
-
+export BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 export BCM_PRIVATE_REGISTRY="$BCM_MANAGER_HOST_NAME:5010"
 export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 
@@ -87,9 +87,9 @@ bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
 # this should have been configured on a global level already when the user initially
 # downloaded BCM from github
 BCM_TOR_PROXY="socks5://127.0.0.1:9050"
-if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
+if [[ "$(git config --get --local http.$BCM_GITHUB_REPO_URL.proxy)" != "$BCM_TOR_PROXY" ]]; then
     echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
-    git config --local http.proxy "$BCM_TOR_PROXY"
+    git config --local "http.$BCM_GITHUB_REPO_URL.proxy" "$BCM_TOR_PROXY"
 fi
 
 # this section configured the local SSH client on the Controller
