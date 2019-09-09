@@ -128,6 +128,3 @@ else
 fi
 
 cd "$BCM_GIT_DIR"
-
-# this sets thhe shell environment $BCM_GIT_DIR
-./bcm

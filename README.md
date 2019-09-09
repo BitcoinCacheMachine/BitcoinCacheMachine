@@ -3,11 +3,11 @@
 
 Bitcoin Cache Machine is open-source software that allows you to create a self-hosted privacy-preserving [software-defined data-center](https://en.wikipedia.org/wiki/Software-defined_data_center). BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization.
 
-> Note! Bitcoin Cache Machine REQUIRES a [Trezor-T](https://trezor.io/) to function! Consider buying a dedicated device for your BCM data center, or use [passphrases](https://wiki.trezor.io/Multi-passphrase_encryption_(hidden_wallets)) to maintain distinct keyspace.
+> Note! Bitcoin Cache Machine REQUIRES a [Trezor-T](https://trezor.io/) to function! Consider buying a dedicated device for your BCM data center. The use of use [passphrases](https://wiki.trezor.io/Multi-passphrase_encryption_(hidden_wallets)) is REQUIRED.
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged using [GPG.asc](./GPG.asc) once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM. BCM HAS NOT undergone formal security evaluation and should be considered for TESTING PURPOSES ONLY.
+**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged using [GPG.asc](./GPG.asc) once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM. BCM HAS NOT undergone formal security evaluation and should be considered for TESTING PURPOSES ONLY. Your Trezor-T MUST be in passphrase mode. Right now, the only fast way to do this is use [trezor.wallet.io](https://trezor.wallet.io)
 
 ```YOU ASSUME ALL RISK IN USING THIS SOFTWARE!!!```
 

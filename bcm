@@ -84,7 +84,7 @@ bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
 # let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already when the user initially
 # downloaded BCM from github
-BCM_TOR_PROXY="socks5://localhost:9050"
+BCM_TOR_PROXY="socks5://127.0.0.1:9050"
 if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
     echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
     git config --local http.proxy "$BCM_TOR_PROXY"

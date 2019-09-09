@@ -95,6 +95,7 @@ if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cl
     exit
 fi
 
+bash -c "$BCM_GIT_DIR/controller/build.sh"
 if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
     ./controller/entrypoint.sh "$@"
     exit

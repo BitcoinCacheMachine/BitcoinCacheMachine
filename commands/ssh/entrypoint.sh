@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -56,14 +56,15 @@ for i in "$@"; do
     esac
 done
 
-if [[ ! -d "$BCM_SSH_DIR" ]]; then
-    mkdir "$BCM_SSH_DIR"
-fi
-
 if [[ ! -f "$BCM_KNOWN_HOSTS_FILE" ]]; then
     touch "$BCM_KNOWN_HOSTS_FILE"
 fi
 
+if [[ -z $SSH_USERNAME ]]; then
+    echo "ERROR: SSH username not specified."
+    cat ./connect/help.txt
+    exit 1
+fi
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./help.txt
@@ -106,27 +107,21 @@ fi
 
 # this command pushes a Trezor public SSH key to an existing SSH host which is AUTHENTICATED using an external SSH keypair.
 # the existing keypair will be removed from the remote node such that ONLY trezor can authenticate you to the endpoint.
-if [[ $BCM_CLI_VERB == "push" ]]; then
+if [[ $BCM_CLI_VERB == "provision" ]]; then
+    echo "Checking SSH availability on port 22."
+    wait-for-it -t 30 "$SSH_HOSTNAME:22"
+    
     # let's add the remote hosts fingerprint to known hosts so we don't get interactive input.
     ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
-    cat "$TREZOR_PUB_KEY_PATH" | ssh -i "$SSH_KEY_PATH" "$SSH_USERNAME@$SSH_HOSTNAME" "cat > /home/$SSH_USERNAME/.ssh/authorized_keys"
+    if [[ ! -f $TREZOR_PUB_KEY_PATH ]]; then
+        # generate a new SSH key for the remote hostname.
+        bcm ssh newkey --hostname="$SSH_HOSTNAME" --username="$SSH_USERNAME"
+        cat "$TREZOR_PUB_KEY_PATH" | ssh -i "$SSH_KEY_PATH" "$SSH_USERNAME@$SSH_HOSTNAME" "cat > /home/$SSH_USERNAME/.ssh/authorized_keys"
+    fi
     
+    # place the public SSH key on the remote SSH endpoint.
     echo "WARNING: You can ONLY use your Trezor now to log into the host '$SSH_HOSTNAME'."
     ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
-    exit
-fi
-
-if [[ $BCM_CLI_VERB == "provision" ]]; then
-    if [[ $BCM_HELP_FLAG == 1 ]]; then
-        cat ./connect/help.txt
-        exit
-    fi
-    
-    if [[ -z $SSH_USERNAME ]]; then
-        echo "ERROR: SSH username not specified."
-        cat ./connect/help.txt
-        exit 1
-    fi
     
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
@@ -136,23 +131,20 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     fi
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    CONTAINER_NAME="bcm_ssh"
-    docker system prune -f
-    
-    if ! docker ps | grep -q "$CONTAINER_NAME"; then
-        echo "Spinning up SSH client daemon ($CONTAINER_NAME)."
-        docker run -d --name="$CONTAINER_NAME" --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
-        -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-        -v "$BCM_SSH_DIR":/home/user/.ssh \
-        --device="$BCM_TREZOR_USB_PATH" \
-        "bcm-trezor:$BCM_VERSION" sleep 600 &>/dev/null &
-        sleep 2
-    fi
-    
-    docker exec -it \
+    docker run -it \
+    --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$BCM_SSH_DIR":/home/user/.ssh \
+    --device="$BCM_TREZOR_USB_PATH" \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
-    "$CONTAINER_NAME" trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- sudo apt update && sudo apt upgrade -y && sudo apt install wait-for-it git tor && wait-for-it -t 30 127.0.0.1:9050 && git config --global http.https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.proxy socks5://127.0.0.1:9050 && mkdir -p "$HOME/git/github/bcm" && if [[ ! -d "$HOME/git/github/bcm" ]]; then git clone "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" "$HOME/git/github/bcm"; else git pull "$HOME/git/github/bcm"; fi && bash -c "$HOME/git/github/bcm/bcm"
+    bcm-trezor:$BCM_VERSION trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- 'set -x && sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y wait-for-it git tor && wait-for-it -t 30 127.0.0.1:9050 && git config --global http.https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.proxy socks5://127.0.0.1:9050 && mkdir -p "$HOME/git/github/bcm" && if [[ ! -d "$HOME/git/github/bcm/.git" ]]; then git clone --quiet "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" "$HOME/git/github/bcm"; else cd "$HOME/git/github/bcm" && git pull "$HOME/git/github/bcm" && cd -; fi && sudo bash -c "$HOME/git/github/bcm/commands/cluster/server_prep.sh" && sudo shutdown -r now'
+    
+    # allow host to shut-off
+    sleep 5
+    
+    # wait for the restart.
+    wait-for-it -t "$SSH_HOSTNAME:22"
 fi
 
 
@@ -162,11 +154,6 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
         exit
     fi
     
-    if [[ -z $SSH_USERNAME ]]; then
-        echo "ERROR: SSH username not specified."
-        cat ./connect/help.txt
-        exit 1
-    fi
     
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
@@ -176,72 +163,13 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     fi
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    CONTAINER_NAME="bcm_ssh"
     docker system prune -f
-    
-    echo "Spinning up SSH client daemon ($CONTAINER_NAME)."
-    docker run -it --name="$CONTAINER_NAME" --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    docker run -it --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$BCM_SSH_DIR":/home/user/.ssh \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" trezor-agent --connect $SSH_USERNAME@$SSH_HOSTNAME
 fi
-
-
-
-# Creates a docker container running at the controller that logins into the remote
-# host and keeps the terminal session alive for a specified period of time (should be configurable)
-if [[ $BCM_CLI_VERB == "shell" ]]; then
-    if [[ $BCM_HELP_FLAG == 1 ]]; then
-        cat ./prepare/help.txt
-        exit
-    fi
-    
-    if [[ -z $SSH_USERNAME ]]; then
-        echo "ERROR: SSH username not specified."
-        exit 1
-    fi
-    
-    # shellcheck disable=SC1090
-    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
-    if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
-        echo "Could not determine Trezor USB PATH."
-        exit
-    fi
-    
-    
-    IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    
-    if docker ps | grep -a ssher; then
-        docker kill ssher
-    fi
-    
-    docker system prune -f
-    
-    docker run -d \
-    --name=ssher \
-    --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
-    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/.ssh \
-    -e SSH_USERNAME="$SSH_USERNAME" \
-    -e SSH_HOSTNAME="$SSH_HOSTNAME" \
-    --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" trezor-agent "$SSH_USERNAME@$SSH_HOSTNAME" -c
-    
-    
-    
-    # TODO UNFORTUNATELY I HAVEN"T FIGURED OUT HOW TO GET THIS TO PROPERLY PROVISION YET
-    # the following COmmand MUST be entered manually.
-    # curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/commands/controller/provision_controller_env.sh > $HOME/provision.sh && chmod 0700 $HOME/provision.sh && sudo bash -c $HOME/provision.sh
-    
-    #echo "Sarting Command"
-    #docker exec -it ssher trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- screen
-    
-    
-    # 'curl -sSL https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/commands/controller/provision_controller_env.sh > $HOME/provision.sh && chmod 0700 $HOME/provision.sh && sudo bash -c $HOME/provision.sh'
-    
-fi
-
 
 if [[ $BCM_CLI_VERB == "add-onion" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
@@ -280,7 +208,6 @@ if [[ $BCM_CLI_VERB == "add-onion" ]]; then
     
     exit
 fi
-
 
 if [[ $BCM_CLI_VERB == "remove-onion" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
