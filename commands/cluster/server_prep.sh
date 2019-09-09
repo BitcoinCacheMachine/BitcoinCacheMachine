@@ -96,4 +96,5 @@ echo ""  | sudo tee /etc/tor/torrc
 
 sudo systemctl unmask tor
 sudo systemctl start tor
+sleep 5
 wait-for-it -t 30 127.0.0.1:9050
