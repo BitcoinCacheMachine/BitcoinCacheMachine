@@ -89,5 +89,6 @@ if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
     } | sudo tee /etc/tor/torrc
 fi
 
+sudo systemctl unmask tor
 sudo systemctl restart tor
 wait-for-it -t 30 127.0.0.1:9050
