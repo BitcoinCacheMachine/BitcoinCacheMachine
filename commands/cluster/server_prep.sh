@@ -3,7 +3,7 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-sudo apt-get install --no-install-recommends -y openssh-server iotop curl socat wait-for-it
+sudo apt-get install --no-install-recommends -y iotop curl socat wait-for-it
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 
@@ -36,5 +36,3 @@ fi
 sudo systemctl restart ssh
 wait-for-it -t 15 127.0.0.1:22
 
-# call bcm and it'll install lxd.
-bash -c "$BCM_GIT_DIR./bcm"
