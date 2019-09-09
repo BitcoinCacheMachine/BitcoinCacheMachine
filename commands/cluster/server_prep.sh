@@ -10,6 +10,7 @@ sudo apt-get install --no-install-recommends -y openssh-server avahi-daemon ioto
 
 # note that we remove the basic tor client in lieu of the distributed binary
 # which tends to be more up-to-date and have more v3 features and reliability.
+# and we prefer snap-based lxd.
 sudo apt-get remove lxd lxd-client tor -y
 sudo apt-get autoremove -y
 
@@ -55,28 +56,18 @@ if ! grep -q lxd /etc/group; then
     sudo addgroup --system lxd
 fi
 
-if ! groups bcm | grep -q lxd; then
-    sudo useradd -g lxd -g sudo -m bcm
+if ! groups | grep -q lxd; then
+    sudo useradd -g lxd -g sudo -m $(whoami)
 fi
 
-if [[ ! -f $HOME/.ssh/authorized_keys ]]; then
-    sudo touch $HOME/.ssh/authorized_keys
-    sudo chown $(whoami):lxd -R $HOME/.ssh
+if [[ ! -f "$HOME/.ssh/authorized_keys" ]]; then
+    sudo touch "$HOME/.ssh/authorized_keys"
+    sudo chown $(whoami):lxd -R "$HOME/.ssh"
 fi
 
 # TODO verify where we need this.
 sudo touch /etc/sudoers.d/bcm
 echo "bcm ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/bcm
-
-######## Install TOR apt package.
-echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list
-echo "deb-src https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list
-
-curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import
-gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
-
-sudo apt-get update
-sudo apt-get install -y tor deb.torproject.org-keyring
 
 # update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
 if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
@@ -93,12 +84,12 @@ fi
 if ! grep -Fxq "HiddenServiceDir /var/lib/tor/ssh/" /etc/tor/torrc; then
     
     {
-        echo "SocksPort 0"
+        echo "SocksPort 9050"
         echo "HiddenServiceDir /var/lib/tor/ssh/"
         echo "HiddenServiceVersion 3"
         echo "HiddenServicePort 22 127.0.0.1:22"
-        #echo "HiddenServiceAuthorizeClient stealth $(hostname)-ssh"
     } | sudo tee /etc/tor/torrc
     
     sudo systemctl reload tor
 fi
+

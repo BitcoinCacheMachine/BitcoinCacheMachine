@@ -3,10 +3,6 @@
 
 #!/bin/bash
 
-CLOUD_SSH_PRIVKEY="$HOME/.ssh/bcm1.pem"
-HOST_NAME="ec2-54-91-180-68.compute-1.amazonaws.com"
-USER_NAME=ubuntu
-
 # SSH connect to the remote host using Trezor for back end authentication
 bcm ssh provision --hostname="$HOST_NAME" --username="$USER_NAME" --ssh-key-path="$CLOUD_SSH_PRIVKEY"
 
