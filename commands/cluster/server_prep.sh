@@ -91,4 +91,11 @@ wait-for-it -t 15 127.0.0.1:22
 #     # } | sudo tee /etc/tor/torrc
 # fi
 
+# install LXD if it doesn't exist.
+
+echo "Info: installing 'lxd' on $HOSTNAME."
+sudo snap install lxd --channel=3.17/candidate
+sudo snap set system snapshots.automatic.retention=no
+sudo lxd init --auto --storage-backend=btrfs
+
 wait-for-it -t 30 127.0.0.1:9050
