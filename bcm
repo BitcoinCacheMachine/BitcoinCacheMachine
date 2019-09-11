@@ -17,15 +17,15 @@ export BCM_DATACENTER="default"
 export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
 
 # if this is 1, then we assume we are running BCM WITHOUT the front-end (e.g., dockerd on bare metal)
-IS_BACKEND_ONLY=0
+IS_FRONTEND=1
 
 for i in "$@"; do
     case $i in
         --help)
             BCM_HELP_FLAG=1
         ;;
-        --backend)
-            IS_BACKEND_ONLY=1
+        --backend-only)
+            IS_FRONTEND=0
         ;;
         *)
             # unknown option
@@ -47,6 +47,8 @@ source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
 fi
+
+export IS_FRONTEND="$IS_FRONTEND"
 
 # switch to 'master' for formal versions.
 export BCM_DEFAULT_GIT_BRANCH="dev"
@@ -127,7 +129,7 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
 fi
 
 # Install docker if we're running this command on a front-end
-if [[ $IS_BACKEND_ONLY = 0 ]]; then
+if [[ $IS_FRONTEND = 1 ]]; then
     bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
 fi
 

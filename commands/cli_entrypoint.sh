@@ -93,7 +93,11 @@ if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cl
     exit
 fi
 
-bash -c "$BCM_GIT_DIR/controller/build.sh"
+# Install docker if we're running this command on a front-end
+if [[ $IS_FRONTEND = 1 ]]; then
+    bash -c "$BCM_GIT_DIR/controller/build.sh"
+fi
+
 if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
     ./controller/entrypoint.sh "$@"
     exit
