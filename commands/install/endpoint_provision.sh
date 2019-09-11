@@ -56,6 +56,6 @@ fi
 
 BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"
 source "$BASHRC_FILE"
-if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
+if cat "$BASHRC_FILE" | grep -q "$BASHRC_TEXT"; then
     echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
 fi

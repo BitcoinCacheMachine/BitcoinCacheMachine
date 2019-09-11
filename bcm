@@ -73,11 +73,6 @@ export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 export BCM_DOCKER_IMAGE_CACHE_FQDN="registry-1.docker.io"
 export BCM_LXD_IMAGE_CACHE="images.linuxcontainers.org"
 
-if [ ! -x "$(command -v lxc)" ]; then
-    # ensure the lxc and docker clients are installed.
-    # IMPORTANT TODO ensure the LXC client is available
-    bash -c "$BCM_GIT_DIR/commands/install/endpoint_provision.sh"
-fi
 
 # let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already when the user initially
