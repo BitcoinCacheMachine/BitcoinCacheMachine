@@ -55,7 +55,7 @@ if [[ ! -f $BASHRC_FILE ]]; then
 fi
 
 source "$BASHRC_FILE"
-if echo "$PATH" | grep -q $BASHRC_TEXT; then
+if ! echo "$PATH" | grep -q $BASHRC_TEXT; then
     echo "Updating ~/.bashrc."
     BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"
     echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
