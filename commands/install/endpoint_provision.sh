@@ -22,21 +22,9 @@ sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 sudo apt-get install --no-install-recommends tor wait-for-it apg -y
 
-
 # Ensure the user is added to the lxd group so it can use the CLI.
 echo "CURRENT USER:  $(whoami)"
-if groups "$(whoami)" | grep -q lxd; then
-    sudo gpasswd -a "$(whoami)" lxd
-fi
 
-if ! snap list | grep -q "lxd"; then
-    # install lxd via snap
-    # unless this is modified, we get snapshot creation in snap when removing lxd.
-    echo "Info: installing 'lxd' on $HOSTNAME."
-    sudo snap install lxd --channel="3.17/candidate"
-    sudo snap set system snapshots.automatic.retention=no
-    sleep 5
-fi
 
 # if the PRESEED_PATH has not been set by the caller, then
 # we just assume we want to do a client installation

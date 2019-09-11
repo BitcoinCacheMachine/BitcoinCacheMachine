@@ -11,7 +11,7 @@ if ! groups "$USER" | grep -q docker; then
     sudo usermod -aG docker "$USER"
 fi
 
-if ! snap list | grep -q docker; then
+if [[ ! -f "$(command -v docker)" ]]; then
     echo "Info: installing 'docker' locally."
     sudo snap install docker --channel="stable"
     

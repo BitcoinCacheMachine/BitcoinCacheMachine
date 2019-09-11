@@ -109,8 +109,25 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
     fi
 fi
 
+# if there's no group called lxd, create it.
+if groups "$(whoami)" | grep -q lxd; then
+    sudo gpasswd -a "$(whoami)" lxd
+fi
+
+# if LXC is not available, install it.
+if [[ ! -f "$(command -v lxd)" ]]; then
+    # install lxd via snap
+    # unless this is modified, we get snapshot creation in snap when removing lxd.
+    echo "Info: installing 'lxd' on $HOSTNAME."
+    sudo snap install lxd --channel="3.17/candidate"
+    sudo snap set system snapshots.automatic.retention=no
+    sleep 5
+fi
+
+
 # Install docker if we're running this command on a front-end
 if [[ $IS_FRONTEND = 1 ]]; then
+    
     bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
     
     # call the CLI entrypoint.
