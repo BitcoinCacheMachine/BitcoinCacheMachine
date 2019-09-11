@@ -56,5 +56,5 @@ fi
 BASHRC_TEXT="export PATH=$""PATH:$HOME/.bcmcode"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
-    echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
+    echo "$BASHRC_TEXT" | sudo tee -a "$BASHRC_FILE"
 fi
