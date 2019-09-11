@@ -50,7 +50,7 @@ fi
 
 
 # commands in ~/.bashrc are delimited by these literals.
-BASHRC_FILE="$HOME/.bashrc"
+BASHRC_FILE="$HOME/.bash_login"
 if [[ ! -f $BASHRC_FILE ]]; then
     touch "$BASHRC_FILE"
     sudo chmod 0644 "$BASHRC_FILE"
