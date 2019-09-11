@@ -25,6 +25,8 @@ sudo apt-get install --no-install-recommends tor wait-for-it apg -y
 
 
 # Ensure the user is added to the lxd group so it can use the CLI.
+echo "CURRENT USER:  $USER"
+groups
 if groups "$USER" | grep -q lxd; then
     sudo gpasswd -a "${USER}" lxd
 fi
@@ -55,8 +57,7 @@ if [[ ! -f $BASHRC_FILE ]]; then
 fi
 
 source "$BASHRC_FILE"
-BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"
-if ! echo "$PATH" | grep -q $BASHRC_TEXT; then
+if ! echo "$PATH" | grep -q "$(pwd)"; then
     echo "Updating ~/.bashrc."
-    echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
+    echo 'BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"' >>"$BASHRC_FILE"
 fi
