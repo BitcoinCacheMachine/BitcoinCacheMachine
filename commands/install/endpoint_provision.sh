@@ -33,9 +33,8 @@ fi
 # install lxd via snap
 # unless this is modified, we get snapshot creation in snap when removing lxd.
 echo "Info: installing 'lxd' on $HOSTNAME."
-sudo snap install lxd --channel="$BCM_LXD_SNAP_CHANNEL"
+sudo snap install lxd --channel="3.17/candidate"
 sudo snap set system snapshots.automatic.retention=no
-# sudo snap restart lxd
 
 # if the PRESEED_PATH has not been set by the caller, then
 # we just assume we want to do a client installation
