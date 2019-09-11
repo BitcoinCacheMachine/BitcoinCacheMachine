@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 echo "IN ENDPOINT_PROVISION"
-PRESEED_PATH="/home/$USERNAME/bcm"
+PRESEED_PATH=
 
 for i in "$@"; do
     case $i in
@@ -31,12 +31,17 @@ if [ ! -x "$(command -v lxd)" ]; then
     sudo snap set system snapshots.automatic.retention=no
 fi
 
-# if the 'bcm' user doesn't exist, let's create it and add it
-# to the NOPASSWD sudoers list (like we have in cloud-init provisioned machines)
+# Ensure the user is added to the lxd group so it can use the CLI.
 if groups "$USER" | grep -q lxd; then
-    sudo adduser bcm
     sudo gpasswd -a "${USER}" lxd
 fi
 
-# run lxd init using the prepared preseed.
-cat "$PRESEED_PATH" | sudo lxd init --preseed
+# if the PRESEED_PATH has not been set by the caller, then
+# we just assume we want to do a client installation
+if [[ -z $PRESEED_PATH ]]; then
+    # run lxd init with --auto
+    sudo lxd init --auto
+else
+    # run lxd init using the prepared preseed.
+    cat "$PRESEED_PATH" | sudo lxd init --preseed
+fi

@@ -58,12 +58,10 @@ if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
     exit
 fi
 
-
 if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     ./show.sh
     exit
 fi
-
 
 if [[ "$BCM_CLI_COMMAND" == "start" ||  "$BCM_CLI_COMMAND" == "stop" || "$BCM_CLI_COMMAND" == "restart"  ]]; then
     ./operations/start_stop_restart.sh

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 sudo apt-get install --no-install-recommends -y openssh-server iotop curl socat wait-for-it

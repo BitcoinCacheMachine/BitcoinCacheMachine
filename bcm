@@ -16,10 +16,16 @@ BCM_HELP_FLAG=0
 export BCM_DATACENTER="default"
 export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
 
+# if this is 1, then we assume we are running BCM WITHOUT the front-end (e.g., dockerd on bare metal)
+IS_BACKEND_ONLY=0
+
 for i in "$@"; do
     case $i in
         --help)
             BCM_HELP_FLAG=1
+        ;;
+        --backend)
+            IS_BACKEND_ONLY=1
         ;;
         *)
             # unknown option
@@ -79,10 +85,11 @@ export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
 export BCM_DOCKER_IMAGE_CACHE_FQDN="registry-1.docker.io"
 export BCM_LXD_IMAGE_CACHE="images.linuxcontainers.org"
 
-# ensure the lxc and docker clients are installed.
-bash -c "$BCM_GIT_DIR/controller/install_lxc_client.sh"
-
-bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
+if [ ! -x "$(command -v lxd)" ]; then
+    # ensure the lxc and docker clients are installed.
+    # IMPORTANT TODO ensure the LXC client is available
+    bash -c "$BCM_GIT_DIR/commands/install/endpoint_provision.sh"
+fi
 
 # let's make sure the local git client is using TOR for git pull operations.
 # this should have been configured on a global level already when the user initially
@@ -117,6 +124,11 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
             echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p"
         } >>"$SSH_LOCAL_CONF"
     fi
+fi
+
+# Install docker if we're running this command on a front-end
+if [[ $IS_BACKEND_ONLY = 0 ]]; then
+    bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
 fi
 
 # call the CLI entrypoint.
