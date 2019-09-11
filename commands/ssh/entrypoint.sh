@@ -105,11 +105,13 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     echo "INFO! Your new Trezor-backed SSH public key for host '$SSH_HOSTNAME' can be found at '$TREZOR_PUB_KEY_PATH'"
 fi
 
+
+echo "Checking SSH availability on port 22."
+wait-for-it -t 30 "$SSH_HOSTNAME:22"
+
 # this command pushes a Trezor public SSH key to an existing SSH host which is AUTHENTICATED using an external SSH keypair.
 # the existing keypair will be removed from the remote node such that ONLY trezor can authenticate you to the endpoint.
 if [[ $BCM_CLI_VERB == "provision" ]]; then
-    echo "Checking SSH availability on port 22."
-    wait-for-it -t 30 "$SSH_HOSTNAME:22"
     
     # let's add the remote hosts fingerprint to known hosts so we don't get interactive input.
     ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
