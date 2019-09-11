@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 PRESEED_PATH=
@@ -34,6 +34,8 @@ fi
 echo "Info: installing 'lxd' on $HOSTNAME."
 sudo snap install lxd --channel="3.17/candidate"
 sudo snap set system snapshots.automatic.retention=no
+
+sleep 5
 
 # if the PRESEED_PATH has not been set by the caller, then
 # we just assume we want to do a client installation

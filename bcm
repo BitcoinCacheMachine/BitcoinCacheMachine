@@ -112,7 +112,7 @@ fi
 # Install docker if we're running this command on a front-end
 if [[ $IS_FRONTEND = 1 ]]; then
     bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
+    
+    # call the CLI entrypoint.
+    ./commands/cli_entrypoint.sh "$@"
 fi
-
-# call the CLI entrypoint.
-./commands/cli_entrypoint.sh "$@"
