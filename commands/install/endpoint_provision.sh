@@ -45,3 +45,17 @@ else
     # run lxd init using the prepared preseed.
     cat "$PRESEED_PATH" | sudo lxd init --preseed
 fi
+
+
+# commands in ~/.bashrc are delimited by these literals.
+BASHRC_FILE="$HOME/.bashrc"
+if [[ ! -f $BASHRC_FILE ]]; then
+    touch "$BASHRC_FILE"
+    sudo chmod 0644 "$BASHRC_FILE"
+fi
+
+BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"
+source "$BASHRC_FILE"
+if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
+    echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
+fi
