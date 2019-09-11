@@ -21,7 +21,7 @@ done
 sudo apt-get update -y
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
-sudo apt-get install --no-install-recommends tor wait-for-it -y
+sudo apt-get install --no-install-recommends tor wait-for-it apg -y
 
 # install lxd via snap
 if [ ! -x "$(command -v lxd)" ]; then
