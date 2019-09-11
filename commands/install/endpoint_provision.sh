@@ -47,7 +47,7 @@ fi
 
 
 # commands in ~/.bashrc are delimited by these literals.
-BASHRC_FILE="/etc/environment"
+BASHRC_FILE="$HOME/.bashrc"
 if [[ ! -f $BASHRC_FILE ]]; then
     touch "$BASHRC_FILE"
     sudo chmod 0644 "$BASHRC_FILE"

@@ -3,7 +3,7 @@
 
 #!/bin/bash
 
-HOST_NAME="ec2-3-95-255-245.compute-1.amazonaws.com"
+HOST_NAME="ec2-54-86-51-14.compute-1.amazonaws.com"
 USER_NAME=ubuntu
 CLOUD_SSH_PRIVKEY="$HOME/.ssh/bcm1.pem"
 
