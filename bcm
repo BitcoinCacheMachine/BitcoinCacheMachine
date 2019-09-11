@@ -90,7 +90,7 @@ export BCM_LXD_IMAGE_CACHE="images.linuxcontainers.org"
 if [ ! -x "$(command -v lxd)" ]; then
     # ensure the lxc and docker clients are installed.
     # IMPORTANT TODO ensure the LXC client is available
-    bash -c "$BCM_GIT_DIR/commands/install/install_lxc_client.sh"
+    bash -c "$BCM_GIT_DIR/commands/cluster/endpoint_provision.sh"
 fi
 
 # let's make sure the local git client is using TOR for git pull operations.
