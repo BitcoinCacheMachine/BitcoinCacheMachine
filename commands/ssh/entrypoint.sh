@@ -133,7 +133,7 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     fi
     
     IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    docker run -it --rm \
+    docker run -it \
     --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$BCM_SSH_DIR":/home/user/.ssh \
