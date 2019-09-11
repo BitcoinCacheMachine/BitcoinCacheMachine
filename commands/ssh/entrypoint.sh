@@ -149,7 +149,7 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     -e SSH_USERNAME="$SSH_USERNAME" \
     -e SSH_HOSTNAME="$SSH_HOSTNAME" \
-    bcm-trezor:$BCM_VERSION trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- 'env'
+    bcm-trezor:$BCM_VERSION trezor-agent -c $SSH_USERNAME@$SSH_HOSTNAME -- 'bcm cluster create'
     #bcm --backend-only && echo "Restarting SSH endpoint." && sudo shutdown -r now'
 fi
 

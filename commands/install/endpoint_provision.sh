@@ -3,7 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-echo "IN ENDPOINT_PROVISION"
 PRESEED_PATH=
 
 for i in "$@"; do
@@ -25,12 +24,10 @@ sudo apt-get install --no-install-recommends tor wait-for-it apg -y
 
 
 # Ensure the user is added to the lxd group so it can use the CLI.
-echo "CURRENT USER:  $USER"
-groups
-if groups "$USER" | grep -q lxd; then
-    sudo gpasswd -a "${USER}" lxd
+echo "CURRENT USER:  $(whoami)"
+if groups "$(whoami)" | grep -q lxd; then
+    sudo gpasswd -a "$(whoami)" lxd
 fi
-
 
 # install lxd via snap
 # unless this is modified, we get snapshot creation in snap when removing lxd.
@@ -50,7 +47,7 @@ fi
 
 
 # commands in ~/.bashrc are delimited by these literals.
-BASHRC_FILE="$HOME/.bash_login"
+BASHRC_FILE="/etc/environment"
 if [[ ! -f $BASHRC_FILE ]]; then
     touch "$BASHRC_FILE"
     sudo chmod 0644 "$BASHRC_FILE"
@@ -59,5 +56,5 @@ fi
 BASHRC_TEXT="export PATH=$""PATH:$HOME/.bcmcode"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
-    echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
+    echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
 fi
