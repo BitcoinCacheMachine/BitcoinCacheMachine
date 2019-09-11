@@ -56,7 +56,7 @@ if [[ ! -f $BASHRC_FILE ]]; then
     sudo chmod 0644 "$BASHRC_FILE"
 fi
 
-BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"
+BASHRC_TEXT="export PATH=$""PATH:$HOME/.bcmcode"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
