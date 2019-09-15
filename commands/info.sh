@@ -38,11 +38,12 @@ if [[ -d $BCM_SSH_DIR ]]; then
 fi
 
 if [ ! -z ${BCM_DEBUG+x} ]; then
-    echo "  cli_debug:                 $BCM_DEBUG"
+    echo "  bcm_debug_mode:                 $BCM_DEBUG"
 fi
 
 echo "  active_chain:              $BCM_ACTIVE_CHAIN"
-
+echo "  active_ssh_endpoint:       $BCM_SSH_HOSTNAME"
+echo "  active_ssh_user:           $BCM_SSH_USERNAME"
 echo "bcm_deployment:"
 
 # remove any legacy lxd software and install install lxd via snap

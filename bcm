@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+#set -Eeuo pipefail
+
+# note the absense of -u allows you to use environment variables from the parent shell
+set -Eeo pipefail
 cd "$(dirname "$0")"
 
 export BCM_GIT_DIR="$(pwd)"
@@ -10,6 +13,8 @@ export BCM_MINOR_VERSION="0"
 export BCM_PATCH_VERSION="1"
 export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION"
 export BCM_DOCKER_BASE_TAG="18.10"
+
+# todo; convert this to a temp encrypted ramdisk that exists for the duration of each bcm call.
 export BCM_RUNTIME_DIR="$HOME/.bcm" && mkdir -p "$BCM_RUNTIME_DIR"
 BCM_HELP_FLAG=0
 export BCM_DATACENTER="default"
@@ -32,8 +37,21 @@ for i in "$@"; do
     esac
 done
 
-export BCM_HELP_FLAG="$BCM_HELP_FLAG"
 
+BCM_SSH_HOSTNAME=${BCM_SSH_HOSTNAME:-"$(hostname)"}
+if [[ ! -z $BCM_SSH_HOSTNAME ]]; then
+    BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
+fi
+
+BCM_SSH_USERNAME=${BCM_SSH_USERNAME:-"$(whoami)"}
+if [[ ! -z $BCM_SSH_USERNAME ]]; then
+    BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
+fi
+
+export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
+export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
+
+export BCM_HELP_FLAG="$BCM_HELP_FLAG"
 export IS_FRONTEND="$IS_FRONTEND"
 
 # switch to 'master' for formal versions.
@@ -110,12 +128,12 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
 fi
 
 # if there's no group called lxd, create it.
-if groups "$(whoami)" | grep -q lxd; then
+if ! groups "$(whoami)" | grep -q lxd; then
     sudo gpasswd -a "$(whoami)" lxd
 fi
 
 # if LXC is not available, install it.
-if [[ ! -f "$(command -v lxd)" ]]; then
+if [[ ! -f "$(command -v lxc)" ]]; then
     # install lxd via snap
     # unless this is modified, we get snapshot creation in snap when removing lxd.
     echo "Info: installing 'lxd' on $HOSTNAME."
@@ -124,11 +142,9 @@ if [[ ! -f "$(command -v lxd)" ]]; then
     sleep 5
 fi
 
-
 # Install docker if we're running this command on a front-end
 if [[ $IS_FRONTEND = 1 ]]; then
-    
-    bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
+    bash -c "$BCM_GIT_DIR/commands/controller/install_docker_client.sh"
     
     # call the CLI entrypoint.
     ./commands/cli_entrypoint.sh "$@"

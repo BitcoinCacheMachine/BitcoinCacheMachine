@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
@@ -119,6 +119,11 @@ fi
 
 if [[ "$BCM_CLI_COMMAND" == "file" ]]; then
     ./file/entrypoint.sh "$@"
+    exit
+fi
+
+if [[ "$BCM_CLI_COMMAND" == "web" ]]; then
+    ./web/entrypoint.sh "$@"
     exit
 fi
 

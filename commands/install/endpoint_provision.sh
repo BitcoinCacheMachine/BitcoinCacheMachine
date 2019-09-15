@@ -22,10 +22,6 @@ sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 sudo apt-get install --no-install-recommends tor wait-for-it apg -y
 
-# Ensure the user is added to the lxd group so it can use the CLI.
-echo "CURRENT USER:  $(whoami)"
-
-
 # if the PRESEED_PATH has not been set by the caller, then
 # we just assume we want to do a client installation
 if [[ ! -f $PRESEED_PATH ]]; then
@@ -35,7 +31,6 @@ else
     # run lxd init using the prepared preseed.
     cat "$PRESEED_PATH" | sudo lxd init --preseed
 fi
-
 
 # commands in ~/.bashrc are delimited by these literals.
 BASHRC_FILE="$HOME/.bashrc"

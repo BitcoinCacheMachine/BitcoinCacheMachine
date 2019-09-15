@@ -14,7 +14,7 @@ fi
 
 BCM_ENDPOINTS_FLAG=0
 BCM_DRIVER=local
-BCM_SSH_HOSTNAME=
+SSH_HOSTNAME=
 BCM_SSH_USERNAME=
 MACVLAN_INTERFACE=
 
@@ -45,8 +45,6 @@ for i in "$@"; do
     esac
 done
 
-
-echo "ARGUMENTS: ""$@"
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./help.txt
     exit
