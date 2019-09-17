@@ -50,11 +50,6 @@ if [[ -z $VM_NAME ]]; then
     exit
 fi
 
-if multipass list | grep -q "$VM_NAME"; then
-    echo "bcm cluster destroy --cluster-name=$VM_NAME"
-    exit
-fi
-
 if [[ -f "$ENDPOINT_DIR/id_rsa" ]]; then
     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
 else

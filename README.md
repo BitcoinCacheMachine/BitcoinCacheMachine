@@ -45,26 +45,30 @@ The first step to getting started with Bitcoin Cache Machine is to clone the git
 
 > NOTE: All BCM documentation ASSUMES you're working from a fresh install of Ubuntu (Desktop or Server) >= 18.04. Windows and MacOS are not directly supported, though you can always run Ubuntu in a VM. This goes for both the user-facing SDN controller and [dedicated back-end x86_64 data center hardware](https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/tree/master/cluster#how-to-prepare-a-physical-server-for-bcm-workloads).
 
-Start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads) from your SDN Controller. Next, configure your local `git` client to clone the BCM github repository using TOR for transport. This prevents github.com (i.e., Microsoft) from recording your real IP address. (It might also be a good idea to use a TOR browser when browsing this repo directly on github.).
+Start by installing [`tor`](https://www.torproject.org/) and [`git`](https://git-scm.com/downloads), wait-for-it, and curl on your SDN Controller. BCM scripts installs all other necessary software (`sudo` may be required).
 
 ```bash
+echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list 
+echo "deb-src https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list
+curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import 
+gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add - 
 sudo apt-get update
-sudo apt-get install -y tor git
-BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
-git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://localhost:9050
+sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring 
+wait-for-it -t 30 127.0.0.1:9050
 ```
 
 You can now clone the BCM repository to your machine over TOR and run setup. You can update your local BCM git repo by running `git pull` from `$BCM_GIT_DIR`.
 
 ```bash
-export BCM_GIT_DIR="$HOME/git/github/bcm"
-mkdir -p "$BCM_GIT_DIR"
+BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
+git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
+export BCM_GIT_DIR="$HOME/.bcmcode"
 git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 cd "$BCM_GIT_DIR"
 ./bcm
 ```
 
-You will need to log out and log back (or restart) in for your group membership to refresh. Feel free to change the directory in which you store the BCM repository on your machine. Just update $PATH in your `~/.bashrc` (`bcm` appends to the PATH variable). `setup.sh` sets up your SDN Controller so that you can use Bitcoin Cache Machine's CLI. Running `bcm` at the terminal ensures that all necessary dependencies are made avaible (LXD client, dockerd) and builds the docker images needed to run bcm commands. The first place you should look for help is the CLI `--help` menus, e.g., `bcm --help`.
+You will need to log out and log back (or restart) in for your group membership to refresh. Feel free to change the directory in which you store the BCM repository on your machine. Just update $PATH in your `~/.bashrc` (`bcm` appends to the PATH variable). Running `bcm` at the terminal ensures that all necessary dependencies are made avaible (LXD client, dockerd) and builds the docker images needed to run bcm commands.
 
 ## Deploying your own BCM Infrastructure
 

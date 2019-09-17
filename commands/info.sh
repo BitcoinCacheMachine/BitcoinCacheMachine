@@ -29,30 +29,15 @@ if [[ -d $PASSWORD_STORE_DIR ]]; then
     echo "  password_dir:              $PASSWORD_STORE_DIR"
 fi
 
-if [[ -d $PASSWORD_STORE_DIR ]]; then
-    echo "  electrum_dir:              $ELECTRUM_DIR"
-fi
-
 if [[ -d $BCM_SSH_DIR ]]; then
     echo "  ssh_dir:                   $BCM_SSH_DIR"
 fi
 
 if [ ! -z ${BCM_DEBUG+x} ]; then
-    echo "  bcm_debug_mode:                 $BCM_DEBUG"
+    echo "  bcm_debug_mode:            $BCM_DEBUG"
 fi
 
-echo "  active_chain:              $BCM_ACTIVE_CHAIN"
 echo "  active_ssh_endpoint:       $BCM_SSH_HOSTNAME"
 echo "  active_ssh_user:           $BCM_SSH_USERNAME"
-echo "bcm_deployment:"
-
-# remove any legacy lxd software and install install lxd via snap
-echo "  active_cluster:            $BCM_CLUSTER_NAME"
-
-CLUSTER_PROJECT="$(lxc project list | grep "(current)")"
-CLUSTER_VERSION="$BCM_VERSION"
-if ! echo "$CLUSTER_PROJECT" | grep -q "default"; then
-    CLUSTER_VERSION=$(echo "$CLUSTER_PROJECT" | awk '{print $2}' | cut -d "_" -f 2)
-fi
-echo "  data_center:               $BCM_DATACENTER"
-echo "  data_center_version:       $CLUSTER_VERSION"
+echo "  target_project:            $BCM_PROJECT"
+echo "  target_chain:              $BCM_ACTIVE_CHAIN"

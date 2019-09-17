@@ -26,9 +26,6 @@ if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "start" && $BCM_CLI_VERB != "s
     exit
 fi
 
-BCM_BACKUP_DIR="$BCM_CLUSTER_DIR/$(lxc remote get-default)/backups"
-export BACKUP_DIR="$BCM_BACKUP_DIR"
-
 if [[ $BCM_CLI_VERB == "start" ]]; then
     STACK_NAME=
     if [ -z "${3:-}" ]; then

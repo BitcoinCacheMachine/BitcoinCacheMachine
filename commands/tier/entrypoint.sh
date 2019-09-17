@@ -28,11 +28,6 @@ if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "
     exit
 fi
 
-# if the current cluster is not configured, let's bring it into existence.
-if lxc info | grep -q "server_clustered: false"; then
-    bcm cluster create
-fi
-
 if [[ $BCM_CLI_VERB == "list" ]]; then
     LXC_LIST_OUTPUT=$(lxc list --format csv --columns ns | grep "RUNNING")
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-manager"; then

@@ -39,7 +39,8 @@ fi
 bash -c "$BCM_GIT_DIR/controller/build.sh"
 docker build -t bcm-electrum:"$BCM_VERSION" --build-arg BCM_VERSION="$BCM_VERSION" ./build/
 
-mkdir -p "$ELECTRUM_DIR"
+
+export ELECTRUM_DIR="$HOME/.electrum" && mkdir -p "$ELECTRUM_DIR"
 mkdir -p "$ELECTRUM_DIR/regtest"
 mkdir -p "$ELECTRUM_DIR/testnet"
 cp ./regtest_config.json "$ELECTRUM_DIR/regtest/config"

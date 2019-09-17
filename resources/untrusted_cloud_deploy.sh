@@ -7,9 +7,7 @@
 # trezor produces a DETERMINISTIC "BCM_USER_NAME@BCM_HOST_NAME" keypair given a specific passphrase.
 # it's RECOMMENDED that you use a SEPARATE passphrase for each trust level you determine: Could be
 # along the lines of institutional trust, and deployment stages, e.g., dev, stage, prod.
-#export BCM_HOST_NAME="ec2-54-86-51-14.compute-1.amazonaws.com"
-#export BCM_USER_NAME=ubuntu
-CLOUD_SSH_PRIVKEY="$HOME/.ssh/bcm1.pem"
+
 
 # commit, stage, push to github (still over https.. TODO switch to trezor-backed SSH over Tor.)
 bcm git commit --stage --message="Improved remote cluster deployment via 'bcm ssh prepare'." --push

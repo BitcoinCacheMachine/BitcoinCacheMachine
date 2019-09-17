@@ -3,12 +3,12 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-PRESEED_PATH=
+YAML_TEXT=
 
 for i in "$@"; do
     case $i in
-        --preseed-path=*)
-            PRESEED_PATH="${i#*=}"
+        --yaml-text=*)
+            YAML_TEXT="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -20,17 +20,15 @@ done
 sudo apt-get update -y
 sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
-sudo apt-get install --no-install-recommends tor wait-for-it apg -y
+sudo apt-get install tor wait-for-it apg -y
 
-# if the PRESEED_PATH has not been set by the caller, then
-# we just assume we want to do a client installation
-if [[ ! -f $PRESEED_PATH ]]; then
-    # run lxd init with --auto
-    sudo lxd init --auto
-else
-    # run lxd init using the prepared preseed.
-    cat "$PRESEED_PATH" | sudo lxd init --preseed
-fi
+echo "YAML_TEXT: $YAML_TEXT"
+echo "$YAML_TEXT" | sudo lxd init --preseed
+
+# all LXC operations use the local unix socket; BCM DOES NOT
+# employ HTTPS -based LXD. All management plane operations are
+# via SSH.
+lxc remote set-default "local"
 
 # commands in ~/.bashrc are delimited by these literals.
 BASHRC_FILE="$HOME/.bashrc"
