@@ -9,10 +9,6 @@ bcm stack start clightning
 
 bcm stack start nbxplorer
 
-# env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
-# shellcheck source=../../project/shared/env.sh
-source "$BCM_GIT_DIR/project/shared/env.sh"
-
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
 --docker-hub-image-name="$DOCKER_HUB_IMAGE" \

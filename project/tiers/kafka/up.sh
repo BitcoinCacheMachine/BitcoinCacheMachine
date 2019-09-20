@@ -1,20 +1,20 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # don't even think about proceeding unless the manager BCM tier is up and running.
 if ! bcm tier list | grep -q manager; then
-    echo "INFO: the 'manager' tier does not exist. Provisioning it now."
     bcm tier create manager
 fi
+
+
+# let's get some shared (between up/down scripts).
+source ./env
 
 # Let's provision the system containers to the cluster.
 export TIER_NAME=kafka
 ../create_tier.sh --tier-name="$TIER_NAME"
-
-# shellcheck disable=1091
-source ./params.sh "$@"
 
 # now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
 # 5 nodes (if we have a cluster of that size). 5 should be more than enough for
@@ -33,14 +33,8 @@ source ./broker/get_env.sh
 export KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS"
 bash -c "./broker/up_lxc_broker.sh"
 
-if [[ $BCM_DEPLOY_STACK_KAFKA_SCHEMA_REGISTRY == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaschemareg/env --container-name=$BCM_KAFKA_HOST_NAME"
-fi
+KAFKA_STACKS_DIR="$BCM_GIT_DIR/project/tiers/kafka/stacks"
 
-if [[ $BCM_DEPLOY_STACK_KAFKA_REST == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkarest/env --container-name=$BCM_KAFKA_HOST_NAME"
-fi
-
-if [[ $BCM_DEPLOY_STACK_KAFKA_CONNECT == 1 ]]; then
-    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$(pwd)/stacks/kafkaconnect/env  --container-name=$BCM_KAFKA_HOST_NAME"
-fi
+for stack in kafkaschemareg kafkarest kafkaconnect; do
+    bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$KAFKA_STACKS_DIR/$stack/env --container-name=$BCM_KAFKA_HOST_NAME"
+done

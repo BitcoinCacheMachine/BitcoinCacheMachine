@@ -12,7 +12,7 @@ if ! groups "$USER" | grep -q docker; then
 fi
 
 if [[ ! -f "$(command -v docker)" ]]; then
-    echo "Info: installing 'docker' locally."
+    echo "INFO: installing 'docker' locally."
     sudo snap install docker --channel="stable"
     
     # next we need to determine the underlying file system so we can upload the correct daemon.json

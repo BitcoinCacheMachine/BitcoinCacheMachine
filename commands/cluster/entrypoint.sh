@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -14,7 +14,7 @@ fi
 
 BCM_ENDPOINTS_FLAG=0
 SSH_HOSTNAME=
-MACVLAN_INTERFACE=
+
 
 for i in "$@"; do
     case $i in
@@ -37,11 +37,11 @@ fi
 
 if [[ "$BCM_CLI_VERB" == "list" ]]; then
     if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
-        lxc cluster list --format csv | grep "$BCM_SSH_HOSTNAME" | awk '{print $1}'
+        lxc cluster list --format csv | grep "$BCM_SSH_HOSTNAME" | awk -F"," '{print $1}'
         exit
     fi
     
-    lxc remote list --format csv | grep "bcm-" | awk -F "," '{print $1}' | awk '{print $1}'
+    lxc remote list --format csv | grep "bcm-" | awk -F "," '{print $1}' | awk -F"," '{print $1}'
     exit
 fi
 
@@ -86,7 +86,7 @@ if [[ $BCM_CLI_VERB == "clear" ]]; then
             bash -c ./clear_lxd.sh
             
             elif [[ "$CHOICE" == "n" ]]; then
-            echo "Info:  Aborted 'bcm cluster clear' command."
+            echo "INFO:  Aborted 'bcm cluster clear' command."
             exit
         else
             echo "Invalid entry. Please try again."

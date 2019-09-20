@@ -57,4 +57,4 @@ if ! lxc project list --format csv | grep -q "default (current)"; then
 fi
 
 # clean up any hanging images
-bash -c "$BCM_GIT_DIR/project/shared/clear_unlabeled_lxc_images.sh"
+bash -c "$BCM_LXD_OPS/clear_unlabeled_lxc_images.sh"

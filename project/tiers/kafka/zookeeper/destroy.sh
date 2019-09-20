@@ -10,7 +10,7 @@ for endpoint in $(bcm cluster list endpoints); do
     ZOOKEEPER_STACK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")"
     
     # remove swarm services related to kafka
-    bash -c "$BCM_GIT_DIR/project/shared/remove_docker_stack.sh --stack-name=$ZOOKEEPER_STACK_NAME"
+    bash -c "$BCM_LXD_OPS/remove_docker_stack.sh --stack-name=$ZOOKEEPER_STACK_NAME"
 done
 
 # remove the network

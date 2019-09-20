@@ -26,9 +26,6 @@ fi
 
 export TIER_NAME=manager
 
-# shellcheck source=../../project/shared/env.sh
-#source "$BCM_GIT_DIR/project/shared/env.sh"
-
 # first, create the profile that represents the tier.
 ../create_tier_profile.sh --tier-name="$TIER_NAME"
 
@@ -85,7 +82,7 @@ if lxc list --format csv -c=ns | grep "$BCM_MANAGER_HOST_NAME" | grep -q STOPPED
     lxc start "$BCM_MANAGER_HOST_NAME"
 fi
 
-bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
+bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
 
 # prepare the host.
 lxc exec "$BCM_MANAGER_HOST_NAME" -- ifmetric eth0 50
@@ -100,7 +97,7 @@ lxc file push ./daemon1.json "$BCM_MANAGER_HOST_NAME"/etc/docker/daemon.json
 
 # restart the host so it runs with new dockerd daemon config.
 lxc restart "$BCM_MANAGER_HOST_NAME"
-bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
+bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
 
 # push the stack files up tthere.
 lxc file push  -p -r ./stacks/ "$BCM_MANAGER_HOST_NAME"/root/manager/
@@ -132,8 +129,7 @@ lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-regi
 # let's cycle through the other cluster members (other than the master)
 # and get their bcm-manager host going.
 # shellcheck disable=SC1090
-source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
-
+source "$BCM_GIT_DIR/project/tiers/get_docker_swarm_tokens.sh"
 
 ## TODO this probably doesn't work with multiple manager containers at the moment.
 # todo need to update daemon.json to populate with hostname of manager-01
@@ -150,7 +146,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
             
             lxc start "$HOSTNAME"
             
-            bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
+            bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$HOSTNAME"
             
             # make sure manager and kafka hosts can reach the swarm master.
             # this steps helps resolve networking before we issue any meaningful

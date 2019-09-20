@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-
-echo "Got into CLEAR>LXD.sh"
 if ! which jq >/dev/null 2>&1; then
     echo "This tool requires: jq"
     exit 1

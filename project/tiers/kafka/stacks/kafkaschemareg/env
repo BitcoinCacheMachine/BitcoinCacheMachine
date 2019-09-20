@@ -1,6 +1,6 @@
-export DOCKERHUB_IMAGE="confluentinc/cp-schema-registry:5.2.2"
+export IMAGE_TAG="$KAFKA_VERSION_TAG"
+export DOCKERHUB_IMAGE="confluentinc/cp-schema-registry:$IMAGE_TAG"
 export IMAGE_NAME="bcm-kafka-schema-registry"
-export IMAGE_TAG="5.1.0"
 export BCM_TIER_NAME="kafka"
 export STACK_NAME="kafkaschemareg"
 export SERVICE_NAME="schema-registry"

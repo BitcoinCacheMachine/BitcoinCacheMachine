@@ -1,4 +1,5 @@
-export DOCKERHUB_IMAGE="portainer/portainer:1.20.2"
+export DOCKERHUB_IMAGE="portainer/portainer"
+export IMAGE_TAG="1.20.2"
 export IMAGE_NAME="bcm-portainer"
 export BCM_TIER_NAME="manager"
 export STACK_NAME="portainer"

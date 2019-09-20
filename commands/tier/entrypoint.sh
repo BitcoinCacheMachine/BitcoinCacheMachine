@@ -50,7 +50,7 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
 fi
 
 if [[ "$BCM_CLI_VERB" == "clear" ]]; then
-    bcm tier destroy bitcoin
+    bcm tier destroy "bitcoin-$BCM_ACTIVE_CHAIN"
     bcm tier destroy underlay
     bcm tier destroy kafka
     bcm tier destroy manager
@@ -80,20 +80,19 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/underlay/up.sh"
     fi
     
-    if  [[ $TIER_NAME == "bitcoin" ]]; then
+    if  [[ $TIER_NAME == "bitcoin-$BCM_ACTIVE_CHAIN" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
     fi
 fi
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    if [[ $TIER_NAME == "manager" ]]; then
-        bash -c "$BCM_GIT_DIR/project/tiers/manager/destroy.sh"
-        elif [[ $TIER_NAME == "kafka" ]]; then
-        bash -c "$BCM_GIT_DIR/project/tiers/kafka/destroy.sh"
-        elif [[ $TIER_NAME == "underlay" ]]; then
-        bash -c "$BCM_GIT_DIR/project/tiers/underlay/destroy.sh"
-        elif  [[ $TIER_NAME == "bitcoin" ]]; then
-        bash -c "$BCM_LXD_OPS/remove_tier.sh --tier-name=bitcoin"
+    
+    # we deal with bitcoin tiers a bit differently since they are scoped by ACTIVE_CHAIN
+    if  [[ $TIER_NAME == bitcoin* ]]; then
+        bash -c "$BCM_GIT_DIR/project/tiers/remove_tier.sh --tier-name=$TIER_NAME"
+    else
+        # if not Bitcoin, we call their specific destroy scripts.
+        bash -c "$BCM_GIT_DIR/project/tiers/$TIER_NAME/destroy.sh"
     fi
 fi
 

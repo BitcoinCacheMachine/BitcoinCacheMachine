@@ -5,16 +5,15 @@ cd "$(dirname "$0")"
 
 export TIER_NAME=manager
 
-# shellcheck source=../../project/shared/env.sh
-source "$BCM_GIT_DIR/project/shared/env.sh"
+
+source "$BCM_GIT_DIR/project/tiers/env.sh" 
 
 # we get the hostname of the LXD container by getting its endpoint ID (which endpoint it's scheduled on)
 for ENDPOINT in $(bcm cluster list endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     
     # remove the host number from the hostname
-    # shellcheck source=../../project/shared/env.sh
-    source "$BCM_GIT_DIR/project/shared/env.sh" --host-ending="$HOST_ENDING"
+    source "$BCM_GIT_DIR/project/tiers/env.sh" --host-ending="$HOST_ENDING"
     
     bash -c "$BCM_LXD_OPS/delete_lxc_container.sh --container-name=$LXC_HOSTNAME"
     bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$LXC_HOSTNAME --endpoint=$ENDPOINT"

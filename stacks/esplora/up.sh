@@ -10,10 +10,6 @@ if ! bcm stack list | grep -q "bitcoind"; then
     bcm stack start bitcoind
 fi
 
-# env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
-# shellcheck source=../../project/shared/env.sh
-source "$BCM_GIT_DIR/project/shared/env.sh"
-
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
 --build-context="$(pwd)/build" \

@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:5.2.2"
+PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:$KAFKA_VERSION_TAG"
 BROKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-broker:$BCM_VERSION"
 
 # if it's the first instance, let's download the kafka image from
@@ -26,8 +26,8 @@ for ENDPOINT in $(bcm cluster list endpoints); do
     BROKER_HOSTNAME="broker-$(printf %02d "$HOST_ENDING")"
     
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
-    # shellcheck source=../../project/shared/env.sh
-    #source "$BCM_GIT_DIR/project/shared/env.sh" --host-ending="$HOST_ENDING"
+    # shellcheck source=BCM_LXD_OPS/env.sh
+    source "$BCM_GIT_DIR/project/tiers/env.sh" --host-ending="$HOST_ENDING"
     
     lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$BROKER_IMAGE" BROKER_HOSTNAME="$BROKER_HOSTNAME" KAFKA_BROKER_ID="$HOST_ENDING" KAFKA_ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT" TARGET_HOST="$BCM_KAFKA_HOST_NAME" docker stack deploy -c /root/stacks/kafka/broker.yml "$BROKER_HOSTNAME"
 done

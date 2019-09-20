@@ -41,7 +41,7 @@ if [[ $BCM_CLI_VERB == "start" ]]; then
     if [[ -f "$UP_FILE" ]]; then
         BCM_BACKUP_DIR="$BCM_BACKUP_DIR" bash -c "$UP_FILE" "$@"
     else
-        echo "Error: BCM does not support this stack name."
+        echo "Error: BCM does not support stack '$STACK_NAME'. Check your spelling."
     fi
 fi
 
@@ -72,7 +72,7 @@ if [[ $BCM_CLI_VERB == "stop" ]]; then
                         LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
                     fi
                     
-                    bash -c "$BCM_GIT_DIR/project/shared/delete_docker_volume.sh --lxc-hostname=$LXC_HOSTNAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
+                    bash -c "$BCM_LXD_OPS/delete_docker_volume.sh --lxc-hostname=$LXC_HOSTNAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
                 done
             fi
         else
@@ -94,7 +94,7 @@ if [[ $BCM_CLI_VERB == "list" ]]; then
     
     if lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME,STOPPED"; then
         lxc start "$BCM_MANAGER_HOST_NAME"
-        bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
+        bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
     fi
     
     if lxc list --format csv -c=n | grep -q "$BCM_MANAGER_HOST_NAME"; then

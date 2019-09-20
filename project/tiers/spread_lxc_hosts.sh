@@ -24,11 +24,6 @@ fi
 
 PROFILE_NAME="bcm-$TIER_NAME"
 
-# if we are provisioning the bitcoin tier, let's go ahead and scope it to the active chain
-if [[ $TIER_NAME == bitcoin* ]]; then
-    PROFILE_NAME="bcm-bitcoin"
-fi
-
 # let's get a bcm-manager LXC instance on each cluster endpoint.
 MASTER_NODE=$(bcm cluster list endpoints | grep '01')
 for ENDPOINT in $(bcm cluster list endpoints); do

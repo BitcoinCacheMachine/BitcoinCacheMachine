@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 YAML_TEXT=
@@ -22,7 +22,6 @@ sudo apt-get remove lxd lxd-client -y
 sudo apt-get autoremove -y
 sudo apt-get install tor wait-for-it apg -y
 
-echo "YAML_TEXT: $YAML_TEXT"
 echo "$YAML_TEXT" | sudo lxd init --preseed
 
 # all LXC operations use the local unix socket; BCM DOES NOT
