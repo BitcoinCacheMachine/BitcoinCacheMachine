@@ -65,6 +65,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     export LXD_SERVER_NAME="$LXD_SERVER_NAME"
+    export IP_OF_MACVLAN_INTERFACE="$(ip addr show eno1 | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
     PRESEED_YAML="$(envsubst <./lxd_preseed/lxd_master_preseed.yml)"
     sudo bash -c "$BCM_GIT_DIR/commands/install/endpoint_provision.sh --yaml-text='$PRESEED_YAML'"
     exit

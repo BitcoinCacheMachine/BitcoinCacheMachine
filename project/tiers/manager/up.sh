@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
@@ -93,7 +93,10 @@ lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag registry:latest bcm-registry:lat
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker swarm init --advertise-addr eth1 >> /dev/null
 
 # upload the docker daemon config to BCM_MANAGER_HOST_NAME
-lxc file push ./daemon1.json "$BCM_MANAGER_HOST_NAME"/etc/docker/daemon.json
+# TODO update this to use a tmpfs mount for temp storage.
+envsubst <./daemon1.json > ./daemon-updated.json
+lxc file push ./daemon-updated.json "$BCM_MANAGER_HOST_NAME"/etc/docker/daemon.json
+rm ./daemon-updated.json
 
 # restart the host so it runs with new dockerd daemon config.
 lxc restart "$BCM_MANAGER_HOST_NAME"
@@ -103,28 +106,27 @@ bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAM
 lxc file push  -p -r ./stacks/ "$BCM_MANAGER_HOST_NAME"/root/manager/
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="bcm-registry:latest" \
-TARGET_PORT=5000 \
+TARGET_PORT="$BCM_REGISTRY_MIRROR_PORT" \
 TARGET_HOST="$BCM_MANAGER_HOST_NAME" \
 REGISTRY_PROXY_REMOTEURL="https://$BCM_DOCKER_IMAGE_CACHE_FQDN" \
 docker stack deploy -c "/root/$TIER_NAME/stacks/registry/regmirror.yml" regmirror
 
-lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:5000"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:$BCM_REGISTRY_MIRROR_PORT"
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="bcm-registry:latest" \
-TARGET_PORT=5010 \
+TARGET_PORT="$BCM_PRIVATE_REGISTRY_PORT" \
 TARGET_HOST="$BCM_MANAGER_HOST_NAME" \
 docker stack deploy -c "/root/manager/stacks/registry/privreg.yml" privateregistry
 
-lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:5010"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:$BCM_PRIVATE_REGISTRY_PORT"
 
 # tag and push the registry image to our local private registry.
-BCM_PRIVATE_REGISTRY="127.0.0.1:5010"
+BCM_PRIVATE_REGISTRY="127.0.0.1:$BCM_PRIVATE_REGISTRY_PORT"
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
 # build and push the docker-base docker image.
 ./build_push_docker_base.sh
-
 
 # let's cycle through the other cluster members (other than the master)
 # and get their bcm-manager host going.
@@ -152,7 +154,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
             # this steps helps resolve networking before we issue any meaningful
             # commands.
             lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 -q "$BCM_MANAGER_HOST_NAME":2377
-            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 -q "$BCM_MANAGER_HOST_NAME":5000
+            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 -q "$BCM_MANAGER_HOST_NAME:$BCM_REGISTRY_MIRROR_PORT"
             lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 "$BCM_PRIVATE_REGISTRY"
             
             if [[ $HOST_ENDING -le 3 ]]; then
@@ -166,7 +168,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
             # another registry mirror and private registry in case node1 goes offline.
             # We will only have 2 locations for docker image distribution.
             if [[ $HOST_ENDING == 2 ]]; then
-                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-manager-01:5000" docker stack deploy -c "/root/manager/stacks/registry/regmirror.yml" regmirror2
+                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-manager-01:$BCM_REGISTRY_MIRROR_PORT" docker stack deploy -c "/root/manager/stacks/registry/regmirror.yml" regmirror2
             fi
         fi
     fi

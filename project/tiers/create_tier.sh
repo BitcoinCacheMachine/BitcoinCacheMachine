@@ -97,7 +97,9 @@ for ENDPOINT in $(bcm cluster list endpoints); do
     source "$BCM_GIT_DIR/project/tiers/get_docker_swarm_tokens.sh"
     if [[ $BCM_TIER_TYPE -ge 1 ]]; then
         lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_MANAGER_HOST_NAME":2377
-        lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_MANAGER_HOST_NAME":5000
-        lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" "$BCM_MANAGER_HOST_NAME":2377
+        lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 15 -q "$BCM_MANAGER_HOST_NAME:$BCM_REGISTRY_MIRROR_PORT"
+        
+        # TODO fix this so we check to see if the engine is NOT part of the swarm yet. then remove || true
+        lxc exec "$LXC_HOSTNAME" -- docker swarm join --token "$DOCKER_SWARM_WORKER_JOIN_TOKEN" "$BCM_MANAGER_HOST_NAME":2377 || true
     fi
 done

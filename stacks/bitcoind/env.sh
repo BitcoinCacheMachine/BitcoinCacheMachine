@@ -4,7 +4,7 @@ set -e
 
 export IMAGE_NAME="bcm-bitcoin-core"
 
-export TIER_NAME="bitcoin$BCM_ACTIVE_CHAIN"
+export TIER_NAME="bitcoin-$BCM_ACTIVE_CHAIN"
 export STACK_NAME="bitcoind"
 export SERVICE_NAME="bitcoind"
 

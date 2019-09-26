@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export IMAGE_NAME="bcm-electrs"
-export TIER_NAME="bitcoin$BCM_ACTIVE_CHAIN"
+export TIER_NAME="bitcoin-$BCM_ACTIVE_CHAIN"
 export STACK_NAME="electrs"
 export SERVICE_NAME="electrs"
 export STACK_DOCKER_VOLUMES="data"

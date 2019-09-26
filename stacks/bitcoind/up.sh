@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # first, let's make sure we deploy our direct dependencies.
-if ! bcm tier list | grep -q "bitcoin$BCM_ACTIVE_CHAIN"; then
+if ! bcm tier list | grep -q "bitcoin-$BCM_ACTIVE_CHAIN"; then
     bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
 fi
 
@@ -25,7 +25,7 @@ source ./env.sh
 # prepare the image.
 "$BCM_LXD_OPS/docker_image_ops.sh" \
 --build-context="$(pwd)/build/" \
---container-name="$LXC_HOSTNAME" \
+--container-name="$BCM_BITCOIN_HOST_NAME" \
 --image-name="$IMAGE_NAME"
 
 # push the stack and build files
@@ -55,7 +55,7 @@ fi
 
 # let's make sure docker has the 'data' volume defined so we can do restore or preseed block/chainstate data
 NEW_INSTALL=0
-LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
+LXC_HOSTNAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-01"
 if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "$DOCKER_VOLUME_NAME"; then
     lxc exec "$LXC_HOSTNAME" -- docker volume create "$DOCKER_VOLUME_NAME"
     
@@ -84,7 +84,7 @@ fi
 # manually if they're in ~/.bitcoin. If all else fails, we will do IDB over Internet.
 
 INITIAL_BLOCK_DOWNLOAD=1
-if [[ -d $BACKUP_DIR ]]; then
+if [[ -d "$BCM_BACKUP_DIR" ]]; then
     if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "bitcoind-$BCM_ACTIVE_CHAIN""-data"; then
         bcm restore bitcoind
     fi

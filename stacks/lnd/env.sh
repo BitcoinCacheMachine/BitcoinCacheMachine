@@ -12,7 +12,7 @@ fi
 export CHAIN_TEXT="$CHAIN_TEXT"
 
 export IMAGE_NAME="bcm-lnd"
-export TIER_NAME="bitcoin$BCM_ACTIVE_CHAIN"
+export TIER_NAME="bitcoin-$BCM_ACTIVE_CHAIN"
 export STACK_NAME="lnd"
 export SERVICE_NAME="lnd"
 

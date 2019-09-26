@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
@@ -49,9 +49,8 @@ fi
 
 # if DOCKER_HUB_IMAGE was passed, we assume that we are simply downloading it and pushing it to our private registry.
 # no operations will be performed otherwise.
-if [[ ! -z $DOCKER_HUB_IMAGE ]]; then
+if [[ ! -z "$DOCKER_HUB_IMAGE" ]]; then
     lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
-    
     FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
     lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$FULLY_QUALIFIED_IMAGE_NAME"
     lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
@@ -74,7 +73,7 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
 fi
 
 function docker_tag_exists() {
-    lxc exec "$BCM_MANAGER_HOST_NAME" -- curl -s -f -lSL "http://127.0.0.1:5010/v2/$1/tags/list" | grep "$1" | grep "$2"
+    lxc exec "$BCM_MANAGER_HOST_NAME" -- curl -s -f -lSL "http://127.0.0.1:$BCM_PRIVATE_REGISTRY_PORT/v2/$1/tags/list" | grep "$1" | grep "$2"
 }
 
 REBUILD=1

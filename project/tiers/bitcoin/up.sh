@@ -16,3 +16,4 @@ fi
 
 # Let's provision the system containers to the cluster.
 ../create_tier.sh --tier-name="bitcoin-$BCM_ACTIVE_CHAIN"
+
