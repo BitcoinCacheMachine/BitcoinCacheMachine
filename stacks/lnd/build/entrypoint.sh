@@ -6,7 +6,6 @@ set -Eeuo pipefail
 TOR_HOST_IP="$(getent hosts torsocks | awk '{ print $1 }')"
 TOR_PROXY="$TOR_HOST_IP:9050"
 TOR_CONTROL="$TOR_HOST_IP:9051"
-TOR_DNS="$TOR_HOST_IP:9053"
 
 OVERLAY_IP=$(ip addr | grep "172.16.240." | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
 

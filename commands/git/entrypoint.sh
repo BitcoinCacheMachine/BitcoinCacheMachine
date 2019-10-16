@@ -79,16 +79,13 @@ if [[ $BCM_CLI_VERB == "commit" ]]; then
         # shellcheck disable=SC1090
         source "$BCM_GIT_DIR/controller/export_usb_path.sh"
         
-        if [[ $STAGE_OUTSTANDING == 1 ]]; then
-            cd "$GIT_REPO_DIR" && git add * && cd -
-        fi
-        
         docker run -it --rm --name gitter \
         -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
         -v "$GNUPGHOME":/home/user/.gnupg \
         -v "$GIT_REPO_DIR":/home/user/gitrepo \
         --device="$BCM_TREZOR_USB_PATH" \
         -e GIT_COMMIT_MESSAGE="$GIT_COMMIT_MESSAGE" \
+        -e GIT_STAGE_ALL="$STAGE_OUTSTANDING" \
         -e DEFAULT_KEY_ID="$DEFAULT_KEY_ID" \
         "$GIT_DOCKER_IMAGE" /home/user/bcmscripts/commit_sign_git_repo.sh
     fi

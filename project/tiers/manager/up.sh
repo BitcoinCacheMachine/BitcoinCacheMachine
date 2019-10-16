@@ -126,7 +126,13 @@ lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag registry:latest "$BCM_PRIVATE_RE
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
 # build and push the docker-base docker image.
-./build_push_docker_base.sh
+IMAGE_NAME="bcm-docker-base"
+lxc file push -p -r ./build/ "$BCM_MANAGER_HOST_NAME"/root/manager/
+IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker image pull "$BASE_DOCKER_IMAGE"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker build --build-arg BASE_IMAGE="$BASE_DOCKER_IMAGE" -t "$IMAGE_NAME" /root/manager/build/
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$IMAGE_NAME"
+
 
 # let's cycle through the other cluster members (other than the master)
 # and get their bcm-manager host going.

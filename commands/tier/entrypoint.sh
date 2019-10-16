@@ -73,7 +73,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
 fi
 
 if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    
+
     # we deal with bitcoin tiers a bit differently since they are scoped by ACTIVE_CHAIN
     if  [[ $TIER_NAME == bitcoin* ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/remove_tier.sh --tier-name=$TIER_NAME"

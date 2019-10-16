@@ -60,8 +60,6 @@ echo "Your certificate will appear as:  '$BCM_CERT_NAME $BCM_CERT_USERNAME@$BCM_
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
     # run the container.
-    
-    ./controller/build_docker_image.sh --image-title="trezor" --base-image="ubuntu:"
     docker run -it --name trezorgpg --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg \

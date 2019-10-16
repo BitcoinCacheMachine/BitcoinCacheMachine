@@ -13,7 +13,6 @@ else
 fi
 
 SSH_KEY_PATH=
-ENDPOINT_DIR=
 ONION_ADDRESS=
 AUTH_TOKEN=
 TITLE=
@@ -22,10 +21,6 @@ BCM_EXECUTE_FLAG=0
 
 for i in "$@"; do
     case $i in
-        --endpoint-dir=*)
-            ENDPOINT_DIR="${i#*=}"
-            shift # past argument=value
-        ;;
         --ssh-key-path=*)
             SSH_KEY_PATH="${i#*=}"
             shift # past argument=value
@@ -120,13 +115,14 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     if [[ ! -f $TREZOR_PUB_KEY_PATH ]]; then
         # generate a new SSH key for the remote hostname.
         bcm ssh newkey --hostname="$BCM_SSH_HOSTNAME" --username="$BCM_SSH_USERNAME"
-        cat "$TREZOR_PUB_KEY_PATH" | ssh -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "cat > /home/$BCM_SSH_USERNAME/.ssh/authorized_keys"
+        < "$TREZOR_PUB_KEY_PATH" ssh -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "cat > /home/\$(whoami)/.ssh/authorized_keys"
     fi
     
     # place the public SSH key on the remote SSH endpoint.
     echo "WARNING: You can ONLY use your Trezor now to log into the host '$SSH_HOSTNAME'."
     ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
     
+    # shellcheck disable=SC2016
     docker run -it \
     --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
@@ -159,8 +155,6 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     "bcm-trezor:$BCM_VERSION" trezor-agent --connect "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
-echo "LOOK HERE!"
-echo "COMMAND LINE: $@"
 if [[ $BCM_EXECUTE_FLAG == 1 ]]; then
     docker system prune -f
     docker run -it --add-host="$BCM_SSH_HOSTNAME:$IP_ADDRESS" \
@@ -249,3 +243,22 @@ if [[ $BCM_CLI_VERB == "list-onion" ]]; then
         fi
     done </etc/tor/torrc
 fi
+
+
+
+# this script grabs the onion site and adds it to your local /etc/tor/torrc
+
+# # now we wait for the service to start, then we grab the new onion site and token
+# # then we add it to our config using bcm ssh add-onion
+# DOCKER_CONTAINER_ID=$(lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker ps | grep toronion | awk '{print $1}')
+# if [[ ! -z $DOCKER_CONTAINER_ID ]]; then
+#     ONION_CREDENTIALS="$(lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker exec -t "$DOCKER_CONTAINER_ID" cat /var/lib/tor/bcmonion/hostname)"
+
+#     if [[ ! -z $ONION_CREDENTIALS ]]; then
+#         ONION_URL="$(echo "$ONION_CREDENTIALS" | awk '{print $1;}')"
+#         ONION_TOKEN="$(echo "$ONION_CREDENTIALS" | awk '{print $2;}')"
+#         bcm ssh add-onion --onion="$ONION_URL" --token="$ONION_TOKEN" --title="$(lxc remote get-default)"
+#     fi
+# else
+#     echo "WARNING: Docker container not found for 'toronion'. You may need to run 'bcm stack start toronion'."
+# fi

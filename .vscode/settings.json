@@ -4,6 +4,10 @@
     "editor.cursorWidth": 3,
     "editor.formatOnSave": true,
     "shellcheck.useWSL": false,
+    "shellcheck.enable": true,
+    "shellcheck.exclude": [
+        1090
+    ],
     "terminal.integrated.fontFamily": "monospace",
     "peacock.color": "#029727",
     "workbench.colorCustomizations": {

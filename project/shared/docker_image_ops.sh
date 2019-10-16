@@ -58,16 +58,15 @@ FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
 # let's first check to see if the image is in the local registry for private images
 # if so, we can just pull that down and exit.
 if [[ $REBUILD == 0 ]]; then
-    FETCH_STATUS="$(lxc exec $LXC_HOST -- docker pull "$FULLY_QUALIFIED_IMAGE_NAME" > /dev/null && echo 1 || echo 0)"
+    FETCH_STATUS="$(lxc exec $LXC_HOST -- docker image pull "$FULLY_QUALIFIED_IMAGE_NAME" > /dev/null && echo 1 || echo 0)"
     if [[ $FETCH_STATUS == 1 ]]; then
         echo "sucess"
     else
         echo "not success"
     fi
-
+    
     exit
 fi
-
 
 # first we ensure out original public image is available.
 if lxc exec "$LXC_HOST" -- docker image list | grep -q "$DOCKER_HUB_IMAGE"; then
@@ -79,11 +78,7 @@ if lxc exec "$LXC_HOST" -- docker image list | grep -q "$FULLY_QUALIFIED_IMAGE_N
     lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$FULLY_QUALIFIED_IMAGE_NAME"
 fi
 
-
 lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
-
-
-
 
 if [[ ! -z $BUILD_CONTEXT ]]; then
     if [[ ! -d $BUILD_CONTEXT ]]; then
@@ -110,12 +105,12 @@ if [[ $REBUILD == 1 ]]; then
         echo "Pushing contents of the build context to LXC host '$LXC_HOST'."
         lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
     fi
-
+    
     # let's build the image and push it to our private registry.
     IMAGE_FQDN="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
     
     echo "Preparing the docker image '$IMAGE_FQDN'"
-    lxc exec "$LXC_HOST" -- docker build --build-arg BCM_PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY" --build-arg BCM_DOCKER_BASE_TAG="$BCM_DOCKER_BASE_TAG" -t "$IMAGE_FQDN" /root/build/
+    lxc exec "$LXC_HOST" -- docker build --build-arg BCM_PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY" --build-arg BASE_IMAGE="$BASE_IMAGE" -t "$IMAGE_FQDN" /root/build/
     lxc exec "$LXC_HOST" -- docker push "$IMAGE_FQDN"
 else
     echo "The image already exists in the private registry. It will not be re-built."

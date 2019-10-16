@@ -5,7 +5,6 @@ cd "$(dirname "$0")"
 
 export TIER_NAME=manager
 
-
 source "$BCM_GIT_DIR/project/tiers/env.sh"
 
 # we get the hostname of the LXD container by getting its endpoint ID (which endpoint it's scheduled on)
@@ -22,7 +21,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
         CONTAINER_NAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-$(printf %02d "$HOST_ENDING")"
     fi
     
-    bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$LXC_HOSTNAME --endpoint=$ENDPOINT"
+    bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$CONTAINER_NAME --endpoint=$ENDPOINT"
 done
 
 bash -c "$BCM_LXD_OPS/delete_lxc_network.sh --network-name=bcmbrGWNat"

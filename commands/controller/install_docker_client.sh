@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 if [[ ! -f "$(command -v docker)" ]]; then
     echo "INFO: Installing 'docker' locally using snap."
     sudo snap install docker --channel="stable"
+    sleep 2
     
     if ! grep -q docker /etc/group; then
         sudo groupadd docker

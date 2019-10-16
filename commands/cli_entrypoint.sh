@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
@@ -48,14 +48,10 @@ if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
     exit
 fi
 
-
-./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
-./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
-
 # If our local CLI target SSH hostname is on another machine, then
 # we should execute it on the reomte machine.
 if [[ "$BCM_SSH_HOSTNAME" != "$(hostname)" ]]; then
-    ./ssh/entrypoint.sh "$@" --execute --command="$@"
+    bash -c './ssh/entrypoint.sh "$@" --execute --command="$@"'
     exit
 else
     
@@ -72,6 +68,10 @@ else
         ./show.sh
         exit
     fi
+    
+    ./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
+    ./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
+    ./controller/build_docker_image.sh --image-title="ots" --base-image="bcm-trezor:$BCM_VERSION"
     
     if [[ "$BCM_CLI_COMMAND" == "start" ||  "$BCM_CLI_COMMAND" == "stop" || "$BCM_CLI_COMMAND" == "restart"  ]]; then
         ./operations/start_stop_restart.sh
@@ -101,11 +101,6 @@ else
     if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cli" || "$BCM_CLI_COMMAND" == "lncli" ]]; then
         ./stack_cli/entrypoint.sh "$@"
         exit
-    fi
-    
-    # Install docker if we're running this command on a front-end
-    if [[ $IS_FRONTEND = 1 ]]; then
-        bash -c "./controller/build_all_docker_images.sh"
     fi
     
     if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then

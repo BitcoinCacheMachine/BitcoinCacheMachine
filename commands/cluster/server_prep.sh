@@ -13,16 +13,16 @@ if ! grep -q lxd /etc/group; then
 fi
 
 if ! groups | grep -q lxd; then
-    sudo useradd -g lxd -g sudo -m $(whoami)
+    sudo useradd -g lxd -g sudo -m "$(whoami)"
 fi
 
 if [[ ! -f "$HOME/.ssh/authorized_keys" ]]; then
     sudo touch "$HOME/.ssh/authorized_keys"
-    sudo chown $(whoami):lxd -R "$HOME/.ssh"
+    sudo chown "$(whoami):lxd" -R "$HOME/.ssh"
 fi
 
 # TODO verify where we need this.
-sudo touch /etc/sudoers.d/$(whoami)
+sudo touch "/etc/sudoers.d/$(whoami)"
 echo "$(whoami) ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$(whoami)"
 
 # update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.

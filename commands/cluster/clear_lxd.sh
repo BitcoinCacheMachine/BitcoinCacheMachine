@@ -35,6 +35,8 @@ for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
         for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
             lxc image delete --project "${project}" "${image}"
         done
+    else
+        echo "INFO: the '--all' flag was not specified, so any existing LXC images were NOT removed."
     fi
 done
 

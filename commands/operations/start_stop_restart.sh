@@ -17,16 +17,14 @@ export BCM_CLI_COMMAND="$BCM_CLI_COMMAND"
 shopt -s expand_aliases
 
 BCM_FORCE_FLAG=0
-BCM_VOLUMES_FLAG=0
+
 
 for i in "$@"; do
     case $i in
         --force)
             BCM_FORCE_FLAG=1
         ;;
-        --delete)
-            BCM_VOLUMES_FLAG=1
-        ;;
+
         *)
             # unknown option
         ;;

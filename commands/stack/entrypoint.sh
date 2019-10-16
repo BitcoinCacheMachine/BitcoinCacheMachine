@@ -65,7 +65,7 @@ if [[ $BCM_CLI_VERB == "stop" ]]; then
             
             # if there are some volumes defined, then we ca remove each one.
             # however, some containers do not write persistent data.
-            if [ ! -z ${STACK_DOCKER_VOLUMES+x} ]; then
+            if [ ! -z "${STACK_DOCKER_VOLUMES+x}" ]; then
                 for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
                     LXC_HOSTNAME="$TIER_NAME"
                     

@@ -21,7 +21,7 @@ if [[ -z $HOST_ENDING ]]; then
     exit
 fi
 
-VERSION=$(echo "$BCM_VERSION" | tr '.' '-')
+#VERSION=$(echo "$BCM_VERSION" | tr '.' '-')
 LXC_HOSTNAME="bcm-$TIER_NAME-$(printf %02d "$HOST_ENDING")"
 
 export LXC_HOSTNAME="$LXC_HOSTNAME"

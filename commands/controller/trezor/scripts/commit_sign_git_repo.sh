@@ -18,6 +18,11 @@ echo "git config --local user.signingkey: $(git config --local --get user.signin
 echo "git config --local user.name set to '$(git config --local --get user.name)'"
 echo "git config --local user.email set to '$(git config --local --get user.email)'"
 
+
+if [[ $GIT_STAGE_ALL == 1 ]]; then
+    git add "*"
+fi
+
 echo "Committing and signing. Get ready to check your Trezor."
 git commit -S -m "$GIT_COMMIT_MESSAGE"
 

@@ -29,7 +29,7 @@ if ! lxc profile list --format csv | grep -q "$PROFILE_NAME"; then
     
     YAML_PATH="$BCM_GIT_DIR/project/tiers/$DIR_NAME/lxc_profile.yml"
     if [[ -f "$YAML_PATH" ]]; then
-        cat "$YAML_PATH" | lxc profile edit "$PROFILE_NAME"
+        < "$YAML_PATH" lxc profile edit "$PROFILE_NAME"
     else
         echo "ERROR: lxc_profile for '$TIER_NAME' tier was not found."
         exit

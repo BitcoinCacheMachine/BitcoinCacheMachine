@@ -1,6 +1,6 @@
-ARG BCM_DOCKER_BASE_TAG
+ARG BASE_IMAGE
 
-FROM ubuntu:${BCM_DOCKER_BASE_TAG}
+FROM ${BASE_IMAGE}
 
 RUN apt-get update \
     && apt-get install -y wait-for-it git iproute2 curl dnsutils wait-for-it iputils-ping iproute2 duplicity ca-certificates net-tools \

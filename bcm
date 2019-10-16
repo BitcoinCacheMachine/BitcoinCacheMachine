@@ -65,7 +65,7 @@ export BCM_DEFAULT_GIT_BRANCH="dev"
 export BCM_ACTIVE_CHAIN="testnet"
 export BCM_SSH_DIR="$HOME/.ssh" && mkdir -p "$BCM_SSH_DIR"
 export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
-export BASE_DOCKER_IMAGE="ubuntu:$BCM_DOCKER_BASE_TAG"
+export BASE_DOCKER_IMAGE="ubuntu:latest"
 
 PASSWORD_STORE_DIR="$HOME/.password_store" && mkdir -p "$PASSWORD_STORE_DIR"
 

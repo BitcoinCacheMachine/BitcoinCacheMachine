@@ -23,9 +23,17 @@ done
 # next, provision (but not start) all LXC system containers across the cluster.
 ./spread_lxc_hosts.sh --tier-name="$TIER_NAME"
 
+
+
 # configure and start the LXC containers
 for ENDPOINT in $(bcm cluster list endpoints); do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
+    
+    # The bcmLocalnet network allows users to access services from the same
+    # host as where bcm back-end services are running (rather than from the network or onion)
+    if [[ $ENDPOINT -gt 1 ]]; then
+        lxc network create --target "$ENDPOINT" bcmLocalnet
+    fi
     
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
     source ./env.sh --host-ending="$HOST_ENDING"
@@ -67,21 +75,13 @@ for ENDPOINT in $(bcm cluster list endpoints); do
             echo "Error: MACVLAN_INTERFACE was not specified."
         fi
         
-        # The above MACVLAN stuff allows us to expose services on the LAN, but we can't
-        # access those services from the same host due to limitations in
-        if [[ $(bcm cluster list endpoints | wc -l) -gt 1 ]]; then
-            # create the # localNet network across the cluster.
-            for ENDPOINT in $(bcm cluster list endpoints); do
-                lxc network create --target "$ENDPOINT" bcmLocalnet
-            done
+        
+        if ! lxc network list --format csv | grep -q bcmLocalnet; then
+            # but if it's just one node, we just create the network.
+            lxc network create bcmLocalnet ipv4.nat=false ipv6.nat=false ipv6.address=none
         else
-            if ! lxc network list --format csv | grep -q bcmLocalnet; then
-                # but if it's just one node, we just create the network.
-                lxc network create bcmLocalnet ipv4.nat=false ipv6.nat=false ipv6.address=none
-            else
-                echo "ERROR: The bcmLocalnet network was not in the proper state or doesn't exist."
-                exit 1
-            fi
+            echo "ERROR: The bcmLocalnet network was not in the proper state or doesn't exist."
+            exit 1
         fi
     fi
     

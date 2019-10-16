@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 
@@ -9,27 +9,11 @@ if ! lxc storage list --format csv | grep -q "bcm"; then
     lxc storage create bcm btrfs
 fi
 
-
-# create the docker_unprivileged profile
-if ! lxc profile list  --format csv | grep -q "bcm_disk"; then
-    lxc profile create bcm_disk
-    cat ./lxd_profiles/bcm_disk.yml | lxc profile edit bcm_disk
-fi
-
-
-
-# create the docker_unprivileged profile
-if ! lxc profile list --format csv | grep -q "docker_unprivileged"; then
-    lxc profile create docker_unprivileged
-    cat ./lxd_profiles/docker_unprivileged.yml | lxc profile edit docker_unprivileged
-fi
-
-# create the docker_privileged profile
-if ! lxc profile list --format csv | grep -q "docker_privileged"; then
-    lxc profile create docker_privileged
-    cat ./lxd_profiles/docker_privileged.yml | lxc profile edit docker_privileged
-fi
-
+# create LXC profiles from templates.
+for PROFILE_NAME in bcm_disk docker_unprivileged docker_privileged; do
+    lxc profile create "$PROFILE_NAME"
+    cat "./$PROFILE_NAME.yml" | lxc profile edit $PROFILE_NAME
+done
 
 if ! lxc project list --format csv | grep -q "default (current)"; then
     lxc project switch default
