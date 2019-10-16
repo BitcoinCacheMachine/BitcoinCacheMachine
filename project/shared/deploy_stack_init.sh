@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # CONTAINER_NAME is the LXC host that we're going to perform our docker operations on.
@@ -48,7 +48,7 @@ fi
 
 STACK_FILE_DIRNAME="$(dirname "$ENV_FILE")"
 
-bash -c "$BCM_LXD_OPS/docker_image_ops.sh --docker-hub-image-name=$DOCKERHUB_IMAGE --build-context=$STACK_FILE_DIRNAME/build --container-name=$CONTAINER_NAME --image-name=$IMAGE_NAME --image-tag=$BCM_VERSION"
+bash -c "$BCM_LXD_OPS/docker_image_ops.sh --docker-hub-image-name=$DOCKERHUB_IMAGE --build-context=$STACK_FILE_DIRNAME/build --container-name=$CONTAINER_NAME --image-name=$IMAGE_NAME"
 
 # push the stack file.
 lxc file push -p -r "$STACK_FILE_DIRNAME/" "$BCM_MANAGER_HOST_NAME/root/stacks/$BCM_TIER_NAME/"

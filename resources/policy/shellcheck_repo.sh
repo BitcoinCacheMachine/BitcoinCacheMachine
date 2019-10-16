@@ -5,4 +5,4 @@
 # goal is to one day get this command to emit (basically) nothing.
 export SHELLCHECK_OPTS="-e SC1091"
 
-find "$BCM_GIT_DIR" -type f -name "*.sh" -exec "shellcheck" "--format=gcc" {} \;
+find ./ -type f -name "*.sh" -exec "shellcheck" "--format=gcc" {} \;

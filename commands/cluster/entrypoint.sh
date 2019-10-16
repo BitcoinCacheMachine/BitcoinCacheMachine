@@ -13,8 +13,7 @@ else
 fi
 
 BCM_ENDPOINTS_FLAG=0
-SSH_HOSTNAME=
-
+ALL_FLAG=0
 
 for i in "$@"; do
     case $i in
@@ -24,6 +23,10 @@ for i in "$@"; do
         ;;
         --create)
             BCM_CLI_VERB="create"
+        ;;
+        --all)
+            ALL_FLAG=1
+            shift # past argument=value
         ;;
         *) ;;
         
@@ -51,6 +54,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     # endpoint listening service on the same interface being used for our
     # default route. TODO; add CLI option to specify address.
     MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
+    IP_OF_MACVLAN_INTERFACE="$(ip addr show "$MACVLAN_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
     BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
     export BCM_LXD_SECRET="$BCM_LXD_SECRET"
     export MACVLAN_INTERFACE="$MACVLAN_INTERFACE"
@@ -65,7 +69,7 @@ if [[ $BCM_CLI_VERB == "create" ]]; then
     fi
     
     export LXD_SERVER_NAME="$LXD_SERVER_NAME"
-    export IP_OF_MACVLAN_INTERFACE="$(ip addr show eno1 | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+    export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
     PRESEED_YAML="$(envsubst <./lxd_preseed/lxd_master_preseed.yml)"
     sudo bash -c "$BCM_GIT_DIR/commands/install/endpoint_provision.sh --yaml-text='$PRESEED_YAML'"
     exit
@@ -84,7 +88,8 @@ if [[ $BCM_CLI_VERB == "clear" ]]; then
             # let's ensure our remote git repo is updated.
             # TODO move this over a TOR connection via PROXY switch/config.
             # TODO ensure we're using an encrypted storage backend for all /tmp/bcm files
-            bash -c ./clear_lxd.sh
+            # by default we retain images to make development easier.
+            bash -c "./clear_lxd.sh --delete-images=$ALL_FLAG"
             
             elif [[ "$CHOICE" == "n" ]]; then
             echo "INFO:  Aborted 'bcm cluster clear' command."
@@ -93,4 +98,15 @@ if [[ $BCM_CLI_VERB == "clear" ]]; then
             echo "Invalid entry. Please try again."
         fi
     done
+fi
+
+
+# this is where we implement 'bcm cluster destroy'
+if [[ $BCM_CLI_VERB == "destroy" ]]; then
+    
+    echo "INFO: Calling 'bcm cluster clear'. Images will be deleted."
+    bash -c ./clear_lxd.sh --retain-images=0 >>/dev/null
+    
+    echo "INFO: Removing the LXD snap."
+    sudo snap remove lxd
 fi

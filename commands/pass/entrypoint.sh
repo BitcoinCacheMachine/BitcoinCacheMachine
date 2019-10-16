@@ -61,10 +61,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
         echo "$GNUPGHOME/env does not exist. Exiting"
         exit
     fi
-    
-    # shellcheck disable=SC1090
-    source "$GNUPGHOME/env"
-    
+
     if [[ ! -d "$PASSWORD_STORE_DIR/.git" ]]; then
         (
             cd "$PASSWORD_STORE_DIR" || exit

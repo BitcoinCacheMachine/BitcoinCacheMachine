@@ -1,13 +1,12 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # don't even think about proceeding unless the manager BCM tier is up and running.
-if ! bcm tier list | grep -q manager; then
+if ! bcm tier list | grep -q "manager"; then
     bcm tier create manager
 fi
-
 
 # let's get some shared (between up/down scripts).
 source ./env

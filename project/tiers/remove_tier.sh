@@ -40,7 +40,13 @@ for LXD_ENDPOINT in $(bcm cluster list endpoints); do
     fi
     
     bash -c "$BCM_LXD_OPS/delete_lxc_container.sh --container-name=$LXC_HOSTNAME"
-    bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$LXC_HOSTNAME --endpoint=$LXD_ENDPOINT"
+    
+    CONTAINER_NAME="$LXC_HOSTNAME"
+    if [[ $LXC_HOSTNAME == *"-bitcoin-"* ]]; then
+        CONTAINER_NAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-$(printf %02d "$HOST_ENDING")"
+    fi
+    
+    bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$CONTAINER_NAME --endpoint=$LXD_ENDPOINT"
 done
 
 if lxc profile list --format csv | grep "$PROFILE_NAME" | grep -q ",0" ; then

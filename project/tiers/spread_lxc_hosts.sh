@@ -42,13 +42,13 @@ for ENDPOINT in $(bcm cluster list endpoints); do
         fi
     else
         # but if it does exist, emit a WARNING that one already exists and will be used
-        echo "WARNING: LXC storage volume '$LXC_DOCKERVOL' in the 'bcm' storage pool already exists."
+        echo "WARNING: The existing LXC storage volume '$LXC_DOCKERVOL' exists and will be attached to the '$LXC_HOSTNAME' LXC container."
     fi
     
     # create the LXC host with the attached profiles.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
         # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.
-        lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile=bcm_disk --profile=docker_privileged --profile="$PROFILE_NAME"
+        lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile="bcm_disk" --profile="docker_privileged" --profile="$PROFILE_NAME"
     else
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi

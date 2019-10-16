@@ -1,7 +1,6 @@
-ARG BCM_PRIVATE_REGISTRY
-ARG BCM_DOCKER_BASE_TAG
+ARG BASE_IMAGE
 
-FROM ${BCM_PRIVATE_REGISTRY}/bcm-docker-base:${BCM_DOCKER_BASE_TAG}
+FROM ${BASE_IMAGE}
 
 #ENV DEBIAN_FRONTEND=noninteractive
 # TODO implement method https://2019.www.torproject.org/docs/debian.html.en to

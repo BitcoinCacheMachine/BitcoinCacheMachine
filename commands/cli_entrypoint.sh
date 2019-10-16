@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
@@ -8,7 +8,6 @@ BCM_CLI_COMMAND=
 if [[ ! -z ${1+x} ]]; then
     BCM_CLI_COMMAND="$1"
 else
-    cat ./help.txt
     exit
 fi
 
@@ -49,6 +48,10 @@ if [[ "$BCM_CLI_COMMAND" == "info" ]]; then
     exit
 fi
 
+
+./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
+./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
+
 # If our local CLI target SSH hostname is on another machine, then
 # we should execute it on the reomte machine.
 if [[ "$BCM_SSH_HOSTNAME" != "$(hostname)" ]]; then
@@ -59,7 +62,7 @@ else
     # these commands will be executed by the local terminal
     export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
     export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
-
+    
     if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
         ./cluster/entrypoint.sh "$@"
         exit
@@ -102,7 +105,7 @@ else
     
     # Install docker if we're running this command on a front-end
     if [[ $IS_FRONTEND = 1 ]]; then
-        bash -c "$BCM_GIT_DIR/controller/build.sh"
+        bash -c "./controller/build_all_docker_images.sh"
     fi
     
     if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
@@ -167,5 +170,4 @@ else
         ./run/entrypoint.sh "$@"
         exit
     fi
-    
 fi

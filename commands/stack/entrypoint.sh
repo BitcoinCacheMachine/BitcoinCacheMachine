@@ -68,11 +68,13 @@ if [[ $BCM_CLI_VERB == "stop" ]]; then
             if [ ! -z ${STACK_DOCKER_VOLUMES+x} ]; then
                 for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
                     LXC_HOSTNAME="$TIER_NAME"
-                    if [[ $TIER_NAME == bitcoin* ]]; then
-                        LXC_HOSTNAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-01"
+                    
+                    CONTAINER_NAME="$LXC_HOSTNAME"
+                    if [[ $LXC_HOSTNAME == *"-bitcoin-"* ]]; then
+                        CONTAINER_NAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-$(printf %02d "$HOST_ENDING")"
                     fi
                     
-                    bash -c "$BCM_LXD_OPS/delete_docker_volume.sh --lxc-hostname=$LXC_HOSTNAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
+                    bash -c "$BCM_LXD_OPS/delete_docker_volume.sh --lxc-hostname=$CONTAINER_NAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
                 done
             fi
         else

@@ -64,7 +64,7 @@ if [[ $BCM_CLI_VERB == "build" ]]; then
     
     BCM_DOCKER_BASE_TAG="jekyll/jekyll:3.8"
     if docker image list | grep -q "$BCM_DOCKER_BASE_TAG"; then
-        docker pull "$BCM_DOCKER_BASE_TAG"
+        docker image pull "$BCM_DOCKER_BASE_TAG"
     fi
     
     if [[ -f "$SITE_PATH/Dockerfile" ]]; then
@@ -92,7 +92,7 @@ if [[ $BCM_CLI_VERB == "run" ]]; then
     
     NGINX_IMAGE="nginx:latest"
     if docker image list | grep -q "$NGINX_IMAGE"; then
-        docker pull "$NGINX_IMAGE"
+        docker image pull "$NGINX_IMAGE"
     fi
     
     if docker ps | grep -a "$SITE_NAME"; then

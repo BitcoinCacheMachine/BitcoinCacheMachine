@@ -9,19 +9,6 @@ if [ -z "${BCM_CLI_VERB}" ]; then
     exit
 fi
 
-LOGGING_METHOD=kafka
-
-for i in "$@"; do
-    case $i in
-        --logging=*)
-            LOGGING_METHOD="${i#*=}"
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
-done
-
 # make sure the user has sent in a valid command; quit if not.
 if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "destroy" && $BCM_CLI_VERB != "clear" ]]; then
     echo "Error: invalid 'bcm tier' command"
@@ -29,7 +16,7 @@ if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "create" && $BCM_CLI_VERB != "
 fi
 
 if [[ $BCM_CLI_VERB == "list" ]]; then
-    LXC_LIST_OUTPUT=$(lxc list --format csv --columns ns | grep "RUNNING")
+    LXC_LIST_OUTPUT="$(lxc list --format csv --columns ns | grep "RUNNING")"
     if echo "$LXC_LIST_OUTPUT" | grep -q "bcm-manager"; then
         echo "manager"
     fi

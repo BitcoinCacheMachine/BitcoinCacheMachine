@@ -1,7 +1,6 @@
-# ARG BCM_PRIVATE_REGISTRY
-# ARG BCM_DOCKER_BASE_TAG
+# ARG BASE_IMAGE
 
-# FROM ${BCM_PRIVATE_REGISTRY}/bcm-docker-base:${BCM_DOCKER_BASE_TAG}
+# FROM ${BASE_IMAGE}
 
 # RUN apt-get update
 # RUN apt-get install -y --no-install-recommends clang cmake

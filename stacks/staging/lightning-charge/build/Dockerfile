@@ -1,7 +1,6 @@
-ARG BCM_PRIVATE_REGISTRY
-ARG BCM_DOCKER_BASE_TAG
+ARG BASE_IMAGE
 
-FROM ${BCM_PRIVATE_REGISTRY}/bcm-docker-base:${BCM_DOCKER_BASE_TAG}
+FROM ${BASE_IMAGE}
 
 RUN apt-get update && apt-get install -y --no-install-recommends git autoconf automake build-essential libtool libgmp-dev libsqlite3-dev python python3 wget zlib1g-dev inotify-tools 
 

@@ -23,7 +23,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - engine.labels.bcm-bitcoin${BCM_ACTIVE_CHAIN:-} == true
+          - engine.labels.bcm-bitcoin-${BCM_ACTIVE_CHAIN:-} == true
 
 volumes:
   lightning-charge-data:

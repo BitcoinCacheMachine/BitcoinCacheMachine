@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 export TIER_NAME=manager
 
 
-source "$BCM_GIT_DIR/project/tiers/env.sh" 
+source "$BCM_GIT_DIR/project/tiers/env.sh"
 
 # we get the hostname of the LXD container by getting its endpoint ID (which endpoint it's scheduled on)
 for ENDPOINT in $(bcm cluster list endpoints); do
@@ -16,6 +16,12 @@ for ENDPOINT in $(bcm cluster list endpoints); do
     source "$BCM_GIT_DIR/project/tiers/env.sh" --host-ending="$HOST_ENDING"
     
     bash -c "$BCM_LXD_OPS/delete_lxc_container.sh --container-name=$LXC_HOSTNAME"
+    
+    CONTAINER_NAME="$LXC_HOSTNAME"
+    if [[ $LXC_HOSTNAME == *"-bitcoin-"* ]]; then
+        CONTAINER_NAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-$(printf %02d "$HOST_ENDING")"
+    fi
+    
     bash -c "$BCM_LXD_OPS/delete_dockerdisk.sh --container-name=$LXC_HOSTNAME --endpoint=$ENDPOINT"
 done
 

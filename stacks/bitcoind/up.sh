@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # first, let's make sure we deploy our direct dependencies.
@@ -10,13 +10,13 @@ fi
 
 # this brings up the onion site that exposes all our
 # services to users having the onion token.
-if ! bcm stack list | grep -q toronion; then
+if bcm stack list | grep -q toronion; then
     bcm stack start toronion
 fi
 
 # this is so services like bitcoind and lightningd, etc.
 # have a SOCKS5 proxy to TOR.
-if ! bcm stack list | grep -q torproxy; then
+if bcm stack list | grep -q torproxy; then
     bcm stack start torproxy
 fi
 

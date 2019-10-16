@@ -1,5 +1,5 @@
-ARG BCM_VERSION
+ARG BASE_IMAGE
 
-FROM bcm-trezor:${BCM_VERSION}
+FROM ${BASE_IMAGE}
 
 CMD [ "/usr/bin/python3", "/usr/local/bin/trezor-gpg-agent" ]

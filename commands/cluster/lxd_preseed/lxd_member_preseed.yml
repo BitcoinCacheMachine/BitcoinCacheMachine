@@ -18,6 +18,7 @@ profiles:
 cluster:
   enabled: true
   server_name: $BCM_SSH_HOSTNAME
+  server_address: $IP_OF_MACVLAN_INTERFACE8443
   cluster_address: $BCM_CLUSTER_MASTER_ENDPOINT_IP:8443
   cluster_certificate: "$BCM_LXD_CLUSTER_CERTIFICATE
 "
@@ -27,6 +28,11 @@ cluster:
     name: default
     key: source
     value: ""
+
+  # we use these on member preseeds for bootstrapping purposes.
+  #server_address: $BCM_CLUSTER_MASTER_ENDPOINT_IP:8443
+  #cluster_password: $BCM_LXD_SECRET
+  #cluster_certificate: ...
 
 # - config:
 #     size: 60GB

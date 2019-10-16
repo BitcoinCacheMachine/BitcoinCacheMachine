@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 YAML_TEXT=
@@ -34,10 +34,4 @@ BASHRC_FILE="$HOME/.bashrc"
 if [[ ! -f $BASHRC_FILE ]]; then
     touch "$BASHRC_FILE"
     sudo chmod 0644 "$BASHRC_FILE"
-fi
-
-BASHRC_TEXT="export PATH=$""PATH:$HOME/.bcmcode"
-source "$BASHRC_FILE"
-if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
-    echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
 fi

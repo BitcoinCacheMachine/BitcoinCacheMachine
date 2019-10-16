@@ -3,12 +3,10 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-ZOOKEEPER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-zookeeper:$BCM_VERSION"
-SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.5"
+ZOOKEEPER_IMAGE="bcm-zookeeper"
+SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.5.5"
 
-lxc exec "$BCM_KAFKA_HOST_NAME" -- docker pull "$SOURCE_ZOOKEEPER_IMAGE"
-lxc exec "$BCM_KAFKA_HOST_NAME" -- docker tag "$SOURCE_ZOOKEEPER_IMAGE" "$ZOOKEEPER_IMAGE"
-lxc exec "$BCM_KAFKA_HOST_NAME" -- docker push "$ZOOKEEPER_IMAGE"
+bash -c "$BCM_LXD_OPS/docker_image_ops.sh --docker-hub-image-name=$SOURCE_ZOOKEEPER_IMAGE --container-name=$BCM_KAFKA_HOST_NAME --image-name=$ZOOKEEPER_IMAGE"
 
 if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network list | grep -q "zookeepernet"; then
     lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network create --driver overlay --opt encrypted --attachable zookeepernet

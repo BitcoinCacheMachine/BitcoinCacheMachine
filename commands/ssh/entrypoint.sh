@@ -134,7 +134,7 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
     -e BCM_SSH_HOSTNAME="$SSH_HOSTNAME" \
-    bcm-trezor:$BCM_VERSION trezor-agent -c $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME -- 'set -ex && export BCM_GIT_DIR="$HOME/.bcmcode" BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" && set -e && echo "BCM_GIT_DIR:  $BCM_GIT_DIR" && echo "BCM_GITHUB_REPO_URL: $BCM_GITHUB_REPO_URL" && echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && echo "deb-src https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import && gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add - && sudo apt-get update && sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring && wait-for-it -t 30 127.0.0.1:9050 && git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050 && mkdir -p "$BCM_GIT_DIR" && if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then git clone --quiet --single-branch --branch dev "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"; fi && cd "$BCM_GIT_DIR" && git fetch && git checkout dev && git pull && bash -c "./commands/install/endpoint_provision.sh" && exit'
+    "bcm-trezor:$BCM_VERSION" trezor-agent -c "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- 'set -ex && export BCM_GIT_DIR="$HOME/git/github/bcm" BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" && set -e && echo "BCM_GIT_DIR:  $BCM_GIT_DIR" && echo "BCM_GITHUB_REPO_URL: $BCM_GITHUB_REPO_URL" && echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && echo "deb-src https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import && gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add - && sudo apt-get update && sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring && wait-for-it -t 30 127.0.0.1:9050 && git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050 && mkdir -p "$BCM_GIT_DIR" && if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then git clone --quiet --single-branch --branch dev "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"; fi && cd "$BCM_GIT_DIR" && git fetch && git checkout dev && git pull && bash -c "./commands/install/endpoint_provision.sh" && exit'
     
     sleep 10
     
@@ -145,7 +145,7 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     --device="$BCM_TREZOR_USB_PATH" \
     -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
     -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
-    bcm-trezor:$BCM_VERSION trezor-agent -c $BCM_SSH_USERNAME@$SSH_HOSTNAME -- 'bash -c "$HOME/.bcmcode/bcm cluster create"'
+    "bcm-trezor:$BCM_VERSION" trezor-agent -c "$BCM_SSH_USERNAME@$SSH_HOSTNAME" -- bash -c "$HOME/git/github/bcm/bcm cluster create"
     
     #bcm --backend-only && echo "Restarting SSH endpoint." && sudo shutdown -r now'
 fi
@@ -156,7 +156,7 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$BCM_SSH_DIR":/home/user/.ssh \
     --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" trezor-agent --connect $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME
+    "bcm-trezor:$BCM_VERSION" trezor-agent --connect "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
 
 echo "LOOK HERE!"
@@ -168,7 +168,7 @@ if [[ $BCM_EXECUTE_FLAG == 1 ]]; then
     -v "$BCM_SSH_DIR":/home/user/.ssh \
     -e BCM_COMMAND="$BCM_COMMAND" \
     --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" trezor-agent --connect $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME -- bcm "$@"
+    "bcm-trezor:$BCM_VERSION" trezor-agent --connect "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- bcm "$@"
 fi
 
 

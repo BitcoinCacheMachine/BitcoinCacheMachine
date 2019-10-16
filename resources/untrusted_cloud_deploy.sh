@@ -1,6 +1,3 @@
-
-
-
 #!/bin/bash
 
 # BCM_USER_NAME and BCM_HOST_NAME represent an identity on your trezor at a specific BIP32 path

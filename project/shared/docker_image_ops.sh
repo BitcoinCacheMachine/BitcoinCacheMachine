@@ -1,12 +1,13 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
 DOCKER_HUB_IMAGE=
 IMAGE_NAME=
 BUILD_CONTEXT=
+REBUILD=0
 
 for i in "$@"; do
     case $i in
@@ -25,6 +26,10 @@ for i in "$@"; do
         --build-context=*)
             BUILD_CONTEXT="${i#*=}"
             shift # past argument=value
+        ;;
+        --rebuild)
+            REBUILD=1
+            shift
         ;;
         *)
             # unknown option
@@ -47,15 +52,38 @@ if [[ -z $BCM_PRIVATE_REGISTRY ]]; then
     exit
 fi
 
-# if DOCKER_HUB_IMAGE was passed, we assume that we are simply downloading it and pushing it to our private registry.
-# no operations will be performed otherwise.
-if [[ ! -z "$DOCKER_HUB_IMAGE" ]]; then
-    lxc exec "$LXC_HOST" -- docker pull "$DOCKER_HUB_IMAGE"
-    FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
-    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$FULLY_QUALIFIED_IMAGE_NAME"
-    lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
+
+FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
+
+# let's first check to see if the image is in the local registry for private images
+# if so, we can just pull that down and exit.
+if [[ $REBUILD == 0 ]]; then
+    FETCH_STATUS="$(lxc exec $LXC_HOST -- docker pull "$FULLY_QUALIFIED_IMAGE_NAME" > /dev/null && echo 1 || echo 0)"
+    if [[ $FETCH_STATUS == 1 ]]; then
+        echo "sucess"
+    else
+        echo "not success"
+    fi
+
     exit
 fi
+
+
+# first we ensure out original public image is available.
+if lxc exec "$LXC_HOST" -- docker image list | grep -q "$DOCKER_HUB_IMAGE"; then
+    lxc exec "$LXC_HOST" -- docker image pull "$DOCKER_HUB_IMAGE"
+fi
+
+# then we tag it as being for bcm.
+if lxc exec "$LXC_HOST" -- docker image list | grep -q "$FULLY_QUALIFIED_IMAGE_NAME"; then
+    lxc exec "$LXC_HOST" -- docker tag "$DOCKER_HUB_IMAGE" "$FULLY_QUALIFIED_IMAGE_NAME"
+fi
+
+
+lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
+
+
+
 
 if [[ ! -z $BUILD_CONTEXT ]]; then
     if [[ ! -d $BUILD_CONTEXT ]]; then
@@ -72,10 +100,6 @@ if ! lxc list --format csv -c n | grep -q "$LXC_HOST"; then
     exit
 fi
 
-function docker_tag_exists() {
-    lxc exec "$BCM_MANAGER_HOST_NAME" -- curl -s -f -lSL "http://127.0.0.1:$BCM_PRIVATE_REGISTRY_PORT/v2/$1/tags/list" | grep "$1" | grep "$2"
-}
-
 REBUILD=1
 if [[ $REBUILD == 1 ]]; then
     # let's make sure there's a dockerfile
@@ -86,10 +110,7 @@ if [[ $REBUILD == 1 ]]; then
         echo "Pushing contents of the build context to LXC host '$LXC_HOST'."
         lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
     fi
-    
-    # refresh the docker-base image
-    bash -c "$BCM_GIT_DIR/project/tiers/manager/build_push_docker_base.sh"
-    
+
     # let's build the image and push it to our private registry.
     IMAGE_FQDN="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
     

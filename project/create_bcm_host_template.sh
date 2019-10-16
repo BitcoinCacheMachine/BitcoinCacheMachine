@@ -3,16 +3,20 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-if ! lxc project list --format csv | grep -q "default (current)"; then
-    lxc project switch default
+
+# if the default storage driver doesn't exist, create it.
+if ! lxc storage list --format csv | grep -q "bcm"; then
+    lxc storage create bcm btrfs
 fi
 
-# first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
-# if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
-# it (being the lxc image 'bcm-template') will be rebuilt.
-if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    echo "INFO: LXC image '$LXC_BCM_BASE_IMAGE_NAME' has already been built."
+
+# create the docker_unprivileged profile
+if ! lxc profile list  --format csv | grep -q "bcm_disk"; then
+    lxc profile create bcm_disk
+    cat ./lxd_profiles/bcm_disk.yml | lxc profile edit bcm_disk
 fi
+
+
 
 # create the docker_unprivileged profile
 if ! lxc profile list --format csv | grep -q "docker_unprivileged"; then
@@ -26,15 +30,17 @@ if ! lxc profile list --format csv | grep -q "docker_privileged"; then
     cat ./lxd_profiles/docker_privileged.yml | lxc profile edit docker_privileged
 fi
 
-# if the default storage driver doesn't exist, create it.
-if ! lxc storage list --format csv | grep -q "bcm"; then
-    lxc storage create bcm btrfs
+
+if ! lxc project list --format csv | grep -q "default (current)"; then
+    lxc project switch default
 fi
 
-# create the docker_unprivileged profile
-if ! lxc profile list  --format csv | grep -q "bcm_disk"; then
-    lxc profile create bcm_disk
-    cat ./lxd_profiles/bcm_disk.yml | lxc profile edit bcm_disk
+# first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
+# if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
+# it (being the lxc image 'bcm-template') will be rebuilt.
+if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+    echo "INFO: LXC image '$LXC_BCM_BASE_IMAGE_NAME' has already been built."
+    exit
 fi
 
 if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
@@ -80,12 +86,6 @@ fi
 # executed when we have a cluster of size 1.
 if lxc network list --format csv | grep bcmbr0 | grep -q PENDING; then
     lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
-fi
-
-# if our image is not prepared, let's go ahead and create it.
-if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    echo "The image '$LXC_BCM_BASE_IMAGE_NAME' is already published."
-    exit
 fi
 
 if ! lxc list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then

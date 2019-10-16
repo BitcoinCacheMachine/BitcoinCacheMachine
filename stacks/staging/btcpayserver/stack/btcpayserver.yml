@@ -31,7 +31,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - engine.labels.bcm-bitcoin${BCM_ACTIVE_CHAIN:-} == true
+          - engine.labels.bcm-bitcoin-${BCM_ACTIVE_CHAIN:-} == true
 
   postgres:
     image: postgres:9.6.5
@@ -44,7 +44,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - engine.labels.bcm-bitcoin${BCM_ACTIVE_CHAIN:-} == true
+          - engine.labels.bcm-bitcoin-${BCM_ACTIVE_CHAIN:-} == true
 
 volumes:
   data:

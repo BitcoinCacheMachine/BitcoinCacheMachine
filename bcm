@@ -4,21 +4,10 @@
 set -Eeo pipefail
 cd "$(dirname "$0")"
 
-export BCM_GIT_DIR="$(pwd)"
-export BCM_LXD_OPS="$BCM_GIT_DIR/project/shared"
-export BCM_MAJOR_VERSION="0"
-export BCM_MINOR_VERSION="0"
-export BCM_PATCH_VERSION="1"
-export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION"
-export BCM_DOCKER_BASE_TAG="18.04"
-
-# todo; convert this to a temp encrypted ramdisk that exists for the duration of each bcm call.
-BCM_HELP_FLAG=0
-export BCM_DATACENTER="default"
-export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
-
 # if this is 1, then we assume we are running BCM WITHOUT the front-end (e.g., dockerd on bare metal)
 IS_FRONTEND=1
+BCM_HELP_FLAG=0
+REBUILD_IMAGES=0
 
 for i in "$@"; do
     case $i in
@@ -28,14 +17,24 @@ for i in "$@"; do
         --backend-only)
             IS_FRONTEND=0
         ;;
+        --rebuild)
+            REBUILD_IMAGES=1
+        ;;
         *)
             # unknown option
         ;;
     esac
 done
 
+if [[ $BCM_HELP_FLAG == 1 ]]; then
+    cat ./commands/help.txt
+    exit
+fi
+
 BCM_DEBUG=${BCM_DEBUG:-1}
 export BCM_DEBUG="$BCM_DEBUG"
+export REBUILD_IMAGES="$REBUILD_IMAGES"
+
 
 BCM_SSH_HOSTNAME=${BCM_SSH_HOSTNAME:-"$(hostname)"}
 if [[ ! -z $BCM_SSH_HOSTNAME ]]; then
@@ -47,28 +46,31 @@ if [[ ! -z $BCM_SSH_USERNAME ]]; then
     BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
 fi
 
-export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
-export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
+GNUPGHOME=${GNUPGHOME:-"$HOME/.gnupg"}
+if [[ ! -z $GNUPGHOME ]]; then
+    GNUPGHOME="$GNUPGHOME"
+fi
+export GNUPGHOME="$GNUPGHOME"
 
-export BCM_HELP_FLAG="$BCM_HELP_FLAG"
-export IS_FRONTEND="$IS_FRONTEND"
+BCM_DATACENTER=${BCM_DATACENTER:-"default"}
+if [[ ! -z $BCM_DATACENTER ]]; then
+    BCM_DATACENTER="$BCM_DATACENTER"
+fi
+export BCM_DATACENTER="$BCM_DATACENTER"
+
+source ./bcm.env
 
 # switch to 'master' for formal versions.
 export BCM_DEFAULT_GIT_BRANCH="dev"
 export BCM_ACTIVE_CHAIN="testnet"
 export BCM_SSH_DIR="$HOME/.ssh" && mkdir -p "$BCM_SSH_DIR"
 export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
+export BASE_DOCKER_IMAGE="ubuntu:$BCM_DOCKER_BASE_TAG"
 
-
-GNUPGHOME="$HOME/.gnupg"
 PASSWORD_STORE_DIR="$HOME/.password_store" && mkdir -p "$PASSWORD_STORE_DIR"
 
-export GNUPGHOME="$GNUPGHOME"
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template"
-
-# todo allow environment override.
-export BCM_LOGGING_METHOD=lxd
 
 BCM_MANAGER_HOST_NAME="bcm-manager-01"
 BCM_KAFKA_HOST_NAME="bcm-kafka-01"
@@ -131,26 +133,54 @@ if ! groups "$(whoami)" | grep -q lxd; then
     sudo gpasswd -a "$(whoami)" lxd
 fi
 
+# TODO - update trusted PGP certificate.
+# echo "GNUPGHOME: $GNUPGHOME"
+# if ! gpg --list-keys | grep -q 94C6163354CB7A8CE5BABCDB36DB4B9E5F3E523C; then
+#     echo "WARNING: the BCM public key will be imported into your local system. "
+#     echo "INFO: bcm commands WILL NOT RUN unless you have explicitly trusted this key."
+#     echo "INFO: run 'sudo gpg --import $BCM_GIT_DIR/PGP.txt' to import the BCM key."
+#     exit
+# fi
+
+# set our GNUPGHOME to the user cert directory
+# if there is no certificate, go ahead and create it.
+if [[ ! -d "$GNUPGHOME/trezor" ]]; then
+    bash -c "$BCM_GIT_DIR/commands/init.sh"
+fi
+
+OLD_GNUPGHOME="$GNUPGHOME"
+export GNUPGHOME="$GNUPGHOME/trezor"
+DEFAULT_KEY_ID=$(gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
+DEFAULT_KEY_ID="${DEFAULT_KEY_ID#*/}"
+DEFAULT_KEY_ID="$(echo "$DEFAULT_KEY_ID" | awk '{print $1}')"
+export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
+export GNUPGHOME="$OLD_GNUPGHOME"
 # if LXC is not available, install it.
 if [[ ! -f "$(command -v lxc)" ]]; then
     # install lxd via snap
     # unless this is modified, we get snapshot creation in snap when removing lxd.
-    echo "INFO: installing 'lxd' on $HOSTNAME."
-    sudo snap install lxd --channel="3.17/candidate"
+    echo "INFO: Installing 'lxd' on $HOSTNAME."
+    sudo snap install lxd --channel="candidate"
     sudo snap set system snapshots.automatic.retention=no
     sleep 5
+fi
+
+BASHRC_FILE="$HOME/.bashrc"
+BASHRC_TEXT="export PATH=$""PATH:$HOME/git/github/bcm"
+source "$BASHRC_FILE"
+if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
+    echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
+    exit
 fi
 
 
 # if the current cluster is not configured, let's bring it into existence.
 if lxc info | grep -q "server_clustered: false"; then
     bash -c "./commands/cluster/entrypoint.sh cluster create"
-    exit
 fi
 
 # Install docker if we're running this command on a front-end
 if [[ $IS_FRONTEND = 1 ]]; then
-    #bash -c "$BCM_GIT_DIR/commands/controller/install_docker_client.sh"
-    
+    bash -c "$BCM_GIT_DIR/commands/controller/install_docker_client.sh"
     ./commands/cli_entrypoint.sh "$@"
 fi

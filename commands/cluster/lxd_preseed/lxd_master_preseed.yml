@@ -1,6 +1,5 @@
 config:
-  core.https_address: "$IP_OF_MACVLAN_INTERFACE:8443"
-  core.trust_password: $BCM_LXD_SECRET
+  core.https_address: 127.0.0.1:8443
 storage_pools:
 - config: {}
   description: "BTRFS storage backend for BCM system containers."
@@ -17,7 +16,12 @@ profiles:
   name: default
 cluster:
   server_name: $LXD_SERVER_NAME
+  server_address: $IP_OF_MACVLAN_INTERFACE:8443
   enabled: true
+#cluster_address
+# this means all BCM SSH hosts are configured to listen for LXD cluster
+# membership on the local LAN with a server name of LXD_SERVER_NAME
+
 
 # goes under storage_pools
 # - config:

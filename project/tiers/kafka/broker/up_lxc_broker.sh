@@ -4,15 +4,9 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:$KAFKA_VERSION_TAG"
-BROKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-broker:$BCM_VERSION"
+BROKER_IMAGE="bcm-broker"
 
-# if it's the first instance, let's download the kafka image from
-# docker hub; then we tag and push to our local private registry
-# so subsequent kafka nodes can just download from there.
-
-lxc exec "$BCM_MANAGER_HOST_NAME" -- docker pull "$PUBLIC_BROKER_IMAGE"
-lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag "$PUBLIC_BROKER_IMAGE" "$BROKER_IMAGE"
-lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BROKER_IMAGE"
+bash -c "$BCM_LXD_OPS/docker_image_ops.sh --docker-hub-image-name=$PUBLIC_BROKER_IMAGE --container-name=$BCM_KAFKA_HOST_NAME --image-name=$BROKER_IMAGE"
 
 if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network list | grep "kafkanet" | grep "overlay" | grep -q "swarm"; then
     lxc exec "$BCM_MANAGER_HOST_NAME" -- docker network create --driver=overlay --opt=encrypted --attachable=true kafkanet

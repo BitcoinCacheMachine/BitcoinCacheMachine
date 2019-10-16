@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
 bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 
-if bcm tier list | grep -q bcm-manager; then
+if bcm tier list | grep -q "manager"; then
     exit
 fi
 
@@ -86,7 +86,7 @@ bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAM
 
 # prepare the host.
 lxc exec "$BCM_MANAGER_HOST_NAME" -- ifmetric eth0 50
-lxc exec "$BCM_MANAGER_HOST_NAME" -- docker pull registry:latest
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker image pull registry:latest
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag registry:latest bcm-registry:latest
 
 # only do this if the swarm hasn't already been initialized.

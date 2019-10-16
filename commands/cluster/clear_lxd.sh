@@ -3,6 +3,21 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+DELETE_IMAGES=0
+
+for i in "$@"; do
+    case $i in
+        --delete-images=*)
+            DELETE_IMAGES="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
+
 if ! which jq >/dev/null 2>&1; then
     echo "This tool requires: jq"
     exit 1
@@ -15,15 +30,12 @@ for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
         lxc delete --project "${project}" -f "${container}"
     done
     
-    # echo "==> Deleting all images for project: ${project}"
-    # for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
-    #     # TODO
-    #     # this if clause is BCM specific. It leaves the already downloaded bcm-lxc-base image so we don't
-    #     # have to download it again when we do a 'bcm cluster clear'. Leaving this image RARELY has negative
-    #     # side effects but helps improve performance due to caching.
-    #     echo "image: $image"
-    #     lxc image delete --project "${project}" "${image}"
-    # done
+    if [[ $DELETE_IMAGES == 1 ]]; then
+        echo "==> Deleting all images for project: ${project}"
+        for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
+            lxc image delete --project "${project}" "${image}"
+        done
+    fi
 done
 
 for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do

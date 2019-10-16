@@ -7,8 +7,6 @@ The only user interface to BCM is the Linux command line. BCM really is just a b
 If the cli is configured correctly, you can run `bcm info` to get an overview of your BCM environment:
 
 * GNUPGHOME:              Directory that contains your Trezor-backed GPG certificates.
-*  - CLUSTER_CERT_ID:        GPG Certificate ID
-*  - CLUSTER_CERT_TITLE:     Satoshi Nakamoto <satoshi@bitcoin.org>
 * PASSWORD_STORE_DIR:     Directory of your Trezor GPG-backed standard unix password manager store.
 * BCM_SSH_DIR:            Directory where SSH public keys (e.g., known_hosts) are placed.
 * BCM_VERSION:            The version of BCM that the CLI is configured to target.
