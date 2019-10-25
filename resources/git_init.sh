@@ -16,7 +16,7 @@ gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
 # update apt and install pre-reqs
 sudo apt-get update
 sudo apt-get remove lxd lxd-client -y
-sudo apt-get autoremove
+sudo apt-get autoremove -y
 sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat
 
 # wait for local tor to come online.
