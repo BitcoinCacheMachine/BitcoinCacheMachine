@@ -18,8 +18,6 @@ for i in "$@"; do
 done
 
 sudo apt-get update -y
-sudo apt-get remove lxd lxd-client -y
-sudo apt-get autoremove -y
 sudo apt-get install tor wait-for-it apg -y
 
 echo "$YAML_TEXT" | sudo lxd init --preseed

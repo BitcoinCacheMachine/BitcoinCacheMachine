@@ -24,6 +24,6 @@ if [[ $GIT_STAGE_ALL == 1 ]]; then
 fi
 
 echo "Committing and signing. Get ready to check your Trezor."
-git commit -S -m "$GIT_COMMIT_MESSAGE"
+git commit -S -m "'$GIT_COMMIT_MESSAGE'"
 
 git log --show-signature -1

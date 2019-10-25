@@ -69,14 +69,6 @@ else
         exit
     fi
     
-    ./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
-    ./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
-    ./controller/build_docker_image.sh --image-title="ots" --base-image="bcm-trezor:$BCM_VERSION"
-    
-    if [[ "$BCM_CLI_COMMAND" == "start" ||  "$BCM_CLI_COMMAND" == "stop" || "$BCM_CLI_COMMAND" == "restart"  ]]; then
-        ./operations/start_stop_restart.sh
-        exit
-    fi
     
     if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
         ./stack/entrypoint.sh "$@"
@@ -102,6 +94,10 @@ else
         ./stack_cli/entrypoint.sh "$@"
         exit
     fi
+    
+    ./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
+    ./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
+    ./controller/build_docker_image.sh --image-title="ots" --base-image="bcm-trezor:$BCM_VERSION"
     
     if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
         ./controller/entrypoint.sh "$@"
@@ -132,23 +128,11 @@ else
         exit
     fi
     
-    
     if [[ "$BCM_CLI_COMMAND" == "logs" ]]; then
         ./stack_cli/entrypoint.sh "$@"
         exit
     fi
-    
-    
-    if [[ "$BCM_CLI_COMMAND" == "config" ]]; then
-        ./config/entrypoint.sh "$@"
-        exit
-    fi
-    
-    if [[ "$BCM_CLI_COMMAND" == "set-chain" ]]; then
-        ./chain/setchain.sh "$@"
-        exit
-    fi
-    
+
     if [[ "$BCM_CLI_COMMAND" == "get-ip" ]]; then
         ./get/entrypoint.sh "$@"
         exit

@@ -12,4 +12,7 @@ fi
 
 multipass launch --disk="120GB" --mem="4098MB" --cpus="4" --name="bcm" bionic
 
-multipass exec bcm -- curl https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/resources/git_init.sh | sudo bash
+multipass connect bcm
+
+curl https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/resources/git_init.sh | bash -
+
