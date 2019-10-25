@@ -17,9 +17,6 @@ for i in "$@"; do
     esac
 done
 
-sudo apt-get update -y
-sudo apt-get install tor wait-for-it apg -y
-
 echo "$YAML_TEXT" | sudo lxd init --preseed
 
 # all LXC operations use the local unix socket; BCM DOES NOT

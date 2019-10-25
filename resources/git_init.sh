@@ -15,9 +15,9 @@ gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
 
 # update apt and install pre-reqs
 sudo apt-get update
-sudo apt-get remove lxd lxd-client -y
+sudo apt-get remove lxd lxd-client tor -y
 sudo apt-get autoremove -y
-sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat
+sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg
 
 # wait for local tor to come online.
 wait-for-it -t 30 127.0.0.1:9050
@@ -168,8 +168,6 @@ BASHRC_TEXT="export PATH=$""PATH:$HOME/git/github/bcm"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
-    exit
 fi
-
 
 echo "WARNING: Please logout or restart your computer before continuing with BCM!"
