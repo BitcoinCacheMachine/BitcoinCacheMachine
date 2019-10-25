@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set -eu
 
 # get the codename, usually bionic or debian
 CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
