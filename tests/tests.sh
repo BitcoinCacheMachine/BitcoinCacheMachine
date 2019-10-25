@@ -10,7 +10,7 @@ if [[ ! -f "$(command -v multipass)" ]]; then
     sleep 5
 fi
 
-multipass launch --disk="20GB" --mem="4098MB" --cpus="4" --name="bcm" bionic
+multipass launch --disk="30GB" --mem="4098MB" --cpus="4" --name="bcm" bionic
 
 multipass mount "$HOME/.gnupg" bcm:/home/ubuntu/.gnupg
 
