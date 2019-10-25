@@ -92,67 +92,15 @@ export BCM_BACKUP_DIR="$HOME/.bcm_backups" && mkdir -p "$BCM_BACKUP_DIR"
 export BCM_DOCKER_IMAGE_CACHE_FQDN="registry-1.docker.io"
 export BCM_LXD_IMAGE_CACHE="images.linuxcontainers.org"
 
-
-# let's make sure the local git client is using TOR for git pull operations.
-# this should have been configured on a global level already when the user initially
-# downloaded BCM from github
-BCM_TOR_PROXY="socks5://127.0.0.1:9050"
-if [[ "$(git config --get --local http.$BCM_GITHUB_REPO_URL.proxy)" != "$BCM_TOR_PROXY" ]]; then
-    echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
-    git config --local "http.$BCM_GITHUB_REPO_URL.proxy" "$BCM_TOR_PROXY"
-fi
-
-# this section configured the local SSH client on the Controller
-# so it uses the local SOCKS5 proxy for any SSH host that has a
-# ".onion" address. We use SSH tunneling to expose the remote onion
-# server's LXD API and access it on the controller via a locally
-# expose port (after SSH tunneling)
-SSH_LOCAL_CONF="$HOME/.ssh/config"
-if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
-    # if the .ssh/config file doesn't exist, create it.
-    mkdir -p "$HOME/.ssh"
-    touch "$SSH_LOCAL_CONF"
-fi
-
-# Next, paste in the necessary .ssh/config settings for accessing
-# remote LXD servers over TOR hidden services. This will make any 'ssh' command
-# redirect all .onion hostnames to your localhost:9050 tor SOCKS5 proxy.
-if [[ -f "$SSH_LOCAL_CONF" ]]; then
-    SSH_ONION_TEXT="Host *.onion"
-    if ! grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
-        echo "Info (IMPORTANT): Updating your /etc/ssh/sshd_config file so it redirects all *.onion names out your local Tor proxy."
-        {
-            echo "$SSH_ONION_TEXT"
-            echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p"
-        } >>"$SSH_LOCAL_CONF"
-    fi
-fi
-
-# if there's no group called lxd, create it.
-if ! groups "$(whoami)" | grep -q lxd; then
-    sudo gpasswd -a "$(whoami)" lxd
-fi
-
-# TODO - update trusted PGP certificate.
-# echo "GNUPGHOME: $GNUPGHOME"
-# if ! gpg --list-keys | grep -q 94C6163354CB7A8CE5BABCDB36DB4B9E5F3E523C; then
-#     echo "WARNING: the BCM public key will be imported into your local system. "
-#     echo "INFO: bcm commands WILL NOT RUN unless you have explicitly trusted this key."
-#     echo "INFO: run 'sudo gpg --import $BCM_GIT_DIR/PGP.txt' to import the BCM key."
-#     exit
-# fi
-
-# set our GNUPGHOME to the user cert directory
-# if there is no certificate, go ahead and create it.
-if [[ ! -d "$GNUPGHOME/trezor" ]]; then
-    bash -c "$BCM_GIT_DIR/commands/init.sh"
-fi
-
 OLD_GNUPGHOME="$GNUPGHOME"
 export GNUPGHOME="$GNUPGHOME/trezor"
-DEFAULT_KEY_ID=$(gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
-DEFAULT_KEY_ID="${DEFAULT_KEY_ID#*/}"
-DEFAULT_KEY_ID="$(echo "$DEFAULT_KEY_ID" | awk '{print $1}')"
+DEFAULT_KEY_ID=
+if [ -d "$GNUPGHOME" ]; then
+    DEFAULT_KEY_ID=$(gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
+    DEFAULT_KEY_ID="${DEFAULT_KEY_ID#*/}"
+    DEFAULT_KEY_ID="$(echo "$DEFAULT_KEY_ID" | awk '{print $1}')"
+fi
+
 export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
 export GNUPGHOME="$OLD_GNUPGHOME"
 

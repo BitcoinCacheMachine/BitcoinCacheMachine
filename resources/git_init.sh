@@ -32,6 +32,15 @@ git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 
 cd "$BCM_GIT_DIR" && git checkout dev
 
+# let's make sure the local git client is using TOR for git pull operations.
+# this should have been configured on a global level already when the user initially
+# downloaded BCM from github
+BCM_TOR_PROXY="socks5://127.0.0.1:9050"
+if [[ "$(git config --get --local http.$BCM_GITHUB_REPO_URL.proxy)" != "$BCM_TOR_PROXY" ]]; then
+    echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
+    git config --local "http.$BCM_GITHUB_REPO_URL.proxy" "$BCM_TOR_PROXY"
+fi
+
 # install LXD
 if [[ ! -f "$(command -v lxc)" ]]; then
     # install lxd via snap
@@ -53,6 +62,20 @@ fi
 
 
 
+# TODO - update trusted PGP certificate.
+# echo "GNUPGHOME: $GNUPGHOME"
+# if ! gpg --list-keys | grep -q 94C6163354CB7A8CE5BABCDB36DB4B9E5F3E523C; then
+#     echo "WARNING: the BCM public key will be imported into your local system. "
+#     echo "INFO: bcm commands WILL NOT RUN unless you have explicitly trusted this key."
+#     echo "INFO: run 'sudo gpg --import $BCM_GIT_DIR/PGP.txt' to import the BCM key."
+#     exit
+# fi
+
+# # if there's no group called lxd, create it.
+# if ! groups "$(whoami)" | grep -q lxd; then
+#     sudo gpasswd -a "$(whoami)" lxd
+# fi
+
 # configure SSH
 ###################
 if [[ ! -f "$HOME/.ssh/authorized_keys" ]]; then
@@ -72,6 +95,34 @@ IP_OF_DEFAULT_ROUTE_INTERFACE="$(ip addr show "$DEFAULT_ROUTE_INTERFACE" | grep 
 # update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
 if ! grep -Fxq "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" /etc/ssh/sshd_config; then
     echo "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" | sudo tee -a /etc/ssh/sshd_config
+fi
+
+# this section configured the local SSH client on the Controller
+# so it uses the local SOCKS5 proxy for any SSH host that has a
+# ".onion" address. We use SSH tunneling to expose the remote onion
+# server's LXD API and access it on the controller via a locally
+# expose port (after SSH tunneling)
+SSH_LOCAL_CONF="$HOME/.ssh/config"
+if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
+    # if the .ssh/config file doesn't exist, create it.
+    mkdir -p "$HOME/.ssh"
+    touch "$SSH_LOCAL_CONF"
+fi
+
+
+
+# Next, paste in the necessary .ssh/config settings for accessing
+# remote LXD servers over TOR hidden services. This will make any 'ssh' command
+# redirect all .onion hostnames to your localhost:9050 tor SOCKS5 proxy.
+if [[ -f "$SSH_LOCAL_CONF" ]]; then
+    SSH_ONION_TEXT="Host *.onion"
+    if ! grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
+        echo "Info (IMPORTANT): Updating your /etc/ssh/sshd_config file so it redirects all *.onion names out your local Tor proxy."
+        {
+            echo "$SSH_ONION_TEXT"
+            echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p"
+        } >>"$SSH_LOCAL_CONF"
+    fi
 fi
 
 sudo systemctl restart ssh

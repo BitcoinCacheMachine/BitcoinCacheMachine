@@ -95,6 +95,14 @@ else
         exit
     fi
     
+    
+    # set our GNUPGHOME to the user cert directory
+    # if there is no certificate, go ahead and create it.
+    if [[ ! -d "$GNUPGHOME/trezor" ]]; then
+        bash -c "$BCM_GIT_DIR/commands/init.sh"
+    fi
+    
+    
     ./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
     ./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
     ./controller/build_docker_image.sh --image-title="ots" --base-image="bcm-trezor:$BCM_VERSION"
@@ -132,7 +140,7 @@ else
         ./stack_cli/entrypoint.sh "$@"
         exit
     fi
-
+    
     if [[ "$BCM_CLI_COMMAND" == "get-ip" ]]; then
         ./get/entrypoint.sh "$@"
         exit
