@@ -64,16 +64,18 @@ fi
 sudo touch "/etc/sudoers.d/$(whoami)"
 echo "$(whoami) ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$(whoami)"
 
+
+DEFAULT_ROUTE_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
+IP_OF_DEFAULT_ROUTE_INTERFACE="$(ip addr show "$DEFAULT_ROUTE_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+#BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
+
 # update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
-if ! grep -Fxq "ListenAddress 0.0.0.0" /etc/ssh/sshd_config; then
-    {
-        echo "ListenAddress 127.0.0.1"
-        echo "ListenAddress 0.0.0.0"
-    } | sudo tee -a /etc/ssh/sshd_config
+if ! grep -Fxq "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" /etc/ssh/sshd_config; then
+    echo "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" | sudo tee -a /etc/ssh/sshd_config
 fi
 
 sudo systemctl restart ssh
-wait-for-it -t 15 127.0.0.1:22
+wait-for-it -t 15 "$IP_OF_DEFAULT_ROUTE_INTERFACE:22"
 # end configure SSH
 #####################
 

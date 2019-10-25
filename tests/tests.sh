@@ -10,9 +10,8 @@ if [[ ! -f "$(command -v multipass)" ]]; then
     sleep 5
 fi
 
-multipass launch --disk="120GB" --mem="4098MB" --cpus="4" --name="bcm" bionic
+multipass launch --disk="20GB" --mem="4098MB" --cpus="4" --name="bcm" bionic
 
 multipass connect bcm
 
-curl -s https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/resources/git_init.sh | bash -
-
+curl https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/resources/git_init.sh > /dev/null | bash -
