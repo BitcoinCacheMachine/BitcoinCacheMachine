@@ -157,15 +157,6 @@ export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
 export GNUPGHOME="$OLD_GNUPGHOME"
 
 
-BASHRC_FILE="$HOME/.bashrc"
-BASHRC_TEXT="export PATH=$""PATH:$HOME/git/github/bcm"
-source "$BASHRC_FILE"
-if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
-    echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
-    exit
-fi
-
-
 # if the current cluster is not configured, let's bring it into existence.
 if lxc info | grep -q "server_clustered: false"; then
     bash -c "./commands/cluster/entrypoint.sh cluster create"

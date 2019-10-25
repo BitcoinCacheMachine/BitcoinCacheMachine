@@ -26,10 +26,3 @@ echo "$YAML_TEXT" | sudo lxd init --preseed
 # employ HTTPS -based LXD. All management plane operations are
 # via SSH.
 lxc remote set-default "local"
-
-# commands in ~/.bashrc are delimited by these literals.
-BASHRC_FILE="$HOME/.bashrc"
-if [[ ! -f $BASHRC_FILE ]]; then
-    touch "$BASHRC_FILE"
-    sudo chmod 0644 "$BASHRC_FILE"
-fi

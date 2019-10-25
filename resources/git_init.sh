@@ -30,6 +30,8 @@ git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
 BCM_GIT_DIR="$HOME/git/github/bcm"
 git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 
+cd "$BCM_GIT_DIR" && git checkout dev
+
 # install LXD
 if [[ ! -f "$(command -v lxc)" ]]; then
     # install lxd via snap
@@ -102,5 +104,15 @@ if [[ ! -f "$(command -v docker)" ]]; then
         sudo snap restart docker
     fi
 fi
+
+
+BASHRC_FILE="$HOME/.bashrc"
+BASHRC_TEXT="export PATH=$""PATH:$HOME/git/github/bcm"
+source "$BASHRC_FILE"
+if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
+    echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
+    exit
+fi
+
 
 echo "WARNING: Please logout or restart your computer before continuing with BCM!"
