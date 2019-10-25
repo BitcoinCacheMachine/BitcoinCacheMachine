@@ -103,6 +103,4 @@ if [[ ! -f "$(command -v docker)" ]]; then
     fi
 fi
 
-
-# run bcm command to init the rest
-bash -c "$BCM_GIT_DIR/bcm"
+echo "WARNING: Please logout or restart your computer before continuing with BCM!"
