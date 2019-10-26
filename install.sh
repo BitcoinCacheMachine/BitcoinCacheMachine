@@ -44,7 +44,7 @@ BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
 
 # clone the BCM repo to $HOME/git/github/bcm
-SUDO_USER_HOME="$SUDO_USER_HOME"
+SUDO_USER_HOME="/home/$SUDO_USER"
 BCM_GIT_DIR="$SUDO_USER_HOME/git/github/bcm"
 if [[ ! -d $BCM_GIT_DIR ]]; then
     git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
