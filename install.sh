@@ -4,8 +4,7 @@ set -eu
 
 echo "INFO: RUNNING BCM INSTALL SCRIPT"
 echo "Current User: $USER"
-echo "BCM_USER:  $BCM_USER"
-
+echo "SUDO_USER:  $SUDO_USER"
 
 # get the codename, usually bionic or debian
 CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
@@ -45,7 +44,7 @@ BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
 
 # clone the BCM repo to $HOME/git/github/bcm
-BCM_GIT_DIR="$HOME/git/github/bcm"
+BCM_GIT_DIR="/home/$SUDO_USER/git/github/bcm"
 if [[ ! -d $BCM_GIT_DIR ]]; then
     git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 else
@@ -78,10 +77,15 @@ if ! grep -q lxd /etc/group; then
     sudo addgroup --system lxd
 fi
 
-# add the current user to the lxd group
+# add the SUDO_USER user to the lxd group
 if ! groups | grep -q lxd; then
-    sudo usermod -G lxd -a "$(whoami)"
+    sudo usermod -G lxd -a "$SUDO_USER"
 fi
+
+# # if there's no group called lxd, create it.
+# if ! groups "$(whoami)" | grep -q lxd; then
+#     sudo gpasswd -a "$(whoami)" lxd
+# fi
 
 # TODO - update trusted PGP certificate.
 # echo "GNUPGHOME: $GNUPGHOME"
@@ -92,27 +96,20 @@ fi
 #     exit
 # fi
 
-# # if there's no group called lxd, create it.
-# if ! groups "$(whoami)" | grep -q lxd; then
-#     sudo gpasswd -a "$(whoami)" lxd
-# fi
-
 # configure SSH
-if [[ ! -f "$HOME/.ssh/authorized_keys" ]]; then
-    sudo touch "$HOME/.ssh/authorized_keys"
-    sudo chown "$USER:$USER" -R "$HOME/.ssh"
+if [[ ! -f "/home/$SUDO_USER/.ssh/authorized_keys" ]]; then
+    sudo touch "/home/$SUDO_USER/.ssh/authorized_keys"
+    sudo chown "$SUDO_USER:$SUDO_USER" -R "/home/$SUDO_USER/.ssh"
 fi
 
 # add the current user to the sudoers
-sudo touch "/etc/sudoers.d/$(whoami)"
-echo "$(whoami) ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$(whoami)"
-
-
-DEFAULT_ROUTE_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
-IP_OF_DEFAULT_ROUTE_INTERFACE="$(ip addr show "$DEFAULT_ROUTE_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
-#BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
+sudo touch "/etc/sudoers.d/$SUDO_USER"
+echo "$SUDO_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$SUDO_USER"
 
 # update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
+# TODO see if we can get this to listen on a specific interface rather than an IP address.
+DEFAULT_ROUTE_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
+IP_OF_DEFAULT_ROUTE_INTERFACE="$(ip addr show "$DEFAULT_ROUTE_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
 if ! grep -Fxq "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" /etc/ssh/sshd_config; then
     echo "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" | sudo tee -a /etc/ssh/sshd_config
 fi
@@ -122,13 +119,12 @@ fi
 # ".onion" address. We use SSH tunneling to expose the remote onion
 # server's LXD API and access it on the controller via a locally
 # expose port (after SSH tunneling)
-SSH_LOCAL_CONF="$HOME/.ssh/config"
+SSH_LOCAL_CONF="/home/$SUDO_USER/.ssh/config"
 if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
     # if the .ssh/config file doesn't exist, create it.
-    mkdir -p "$HOME/.ssh"
+    mkdir -p "/home/$SUDO_USER/.ssh"
     touch "$SSH_LOCAL_CONF"
 fi
-
 
 
 # Next, paste in the necessary .ssh/config settings for accessing
@@ -160,8 +156,8 @@ if [[ ! -f "$(command -v docker)" ]]; then
         sudo groupadd docker
     fi
     
-    if ! groups "$USER" | grep -q docker; then
-        sudo usermod -aG docker "$USER"
+    if ! groups "$SUDO_USER" | grep -q docker; then
+        sudo usermod -aG docker "$SUDO_USER"
     fi
     
     # next we need to determine the underlying file system so we can upload the correct daemon.json
@@ -179,8 +175,8 @@ if [[ ! -f "$(command -v docker)" ]]; then
 fi
 
 
-BASHRC_FILE="$HOME/.bashrc"
-BASHRC_TEXT="export PATH=$""PATH:$HOME/git/github/bcm"
+BASHRC_FILE="/home/$SUDO_USER/.bashrc"
+BASHRC_TEXT="export PATH=$""PATH:/home/$SUDO_USER/git/github/bcm"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
