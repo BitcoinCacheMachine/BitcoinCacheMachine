@@ -23,8 +23,6 @@ done
 # next, provision (but not start) all LXC system containers across the cluster.
 ./spread_lxc_hosts.sh --tier-name="$TIER_NAME"
 
-
-
 # configure and start the LXC containers
 for ENDPOINT in $CLUSTER_ENDPOINTS; do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)

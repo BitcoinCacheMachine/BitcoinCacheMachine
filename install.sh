@@ -2,6 +2,10 @@
 
 set -eu
 
+echo "INFO: RUNNING BCM INSTALL SCRIPT"
+echo "Current User: $USER"
+
+
 # get the codename, usually bionic or debian
 CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
 
@@ -73,9 +77,9 @@ if ! grep -q lxd /etc/group; then
     sudo addgroup --system lxd
 fi
 
-USER="$(whoami)"
+# add the current user to the lxd group
 if ! groups | grep -q lxd; then
-    sudo useradd -g lxd -g sudo -m "$USER"
+    sudo usermod -G lxd -a "$(whoami)"
 fi
 
 # TODO - update trusted PGP certificate.
@@ -93,13 +97,12 @@ fi
 # fi
 
 # configure SSH
-###################
 if [[ ! -f "$HOME/.ssh/authorized_keys" ]]; then
     sudo touch "$HOME/.ssh/authorized_keys"
-    sudo chown "$(whoami):lxd" -R "$HOME/.ssh"
+    sudo chown "$USER:$USER" -R "$HOME/.ssh"
 fi
 
-# TODO verify where we need this.
+# add the current user to the sudoers
 sudo touch "/etc/sudoers.d/$(whoami)"
 echo "$(whoami) ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$(whoami)"
 
