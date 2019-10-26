@@ -15,7 +15,7 @@ fi
 lxc file push -p ./broker.yml "$BCM_MANAGER_HOST_NAME"/root/stacks/kafka/broker.yml
 
 # let's deploy a kafka node to each cluster endpoint.
-for ENDPOINT in $(bcm cluster list endpoints); do
+for ENDPOINT in $CLUSTER_ENDPOINTS; do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     BROKER_HOSTNAME="broker-$(printf %02d "$HOST_ENDING")"
     

@@ -18,7 +18,7 @@ export TIER_NAME=kafka
 # now it's time to deploy zookeeper. Let's deploy a zookeeper node to the first
 # 5 nodes (if we have a cluster of that size). 5 should be more than enough for
 # most deployments.
-CLUSTER_NODE_COUNT=$(bcm cluster list endpoints | wc -l)
+CLUSTER_NODE_COUNT=$(echo "$CLUSTER_ENDPOINTS" | wc -l)
 export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
 
 source ./zookeeper/get_env.sh

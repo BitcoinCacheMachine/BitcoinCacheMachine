@@ -26,7 +26,7 @@ done
 
 
 # configure and start the LXC containers
-for ENDPOINT in $(bcm cluster list endpoints); do
+for ENDPOINT in $CLUSTER_ENDPOINTS; do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     
     # The bcmLocalnet network allows users to access services from the same

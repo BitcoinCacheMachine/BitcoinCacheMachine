@@ -8,7 +8,7 @@ export TIER_NAME=manager
 source "$BCM_GIT_DIR/project/tiers/env.sh"
 
 # we get the hostname of the LXD container by getting its endpoint ID (which endpoint it's scheduled on)
-for ENDPOINT in $(bcm cluster list endpoints); do
+for ENDPOINT in $CLUSTER_ENDPOINTS; do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     
     # remove the host number from the hostname

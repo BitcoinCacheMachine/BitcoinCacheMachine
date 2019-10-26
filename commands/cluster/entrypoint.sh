@@ -12,15 +12,10 @@ else
     exit
 fi
 
-BCM_ENDPOINTS_FLAG=0
 ALL_FLAG=0
 
 for i in "$@"; do
     case $i in
-        endpoints)
-            BCM_ENDPOINTS_FLAG=1
-            shift # past argument=value
-        ;;
         --create)
             BCM_CLI_VERB="create"
         ;;
@@ -35,16 +30,6 @@ done
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./help.txt
-    exit
-fi
-
-if [[ "$BCM_CLI_VERB" == "list" ]]; then
-    if [[ $BCM_ENDPOINTS_FLAG == 1 ]]; then
-        lxc cluster list --format csv | grep "$BCM_SSH_HOSTNAME" | awk -F"," '{print $1}'
-        exit
-    fi
-    
-    lxc remote list --format csv | grep "bcm-" | awk -F "," '{print $1}' | awk -F"," '{print $1}'
     exit
 fi
 

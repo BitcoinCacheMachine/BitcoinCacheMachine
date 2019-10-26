@@ -4,9 +4,9 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # iterate over endpoints and delete relevant resources
-for endpoint in $(bcm cluster list endpoints); do
+for ENDPOINT in $CLUSTER_ENDPOINTS; do
     #echo $endpoint
-    HOST_ENDING=$(echo "$endpoint" | tail -c 2)
+    HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     ZOOKEEPER_STACK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")"
     
     # remove swarm services related to kafka

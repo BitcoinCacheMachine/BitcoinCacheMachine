@@ -58,6 +58,8 @@ else
     # these commands will be executed by the local terminal
     export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
     export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
+    CLUSTER_ENDPOINTS="$(lxc cluster list --format csv | grep "$BCM_SSH_HOSTNAME" | awk -F"," '{print $1}')"
+    export CLUSTER_ENDPOINTS="$CLUSTER_ENDPOINTS"
     
     if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
         ./cluster/entrypoint.sh "$@"
@@ -68,7 +70,6 @@ else
         ./show.sh
         exit
     fi
-    
     
     if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
         ./stack/entrypoint.sh "$@"

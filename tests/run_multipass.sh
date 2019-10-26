@@ -19,6 +19,8 @@ fi
 
 multipass exec bcm -- wget --output-document=bcm_init.sh https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/resources/bcm_init.sh >>/dev/null
 multipass exec bcm -- chmod 0744 bcm_init.sh
-multipass exec bcm -- bash -c bcm_init.sh
+multipass exec bcm -- bash -c /home/ubuntu/bcm_init.sh
 
-multipass exec bcm -- bcm stack start bitcoind
+multipass connect bcm
+
+bcm stack start bitcoind

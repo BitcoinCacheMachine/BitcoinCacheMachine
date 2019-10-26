@@ -31,11 +31,11 @@ export TIER_NAME=manager
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
-if [[ $(bcm cluster list endpoints | wc -l) -gt 1 ]]; then
+if [[ $(echo "$CLUSTER_ENDPOINTS" | wc -l) -gt 1 ]]; then
     # create and populate the required network
     
     # we have to do this for each cluster node
-    for endpoint in $(bcm cluster list endpoints); do
+    for endpoint in $CLUSTER_ENDPOINTS; do
         lxc network create --target "$endpoint" bcmbrGWNat
         lxc network create --target "$endpoint" bcmNet
     done
@@ -141,9 +141,9 @@ source "$BCM_GIT_DIR/project/tiers/get_docker_swarm_tokens.sh"
 
 ## TODO this probably doesn't work with multiple manager containers at the moment.
 # todo need to update daemon.json to populate with hostname of manager-01
-MASTER_NODE=$(bcm cluster list endpoints | grep '01')
+MASTER_NODE=$(echo "$CLUSTER_ENDPOINTS" | grep '01')
 HOSTNAME=
-for ENDPOINT in $(bcm cluster list endpoints); do
+for ENDPOINT in $CLUSTER_ENDPOINTS; do
     if [[ $ENDPOINT != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
         HOSTNAME="bcm-manager-$(printf %02d "$HOST_ENDING")"

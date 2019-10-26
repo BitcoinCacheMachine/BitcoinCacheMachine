@@ -28,7 +28,7 @@ if [[ $TIER_NAME == bitcoin* ]]; then
 fi
 
 # iterate over endpoints and delete actual LXC hosts.
-for LXD_ENDPOINT in $(bcm cluster list endpoints); do
+for LXD_ENDPOINT in $CLUSTER_ENDPOINTS; do
     HOST_ENDING=$(echo "$LXD_ENDPOINT" | tail -c 2)
     
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.

@@ -25,8 +25,8 @@ fi
 PROFILE_NAME="bcm-$TIER_NAME"
 
 # let's get a bcm-manager LXC instance on each cluster endpoint.
-MASTER_NODE=$(bcm cluster list endpoints | grep '01')
-for ENDPOINT in $(bcm cluster list endpoints); do
+MASTER_NODE=$(echo "$CLUSTER_ENDPOINTS" | grep '01')
+for ENDPOINT in $CLUSTER_ENDPOINTS; do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     LXC_HOSTNAME="bcm-$TIER_NAME-$(printf %02d "$HOST_ENDING")"
     LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
