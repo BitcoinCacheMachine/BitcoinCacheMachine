@@ -10,28 +10,28 @@ echo "SUDO_USER:  $SUDO_USER"
 CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
 
 # add the tor apt repository
-echo "deb https://deb.torproject.org/torproject.org $CODE_NAME main" | sudo tee -a /etc/apt/sources.list
-echo "deb-src https://deb.torproject.org/torproject.org $CODE_NAME main" | sudo tee -a /etc/apt/sources.list
+echo "deb https://deb.torproject.org/torproject.org $CODE_NAME main" | tee -a /etc/apt/sources.list
+echo "deb-src https://deb.torproject.org/torproject.org $CODE_NAME main" | tee -a /etc/apt/sources.list
 
 # download the tor PGP key and add it as a trusted key to apt
-curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import
-gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
+curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --import
+gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
 
 # update apt and install pre-reqs;
-sudo apt-get update
+apt-get update
 
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
     if dpkg -s $PKG >/dev/null 2>&1; then
-        sudo apt-get remove "$PKG" -y
+        apt-get remove "$PKG" -y
     fi
 done
 
 # remove any unused software.
-sudo apt-get autoremove -y
+apt-get autoremove -y
 
 # reinstall required software.
-sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd
+apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd
 
 # upgrade all existing software.
 # sudo apt-get upgrade -y
@@ -44,7 +44,7 @@ BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
 
 # clone the BCM repo to $HOME/git/github/bcm
-BCM_GIT_DIR="/home/$SUDO_USER/git/github/bcm"
+BCM_GIT_DIR="$SUDO_USER_HOME/git/github/bcm"
 if [[ ! -d $BCM_GIT_DIR ]]; then
     git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 else
@@ -67,19 +67,19 @@ if [[ ! -f "$(command -v lxc)" ]]; then
     # install lxd via snap
     # unless this is modified, we get snapshot creation in snap when removing lxd.
     echo "INFO: Installing 'lxd' on $HOSTNAME."
-    sudo snap install lxd --channel="candidate"
-    sudo snap set system snapshots.automatic.retention=no
+    snap install lxd --channel="candidate"
+    snap set system snapshots.automatic.retention=no
     sleep 5
 fi
 
 # if the lxd group doesn't exist, create it.
 if ! grep -q lxd /etc/group; then
-    sudo addgroup --system lxd
+    addgroup --system lxd
 fi
 
 # add the SUDO_USER user to the lxd group
 if ! groups | grep -q lxd; then
-    sudo usermod -G lxd -a "$SUDO_USER"
+    usermod -G lxd -a "$SUDO_USER"
 fi
 
 # # if there's no group called lxd, create it.
@@ -97,21 +97,11 @@ fi
 # fi
 
 # configure SSH
-if [[ ! -f "/home/$SUDO_USER/.ssh/authorized_keys" ]]; then
-    sudo touch "/home/$SUDO_USER/.ssh/authorized_keys"
-    sudo chown "$SUDO_USER:$SUDO_USER" -R "/home/$SUDO_USER/.ssh"
-fi
-
-# add the current user to the sudoers
-sudo touch "/etc/sudoers.d/$SUDO_USER"
-echo "$SUDO_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$SUDO_USER"
-
-# update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
-# TODO see if we can get this to listen on a specific interface rather than an IP address.
-DEFAULT_ROUTE_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
-IP_OF_DEFAULT_ROUTE_INTERFACE="$(ip addr show "$DEFAULT_ROUTE_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
-if ! grep -Fxq "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" /etc/ssh/sshd_config; then
-    echo "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" | sudo tee -a /etc/ssh/sshd_config
+SUDO_USER_HOME="$SUDO_USER_HOME"
+mkdir -p "$SUDO_USER_HOME/.ssh"
+if [[ ! -f "$SUDO_USER_HOME/.ssh/authorized_keys" ]]; then
+    touch "$SUDO_USER_HOME/.ssh/authorized_keys"
+    chown "$SUDO_USER:$SUDO_USER" -R "$SUDO_USER_HOME/.ssh"
 fi
 
 # this section configured the local SSH client on the Controller
@@ -119,10 +109,9 @@ fi
 # ".onion" address. We use SSH tunneling to expose the remote onion
 # server's LXD API and access it on the controller via a locally
 # expose port (after SSH tunneling)
-SSH_LOCAL_CONF="/home/$SUDO_USER/.ssh/config"
+SSH_LOCAL_CONF="$SUDO_USER_HOME/.ssh/config"
 if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
     # if the .ssh/config file doesn't exist, create it.
-    mkdir -p "/home/$SUDO_USER/.ssh"
     touch "$SSH_LOCAL_CONF"
 fi
 
@@ -141,7 +130,21 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
     fi
 fi
 
-sudo systemctl restart ssh
+
+# # add the current user to the sudoers
+# sudo touch "/etc/sudoers.d/$SUDO_USER"
+# echo "$SUDO_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$SUDO_USER"
+
+# update /etc/ssh/sshd_config to listen for incoming SSH connections on all interfaces.
+# TODO see if we can get this to listen on a specific interface rather than an IP address.
+DEFAULT_ROUTE_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
+IP_OF_DEFAULT_ROUTE_INTERFACE="$(ip addr show "$DEFAULT_ROUTE_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+if ! grep -Fxq "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" /etc/ssh/sshd_config; then
+    echo "ListenAddress $IP_OF_DEFAULT_ROUTE_INTERFACE" | tee -a /etc/ssh/sshd_config
+fi
+
+
+systemctl restart ssh
 wait-for-it -t 15 "$IP_OF_DEFAULT_ROUTE_INTERFACE:22"
 # end configure SSH
 #####################
@@ -149,15 +152,15 @@ wait-for-it -t 15 "$IP_OF_DEFAULT_ROUTE_INTERFACE:22"
 # install docker
 if [[ ! -f "$(command -v docker)" ]]; then
     echo "INFO: Installing 'docker' locally using snap."
-    sudo snap install docker --channel="stable"
+    snap install docker --channel="stable"
     sleep 2
     
     if ! grep -q docker /etc/group; then
-        sudo groupadd docker
+        groupadd docker
     fi
     
     if ! groups "$SUDO_USER" | grep -q docker; then
-        sudo usermod -aG docker "$SUDO_USER"
+        usermod -aG docker "$SUDO_USER"
     fi
     
     # next we need to determine the underlying file system so we can upload the correct daemon.json
@@ -169,14 +172,13 @@ if [[ ! -f "$(command -v docker)" ]]; then
         DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/btrfs_daemon.json"
         DEST_DAEMON_FILE="/var/snap/docker/current/config/daemon.json"
         echo "INFO: Setting dockerd daemon settings to $DEST_DAEMON_FILE"
-        sudo cp "$DAEMON_CONFIG" "$DEST_DAEMON_FILE"
-        sudo snap restart docker
+        cp "$DAEMON_CONFIG" "$DEST_DAEMON_FILE"
+        snap restart docker
     fi
 fi
 
-
-BASHRC_FILE="/home/$SUDO_USER/.bashrc"
-BASHRC_TEXT="export PATH=$""PATH:/home/$SUDO_USER/git/github/bcm"
+BASHRC_FILE="$SUDO_USER_HOME/.bashrc"
+BASHRC_TEXT="export PATH=$""PATH:$SUDO_USER_HOME/git/github/bcm"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
