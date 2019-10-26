@@ -43,7 +43,7 @@ wait-for-it -t 30 127.0.0.1:9050
 BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
 
-# clone the BCM repo to $HOME/git/github/bcm
+# clone the BCM repo to /home/$SUDO_USER/git/github/bcm
 SUDO_USER_HOME="/home/$SUDO_USER"
 BCM_GIT_DIR="$SUDO_USER_HOME/git/github/bcm"
 if [[ ! -d $BCM_GIT_DIR ]]; then
