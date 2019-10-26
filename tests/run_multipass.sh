@@ -21,6 +21,8 @@ multipass exec bcm -- wget --output-document=install.sh https://raw.githubuserco
 multipass exec bcm -- chmod 0744 install.sh
 multipass exec bcm -- sudo bash -c /home/ubuntu/install.sh
 
+multipass restart bcm
+
 # then connect to the VM and deploy whatever you want
 #multipass connect bcm
-#bcm stack start bitcoind
+bcm stack start bitcoind

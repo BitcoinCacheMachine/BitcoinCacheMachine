@@ -29,7 +29,7 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
     
     # The bcmLocalnet network allows users to access services from the same
     # host as where bcm back-end services are running (rather than from the network or onion)
-    if [[ $ENDPOINT -gt 1 ]]; then
+    if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
         lxc network create --target "$ENDPOINT" bcmLocalnet
     fi
     

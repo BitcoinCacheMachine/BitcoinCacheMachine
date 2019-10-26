@@ -2,7 +2,6 @@
 
 set -Eeuo pipefail
 
-CLUSTER_NODE_COUNT=$(echo "$CLUSTER_ENDPOINTS" | wc -l)
 ZOOKEEPER_SERVERS="server.1=zookeeper-01:2888:3888"
 ZOOKEEPER_CONNECT="zookeeper-01:2181"
 export MAX_ZOOKEEPER_NODES=5

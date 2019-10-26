@@ -59,6 +59,8 @@ else
     export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
     export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
     CLUSTER_ENDPOINTS="$(lxc cluster list --format csv | grep "$BCM_SSH_HOSTNAME" | awk -F"," '{print $1}')"
+    CLUSTER_NODE_COUNT=$(echo "$CLUSTER_ENDPOINTS" | wc -l)
+    export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
     export CLUSTER_ENDPOINTS="$CLUSTER_ENDPOINTS"
     
     if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
