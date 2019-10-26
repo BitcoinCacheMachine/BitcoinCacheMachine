@@ -73,11 +73,10 @@ if ! grep -q lxd /etc/group; then
     sudo addgroup --system lxd
 fi
 
+USER="$(whoami)"
 if ! groups | grep -q lxd; then
-    sudo useradd -g lxd -g sudo -m "$(whoami)"
+    sudo useradd -g lxd -g sudo -m "$USER"
 fi
-
-
 
 # TODO - update trusted PGP certificate.
 # echo "GNUPGHOME: $GNUPGHOME"
@@ -183,4 +182,4 @@ if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
 fi
 
-echo "WARNING: Please logout or restart your computer before continuing with BCM!"
+echo "WARNING: Please restart your computer before running any 'bcm' commands!"
