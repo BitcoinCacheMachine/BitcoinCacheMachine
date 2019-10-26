@@ -34,7 +34,7 @@ sudo apt-get autoremove -y
 sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd
 
 # upgrade all existing software.
-sudo apt-get upgrade -y
+# sudo apt-get upgrade -y
 
 # wait for local tor to come online.
 wait-for-it -t 30 127.0.0.1:9050

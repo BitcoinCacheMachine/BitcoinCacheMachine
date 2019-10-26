@@ -17,9 +17,9 @@ if ! multipass list | grep -q bcm; then
     multipass launch --disk="30GB" --mem="4098MB" --cpus="4" --name="bcm" bionic
 fi
 
-multipass exec bcm -- wget --output-document=bcm_init.sh https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/install.sh >>/dev/null
+multipass exec bcm -- wget --output-document=install.sh https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/install.sh >>/dev/null
 multipass exec bcm -- chmod 0744 install.sh
-multipass exec bcm -- bash -c /home/ubuntu/install.sh
+multipass exec bcm -- sudo bash -c /home/ubuntu/install.sh
 
 # then connect to the VM and deploy whatever you want
 #multipass connect bcm
