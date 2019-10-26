@@ -94,9 +94,10 @@ lxc exec "$BCM_MANAGER_HOST_NAME" -- docker swarm init --advertise-addr eth1 >> 
 
 # upload the docker daemon config to BCM_MANAGER_HOST_NAME
 # TODO update this to use a tmpfs mount for temp storage.
-envsubst <./daemon1.json > ./daemon-updated.json
-lxc file push ./daemon-updated.json "$BCM_MANAGER_HOST_NAME"/etc/docker/daemon.json
-rm ./daemon-updated.json
+mkdir -p "$BCM_TMP_DIR"
+envsubst <./daemon1.json > "$BCM_TMP_DIR/daemon-updated.json"
+lxc file push "$BCM_TMP_DIR/daemon-updated.json" "$BCM_MANAGER_HOST_NAME"/etc/docker/daemon.json
+rm "$BCM_TMP_DIR/daemon-updated.json"
 
 # restart the host so it runs with new dockerd daemon config.
 lxc restart "$BCM_MANAGER_HOST_NAME"

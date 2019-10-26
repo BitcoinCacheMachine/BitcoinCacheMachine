@@ -44,11 +44,10 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
     # each tier has a specific daemon.json config
     DAEMON_JSON="$BCM_GIT_DIR/project/tiers/$TIER_BASE_NAME/daemon.json"
     if [ -f "$DAEMON_JSON" ]; then
-        mkdir -p /tmp/bcm
-        touch "/tmp/bcm/env"
-        envsubst <"$DAEMON_JSON" >"/tmp/bcm/env"
-        lxc file push "/tmp/bcm/env" "$LXC_HOSTNAME/etc/docker/daemon.json"
-        rm "/tmp/bcm/env"
+        touch "$BCM_TMP_DIR/env"
+        envsubst <"$DAEMON_JSON" >"$BCM_TMP_DIR/env"
+        lxc file push "$BCM_TMP_DIR/env" "$LXC_HOSTNAME/etc/docker/daemon.json"
+        rm "$BCM_TMP_DIR/env"
     fi
     # each tier can have a specific dhcp conf file, but it's optional due to default behavior.
     DHCPD_CONF_FILE="$BCM_GIT_DIR/project/tiers/$TIER_BASE_NAME/dhcp_conf.yml"

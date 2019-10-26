@@ -72,7 +72,7 @@ if [[ $BCM_CLI_VERB == "clear" ]]; then
             CONTINUE=1
             # let's ensure our remote git repo is updated.
             # TODO move this over a TOR connection via PROXY switch/config.
-            # TODO ensure we're using an encrypted storage backend for all /tmp/bcm files
+            # TODO ensure we're using an encrypted storage backend for all $BCM_TMP_DIR files
             # by default we retain images to make development easier.
             bash -c "./clear_lxd.sh --delete-images=$ALL_FLAG"
             
