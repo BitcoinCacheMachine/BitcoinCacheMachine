@@ -4,6 +4,7 @@ set -eu
 
 echo "INFO: RUNNING BCM INSTALL SCRIPT"
 echo "Current User: $USER"
+echo "BCM_USER:  $BCM_USER"
 
 
 # get the codename, usually bionic or debian
