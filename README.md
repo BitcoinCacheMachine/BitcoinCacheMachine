@@ -43,10 +43,10 @@ All you need to get started is an SSH endpoint running Ubuntu 18.04. When runnin
 
 ## Getting Started
 
-The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your new SDN controller, a user-facing desktop or laptop. The best way to do this is run a debian or Ubuntu VM behind a whonix gateway running on QubesOS. In either case, the installation procedures are the same:
+The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your new SDN controller, a user-facing desktop or laptop running a Debian-based OS. The best way to do this is run a Debian Tempalte VM running behind a whonix gateway running on QubesOS. In either case, the installation procedures are the same:
 
 ```bash
-curl https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/resources/git_init.sh | sudo bash
+curl https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/resources/bcm_init.sh | sudo bash
 ```
 
 The script above runs the bcm entrypoint. Afterwards, you may need to log out and log back (or restart) in for your group membership to refresh. Running `bcm` at the terminal ensures that all necessary dependencies are made availble (LXD client, dockerd) and builds the docker images needed to run bcm commands.

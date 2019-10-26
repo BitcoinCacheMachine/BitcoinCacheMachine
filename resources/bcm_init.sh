@@ -13,10 +13,20 @@ echo "deb-src https://deb.torproject.org/torproject.org $CODE_NAME main" | sudo 
 curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import
 gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
 
-# update apt and install pre-reqs
+# update apt and install pre-reqs;
 sudo apt-get update
-sudo apt-get remove lxd lxd-client tor -y
+
+# remove any pre-existing software that may exist and have conflicts.
+for PKG in lxd lxd-client tor; do
+    if dpkg -s $PKG >/dev/null 2>&1; then
+        sudo apt-get remove "$PKG" -y
+    fi
+done
+
+# remove any unused software.
 sudo apt-get autoremove -y
+
+# reinstall required software.
 sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg
 
 # wait for local tor to come online.
