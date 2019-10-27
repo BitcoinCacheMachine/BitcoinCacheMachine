@@ -6,9 +6,6 @@ cd "$(dirname "$0")"
 # only continue if the necessary image exists.
 bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
 
-if bcm tier list | grep -q "manager"; then
-    exit
-fi
 
 # It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
 if ! lxc project list --format csv  | grep -q "$BCM_PROJECT"; then

@@ -3,10 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# first, let's make sure we deploy our direct dependencies.
-if ! bcm tier list | grep -q "bitcoin-$BCM_ACTIVE_CHAIN"; then
-    bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
-fi
 
 # this brings up the onion site that exposes all our
 # services to users having the onion token.

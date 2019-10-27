@@ -1,11 +1,12 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# don't even think about proceeding unless the manager BCM tier is up and running.
-if ! bcm tier list | grep -q "manager"; then
-    bcm tier create manager
+
+# let's make sure the manager tier exists before we deploy kafka
+if ! lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-manager"; then
+    bash -c "$BCM_GIT_DIR/project/tiers/manager/up.sh"
 fi
 
 # let's get some shared (between up/down scripts).
@@ -30,7 +31,6 @@ export KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS"
 bash -c "./broker/up_lxc_broker.sh"
 
 KAFKA_STACKS_DIR="$BCM_GIT_DIR/project/tiers/kafka/stacks"
-
 for stack in kafkaschemareg kafkarest kafkaconnect; do
     bash -c "$BCM_LXD_OPS/deploy_stack_init.sh --env-file-path=$KAFKA_STACKS_DIR/$stack/env --container-name=$BCM_KAFKA_HOST_NAME"
 done

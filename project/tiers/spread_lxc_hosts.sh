@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TIER_NAME=
@@ -25,24 +25,15 @@ fi
 PROFILE_NAME="bcm-$TIER_NAME"
 
 # let's get a bcm-manager LXC instance on each cluster endpoint.
-MASTER_NODE=$(echo "$CLUSTER_ENDPOINTS" | grep '01')
 for ENDPOINT in $CLUSTER_ENDPOINTS; do
     HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
     LXC_HOSTNAME="bcm-$TIER_NAME-$(printf %02d "$HOST_ENDING")"
     LXC_DOCKERVOL="$LXC_HOSTNAME-docker"
     
     # only create the new storage volume if it doesn't already exist
-    if lxc storage volume list bcm --format csv | grep -q "$LXC_DOCKERVOL"; then
-        # then this is normal behavior. Let's create the storage volume
-        if [ "$ENDPOINT" != "$MASTER_NODE" ]; then
-            echo "Creating volume '$LXC_DOCKERVOL' on the 'bcm' storage pool on cluster member '$ENDPOINT'."
-            lxc storage volume create bcm "$LXC_DOCKERVOL" block.filesystem=ext4 --target "$ENDPOINT"
-        else
-            lxc storage volume create bcm "$LXC_DOCKERVOL" block.filesystem=ext4
-        fi
-    else
-        # but if it does exist, emit a WARNING that one already exists and will be used
-        echo "WARNING: The existing LXC storage volume '$LXC_DOCKERVOL' exists and will be attached to the '$LXC_HOSTNAME' LXC container."
+    if ! lxc storage volume list bcm --format csv | grep -q "$LXC_DOCKERVOL"; then
+        echo "Creating volume '$LXC_DOCKERVOL' on the 'bcm' storage pool on cluster member '$ENDPOINT'."
+        lxc storage volume create bcm "$LXC_DOCKERVOL" block.filesystem=ext4 --target "$ENDPOINT"
     fi
     
     # create the LXC host with the attached profiles.
@@ -53,11 +44,10 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
         echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi
     
-    if lxc storage volume list bcm --format csv | grep "$LXC_DOCKERVOL" | grep -q ",0, "; then
+    # last, attach the storage volume to the container.
+    if ! lxc storage volume list bcm --format csv | grep "$LXC_DOCKERVOL" | grep -q ",0, "; then
         if lxc storage volume show bcm "$LXC_DOCKERVOL" | grep -q "location: $ENDPOINT"; then
             lxc storage volume attach bcm "$LXC_DOCKERVOL" "$LXC_HOSTNAME" dockerdisk path=/var/lib/docker
         fi
-    else
-        echo "WARNING: Your dockervol was already attached to '$LXC_HOSTNAME'."
     fi
 done

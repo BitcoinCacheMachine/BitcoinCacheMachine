@@ -1,28 +1,15 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# exit if the tier already exists! Operator must first delete it.
-if bcm tier list | grep -q "bitcoin-$BCM_ACTIVE_CHAIN"; then
-    echo "The 'bitcoin-$BCM_ACTIVE_CHAIN' tier is already provisioned."
-    exit
-fi
-
-# don't even think about proceeding unless the manager BCM tier is up and running.
-if ! bcm tier list | grep -q "manager"; then
-    bash -c "$BCM_GIT_DIR/project/tiers/manager/up.sh"
-fi
-
-# ensure the kafka tier is up
-if ! bcm tier list | grep -q "kafka"; then
-    bash -c "$BCM_GIT_DIR/project/tiers/kafka/up.sh"
-fi
-
-# ensure the underlay tier is up.
-if ! bcm tier list | grep -q "underlay"; then
+# let's make sure the underlay tier exists before we deploy bitcoin
+if ! lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-underlay"; then
     bash -c "$BCM_GIT_DIR/project/tiers/underlay/up.sh"
 fi
 
-# Let's provision the system containers to the cluster.
-../create_tier.sh --tier-name="bitcoin-$BCM_ACTIVE_CHAIN"
+# deploy the bitcoin tier if it doesn't already exist.
+if lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-bitcoin-$BCM_ACTIVE_CHAIN"; then
+    # Let's provision the system containers to the cluster.
+    ../create_tier.sh --tier-name="bitcoin-$BCM_ACTIVE_CHAIN"
+fi
