@@ -63,6 +63,11 @@ FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
 if [[ $REBUILD == 0 ]]; then
     IMAGE_EXISTS_IN_DOCKER_REG="$(lxc exec $LXC_HOST -- docker image pull "$FULLY_QUALIFIED_IMAGE_NAME" > /dev/null && echo 1 || echo 0)"
     if [[ $IMAGE_EXISTS_IN_DOCKER_REG == 0 ]]; then
+        if [[ -z $DOCKER_HUB_IMAGE ]]; then
+            echo "ERROR: DOCKER_HUB_IMAGE not set."
+            exit
+        fi
+        
         # if the image doesn't exist in our docker registry, and not in our local docker daemon either
         # then we can pull it down from the public Docker registry and tag and push it appropriately.
         if ! lxc exec "$LXC_HOST" -- docker image list | grep -q "$DOCKER_HUB_IMAGE"; then
@@ -80,15 +85,14 @@ else
     fi
     
     # let's make sure there's a dockerfile
-    if [[ ! -f "$BUILD_CONTEXT/Dockerfile" ]]; then
-        echo "There was no Dockerfile found in the build context."
-        exit
-    else
+    if [[ -f "$BUILD_CONTEXT/Dockerfile" ]]; then
         echo "Pushing contents of the build context to LXC host '$LXC_HOST'."
         lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
+        
+        echo "Building the docker image '$FULLY_QUALIFIED_IMAGE_NAME'"
+        FULLY_QUALIFIED_BASE_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$BASE_IMAGE:$BCM_VERSION"
+        lxc exec "$LXC_HOST" -- docker pull "$FULLY_QUALIFIED_BASE_IMAGE_NAME"
+        lxc exec "$LXC_HOST" -- docker build --build-arg BASE_IMAGE="$FULLY_QUALIFIED_BASE_IMAGE_NAME" -t "$FULLY_QUALIFIED_IMAGE_NAME" /root/build/
+        lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
     fi
-    
-    echo "Preparing the docker image '$FULLY_QUALIFIED_IMAGE_NAME'"
-    lxc exec "$LXC_HOST" -- docker build --build-arg BCM_PRIVATE_REGISTRY="$BCM_PRIVATE_REGISTRY" --build-arg BASE_IMAGE="$BASE_IMAGE" -t "$FULLY_QUALIFIED_IMAGE_NAME" /root/build/
-    lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"
 fi

@@ -74,6 +74,17 @@ else
     fi
     
     if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
+        # let's make sure our docker swarm master is available for querying.
+        if ! lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME"; then
+            bcm tier create bitcoin
+        fi
+        
+        # if the manager is stopped, start it.
+        if lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME,STOPPED"; then
+            lxc start "$BCM_MANAGER_HOST_NAME"
+            bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
+        fi
+        
         ./stack/entrypoint.sh "$@"
         exit
     fi

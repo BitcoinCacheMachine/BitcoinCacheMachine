@@ -3,6 +3,12 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+
+# let's make sure the toronion is available first.
+if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q toronion; then
+    bcm stack start toronion
+fi
+
 # push the stack files up tthere.
 lxc file push  -p -r ./stack/ "$BCM_MANAGER_HOST_NAME"/root/torproxy
 

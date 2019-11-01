@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # first, let's make sure we deploy our direct dependencies.
-if ! bcm stack list | grep -q "bitcoind"; then
+if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q "bitcoind"; then
     bcm stack start bitcoind
 fi
 

@@ -40,11 +40,19 @@ BCM_SSH_HOSTNAME=${BCM_SSH_HOSTNAME:-"$(hostname)"}
 if [[ ! -z $BCM_SSH_HOSTNAME ]]; then
     BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
 fi
+export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
 
 BCM_SSH_USERNAME=${BCM_SSH_USERNAME:-"$(whoami)"}
 if [[ ! -z $BCM_SSH_USERNAME ]]; then
     BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
 fi
+export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
+
+BCM_ACTIVE_CHAIN=${BCM_ACTIVE_CHAIN:-"testnet"}
+if [[ ! -z $BCM_ACTIVE_CHAIN ]]; then
+    BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN"
+fi
+export BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN"
 
 GNUPGHOME=${GNUPGHOME:-"$HOME/.gnupg"}
 if [[ ! -z $GNUPGHOME ]]; then
@@ -58,11 +66,28 @@ if [[ ! -z $BCM_DATACENTER ]]; then
 fi
 export BCM_DATACENTER="$BCM_DATACENTER"
 
-source ./bcm.env
+
+export BCM_MAJOR_VERSION="0"
+export BCM_MINOR_VERSION="0"
+export BCM_PATCH_VERSION="1"
+export BCM_VERSION_FLAG="beta"
+export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION-$BCM_VERSION_FLAG"
+
+BCM_GIT_DIR="$(pwd)"
+export BCM_GIT_DIR="$BCM_GIT_DIR"
+export BCM_LXD_OPS="$BCM_GIT_DIR/project/shared"
+
+# todo; convert this to a temp encrypted ramdisk that exists for the duration of each bcm call.
+BCM_HELP_FLAG=0
+
+export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
+
+export BCM_HELP_FLAG="$BCM_HELP_FLAG"
+export IS_FRONTEND="$IS_FRONTEND"
+
 
 # switch to 'master' for formal versions.
 export BCM_DEFAULT_GIT_BRANCH="dev"
-export BCM_ACTIVE_CHAIN="testnet"
 export BCM_SSH_DIR="$HOME/.ssh" && mkdir -p "$BCM_SSH_DIR"
 export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
 export BASE_DOCKER_IMAGE="ubuntu:latest"

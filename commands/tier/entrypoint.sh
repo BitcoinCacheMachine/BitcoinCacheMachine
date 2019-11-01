@@ -33,15 +33,11 @@ if [ -z "${TIER_NAME}" ]; then
 fi
 
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    # get a list of the running tier containers.
-    # LXC_LIST_OUTPUT="$(lxc list --format csv --columns ns | grep "RUNNING")"
-    
     if  [[ $TIER_NAME == "bitcoin" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
         elif  [[ $TIER_NAME == "underlay" ]]; then
         bash -c "$BCM_GIT_DIR/project/tiers/underlay/up.sh"
         elif [[ $TIER_NAME == "kafka" ]]; then
-        
         bash -c "$BCM_GIT_DIR/project/tiers/kafka/up.sh"
         elif  [[ $TIER_NAME == "manager" ]]; then
         # let's make sure we have the LXD project set up correctly.

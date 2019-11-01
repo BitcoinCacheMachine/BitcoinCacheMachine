@@ -65,7 +65,7 @@ if [[ $(wc -w <<< "$BACKUP_DOCKER_VOLUMES") -gt 0 ]]; then
             if [[ $BACKUP == 1 ]]; then
                 # if the stack is running, we stop immediately.  These scripts are only intended for manual backups
                 # and services are ASSUMED To be OFF.
-                if bcm stack list | grep -q "$STACK_NAME"; then
+                if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME"; then
                     echo "WARNING: Can't perform a manual backup when '$STACK_NAME' is running. Remove running bcm stacks using the 'bcm stack remove [stack_name]' to stop relevant services."
                     exit 1
                 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -82,29 +82,6 @@ if [[ $BCM_CLI_VERB == "stop" ]]; then
             exit
         fi
         
-    fi
-fi
-
-if [[ $BCM_CLI_VERB == "list" ]]; then
-    PREFIX="-$BCM_ACTIVE_CHAIN"
-    
-    
-    if ! lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME"; then
-        echo "Warning! '$BCM_MANAGER_HOST_NAME' does not exist. Considering running 'bcm stack start' command."
-        exit
-    fi
-    
-    if lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME,STOPPED"; then
-        lxc start "$BCM_MANAGER_HOST_NAME"
-        bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
-    fi
-    
-    if lxc list --format csv -c=n | grep -q "$BCM_MANAGER_HOST_NAME"; then
-        CHAIN=$BCM_ACTIVE_CHAIN
-        for STACK in $(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN"); do
-            STACK=${STACK%"$PREFIX"}
-            echo "$STACK"
-        done
     fi
 fi
 

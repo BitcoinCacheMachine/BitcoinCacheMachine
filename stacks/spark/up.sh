@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 source ./env.sh
 
 # first, let's make sure we deploy our direct dependencies.
-if ! bcm stack list | grep -q "clightning"; then
+if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q "clightning"; then
     bcm stack start clightning
 fi
 

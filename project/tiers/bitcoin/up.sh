@@ -9,7 +9,7 @@ if ! lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-underlay
 fi
 
 # deploy the bitcoin tier if it doesn't already exist.
-if lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-bitcoin-$BCM_ACTIVE_CHAIN"; then
+if ! lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-bitcoin-$BCM_ACTIVE_CHAIN"; then
     # Let's provision the system containers to the cluster.
     ../create_tier.sh --tier-name="bitcoin-$BCM_ACTIVE_CHAIN"
 fi

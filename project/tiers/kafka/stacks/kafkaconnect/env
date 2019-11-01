@@ -1,6 +1,5 @@
-export IMAGE_TAG="$KAFKA_VERSION_TAG"
-export DOCKERHUB_IMAGE="confluentinc/cp-kafka-connect:$IMAGE_TAG"
+export DOCKER_HUB_IMAGE="confluentinc/cp-kafka-connect:5.3.1"
 export IMAGE_NAME="bcm-kafka-connect"
-export BCM_TIER_NAME="kafka"
+export TIER_NAME="kafka"
 export STACK_NAME="kafkaconnect"
 export SERVICE_NAME="kafka-connect"

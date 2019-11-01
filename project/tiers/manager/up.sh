@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # only continue if the necessary image exists.
@@ -119,7 +119,6 @@ docker stack deploy -c "/root/manager/stacks/registry/privreg.yml" privateregist
 lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:$BCM_PRIVATE_REGISTRY_PORT"
 
 # tag and push the registry image to our local private registry.
-BCM_PRIVATE_REGISTRY="127.0.0.1:$BCM_PRIVATE_REGISTRY_PORT"
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 

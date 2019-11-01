@@ -4,15 +4,8 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 
-# this brings up the onion site that exposes all our
-# services to users having the onion token.
-if bcm stack list | grep -q toronion; then
-    bcm stack start toronion
-fi
-
-# this is so services like bitcoind and lightningd, etc.
-# have a SOCKS5 proxy to TOR.
-if bcm stack list | grep -q torproxy; then
+# let's make sure the tor proxy script is executed, if necessary.
+if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q torproxy; then
     bcm stack start torproxy
 fi
 

@@ -1,4 +1,3 @@
 #!/bin/bash
 
 export BCM_TIER_TYPE=1
-export KAFKA_VERSION_TAG="5.3.1"
