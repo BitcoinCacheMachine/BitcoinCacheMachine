@@ -60,7 +60,11 @@ fi
 # let's first check to see if the image is in the local registry for private images
 # if so, we can just pull that down and exit.
 FULLY_QUALIFIED_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
-if [[ $REBUILD == 0 ]]; then
+
+# if the build context is empty, then we should probably pull from dockerhub.
+if [[ -z $BUILD_CONTEXT ]]; then
+    
+    # before we pull from dockerhub, let's check to see if it's in our local registry already
     IMAGE_EXISTS_IN_DOCKER_REG="$(lxc exec $LXC_HOST -- docker image pull "$FULLY_QUALIFIED_IMAGE_NAME" > /dev/null && echo 1 || echo 0)"
     if [[ $IMAGE_EXISTS_IN_DOCKER_REG == 0 ]]; then
         if [[ -z $DOCKER_HUB_IMAGE ]]; then
@@ -79,11 +83,6 @@ if [[ $REBUILD == 0 ]]; then
         echo "INFO: the image '$FULLY_QUALIFIED_IMAGE_NAME' was found in the BCM local docker registry."
     fi
 else
-    if [[ -z $BUILD_CONTEXT ]]; then
-        echo "The build context was empty."
-        exit
-    fi
-    
     # let's make sure there's a dockerfile
     if [[ -f "$BUILD_CONTEXT/Dockerfile" ]]; then
         echo "Pushing contents of the build context to LXC host '$LXC_HOST'."

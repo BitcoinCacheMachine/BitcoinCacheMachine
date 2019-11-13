@@ -26,7 +26,7 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
     # env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
     source "$BCM_GIT_DIR/project/tiers/env.sh" --host-ending="$HOST_ENDING"
     
-    lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$ZOOKEEPER_IMAGE" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d "$HOST_ENDING")" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")" TARGET_HOST="$LXC_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/kafka/zookeeper.yml "zookeeper-$(printf %02d "$HOST_ENDING")"
+    lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/$ZOOKEEPER_IMAGE:$BCM_VERSION" ZOOKEEPER_HOSTNAME="zookeeper-$(printf %02d "$HOST_ENDING")" OVERLAY_NETWORK_NAME="zookeeper-$(printf %02d "$HOST_ENDING")" TARGET_HOST="$LXC_HOSTNAME" ZOOKEPER_ID="$HOST_ENDING" ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS" docker stack deploy -c /root/stacks/kafka/zookeeper.yml "zookeeper-$(printf %02d "$HOST_ENDING")"
     
     NODE=$(("$NODE" + 1))
 done

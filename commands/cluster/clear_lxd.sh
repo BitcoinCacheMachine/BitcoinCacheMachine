@@ -31,9 +31,12 @@ for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
     done
     
     if [[ $DELETE_IMAGES == 1 ]]; then
-        echo "==> Deleting all images for project: ${project}"
         for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
-            lxc image delete --project "${project}" "${image}"
+            FINGERPRINT=${image:0:12}
+            if lxc image list --format csv --columns lf | grep "$FINGERPRINT" | grep -q "bcm-lxc-base"; then
+                echo "==> Deleting image ${FINGERPRINT} for project: ${project}"
+                lxc image delete --project "${project}" "${image}"
+            fi
         done
     else
         echo "INFO: the '--all' flag was not specified, so any existing LXC images were NOT removed."

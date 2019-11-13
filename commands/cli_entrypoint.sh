@@ -8,6 +8,9 @@ BCM_CLI_COMMAND=
 if [[ ! -z ${1+x} ]]; then
     BCM_CLI_COMMAND="$1"
 else
+    # if we get here, then the user didn't supply the correct resonse.
+    echo "ERROR: Please supply a bcm command."
+    cat ./help.txt
     exit
 fi
 
@@ -58,8 +61,10 @@ else
     # these commands will be executed by the local terminal
     export BCM_FORCE_FLAG="$BCM_FORCE_FLAG"
     export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
+    RUNNING_CONTAINERS="$(lxc list --format csv --columns ns | grep "RUNNING")" || true
     CLUSTER_ENDPOINTS="$(lxc cluster list --format csv | grep "$BCM_SSH_HOSTNAME" | awk -F"," '{print $1}')"
     CLUSTER_NODE_COUNT=$(echo "$CLUSTER_ENDPOINTS" | wc -l)
+    export RUNNING_CONTAINERS="$RUNNING_CONTAINERS"
     export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
     export CLUSTER_ENDPOINTS="$CLUSTER_ENDPOINTS"
     
@@ -115,7 +120,6 @@ else
     if [[ ! -d "$GNUPGHOME/trezor" ]]; then
         bash -c "$BCM_GIT_DIR/commands/init.sh"
     fi
-    
     
     ./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
     ./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"

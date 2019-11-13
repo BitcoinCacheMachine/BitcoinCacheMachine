@@ -25,7 +25,6 @@ bash -c "./zookeeper/up.sh"
 export ZOOKEEPER_CONNECT="$ZOOKEEPER_CONNECT"
 export ZOOKEEPER_SERVERS="$ZOOKEEPER_SERVERS"
 
-
 source ./broker/get_env.sh
 export KAFKA_BOOSTRAP_SERVERS="$KAFKA_BOOSTRAP_SERVERS"
 bash -c "./broker/up_lxc_broker.sh"

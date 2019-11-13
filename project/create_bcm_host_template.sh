@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+echo "Creating the BCM LXC HOST TEMPLATE."
 
 # if the default storage driver doesn't exist, create it.
 if ! lxc storage list --format csv | grep -q "bcm"; then
@@ -11,25 +12,15 @@ fi
 
 # create LXC profiles from templates.
 for PROFILE_NAME in bcm_disk docker_unprivileged docker_privileged; do
-    lxc profile create "$PROFILE_NAME"
-    cat "./$PROFILE_NAME.yml" | lxc profile edit $PROFILE_NAME
+    # if the profile doesn't already exist, we create it.
+    if ! lxc profile list --format csv | grep -q "$PROFILE_NAME"; then
+        lxc profile create "$PROFILE_NAME"
+        cat "./$PROFILE_NAME.yml" | lxc profile edit $PROFILE_NAME
+    fi
 done
 
 if ! lxc project list --format csv | grep -q "default (current)"; then
     lxc project switch default
-fi
-
-# first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
-# if it exists, we will quit by default, UNLESS the user has passed in an override, in which case
-# it (being the lxc image 'bcm-template') will be rebuilt.
-if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    echo "INFO: LXC image '$LXC_BCM_BASE_IMAGE_NAME' has already been built."
-    exit
-fi
-
-if lxc list --format csv -c n | grep -q "bcm-lxc-base"; then
-    echo "The LXD image 'bcm-lxc-base' doesn't exist. Exiting."
-    exit
 fi
 
 # download the main ubuntu image if it doesn't exist.
@@ -119,8 +110,3 @@ lxc snapshot "$LXC_BCM_BASE_IMAGE_NAME" bcmHostSnapshot
 # other members of the LXD cluster will be able to pull and run this image
 echo "Publishing $LXC_BCM_BASE_IMAGE_NAME""/bcmHostSnapshot" "'$LXC_BCM_BASE_IMAGE_NAME' on cluster '$(lxc remote get-default)'."
 lxc publish "$LXC_BCM_BASE_IMAGE_NAME/bcmHostSnapshot" --alias "$LXC_BCM_BASE_IMAGE_NAME"
-
-
-if lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    lxc delete "$LXC_BCM_BASE_IMAGE_NAME"
-fi

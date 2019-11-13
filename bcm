@@ -130,6 +130,11 @@ fi
 export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
 export GNUPGHOME="$OLD_GNUPGHOME"
 
+# check if all required programs are installed
+if [[ ! -f "$(command -v lxc)" ]]; then
+    echo "ERROR: LXD is not installed. Please run the bcm installer script."
+    exit
+fi
 
 # if the current cluster is not configured, let's bring it into existence.
 if lxc info | grep -q "server_clustered: false"; then

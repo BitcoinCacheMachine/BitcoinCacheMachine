@@ -3,9 +3,11 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# only continue if the necessary image exists.
-bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
-
+# first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
+if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
+    # only continue if the necessary image exists.
+    bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
+fi
 
 # It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
 if ! lxc project list --format csv  | grep -q "$BCM_PROJECT"; then
@@ -171,7 +173,7 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
             # another registry mirror and private registry in case node1 goes offline.
             # We will only have 2 locations for docker image distribution.
             if [[ $HOST_ENDING == 2 ]]; then
-                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-manager-01:$BCM_REGISTRY_MIRROR_PORT" docker stack deploy -c "/root/manager/stacks/registry/regmirror.yml" regmirror2
+                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:$BCM_VERSION" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-manager-01:$BCM_REGISTRY_MIRROR_PORT" docker stack deploy -c "/root/manager/stacks/registry/regmirror.yml" regmirror2
             fi
         fi
     fi
