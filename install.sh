@@ -31,7 +31,7 @@ done
 apt-get autoremove -y
 
 # reinstall required software.
-apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd openssh-server
+apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd openssh-server jq gnupg snapd
 
 # upgrade all existing software.
 # sudo apt-get upgrade -y

@@ -48,7 +48,7 @@ function createBCMBRGW() {
 
 function createBCMNet() {
     if ! lxc network list --format csv | grep -q bcmNet; then
-        lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
+        lxc network create bcmNet bridge.mode=fan fan.type=vxlan fan.underlay_subnet=172.17.0.0/24 dns.mode=dynamic
     fi
 }
 

@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-echo "Creating the BCM LXC HOST TEMPLATE."
-
 # if the default storage driver doesn't exist, create it.
 if ! lxc storage list --format csv | grep -q "bcm"; then
     lxc storage create bcm btrfs

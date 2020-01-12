@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeoux pipefail
+set -Eeou pipefail
 
 # this is the entrypoint in to the testing framework for BCM.
 # all test cases are executed against a fresh bionic instance (VM) using multipass

@@ -8,7 +8,7 @@ DELETE_IMAGES=0
 for i in "$@"; do
     case $i in
         --delete-images=*)
-            DELETE_IMAGES="${i#*=}"
+            DELETE_IMAGES=1
             shift # past argument=value
         ;;
         *)
@@ -19,8 +19,7 @@ done
 
 
 if ! which jq >/dev/null 2>&1; then
-    echo "This tool requires: jq"
-    exit 1
+    sudo apt update && sudo apt install -y jq
 fi
 
 ## Delete anything that's tied to a project
@@ -33,13 +32,13 @@ for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
     if [[ $DELETE_IMAGES == 1 ]]; then
         for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
             FINGERPRINT=${image:0:12}
-            if lxc image list --format csv --columns lf | grep "$FINGERPRINT" | grep -q "bcm-lxc-base"; then
-                echo "==> Deleting image ${FINGERPRINT} for project: ${project}"
-                lxc image delete --project "${project}" "${image}"
-            fi
+            #if lxc image list --format csv --columns lf | grep "$FINGERPRINT" | grep -q "bcm-lxc-base"; then
+            echo "==> Deleting image ${FINGERPRINT} for project: ${project}"
+            lxc image delete --project "${project}" "${image}"
+          
         done
     else
-        echo "INFO: the '--all' flag was not specified, so any existing LXC images were NOT removed."
+        echo "INFO: the '--delete-images' flag was not specified, so any existing LXC images were NOT removed."
     fi
 done
 

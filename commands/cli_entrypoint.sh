@@ -16,7 +16,7 @@ fi
 
 export BCM_CLI_COMMAND="$BCM_CLI_COMMAND"
 
-shopt -s expand_aliases
+#shopt -s expand_aliases
 
 BCM_FORCE_FLAG=0
 BCM_VOLUMES_FLAG=0
@@ -53,7 +53,7 @@ fi
 
 # If our local CLI target SSH hostname is on another machine, then
 # we should execute it on the reomte machine.
-if [[ "$BCM_SSH_HOSTNAME" != "$(hostname)" ]]; then
+if [[ "$BCM_SSH_HOSTNAME" != "localhost" ]]; then
     bash -c './ssh/entrypoint.sh "$@" --execute --command="$@"'
     exit
 else

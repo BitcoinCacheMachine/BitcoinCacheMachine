@@ -114,8 +114,8 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
     if [[ ! -f $TREZOR_PUB_KEY_PATH ]]; then
         # generate a new SSH key for the remote hostname.
-        bcm ssh newkey --hostname="$BCM_SSH_HOSTNAME" --username="$BCM_SSH_USERNAME"
-        < "$TREZOR_PUB_KEY_PATH" ssh -i "$SSH_KEY_PATH" "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" "cat > /home/\$(whoami)/.ssh/authorized_keys"
+        bash -c "$BCM_GIT_DIR/commands/ssh newkey --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME
+        < $TREZOR_PUB_KEY_PATH ssh -i $SSH_KEY_PATH $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME cat > /home/\$(whoami)/.ssh/authorized_keys"
     fi
     
     # place the public SSH key on the remote SSH endpoint.
