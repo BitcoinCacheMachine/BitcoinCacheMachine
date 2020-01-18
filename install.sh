@@ -22,7 +22,7 @@ apt-get update
 
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
-    if dpkg -s $PKG >/dev/null 2>&1; then
+    if dpkg -s "$PKG" >/dev/null 2>&1; then
         apt-get remove "$PKG" -y
     fi
 done
@@ -34,7 +34,7 @@ apt-get autoremove -y
 apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd openssh-server jq gnupg snapd
 
 # upgrade all existing software.
-# sudo apt-get upgrade -y
+sudo apt-get upgrade -y
 
 # wait for local tor to come online.
 wait-for-it -t 30 127.0.0.1:9050
@@ -68,7 +68,7 @@ if [[ ! -f "$(command -v lxc)" ]]; then
     # install lxd via snap
     # unless this is modified, we get snapshot creation in snap when removing lxd.
     echo "INFO: Installing 'lxd' on $HOSTNAME."
-    snap install lxd --channel="candidate"
+    snap install lxd --channel="stable"
     snap set system snapshots.automatic.retention=no
     sleep 5
 fi

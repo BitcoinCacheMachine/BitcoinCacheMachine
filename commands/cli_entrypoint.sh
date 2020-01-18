@@ -9,7 +9,6 @@ if [[ ! -z ${1+x} ]]; then
     BCM_CLI_COMMAND="$1"
 else
     # if we get here, then the user didn't supply the correct resonse.
-    echo "ERROR: Please supply a bcm command."
     cat ./help.txt
     exit
 fi
