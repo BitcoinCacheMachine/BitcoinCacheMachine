@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 # let's make sure the toronion is available first.
 if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q toronion; then
-    bcm stack start toronion
+    bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=toronion"
 fi
 
 # push the stack files up tthere.

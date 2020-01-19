@@ -17,11 +17,6 @@ for i in "$@"; do
     esac
 done
 
-
-if ! which jq >/dev/null 2>&1; then
-    sudo apt update && sudo apt install -y jq
-fi
-
 ## Delete anything that's tied to a project
 for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
     echo "==> Deleting all containers for project: ${project}"

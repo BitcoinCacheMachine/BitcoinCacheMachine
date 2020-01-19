@@ -43,14 +43,17 @@ wait-for-it -t 30 127.0.0.1:9050
 BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
 
-# clone the BCM repo to /home/$SUDO_USER/git/github/bcm
+# clone the BCM repo to /home/$SUDO_USER/bcm
 SUDO_USER_HOME="/home/$SUDO_USER"
-BCM_GIT_DIR="$SUDO_USER_HOME/git/github/bcm"
+BCM_GIT_DIR="$SUDO_USER_HOME/bcm"
 if [[ ! -d $BCM_GIT_DIR ]]; then
     git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 else
     cd "$BCM_GIT_DIR" && git pull
 fi
+
+# ensure the user owns the files.
+chown -R "$SUDO_USER:$SUDO_USER" "$BCM_GIT_DIR"
 
 cd "$BCM_GIT_DIR" && git checkout dev
 
@@ -68,7 +71,7 @@ if [[ ! -f "$(command -v lxc)" ]]; then
     # install lxd via snap
     # unless this is modified, we get snapshot creation in snap when removing lxd.
     echo "INFO: Installing 'lxd' on $HOSTNAME."
-    snap install lxd --channel="stable"
+    snap install lxd --channel="candidate"
     snap set system snapshots.automatic.retention=no
     sleep 5
 fi
@@ -178,7 +181,7 @@ if [[ ! -f "$(command -v docker)" ]]; then
 fi
 
 BASHRC_FILE="$SUDO_USER_HOME/.bashrc"
-BASHRC_TEXT="export PATH=$""PATH:$SUDO_USER_HOME/git/github/bcm"
+BASHRC_TEXT="export PATH=$""PATH:$SUDO_USER_HOME/bcm"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"

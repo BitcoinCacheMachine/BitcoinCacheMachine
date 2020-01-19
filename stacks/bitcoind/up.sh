@@ -1,15 +1,15 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+# shellcheck source=env.sh
+source ./env.sh
 
 # let's make sure the tor proxy script is executed, if necessary.
 if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q torproxy; then
-    bcm stack start torproxy
+    bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=torproxy"
 fi
-
-source ./env.sh
 
 # prepare the image.
 "$BCM_LXD_OPS/docker_image_ops.sh" \
@@ -75,7 +75,7 @@ fi
 INITIAL_BLOCK_DOWNLOAD=1
 if [[ -d "$BCM_BACKUP_DIR" ]]; then
     if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "bitcoind-$BCM_ACTIVE_CHAIN""-data"; then
-        bcm restore bitcoind
+        bash -c "$BCM_LXD_OPS/backup_restore.sh --stack=bitcoind"
     fi
 else
     if [[ $NEW_INSTALL == 1 ]]; then

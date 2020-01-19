@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 source ./env.sh
 
-#bcm stack start lnd
+bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=lnd"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
