@@ -1,10 +1,11 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
-echo "INFO: RUNNING BCM INSTALL SCRIPT"
-echo "Current User: $USER"
-echo "SUDO_USER:  $SUDO_USER"
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root. Try 'sudo bash -c ./install.sh'" 
+   exit 1
+fi
 
 # get the codename, usually bionic or debian
 CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
@@ -44,8 +45,9 @@ BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
 
 # clone the BCM repo to /home/$SUDO_USER/bcm
-SUDO_USER_HOME="/home/$SUDO_USER"
+SUDO_USER_HOME="/home/$SUDO_USER/Persistent"
 BCM_GIT_DIR="$SUDO_USER_HOME/bcm"
+export BCM_GIT_DIR="$BCM_GIT_DIR"
 if [[ ! -d $BCM_GIT_DIR ]]; then
     git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
 else
@@ -85,6 +87,8 @@ fi
 if ! groups | grep -q lxd; then
     usermod -G lxd -a "$SUDO_USER"
 fi
+
+bash -c "$BCM_GIT_DIR/commands/cluster/cluster_create.sh"
 
 # # if there's no group called lxd, create it.
 # if ! groups "$(whoami)" | grep -q lxd; then
