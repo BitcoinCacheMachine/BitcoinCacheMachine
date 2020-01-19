@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'

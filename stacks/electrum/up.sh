@@ -31,7 +31,7 @@ fi
 if [[ $MODE == "tm" ]]; then
     # ensure the back end is provisioned.
     if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q "electrs"; then
-        bcm stack start electrs
+        bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=electrs"
     fi
 fi
 

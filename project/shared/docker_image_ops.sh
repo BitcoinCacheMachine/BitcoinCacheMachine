@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 LXC_HOST=
@@ -8,6 +8,7 @@ DOCKER_HUB_IMAGE=
 IMAGE_NAME=
 BUILD_CONTEXT=
 REBUILD=0
+BASE_IMAGE_NAME="bcm-docker-base"
 
 for i in "$@"; do
     case $i in
@@ -89,7 +90,7 @@ else
         lxc file push -r -p "$BUILD_CONTEXT/" "$LXC_HOST/root"
         
         echo "Building the docker image '$FULLY_QUALIFIED_IMAGE_NAME'"
-        FULLY_QUALIFIED_BASE_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
+        FULLY_QUALIFIED_BASE_IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$BASE_IMAGE_NAME:$BCM_VERSION"
         lxc exec "$LXC_HOST" -- docker pull "$FULLY_QUALIFIED_BASE_IMAGE_NAME"
         lxc exec "$LXC_HOST" -- docker build --build-arg BASE_IMAGE="$FULLY_QUALIFIED_BASE_IMAGE_NAME" -t "$FULLY_QUALIFIED_IMAGE_NAME" /root/build/
         lxc exec "$LXC_HOST" -- docker push "$FULLY_QUALIFIED_IMAGE_NAME"

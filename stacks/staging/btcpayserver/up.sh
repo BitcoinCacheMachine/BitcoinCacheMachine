@@ -5,9 +5,8 @@ cd "$(dirname "$0")"
 
 source ./env
 
-bcm stack start clightning
-
-bcm stack start nbxplorer
+bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=clightning"
+bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=nbxplorer"
 
 # prepare the image.
 "$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \

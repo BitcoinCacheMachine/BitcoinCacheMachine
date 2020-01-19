@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 source ./env
 
 # first, let's make sure we deploy our direct dependencies.
-bcm stack start clightning
+bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=clightning"
 
 # this is the LXC host that the docker container is going to be provisioned to.
 HOST_ENDING="01"

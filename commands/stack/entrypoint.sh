@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=${2:-}
@@ -26,6 +26,7 @@ if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "start" && $BCM_CLI_VERB != "s
     exit
 fi
 
+
 if [[ $BCM_CLI_VERB == "start" ]]; then
     STACK_NAME=
     if [ -z "${3:-}" ]; then
@@ -44,6 +45,7 @@ if [[ $BCM_CLI_VERB == "start" ]]; then
         echo "Error: BCM does not support stack '$STACK_NAME'. Check your spelling."
     fi
 fi
+
 
 if [[ $BCM_CLI_VERB == "stop" ]]; then
     validateStackParam "$BCM_CLI_VERB"

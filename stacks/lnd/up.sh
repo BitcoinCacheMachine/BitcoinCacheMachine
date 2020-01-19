@@ -3,8 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-#bcm stack start bitcoind
-
 # source the bitcoind information so we can pass it to the stack.
 # shellcheck source=../bitcoind/env.sh
 source "$BCM_STACKS_DIR/bitcoind/env.sh"
