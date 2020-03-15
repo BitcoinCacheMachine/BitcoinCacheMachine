@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root. Try 'sudo bash -c ./install.sh'"

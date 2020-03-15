@@ -21,6 +21,8 @@ multipass exec bcm -- wget --output-document=install.sh https://raw.githubuserco
 multipass exec bcm -- chmod 0744 install.sh
 multipass exec bcm -- sudo bash -c /home/ubuntu/install.sh
 
+sleep 5
+
 multipass restart bcm
 
 multipass exec bcm -- mkdir -p /home/ubuntu/Persistent/bcm
