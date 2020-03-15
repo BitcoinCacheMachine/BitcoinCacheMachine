@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 VALUE="${2:-}"
@@ -111,7 +111,8 @@ if [[ $BCM_CLI_VERB == "run" ]]; then
     echo "Note! You can find a locally running copy of your site at $DOMAIN_NAME:$EXTERNAL_PORT"
 fi
 
+# in publish, we create a VM on AWS if it doesn't already exist and publish the website to it.
+# future work, we can integrate DNS providers and wire that up too.
 if [[ $BCM_CLI_VERB == "publish" ]]; then
-    echo "TODO"
-    exit
+    
 fi

@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 ZOOKEEPER_IMAGE="bcm-zookeeper"
-SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.5.5"
+SOURCE_ZOOKEEPER_IMAGE="zookeeper:3.5.6"
 
 bash -c "$BCM_LXD_OPS/docker_image_ops.sh --docker-hub-image-name=$SOURCE_ZOOKEEPER_IMAGE --container-name=$BCM_KAFKA_HOST_NAME --image-name=$ZOOKEEPER_IMAGE"
 

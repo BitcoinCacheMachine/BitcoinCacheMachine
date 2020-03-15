@@ -2,6 +2,7 @@
 
 set -Eeuo pipefail
 
+echo "BCM Runtime:"
 echo "  BCM_TARGET_VERSION:        $BCM_VERSION"
 echo "  GNUPGHOME:                 $GNUPGHOME"
 echo "  DEFAULT_KEY_ID:            $DEFAULT_KEY_ID"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # let's make sure the kafka tier exists before we deploy underlay

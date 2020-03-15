@@ -22,3 +22,6 @@ multipass exec bcm -- chmod 0744 install.sh
 multipass exec bcm -- sudo bash -c /home/ubuntu/install.sh
 
 multipass restart bcm
+
+multipass exec bcm -- mkdir -p /home/ubuntu/Persistent/bcm
+multipass mount "$BCM_GIT_DIR" bcm:/home/ubuntu/Persistent/bcm

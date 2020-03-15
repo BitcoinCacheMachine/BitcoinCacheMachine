@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:5.3.1"
+PUBLIC_BROKER_IMAGE="confluentinc/cp-kafka:5.4.0"
 BROKER_IMAGE="bcm-broker"
 
 bash -c "$BCM_LXD_OPS/docker_image_ops.sh --docker-hub-image-name=$PUBLIC_BROKER_IMAGE --container-name=$BCM_KAFKA_HOST_NAME --image-name=$BROKER_IMAGE"

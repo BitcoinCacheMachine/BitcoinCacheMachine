@@ -1,21 +1,28 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root. Try 'sudo bash -c ./install.sh'" 
-   exit 1
+    echo "This script must be run as root. Try 'sudo bash -c ./install.sh'"
+    exit 1
 fi
 
 # get the codename, usually bionic or debian
 CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
 
 # add the tor apt repository
-echo "deb https://deb.torproject.org/torproject.org $CODE_NAME main" | tee -a /etc/apt/sources.list
-echo "deb-src https://deb.torproject.org/torproject.org $CODE_NAME main" | tee -a /etc/apt/sources.list
+TOR_PROJECT_LINE="deb https://deb.torproject.org/torproject.org $CODE_NAME main"
+TOR_PROJECT_LINE2="deb-src https://deb.torproject.org/torproject.org $CODE_NAME main"
+if ! grep -Fxq "$TOR_PROJECT_LINE" /etc/apt/sources.list; then
+    echo "$TOR_PROJECT_LINE" | tee -a /etc/apt/sources.list
+fi
+
+if ! grep -Fxq "$TOR_PROJECT_LINE2" /etc/apt/sources.list; then
+    echo "$TOR_PROJECT_LINE2" | tee -a /etc/apt/sources.list
+fi
 
 # download the tor PGP key and add it as a trusted key to apt
-curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --import
+gpg --import ./resources/tor.gpg
 gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
 
 # update apt and install pre-reqs;
@@ -32,7 +39,7 @@ done
 apt-get autoremove -y
 
 # reinstall required software.
-apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd openssh-server jq gnupg snapd
+apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring iotop socat apg snapd openssh-server jq gnupg snapd sshfs
 
 # upgrade all existing software.
 sudo apt-get upgrade -y
@@ -157,34 +164,31 @@ wait-for-it -t 15 "$IP_OF_DEFAULT_ROUTE_INTERFACE:22"
 #####################
 
 # install docker
-if [[ ! -f "$(command -v docker)" ]]; then
-    echo "INFO: Installing 'docker' locally using snap."
-    snap install docker --channel="stable"
-    sleep 2
-    
-    if ! grep -q docker /etc/group; then
-        groupadd docker
-    fi
-    
-    if ! groups "$SUDO_USER" | grep -q docker; then
-        usermod -aG docker "$SUDO_USER"
-    fi
-    
-    # next we need to determine the underlying file system so we can upload the correct daemon.json
-    DEVICE="$(df -h "$HOME" | grep ' /' | awk '{print $1}')"
-    FILESYSTEM="$(mount | grep "$DEVICE")"
-    
-    DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/overlay_daemon.json"
-    if echo "$FILESYSTEM" | grep -q "btrfs"; then
-        DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/btrfs_daemon.json"
-        DEST_DAEMON_FILE="/var/snap/docker/current/config/daemon.json"
-        echo "INFO: Setting dockerd daemon settings to $DEST_DAEMON_FILE"
-        cp "$DAEMON_CONFIG" "$DEST_DAEMON_FILE"
-        snap restart docker
-    fi
+snap install docker --channel="stable"
+
+if ! grep -q docker /etc/group; then
+    addgroup --system docker
 fi
 
-BASHRC_FILE="$SUDO_USER_HOME/.bashrc"
+if ! groups "$SUDO_USER" | grep -q docker; then
+    adduser $SUDO_USER docker
+fi
+
+# next we need to determine the underlying file system so we can upload the correct daemon.json
+DEVICE="$(df -h "$HOME" | grep ' /' | awk '{print $1}')"
+FILESYSTEM="$(mount | grep "$DEVICE")"
+
+DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/overlay_daemon.json"
+if echo "$FILESYSTEM" | grep -q "btrfs"; then
+    DAEMON_CONFIG="$BCM_GIT_DIR/commands/install/btrfs_daemon.json"
+    DEST_DAEMON_FILE="/var/snap/docker/current/config/daemon.json"
+    echo "INFO: Setting dockerd daemon settings to $DEST_DAEMON_FILE"
+    cp "$DAEMON_CONFIG" "$DEST_DAEMON_FILE"
+    snap restart docker
+fi
+
+
+BASHRC_FILE="/home/$SUDO_USER/.bashrc"
 BASHRC_TEXT="export PATH=$""PATH:$SUDO_USER_HOME/bcm"
 source "$BASHRC_FILE"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then

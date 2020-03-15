@@ -1,4 +1,4 @@
-export DOCKER_HUB_IMAGE="confluentinc/cp-enterprise-control-center:5.1.0"
+export DOCKER_HUB_IMAGE="confluentinc/cp-enterprise-control-center:5.4.0"
 export IMAGE_NAME="bcm-kafka-control-center"
 export TIER_NAME="underlay"
 export STACK_NAME="kafkacontrolcenter"

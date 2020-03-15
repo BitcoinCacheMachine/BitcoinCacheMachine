@@ -15,10 +15,9 @@ fi
 
 export BCM_CLI_COMMAND="$BCM_CLI_COMMAND"
 
-#shopt -s expand_aliases
-
 BCM_FORCE_FLAG=0
 BCM_VOLUMES_FLAG=0
+ALL_FLAG=0
 
 for i in "$@"; do
     case $i in
@@ -28,11 +27,16 @@ for i in "$@"; do
         --delete)
             BCM_VOLUMES_FLAG=1
         ;;
+        --all)
+            ALL_FLAG=1
+        ;;
         *)
             # unknown option
         ;;
     esac
 done
+
+export ALL_FLAG="$ALL_FLAG"
 
 if [[ "$BCM_CLI_COMMAND" == "reset" ]]; then
     ./reset.sh "$@"
@@ -113,24 +117,25 @@ else
         exit
     fi
     
-    
-    # set our GNUPGHOME to the user cert directory
-    # if there is no certificate, go ahead and create it.
-    if [[ ! -d "$GNUPGHOME/trezor" ]]; then
-        bash -c "$BCM_GIT_DIR/commands/init.sh"
-    fi
-    
     ./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
     ./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
     ./controller/build_docker_image.sh --image-title="ots" --base-image="bcm-trezor:$BCM_VERSION"
     
-    if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
-        ./controller/entrypoint.sh "$@"
+    if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
+        ./init.sh "$@"
         exit
     fi
     
-    if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
-        ./init.sh "$@"
+    # set our GNUPGHOME to the user cert directory
+    # if there is no certificate, go ahead and create it.
+    if [[ ! -d "$GNUPGHOME/trezor" ]]; then
+        echo "ERROR: 'The '$GNUPGHOME/trezor' directory does not exist. Please run 'bcm init'."
+        exit
+    fi
+    
+    if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
+        ./controller/entrypoint.sh "$@"
+        exit
     fi
     
     if [[ "$BCM_CLI_COMMAND" == "pass" ]]; then

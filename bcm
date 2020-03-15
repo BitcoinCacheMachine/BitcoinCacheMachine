@@ -93,7 +93,7 @@ export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
 export BASE_DOCKER_IMAGE="ubuntu:latest"
 export BCM_TMP_DIR="/tmp/bcm" && mkdir -p "$BCM_TMP_DIR"
 
-PASSWORD_STORE_DIR="$HOME/.password_store" && mkdir -p "$PASSWORD_STORE_DIR"
+PASSWORD_STORE_DIR="$HOME/.password-store" && mkdir -p "$PASSWORD_STORE_DIR"
 
 export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template"

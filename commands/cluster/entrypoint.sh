@@ -12,16 +12,10 @@ else
     exit
 fi
 
-ALL_FLAG=0
-
 for i in "$@"; do
     case $i in
         --create)
             BCM_CLI_VERB="create"
-        ;;
-        --all)
-            ALL_FLAG=1
-            shift # past argument=value
         ;;
         *) ;;
         
@@ -52,7 +46,7 @@ if [[ $BCM_CLI_VERB == "clear" ]]; then
             # TODO move this over a TOR connection via PROXY switch/config.
             # TODO ensure we're using an encrypted storage backend for all $BCM_TMP_DIR files
             # by default we retain images to make development easier.
-            bash -c "./clear_lxd.sh --delete-images=$ALL_FLAG"
+            bash -c "./clear_lxd.sh"
             
             elif [[ "$CHOICE" == "n" ]]; then
             echo "INFO:  Aborted 'bcm cluster clear' command."
@@ -61,15 +55,4 @@ if [[ $BCM_CLI_VERB == "clear" ]]; then
             echo "Invalid entry. Please try again."
         fi
     done
-fi
-
-
-# this is where we implement 'bcm cluster destroy'
-if [[ $BCM_CLI_VERB == "destroy" ]]; then
-    
-    echo "INFO: Calling 'bcm cluster clear'. Images will be deleted."
-    bash -c ./clear_lxd.sh --retain-images=0 >>/dev/null
-    
-    echo "INFO: Removing the LXD snap."
-    sudo snap remove lxd
 fi

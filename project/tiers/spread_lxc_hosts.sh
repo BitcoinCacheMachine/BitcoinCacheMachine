@@ -33,7 +33,7 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
     # only create the new storage volume if it doesn't already exist
     if ! lxc storage volume list bcm --format csv | grep -q "$LXC_DOCKERVOL"; then
         echo "Creating volume '$LXC_DOCKERVOL' on the 'bcm' storage pool on cluster member '$ENDPOINT'."
-        lxc storage volume create bcm "$LXC_DOCKERVOL" block.filesystem=ext4 --target "$ENDPOINT"
+        lxc storage volume create bcm "$LXC_DOCKERVOL" --target "$ENDPOINT"
     fi
     
     # create the LXC host with the attached profiles.

@@ -1,12 +1,7 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
-
-# let's make sure the bitcoin tier exists.
-if ! lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-bitcoin-$BCM_ACTIVE_CHAIN"; then
-    bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
-fi
 
 source ./env
 

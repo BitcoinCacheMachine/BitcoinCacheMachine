@@ -1,21 +1,9 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-DELETE_IMAGES=0
-
-for i in "$@"; do
-    case $i in
-        --delete-images=*)
-            DELETE_IMAGES=1
-            shift # past argument=value
-        ;;
-        *)
-            # unknown option
-        ;;
-    esac
-done
+echo "ALL_FLAG:  $ALL_FLAG"
 
 ## Delete anything that's tied to a project
 for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
@@ -24,16 +12,13 @@ for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
         lxc delete --project "${project}" -f "${container}"
     done
     
-    if [[ $DELETE_IMAGES == 1 ]]; then
+    if [[ $ALL_FLAG == 1 ]]; then
         for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
             FINGERPRINT=${image:0:12}
             #if lxc image list --format csv --columns lf | grep "$FINGERPRINT" | grep -q "bcm-lxc-base"; then
             echo "==> Deleting image ${FINGERPRINT} for project: ${project}"
             lxc image delete --project "${project}" "${image}"
-          
         done
-    else
-        echo "INFO: the '--delete-images' flag was not specified, so any existing LXC images were NOT removed."
     fi
 done
 

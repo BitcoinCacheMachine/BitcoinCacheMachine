@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 source ./env.sh
 
 # let's make sure the tor proxy script is executed, if necessary.
-if lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep -q "$STACK_NAME" | grep -q torproxy; then
+if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep "$STACK_NAME" | grep -q torproxy; then
     bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=torproxy"
 fi
 
@@ -75,7 +75,7 @@ fi
 INITIAL_BLOCK_DOWNLOAD=1
 if [[ -d "$BCM_BACKUP_DIR" ]]; then
     if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "bitcoind-$BCM_ACTIVE_CHAIN""-data"; then
-        bash -c "$BCM_LXD_OPS/backup_restore.sh --stack=bitcoind"
+        bash -c "$BCM_LXD_OPS/backup_restore.sh --stack=bitcoind --lxc-host=$BCM_BITCOIN_HOST_NAME"
     fi
 else
     if [[ $NEW_INSTALL == 1 ]]; then

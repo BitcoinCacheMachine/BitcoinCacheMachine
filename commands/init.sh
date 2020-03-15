@@ -70,15 +70,15 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
     "bcm-trezor:$BCM_VERSION" trezor-gpg init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
     
     echo "Your public key and public keyring material can be found at '$GNUPGHOME'."
-fi
-
-mkdir -p "$PASSWORD_STORE_DIR"
-if [[ ! -d "$PASSWORD_STORE_DIR/.git" ]]; then
-    # now let's initialize the password repository with the GPG key
-    bash -c "$BCM_GIT_DIR/commands/pass/entrypoint.sh --name=$BCM_CERT_NAME --username=$BCM_CERT_USERNAME --hostname=$BCM_CERT_HOSTNAME"
     
-    echo "Your GPG keys and password store have successfully initialized. Be sure to back it up!"
-else
-    echo "ERROR: $PASSWORD_STORE_DIR already exists."
-    exit
+    mkdir -p "$PASSWORD_STORE_DIR"
+    docker run -it --name pass --rm \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$GNUPGHOME":/home/user/.gnupg \
+    -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
+    -e BCM_CERT_NAME="$BCM_CERT_NAME" \
+    -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
+    -e BCM_CERT_HOSTNAME="$BCM_CERT_HOSTNAME" \
+    --device="$BCM_TREZOR_USB_PATH" \
+    "bcm-trezor:$BCM_VERSION" pass init "$BCM_CERT_NAME <$BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME>"
 fi

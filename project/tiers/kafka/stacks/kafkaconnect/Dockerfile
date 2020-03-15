@@ -1,4 +1,4 @@
-FROM confluentinc/cp-kafka-connect:5.1.0
+FROM confluentinc/cp-kafka-connect:5.4.0
 #bcm-kafka-connect:latest
 RUN mkdir -p /usr/local/share/kafka/plugins
 ADD ./syslog/* /usr/local/share/kafka/plugins/
