@@ -9,7 +9,7 @@ bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=clightning"
 bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=nbxplorer"
 
 # prepare the image.
-"$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
+"$BCM_LXD_OPS/docker_image_ops.sh" \
 --docker-hub-image-name="$DOCKER_HUB_IMAGE" \
 --container-name="$LXC_HOSTNAME" \
 --image-name="$IMAGE_NAME"

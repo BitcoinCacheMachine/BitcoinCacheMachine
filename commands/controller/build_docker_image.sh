@@ -39,5 +39,5 @@ fi
 
 IMAGE_FQDN="bcm-$IMAGE_TITLE:$BCM_VERSION"
 if [ -z "$(docker images -q "$IMAGE_FQDN")" ] || [ "$REBUILD_IMAGES" == 1 ]; then
-    docker build --build-arg BASE_IMAGE="$BASE_IMAGE" -t "$IMAGE_FQDN" "$BCM_GIT_DIR/commands/controller/$IMAGE_TITLE/"
+    docker build --build-arg BASE_IMAGE="$BASE_IMAGE" -t "$IMAGE_FQDN" "$BCM_COMMAND_DIR/controller/$IMAGE_TITLE/"
 fi

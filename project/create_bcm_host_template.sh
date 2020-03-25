@@ -3,24 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# if the default storage driver doesn't exist, create it.
-if ! lxc storage list --format csv | grep -q "bcm"; then
-    lxc storage create bcm btrfs
-fi
-
-# create LXC profiles from templates.
-for PROFILE_NAME in bcm_disk docker_unprivileged docker_privileged; do
-    # if the profile doesn't already exist, we create it.
-    if ! lxc profile list --format csv | grep -q "$PROFILE_NAME"; then
-        lxc profile create "$PROFILE_NAME"
-        cat "./$PROFILE_NAME.yml" | lxc profile edit $PROFILE_NAME
-    fi
-done
-
-if ! lxc project list --format csv | grep -q "default (current)"; then
-    lxc project switch default
-fi
-
 # download the main ubuntu image if it doesn't exist.
 # if it does exist, it SHOULD be the latest image (due to auto-update).
 if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if multipass list | grep -q bcm; then
+    multipass umount bcm:
     multipass stop bcm
     multipass delete bcm
     multipass purge

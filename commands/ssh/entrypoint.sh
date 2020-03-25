@@ -94,10 +94,6 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     echo "INFO! Your new Trezor-backed SSH public key for host '$BCM_SSH_HOSTNAME' can be found at '$TREZOR_PUB_KEY_PATH'"
 fi
 
-
-echo "Checking SSH availability on port 22."
-wait-for-it -t 60 "$BCM_SSH_HOSTNAME:22"
-
 # shellcheck disable=SC1090
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
 if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
@@ -114,7 +110,7 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
     if [[ ! -f $TREZOR_PUB_KEY_PATH ]]; then
         # generate a new SSH key for the remote hostname.
-        bash -c "$BCM_GIT_DIR/commands/ssh newkey --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME
+        bash -c "$BCM_COMMAND_DIR/ssh newkey --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME
         < $TREZOR_PUB_KEY_PATH ssh -i $SSH_KEY_PATH $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME cat > /home/\$(whoami)/.ssh/authorized_keys"
     fi
     

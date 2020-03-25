@@ -14,7 +14,7 @@ HOST_ENDING="01"
 CONTAINER_NAME="bcm-$TIER_NAME-$HOST_ENDING"
 
 # prepare the image.
-"$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
+"$BCM_LXD_OPS/docker_image_ops.sh" \
 --build-context="$(pwd)/build/" \
 --container-name="$CONTAINER_NAME" \
 --image-name="$IMAGE_NAME"

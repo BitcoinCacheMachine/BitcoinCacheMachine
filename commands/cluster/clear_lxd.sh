@@ -1,9 +1,7 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
-
-echo "ALL_FLAG:  $ALL_FLAG"
 
 ## Delete anything that's tied to a project
 for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do

@@ -1,15 +1,10 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # shellcheck source=env.sh
 source ./env.sh
-
-# let's make sure the tor proxy script is executed, if necessary.
-if ! lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$BCM_ACTIVE_CHAIN" | grep "$STACK_NAME" | grep -q torproxy; then
-    bash -c "$BCM_LXD_OPS/up_bcm_stack.sh --stack-name=torproxy"
-fi
 
 # prepare the image.
 "$BCM_LXD_OPS/docker_image_ops.sh" \

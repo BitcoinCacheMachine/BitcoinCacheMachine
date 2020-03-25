@@ -5,7 +5,7 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-BCM_SSH_HOSTNAME=localhost
+#BCM_SSH_HOSTNAME=localhost
 
 for i in "$@"; do
     case $i in
@@ -13,7 +13,7 @@ for i in "$@"; do
             BCM_SSH_HOSTNAME="${i#*=}"
             shift # past argument=value
         ;;
-
+        
         *)
             # unknown option
         ;;
@@ -29,7 +29,7 @@ IP_OF_MACVLAN_INTERFACE="$(ip addr show "$MACVLAN_INTERFACE" | grep "inet " | cu
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
 export MACVLAN_INTERFACE="$MACVLAN_INTERFACE"
-LXD_SERVER_NAME="$BCM_SSH_HOSTNAME"
+LXD_SERVER_NAME="$(hostname)"
 # these two lines are so that ssh hosts can have the correct naming convention for LXD node info.
 if [[ ! "$LXD_SERVER_NAME" == *"-01"* ]]; then
     LXD_SERVER_NAME="$LXD_SERVER_NAME-01"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
@@ -29,30 +29,10 @@ fi
 
 # bcm cluster create provisions a new BCM cluster to the localhost
 if [[ $BCM_CLI_VERB == "create" ]]; then
-    bash -c "$BCM_GIT_DIR/commands/cluster/cluster_create.sh"
+    bash -c "$BCM_COMMAND_DIR/cluster/cluster_create.sh"
 fi
 
 # this is where we implement 'bcm cluster destroy'
 if [[ $BCM_CLI_VERB == "clear" ]]; then
-    # TODO convert this to git and reference the upstream repo script. https://github.com/lxc/lxd/blob/master/scripts/empty-lxd.sh
-    CONTINUE=0
-    while [[ "$CONTINUE" == 0 ]]; do
-        echo "WARNING: Are you sure you want to delete all LXD objects from cluster '$BCM_SSH_HOSTNAME'? This will DESTROY ALL DATA!!!"
-        read -rp "Are you sure (y/n):  " CHOICE
-        
-        if [[ "$CHOICE" == "y" ]]; then
-            CONTINUE=1
-            # let's ensure our remote git repo is updated.
-            # TODO move this over a TOR connection via PROXY switch/config.
-            # TODO ensure we're using an encrypted storage backend for all $BCM_TMP_DIR files
-            # by default we retain images to make development easier.
-            bash -c "./clear_lxd.sh"
-            
-            elif [[ "$CHOICE" == "n" ]]; then
-            echo "INFO:  Aborted 'bcm cluster clear' command."
-            exit
-        else
-            echo "Invalid entry. Please try again."
-        fi
-    done
+    bash -c "./clear_lxd.sh"
 fi

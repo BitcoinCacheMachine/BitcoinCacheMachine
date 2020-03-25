@@ -40,8 +40,6 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
         # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.
         lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile="bcm_disk" --profile="docker_privileged" --profile="$PROFILE_NAME"
-    else
-        echo "WARNING: LXC host '$LXC_HOSTNAME' already exists."
     fi
     
     # last, attach the storage volume to the container.

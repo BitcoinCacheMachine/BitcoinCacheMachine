@@ -3,26 +3,6 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# first, let's check to see if our end proudct -- namely our LXC image with alias 'bcm-template'
-if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
-    # only continue if the necessary image exists.
-    bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
-fi
-
-# It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
-if ! lxc project list --format csv  | grep -q "$BCM_PROJECT"; then
-    lxc project create "$BCM_PROJECT"
-    
-    # these two commands means that each project will
-    # inherit profiles and images contained in the default project.
-    lxc project set "$BCM_PROJECT" features.images false
-    lxc project set "$BCM_PROJECT" features.profiles false
-fi
-
-if ! lxc project list --format csv | grep -q "$BCM_PROJECT (current)"; then
-    lxc project switch "$BCM_PROJECT"
-fi
-
 export TIER_NAME=manager
 
 # first, create the profile that represents the tier.
@@ -48,7 +28,8 @@ function createBCMBRGW() {
 
 function createBCMNet() {
     if ! lxc network list --format csv | grep -q bcmNet; then
-        lxc network create bcmNet bridge.mode=fan fan.type=vxlan fan.underlay_subnet=172.17.0.0/24 dns.mode=dynamic
+        lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
+        # fan.underlay_subnet=172.17.0.0/24
     fi
 }
 

@@ -11,7 +11,7 @@ source "$BCM_STACKS_DIR/bitcoind/env.sh"
 source ./env.sh
 
 # prepare the image.
-"$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
+"$BCM_LXD_OPS/docker_image_ops.sh" \
 --build-context="$(pwd)/build" \
 --container-name="$LXC_HOSTNAME" \
 --image-name="$IMAGE_NAME"

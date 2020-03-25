@@ -53,7 +53,7 @@ while [[ -z "$BCM_CERT_HOSTNAME" ]]; do
 done
 
 # shellcheck disable=SC2153
-bash -c "$BCM_GIT_DIR/commands/git_init_dir.sh $GNUPGHOME"
+bash -c "$BCM_COMMAND_DIR/git_init_dir.sh $GNUPGHOME"
 
 echo "Your certificate will appear as:  '$BCM_CERT_NAME $BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME'"
 

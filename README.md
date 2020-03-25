@@ -3,7 +3,7 @@
 
 Bitcoin Cache Machine is open-source software that allows you to create a self-hosted privacy-preserving [software-defined data-center](https://en.wikipedia.org/wiki/Software-defined_data_center). BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization.
 
-> Note! Bitcoin Cache Machine REQUIRES a [Trezor-T](https://trezor.io/) to function! Consider buying a dedicated device for your BCM data center. The use of use [passphrases](https://wiki.trezor.io/Multi-passphrase_encryption_(hidden_wallets)) is REQUIRED.
+BCM is a set of BASH scripts that allows administrators to run bitcoin node infrastructure. We all know that it is unlikely that the "average Joe" will run their own Bitcoin infrastrcture. There are REAL costs associated with attaining self-soverignty. Running a high-uptime node infrastructure takes real skill and resources! However, most people know one or more people in their life that are "tech-savvy" and are able to run these software services for them. Like everything in life, trade-off exists. In this case, BCM is a set of software that is run by a person you trust (i.e., the neighborhood Geek/Nerd whose morals you trust). Your administrator should be someone you trust not to act in immoral or untrustworthy ways. Examples include millennial sons and daughters, computer-literate friends, local neighborhood anarchists, etc..
 
 ## Project Status
 
@@ -43,14 +43,19 @@ All you need to get started is an SSH endpoint running Ubuntu 18.04. When runnin
 
 ## Getting Started
 
-The first step to getting started with Bitcoin Cache Machine is to clone the git repo to your new SDN controller, a user-facing desktop or laptop running a Debian-based OS. The best way to do this is run a Debian Tempalte VM running behind a whonix gateway running on QubesOS. In either case, the installation procedures are the same:
+The first step to getting started with Bitcoin Cache Machine get the BCM scripts (git repo) to your computer, a user-facing desktop or laptop running a Debian-based OS. Do the following to get the code.
 
 ```bash
-sudo apt update && sudo apt install -y curl
-curl https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/install.sh | sudo bash
+# Verify init_bcm.sh
+wget -o pull_bcm.sh https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
+
+# run the script; installs TOR and git pulls the BCM source code.
+sudo bash -c ./init_bcm.sh
 ```
 
-The script above runs the bcm entrypoint. Afterwards, you may need to log out and log back (or restart) in for your group membership to refresh. Running `bcm` at the terminal ensures that all necessary dependencies are made availble (LXD client, dockerd) and builds the docker images needed to run bcm commands.
+The script above install the latest tor proxy, the pulls the BCM git clones the repo to your pwd. Now that you have the code (in the bcm directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs, which is useful if you want to run multiple BCM instances on a single set of hardware. You can also use BCM shell scripts to deploy BCM server-side infrastructure to a remote SSH endpoint (or SSH exposed as an onion service).
+
+If you want to deploy locally, just run `bcm deploy`. If you want to run BCM in Type-1 vms, use BCM_GIT_DIR/test/refresh_bcm.sh.
 
 ## Deploying your own BCM Infrastructure
 
