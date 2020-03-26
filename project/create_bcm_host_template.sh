@@ -16,7 +16,7 @@ if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
         fi
     fi
     
-    LXC_BASE_VERSION="18.04"
+    LXC_BASE_VERSION="20.04"
     echo "Copying the ubuntu/$LXC_BASE_VERSION lxc image from LXD image server '$LXD_IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
     lxc image copy "$LXD_IMAGE_REMOTE:ubuntu/$LXC_BASE_VERSION" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
 fi

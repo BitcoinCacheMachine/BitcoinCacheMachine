@@ -1,9 +1,7 @@
 
 # Bitcoin Cache Machine
 
-Bitcoin Cache Machine is open-source software that allows you to create a self-hosted privacy-preserving [software-defined data-center](https://en.wikipedia.org/wiki/Software-defined_data_center). BCM is built entirely with free and open-source software and is meant primarily for home and small office use in line with the spirit of decentralization.
-
-BCM is a set of BASH scripts that allows administrators to run bitcoin node infrastructure. We all know that it is unlikely that the "average Joe" will run their own Bitcoin infrastrcture. There are REAL costs associated with attaining self-soverignty. Running a high-uptime node infrastructure takes real skill and resources! However, most people know one or more people in their life that are "tech-savvy" and are able to run these software services for them. Like everything in life, trade-off exists. In this case, BCM is a set of software that is run by a person you trust (i.e., the neighborhood Geek/Nerd whose morals you trust). Your administrator should be someone you trust not to act in immoral or untrustworthy ways. Examples include millennial sons and daughters, computer-literate friends, local neighborhood anarchists, etc..
+Bitcoin Cache Machine is open-source software that allows you to create and manage one or more Bitcoin-focused privacy-preserving personal payment systems (perfect for long-term HODLers). BCM scripts allow you to quickly deploy a purely software-defined bitcoin payment stack to your local Ubuntu machine, or any Ubuntu-based SSH endpoint (e.g., SSH over LAN, SSH over Tor onion). BCM is built entirely with free and open-source software and is meant primarily for long-term Bitcoin HODLrs that want to run their own Bitcoin node infrastructure along with privacy-preserving technologies such as JoinMarket for on-chain UTXO management, and c-Lightning for access to Bitcoin's high-speed and low-free payment network, Lightning.
 
 ## Project Status
 
@@ -17,7 +15,7 @@ BCM HAS NOT undergone formal security evaluation and should be considered for TE
 
 If you're involved with Bitcoin or care about your privacy, you will undoubtedly understand the importance of [running your own fully-validating bitcoin node](https://medium.com/@lopp/securing-your-financial-sovereignty-3af6fe834603). Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your software up-to-date? Is your wallet software configured to consult your trusted full node (and ONLY your node)? Has TOR for these services been configured? Are you backing up user critical data in real time? In practice, there are ton of considerations that need to be addressed.
 
-There are many areas where your privacy can be compromised if you're not careful. BCM is meant to handle many of these concerns by creating a software-defined data center at your home or office that's pre-configured to protect your overall privacy. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest. Bitcoin Cache Machine dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure.
+There are many areas where your privacy can be compromised if you're not careful. BCM is meant to handle many of these concerns by creating a software-defined data center at your home or office that's pre-configured to protect your overall privacy. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest. BCM dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure.
 
 For more information about the motivations behind Bitcoin Cache Machine, visit the [public website](https://www.bitcoincachemachine.org/2018/11/27/introducing-bitcoin-cache-machine/).
 
@@ -32,32 +30,36 @@ Here are some of the development goals for Bitcoin Cache Machine:
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
 * Require hardware wallets for cryptographic operations (PGP, SSH, and Bitcoin transactions).
 * Configure all software to protect user's privacy (e.g., TOR for external communication, disk encryption, minimal attack surface, etc.).
-* Pursue [Global Consensus and Local Consensus Models](https://twitter.com/SarahJamieLewis/status/1016832509709914112) for core platform components, e.g., Bitcoin for global financial operations and [cwtch](https://openprivacy.ca/blog/2018/06/28/announcing-cwtch/) for asynchronous, multi-peer communications.
-* Enhance overall security and performance and network health by running a Tor middle relay and serving bitcoin blocks over Tor.
 
 ## What is needed to Run Bitcoin Cache Machine
 
-If you can run a modern Linux kernel and [LXD](https://linuxcontainers.org/lxd/), you can run BCM. BCM data-center workload components run as background server-side processes, so you'll usually want to have one or more always-on computers with a reliable Internet connection, especially if you're running something like BTCPay Server, which serves web pages (e.g., invoices) to external third parties or running a liquidity-providing Lightning node or acting a [JoinMarket](https://github.com/JoinMarket-Org/joinmarket-clientserver) maker. You can run BCM data-center workloads directly on your Ubuntu installation or it can run in a hardware-based VM using [multipass](https://github.com/CanonicalLtd/multipass). User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
-
-All you need to get started is an SSH endpoint running Ubuntu 18.04. When running BCM standalone such a user-facing desktop or laptop, data center workloads run within the context of [KVM-based Virtual Machine](https://www.linux-kvm.org/page/Main_Page) if supported by the hardware. README.md in the `cluster` directory has more details on prepping a bare-bones Ubuntu Server for a dedicated back-end server.
+If you can run Ubuntu 18.04, you can run BCM. BCM is deployed as a data-center back-end, so you'll want to deploy BCM to a computer with reliable power and internet connections. Some of the services deployed on BCM require contant Internet connectivity (e.g., market maker functionality for Bisq and JoinMarket, transaction relay for Lightning node). You can run BCM data-center workloads directly on your Ubuntu installation (best performance) or it can run in a hardware-based VM (useful if you're running multiple BCM instances [e.g., family members] on shared hardware). User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
 
 ## Getting Started
 
-The first step to getting started with Bitcoin Cache Machine get the BCM scripts (git repo) to your computer, a user-facing desktop or laptop running a Debian-based OS. Do the following to get the code.
+The first step to getting started with Bitcoin Cache Machine get the BCM scripts (git repo) to your computer, a user-facing desktop or laptop running a Debian-based OS. The instructions below can be executed that will help you get started.
 
 ```bash
-# Verify init_bcm.sh
+# download the BCM init script; VERIFY CONTENTS!
 wget -o pull_bcm.sh https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
 
-# make the script executable then run; 
-# scripts installs TOR, then git pulls the BCM source code from github
+# make the script executable then run it 
+# scripts installs TOR, then git pulls the BCM source code from github 
+# TODO 1) move from github to zeronet
 chmod 0744 ./init_bcm.sh
 sudo bash -c ./init_bcm.sh
 ```
 
-The script above install the latest tor proxy, the pulls the BCM git clones the repo to your pwd. Now that you have the code (in the bcm directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs, which is useful if you want to run multiple BCM instances on a single set of hardware. You can also use BCM shell scripts to deploy BCM server-side infrastructure to a remote SSH endpoint (or SSH exposed as an onion service).
+The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the bcm directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs, which is useful if you want to run multiple BCM instances on shared hardware. You can also use BCM shell scripts to deploy BCM server-side infrastructure to a remote SSH endpoint (or SSH exposed as an onion service).
 
-If you want to deploy locally, just run `bcm deploy`. If you want to run BCM in Type-1 vms, use BCM_GIT_DIR/test/refresh_bcm.sh.
+After you have the BCM scripts, run the installer:
+
+```bash
+sudo bash -c ./install_bcm.sh
+```
+
+Next, decide how you want to run BCM:
+. If you want to run BCM in Type-1 vms, use BCM_GIT_DIR/test/refresh_bcm.sh.
 
 ## Deploying your own BCM Infrastructure
 

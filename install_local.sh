@@ -66,7 +66,6 @@ fi
 if [[ -f "$SSH_LOCAL_CONF" ]]; then
     SSH_ONION_TEXT="Host *.onion"
     if ! grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
-        echo "INFO: Updating your /etc/ssh/sshd_config file so it redirects all *.onion names out your local Tor proxy."
         {
             echo "$SSH_ONION_TEXT"
             echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p"
@@ -79,6 +78,8 @@ fi
 BASHRC_FILE="$SUDO_USER_HOME/.profile"
 BASHRC_TEXT="export PATH=$""PATH:/snap/bin"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
-    echo "$BASHRC_TEXT" | tee -a "$BASHRC_FILE"
-    echo "DEBIAN_FRONTEND=noninteractive" | tee -a "$BASHRC_FILE"
+    { 
+        echo "$BASHRC_TEXT" 
+        echo "DEBIAN_FRONTEND=noninteractive" 
+    } >> "$BASHRC_FILE"
 fi
