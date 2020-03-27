@@ -33,7 +33,7 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 ## What is needed to Run Bitcoin Cache Machine
 
-If you can run Ubuntu 18.04, you can run BCM. BCM is deployed as a data-center back-end, so you'll want to deploy BCM to a computer with reliable power and internet connections. Some of the services deployed on BCM require contant Internet connectivity (e.g., market maker functionality for Bisq and JoinMarket, transaction relay for Lightning node). You can run BCM data-center workloads directly on your Ubuntu installation (best performance) or it can run in a hardware-based VM (useful if you're running multiple BCM instances [e.g., family members] on shared hardware). User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
+If you can run Ubuntu, you can run BCM. BCM is deployed as a data-center back-end, so you'll want to deploy BCM to a computer with reliable power and internet connections. Some of the services deployed on BCM require contant Internet connectivity (e.g., market maker functionality for Bisq and JoinMarket, transaction relay for Lightning node). You can run BCM data-center workloads directly on your Ubuntu installation (best performance) or it can run in a hardware-based VM (useful if you're running multiple BCM instances [e.g., family members] on shared hardware). User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
 
 ## Getting Started
 

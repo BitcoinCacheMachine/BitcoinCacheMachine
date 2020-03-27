@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/farscapian
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://www.bitcoincachemachine.org
+  * I am farscapian (https://keybase.io/farscapian) on keybase.
+  * I have a public key ASAwDQenaYQEy43HUQNbNe0i2N1_1iEVr0JeM0ExLOLfkgo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120bfe90b745e6c0bed01c1eb85b061366ee6764581f94fcf0e53ab4b019dedcadf0a",
+      "host": "keybase.io",
+      "kid": "0120300d07a7698404cb8dc751035b35ed22d8dd7fd62115af425e3341312ce2df920a",
+      "uid": "097152d6b8fcfa3ecfb99ddf61d7ef19",
+      "username": "farscapian"
+    },
+    "merkle_root": {
+      "ctime": 1551057542,
+      "hash": "2d109b09144ae1e6ce79a325ba435e7dad63fb2910ba3deed438abfc6a55c15515a699a1c874402f071ba93ec5b9e8b5c687732daed6222e9b24185b5781d5bc",
+      "hash_meta": "5784101a8f91892b4016c434ec66b85b8a551b105fd31a256caf6e4c7e3ad2cd",
+      "seqno": 4823078
+    },
+    "service": {
+      "entropy": "GplP6kNdrqc4c7fxqwNIWbNy",
+      "hostname": "www.bitcoincachemachine.org",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "3.0.0"
+  },
+  "ctime": 1551057653,
+  "expire_in": 504576000,
+  "prev": "22908ca8e43f2d32fad8f391913b75b9354c551f474addaa7df42e64c63b008b",
+  "seqno": 263,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgMA0Hp2mEBMuNx1EDWzXtItjdf9YhFa9CXjNBMSzi35IKp3BheWxvYWTETJcCzQEHxCAikIyo5D8tMvrY85GRO3W5NUxVH0dK3ap99C5kxjsAi8QgL6vqjhQ4IgCYhF3b/7jGkturY4k2l4QQ5t9T/Rf1o24CAcKjc2lnxEADhyEKyRbazPxQzjQ13lMVv7buHWEk3HHjvEhQCpz+D9h9YVYAOeybwux5JJ2in7lGLdjK9bWjjhYsD4OKt+QEqHNpZ190eXBlIKRoYXNogqR0eXBlCKV2YWx1ZcQg9rkDi1V6xClboLWN0/GMe+A8qTCf1yOu+tqyggz1fzSjdGFnzQICp3ZlcnNpb24B
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/farscapian
+
+==================================================================

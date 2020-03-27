@@ -1,0 +1,41 @@
+---
+layout: default
+---
+
+<!-- Page Header -->
+<header class="intro-header" style="background-image: url('{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}');margin-bottom: 0px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="site-heading" style="padding: 100px 0 25px 0">
+                    {% if page.url == '/' %}
+                    {% if site.icon %}
+                    <img src="{{ site.icon }}">
+                    {% endif %}
+                    {% else %}{% endif %}
+                    <h3>{{ page.title }}</h3>
+                    <!-- <hr class="small"> -->
+                    <span class="subheading">{{ page.description }}</span>
+                    {% if page.url == '/' %}
+                    <a target="_blank" class="github-download" rel="noopener noreferrer" href="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine">Download Source Files</a>
+                    <br />
+                    <span class="github"><img src="img/github.png" /></span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="bcm-hr" />
+</header>
+
+<!-- Main Content -->
+{% if page.url == '/' %}
+<div class="home-background">
+    {% endif %}
+    <div class="container container-custom">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                {{ content }}
+            </div>
+        </div>
+    </div>

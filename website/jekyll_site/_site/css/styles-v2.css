@@ -1,0 +1,231 @@
+@font-face {
+    font-family: 'Proxima Nova Light';
+    src: url('../fonts/ProximaNova-Light.eot');
+    src: url('../fonts/ProximaNova-Light.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/ProximaNova-Light.woff2') format('woff2'),
+        url('../fonts/ProximaNova-Light.woff') format('woff'),
+        url('../fonts/ProximaNova-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Proxima Nova Regular';
+    src: url('../fonts/ProximaNova-Regular.eot');
+    src: url('../fonts/ProximaNova-Regular.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/ProximaNova-Regular.woff2') format('woff2'),
+        url('../fonts/ProximaNova-Regular.woff') format('woff'),
+        url('../fonts/ProximaNova-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Proxima Nova Bold';
+    src: url('../fonts/ProximaNova-Bold.eot');
+    src: url('../fonts/ProximaNova-Bold.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/ProximaNova-Bold.woff2') format('woff2'),
+        url('../fonts/ProximaNova-Bold.woff') format('woff'),
+        url('../fonts/ProximaNova-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Proxima Nova Regular', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h5, h6, .intro-header .site-heading .subheading, .intro-header .page-heading .subheading {
+    font-family: 'Proxima Nova Light', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #ffe0ab;
+    font-weight: normal;
+}
+
+h4 {
+    font-family: 'Proxima Nova Regular', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: normal;
+}
+
+h3 {
+    font-family: 'Proxima Nova Bold', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: normal;
+}
+
+.navbar-custom .nav li a, .navbar-custom.is-fixed .nav li a {
+    font-family: 'Proxima Nova Regular', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #ffe0ab;
+    font-size: 14px;
+}
+
+.navbar-custom.is-fixed .nav li a:hover {
+    color: #fff;
+}
+
+.navbar-custom.is-fixed {
+    top: 0;
+    position: fixed;
+}
+
+.navbar-custom.is-fixed {
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+}
+
+.github {
+    font-family: 'Proxima Nova Bold', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #ffe0ab;
+}
+
+.github-download, .github-download:hover, .github-download:focus, .github-download:active {
+    border: 2px solid #ffe0ab;
+    border-radius: 5px;
+    padding: 10px 30px;
+    text-transform: uppercase;
+    color: #ffe0ab;
+    margin-top: 30px;
+    display: inline-block;
+    margin-bottom: 5px;
+    font-family: 'Proxima Nova Bold', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: initial;
+}
+
+.intro-header .site-heading .subheading, .intro-header .page-heading .subheading {
+    font-size: 26px;
+}
+
+.bcm-hr {
+    border-top: 10px solid #ffe0ab;
+    padding: 0px;
+    margin: 0px;
+}
+
+.home-background {
+    background: url(../img/background_gradient.png) no-repeat center center;
+    background-attachment: scroll;
+    background-size: cover;
+    color: #ffe0ab;
+}
+
+.home-background ul {
+    padding-left: 15px;
+}
+
+.home-background ul li {
+    font-size: 18px;
+}
+
+.home-background h2 {
+    margin-bottom: 20px;
+}
+
+.navbar-custom.is-fixed {
+    background-color: rgba(0, 0, 0, 1);
+    border-bottom: 1px solid #ffe0ab;
+    padding-bottom: 10px;
+}
+
+.navbar-default {
+    padding-bottom: 10px;
+}
+
+.navbar-default .navbar-collapse, .navbar-default .navbar-form {
+    border-color: #ffe0ab;
+}
+
+.navbar-header img {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+@media only screen and (max-width: 767px) {
+    .navbar-custom {
+        position: fixed;
+    }
+
+    .navbar-default {
+        border-color: #ffe0ab;
+    }
+
+    .navbar-fixed-top {
+        background-color: rgba(0, 0, 0, 1);
+        padding-bottom: 0px;
+    }
+
+    .navbar-fixed-top .navbar-header img {
+        margin-top: 0px !important;
+    }
+}
+
+.navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+    background-color: transparent;
+}
+
+.container-custom {
+    padding: 50px 15px 100px 15px;
+}
+
+.latest-from-blog h2 {
+    color: #000;
+}
+
+.post-preview>.post-meta {
+    color: #000000;
+    font-style: normal;
+    font-family: 'Proxima Nova Bold', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+footer {
+    background-color: #000;
+    font-family: 'Proxima Nova Bold', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.copyright, .copyright a {
+    color: #ffe0ab;
+    text-decoration: none;
+}
+
+.copyright a:hover {
+    color: #fff;
+}
+
+footer .fa {
+    color: #bfbfbf;
+}
+
+footer .fa-inverse {
+    color: #000;
+}
+
+#content, #content h2, .recentpost, .recentpost h4, .recentpost h2 {
+    color: #000;
+}
+
+.member-name {
+    color: #000;
+}
+
+@media only screen and (min-width: 768px) {
+    .intro-header .post-heading h1 {
+        font-size: 40px;
+    }
+
+    .intro-header .post-heading h2 {
+        font-size: 24px;
+    }
+}
+
+/* @media only screen and (min-width: 1170px) */
+.navbar-custom {
+    position: fixed;
+    -webkit-transition: none;
+    -moz-transition: none;
+    transition: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+    -ms-transform: none;
+    -o-transform: none;
+    transform: none;
+}

@@ -2,21 +2,18 @@ ARG BASE_IMAGE
 
 FROM ${BASE_IMAGE}
 
-#ENV DEBIAN_FRONTEND=noninteractive
-# TODO implement method https://2019.www.torproject.org/docs/debian.html.en to
-# to apt as tor.
+ENV DEBIAN_FRONTEND=noninteractive
 
-# get the codename, usually bionic or debian
-ENV CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
-
-RUN echo "deb https://deb.torproject.org/torproject.org $CODE_NAME main" >> /etc/apt/sources.list
-RUN echo "deb-src https://deb.torproject.org/torproject.org $CODE_NAME main" >> /etc/apt/sources.list
+RUN echo "deb https://mirror.netcologne.de/torproject.org bionic main" >> /etc/apt/sources.list
+RUN echo "deb-src https://mirror.netcologne.de/torproject.org bionic main" >> /etc/apt/sources.list
 
 COPY ./TOR-project-PGP.pub tor.pgp.pub
 RUN gpg --import tor.pgp.pub
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 RUN gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
 
 RUN apt-get update
+RUN apt-get install -y apt-transport-https
 RUN apt-get install -y tor deb.torproject.org-keyring
 
 # SOCKS5, Control Port, DNS

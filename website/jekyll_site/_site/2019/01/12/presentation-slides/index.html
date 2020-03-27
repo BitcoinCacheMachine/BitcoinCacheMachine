@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Privacy-preserving Bitcoin Payment infrastructure for home and office.">
+	<meta property="og:title" content="Greenville ACM presentation on Bitcoin Cache Machine" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch////2019/01/12/presentation-slides/" />
+<meta property="og:image" content="http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch///img/header_v2.png">
+
+
+	
+
+	<link rel='shortcut icon' type='image/png' href='/img/favicon.png' />
+
+	<title>Greenville ACM presentation on Bitcoin Cache Machine - Bitcoin Cache Machine - A Secure, Privacy-Preserving, Software-Defined Data Center</title>
+
+	<link rel="canonical" href="/2019/01/12/presentation-slides/">
+
+	<!-- Bootstrap Core CSS -->
+	<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="/css/clean-blog.css">
+
+	<!-- Adjust Colors -->
+	<link rel="stylesheet" href="/colorscheme.css">
+
+	<!-- Pygments Github CSS -->
+	<link rel="stylesheet" href="/css/syntax.css">
+
+	<!-- Custom Fonts -->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="/css/styles-v2.css">
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<!-- Math Jax -->
+	<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+	</script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
+	<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+		TeX: { equationNumbers: { autoNumber: "AMS" } }
+	});
+	</script>
+
+	<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.min.js" type="text/javascript"></script>-->
+
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+	<!-- Bootstrap Core JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+	<!-- Custom Theme JavaScript -->
+	<script src="/js/clean-blog.min.js "></script>
+
+	
+
+</head>
+
+
+<body>
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            
+            <a href="/"><img src="/img/bcm_logo_v2.png" style="height: 50px; margin-top: 10px;"></a>
+            
+            <!-- <a class="navbar-brand" href="/">Bitcoin Cache Machine - A Secure, Privacy-Preserving, Software-Defined Data Center</a> -->
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li>
+                    <a href="/about">About</a>
+                </li>
+                <li>
+                    <a href="/docs">Docs</a>
+                </li>
+                <li>
+                    <a href="/members">Members</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+
+    <!-- Post Header -->
+<header class="intro-header" style="background-image: url('/img/header_v2.png');">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+				<div class="post-heading" style="padding: 50px 0">
+					<h1>Greenville ACM presentation on Bitcoin Cache Machine</h1>
+					
+					<h2 class="subheading">Problem statement, concept of operations, command line interface, architecture.</h2>
+					
+					<span class="meta">Posted by farscapian on January 12, 2019</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+
+
+
+
+
+<div class="float-left">
+	<div class="recentpost" style="padding: 10px">
+
+		<h4> Recently by the same author: </h4>
+
+		<hr class="style-one">
+
+		<a href="/2019/07/20/deploy-your-bitcoin-stacks/">
+			<h2 class="post-title"> Using BCM to deploy fully-integrated Bitcoin-related software</h2>
+		</a>
+
+		
+		<h4 class="post-subtitle">Let's deploy bitcoind, clightning, lnd, spark, ride the lightning, and more!</h4>
+		
+
+		<p class="post-meta" style="margin-top: 5px;margin-bottom:5px; font-size: 0.8em">Posted by farscapian on July 20, 2019</p>
+
+		<div class="notepad-index-post-tags" style="">
+			<a href="/search/index.html#documentation" title="Other posts from the Documentation tag">Documentation</a>&nbsp;<a href="/search/index.html#learning" title="Other posts from the Learning tag">Learning</a>&nbsp;<a href="/search/index.html#slides" title="Other posts from the Slides tag">Slides</a>
+		</div>
+
+		
+		
+		
+
+	</div>
+</div>
+
+
+
+
+
+
+
+<!-- Also Interesting -->
+
+
+
+
+
+
+		
+
+
+
+
+
+
+<div class="float-right">
+	<div class="relevantpost" style="padding: 10px">
+
+
+		<h4> You may find interesting: </h4>
+
+		<hr class="style-one">
+
+		<a href="/2019/07/20/initialize-your-gpg-certs/">
+			<h2 class="post-title"> Use BCM with your Trezor</h2>
+		</a>
+
+		
+		<h4 class="post-subtitle">Initialize your Trezor GPG certificates, make git commits and tags, and login to a remote machine using SSH.</h4>
+		
+
+		<p class="post-meta" style="margin-top: 5px;margin-bottom:5px; font-size: 0.8em">Posted by farscapian on July 20, 2019</p>
+
+		<div class="notepad-index-post-tags" style="">
+			<a href="/search/index.html#documentation" title="Other posts from the Documentation tag">Documentation</a>&nbsp;<a href="/search/index.html#learning" title="Other posts from the Learning tag">Learning</a>&nbsp;<a href="/search/index.html#slides" title="Other posts from the Slides tag">Slides</a>
+		</div>
+
+		
+
+		
+
+
+
+		
+
+		<hr class="style-one">
+
+		<a href="/2019/07/20/initialize-your-gpg-certs/">
+			<h2 class="post-title"> Use BCM with your Trezor</h2>
+		</a>
+
+		
+		<h4 class="post-subtitle">Initialize your Trezor GPG certificates, make git commits and tags, and login to a remote machine using SSH.</h4>
+		
+
+		<p class="post-meta" style="margin-top: 5px;margin-bottom:5px; font-size: 0.8em">Posted by farscapian on July 20, 2019</p>
+
+		<div class="notepad-index-post-tags" style="">
+			<a href="/search/index.html#documentation" title="Other posts from the Documentation tag">Documentation</a>&nbsp;<a href="/search/index.html#learning" title="Other posts from the Learning tag">Learning</a>&nbsp;<a href="/search/index.html#slides" title="Other posts from the Slides tag">Slides</a>
+		</div>
+
+		
+
+		
+		
+
+		
+
+
+
+
+
+
+		
+
+		
+
+
+
+		
+
+		
+
+
+
+		
+
+		
+		
+
+		
+
+
+
+		
+
+
+
+
+
+
+		
+
+		
+
+
+
+		
+
+		
+
+
+
+		
+
+		
+		
+
+		
+
+	</div>
+</div>
+
+<!-- Post Content -->
+<style>
+    img {
+        display:block;
+        max-width:  100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    @media only screen and (min-width: 1000px) {
+    img {
+        -moz-transition:-moz-transform 0.5s ease-in; 
+        -webkit-transition:-webkit-transform 0.5s ease-in; 
+        -o-transition:-o-transform 0.5s ease-in;
+    }
+    img:active{
+        -moz-transform:scale(1.2); 
+        -webkit-transform:scale(1.2);
+        -o-transform:scale(1.2);
+    }
+    }
+    @media only screen and (min-width: 1250px) {
+    img {
+        -moz-transition:-moz-transform 0.5s ease-in; 
+        -webkit-transition:-webkit-transform 0.5s ease-in; 
+        -o-transition:-o-transform 0.5s ease-in;
+    }
+    img:active{
+        -moz-transform:scale(1.5); 
+        -webkit-transform:scale(1.5);
+        -o-transform:scale(1.5);
+    }
+    }
+    @media only screen and (min-width: 1500px) {
+    img {
+        -moz-transition:-moz-transform 0.5s ease-in; 
+        -webkit-transition:-webkit-transform 0.5s ease-in; 
+        -o-transition:-o-transform 0.5s ease-in;
+    }
+    img:active{
+        -moz-transform:scale(2); 
+        -webkit-transform:scale(2);
+        -o-transform:scale(2);
+    }
+    }
+    </style>
+
+<article>
+	<div id="content" class="container">
+		<div class="row">
+			<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+				<p>Here’s the link to the <a href="/assets/bcm_presentation_10Jan19.pdf">presentation slides.</a>.</p>
+
+
+				<hr>
+
+				<ul class="pager">
+					
+					<li class="previous">
+						<a href="/2018/11/27/introducing-bitcoin-cache-machine/" data-toggle="tooltip" data-placement="top" title="Introducing Bitcoin Cache Machine">&larr; Previous Post</a>
+					</li>
+					
+					
+					<li class="next">
+						<a href="/2019/07/20/getting-started-with-bcm/" data-toggle="tooltip" data-placement="top" title="Getting Started with Bitcoin Cache Machine">Next Post &rarr;</a>
+					</li>
+					
+				</ul>
+
+			</div>
+		</div>
+	</div>
+</article>
+
+<hr>
+
+	
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="https://twitter.com/BTCCacheMachine">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li>
+                        <a href="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+                </ul>
+                <p class="copyright">copyright 2020 | <a href="https://github.com/BitcoinCacheMachine" target="_blank">Bitcoin Cache Machine</a> | All Rights Reserved</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+</body>
+
+</html>

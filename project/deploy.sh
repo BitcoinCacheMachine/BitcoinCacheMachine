@@ -2,7 +2,8 @@
 
 
 # purpose of this script is to call the scripts that are necessary to deploy BCM
-# we start bottom up and terminate each script upon service activation.
+# we start bottom up (i.e., LXC image, LXC containers, docker images, docker containers, etc)
+# and terminate each script upon service activation.
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"
