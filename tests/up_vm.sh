@@ -29,7 +29,7 @@ envsubst <./bcm_vm_lxc_profile.yml >"/tmp/cloud-init.yml"
 VM_PROFILE_NAME="$BCM_VM_NAME-vm"
 lxc profile create "$VM_PROFILE_NAME"
 cat /tmp/cloud-init.yml | lxc profile edit "$VM_PROFILE_NAME"
-#rm /tmp/cloud-init.yml
+shred -uvz /tmp/cloud-init.yml
 
 lxc init images:ubuntu/focal/cloud --vm --profile="$VM_PROFILE_NAME" "$BCM_VM_NAME"
 #lxc network attach bcmmacvlan "$BCM_VM_NAME" eth0
