@@ -28,11 +28,11 @@ if ! groups | grep -q lxd; then
     usermod -G lxd -a "$SUDO_USER"
 fi
 
-# install LXD
-if [[ ! -f "$(command -v lxc)" ]]; then
-    snap set system snapshots.automatic.retention=no
-    snap install lxd --channel="candidate"
-fi
+# # install LXD
+# if [[ ! -f "$(command -v lxc)" ]]; then
+#     snap set system snapshots.automatic.retention=no
+#     snap install lxd --channel="candidate"
+# fi
 
 export BCM_GIT_DIR="$(pwd)"
 SUDO_USER_HOME="/home/$SUDO_USER"
