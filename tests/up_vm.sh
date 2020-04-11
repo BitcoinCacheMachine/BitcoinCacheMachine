@@ -42,12 +42,12 @@ sleep 60
 IP_V4_ADDRESS=$(lxc list --format csv --columns=4n | grep ",$BCM_VM_NAME" | awk '{print $1;}')
 wait-for-it -t 15 "$IP_V4_ADDRESS:22"
 
-# let's get the hosts fingerprint and accept it.
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o "StrictHostKeyChecking no" "ubuntu@$IP_V4_ADDRESS" -- 'sudo mkdir -p "/bcmbootstrap" && sudo chown ubuntu:ubuntu /bcmbootstrap'
-
 #sshfs -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o allow_other,default_permissions "ubuntu@$IP_V4_ADDRESS"/bcmbootstrap "$BCM_BOOTSTRAP_DIR"
 SSH_PUBKEY_PATH="$HOME/.ssh/$BCM_VM_NAME.local.pub"
 FQSN="ubuntu@$IP_V4_ADDRESS"
+
+# let's get the hosts fingerprint and accept it.
+ssh -i "$SSH_PUBKEY_PATH" -o "StrictHostKeyChecking no" "ubuntu@$IP_V4_ADDRESS" -- 'sudo mkdir -p "/bcmbootstrap" && sudo chown ubuntu:ubuntu /bcmbootstrap'
 
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chmod 0744 /home/ubuntu/init_bcm.sh
