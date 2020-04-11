@@ -68,7 +68,7 @@ The script above install the latest tor proxy, the pulls the BCM git clones the 
 After you have the BCM scripts, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment. Running just `bcm` will give you a help menu.
 
 ```bash
-sudo bash -c ./install_bcm.sh
+sudo bash -c ./install.sh
 ```
 
 Next, decide how you want to run BCM:

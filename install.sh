@@ -8,7 +8,7 @@ export DEBIAN_FRONTEND=noninteractive
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
     if dpkg -s "$PKG" >/dev/null 2>&1; then
-        apt-get remove "$PKG" -y
+        aptdcon -y --remove "$PKG"
     fi
 done
 
