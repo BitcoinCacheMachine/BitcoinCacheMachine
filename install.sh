@@ -5,6 +5,9 @@ cd "$(dirname "$0")"
 
 export DEBIAN_FRONTEND=noninteractive
 
+# reinstall required software.
+apt-get install -y curl git iotop socat apg snap snapd jq gnupg snapd sshfs aptdcon
+
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
     if dpkg -s "$PKG" >/dev/null 2>&1; then
@@ -12,8 +15,6 @@ for PKG in lxd lxd-client tor; do
     fi
 done
 
-# reinstall required software.
-apt-get install -y curl git iotop socat apg snap snapd jq gnupg snapd sshfs
 
 # remove any unused software.
 apt-get autoremove -y

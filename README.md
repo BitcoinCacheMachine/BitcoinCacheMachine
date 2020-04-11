@@ -71,6 +71,8 @@ After you have the BCM scripts, run the installer script. This installs necessar
 sudo bash -c ./install.sh
 ```
 
+You may want to log out and log back in for your group membership to update. 
+
 Next, decide how you want to run BCM:
 
 . If you want to run BCM in Type-1 vms with hardware-enforced separation, use `bcm deploy`. Export BCM_VM_NAME to deploy more Type 1 VMs.
