@@ -9,7 +9,7 @@ set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TOR_ONLY=0
-BCM_GIT_DIR="$HOME/bin/bcm"
+BCM_GIT_DIR="$HOME/bcm"
 BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 
 for i in "$@"; do
