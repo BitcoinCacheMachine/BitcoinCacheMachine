@@ -7,9 +7,7 @@ config:
     #package_reboot_if_required: true
     packages:
       - openssh-server
-      - sshfs
       - avahi-daemon
-      - aptdcon
     users:
       - name: ubuntu
         groups: lxd

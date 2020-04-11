@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 export DEBIAN_FRONTEND=noninteractive
 
 # reinstall required software.
-apt-get install -y curl git apg snap snapd gnupg snapd
+apt-get install -y curl git apg snap snapd gnupg aptdcon
 
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
