@@ -8,7 +8,6 @@ config:
     packages:
       - openssh-server
       - avahi-daemon
-      - aptdcon
     users:
       - name: ubuntu
         groups: lxd
