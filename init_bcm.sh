@@ -369,8 +369,7 @@ wait-for-it -t 30 127.0.0.1:9050
 
 if [[ "$TOR_ONLY" = 0 ]]; then
     # configure git to download through the local tor proxy.
-    BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/tree/dev"
-    git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
+    git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050
     
     # clone the BCM repo to /home/$SUDO_USER/bcm
     SUDO_USER_HOME="/home/$SUDO_USER"
