@@ -10,6 +10,7 @@ cd "$(dirname "$0")"
 
 TOR_ONLY=0
 BCM_GIT_DIR="$HOME/bcm"
+mkdir -p "$BCM_GIT_DIR"
 BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 
 for i in "$@"; do
