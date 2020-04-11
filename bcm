@@ -9,6 +9,9 @@ IS_FRONTEND=1
 BCM_HELP_FLAG=0
 REBUILD_IMAGES=0
 
+# when 0, we assume we are targeting SSH connections to remote BCM_SSH_HOSTNAME instead of executing locally.
+DEPLOY_LOCALHOST=0
+
 # make snap commands available to the script.
 PATH="$PATH:/snap/bin"
 export PATH="$PATH"
@@ -23,6 +26,9 @@ for i in "$@"; do
         ;;
         --rebuild)
             REBUILD_IMAGES=1
+        ;;
+        --localhost)
+            DEPLOY_LOCALHOST=1
         ;;
         *)
             # unknown option
@@ -148,3 +154,7 @@ export CLUSTER_ENDPOINTS="$CLUSTER_ENDPOINTS"
 
 # Install docker if we're running this command on a front-end
 ./commands/cli_entrypoint.sh "$@"
+
+
+#TODO
+#DEPLOY_LOCALHOST
