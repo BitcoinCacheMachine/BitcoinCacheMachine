@@ -3,12 +3,19 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# # remove any pre-existing software that may exist and have conflicts.
-# for PKG in lxd lxd-client tor; do
-#     if dpkg -s "$PKG" >/dev/null 2>&1; then
-#         apt-get remove -y "$PKG"
-#     fi
-# done
+# remove any pre-existing software that may exist and have conflicts.
+for PKG in lxd lxd-client tor; do
+    if dpkg -s "$PKG" >/dev/null 2>&1; then
+        while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
+            echo "Waiting for apt..."
+            sleep .5
+        done
+        
+        apt-get remove -y "$PKG"
+    fi
+done
+
+
 
 # reinstall required software.
 apt-get install -y curl git apg snap snapd gnupg shred
@@ -33,10 +40,10 @@ export BCM_GIT_DIR="$(pwd)"
 SUDO_USER_HOME="/home/$SUDO_USER"
 bash -c "$BCM_GIT_DIR/commands/cluster/cluster_create.sh"
 
-# if there's no group called lxd, create it.
-if ! groups "$(whoami)" | grep -q lxd; then
-    gpasswd -a "$(whoami)" lxd
-fi
+# # if there's no group called lxd, create it.
+# if ! groups "$(whoami)" | grep -q lxd; then
+#     gpasswd -a "$(whoami)" lxd
+# fi
 
 # Let's make sure the .ssh folder exists. This will hold known SSH BCM hosts
 # SSH authentication to remote hosts uses the trezor
