@@ -46,12 +46,14 @@ wait-for-it -t 15 "$IP_V4_ADDRESS:22"
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o "StrictHostKeyChecking no" "ubuntu@$IP_V4_ADDRESS" -- 'sudo mkdir -p "/bcmbootstrap" && sudo chown ubuntu:ubuntu /bcmbootstrap'
 
 #sshfs -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o allow_other,default_permissions "ubuntu@$IP_V4_ADDRESS"/bcmbootstrap "$BCM_BOOTSTRAP_DIR"
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" chmod 0744 /home/ubuntu/init_bcm.sh
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" rm /home/ubuntu/init_bcm.sh
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" bash -c "/home/ubuntu/bcm/bcm deploy"
+SSH_PUBKEY_PATH="$HOME/.ssh/$BCM_VM_NAME.local.pub"
+FQSN="ubuntu@$IP_V4_ADDRESS"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chmod 0744 /home/ubuntu/init_bcm.sh
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" rm /home/ubuntu/init_bcm.sh
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/bcm deploy"
 
 # # make the script executable then run it
 # # scripts installs TOR, then git pulls the BCM source code from github

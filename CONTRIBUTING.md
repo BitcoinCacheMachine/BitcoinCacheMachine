@@ -8,9 +8,7 @@
 
 Sign up for a github.com account.
 
-Fork the BitcoinCacheMachine repository to your account. Clone your forked repo to your machine then make some changes to your local repo. Feel free to make your changes on a branch of your making.
-
-BCM is developed in Visual Studio Code by BCM's main author. Feel free to use any editor you want, just be sure to .gitignore any editor manifests.
+Fork the BitcoinCacheMachine repository to your account. Run the installation scripts, but add the '--git-repo=<REPO_URL>' to clone your own fork. This will allow you to make changes against your repo and thus develop your own version of BCM. Please! If you have useful additions, please consider submitting your changes as a pull request on the main page!
 
 ## Linters
 
