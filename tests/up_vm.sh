@@ -54,6 +54,7 @@ ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chmod 0744 /home/ubuntu/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" rm /home/ubuntu/init_bcm.sh
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/bcm deploy"
 
 
