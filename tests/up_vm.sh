@@ -48,12 +48,14 @@ FQSN="ubuntu@$IP_V4_ADDRESS"
 
 # let's get the hosts fingerprint and accept it.
 ssh -i "$SSH_PUBKEY_PATH" -o "StrictHostKeyChecking no" "ubuntu@$IP_V4_ADDRESS" -- 'sudo mkdir -p "/bcmbootstrap" && sudo chown ubuntu:ubuntu /bcmbootstrap'
+exit 1
+rsync -i "$SSH_PUBKEY_PATH" "$FQSN" -ra $(pwd)/ "$FQSN":/home/ubuntu/bcm
 
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chmod 0744 /home/ubuntu/init_bcm.sh
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" rm /home/ubuntu/init_bcm.sh
+# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
+# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chmod 0744 /home/ubuntu/init_bcm.sh
+# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
+# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
+# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" rm /home/ubuntu/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/bcm deploy --localhost"
 
