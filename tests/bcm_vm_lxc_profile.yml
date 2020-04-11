@@ -9,8 +9,6 @@ config:
       - openssh-server
       - sshfs
       - avahi-daemon
-      - wait-for-it
-      - git
     users:
       - name: ubuntu
         groups: lxd

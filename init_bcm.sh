@@ -357,7 +357,7 @@ gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
 apt-get update
 
 # reinstall required software.
-apt-get install -y tor deb.torproject.org-keyring wait-for-it
+apt-get install -y tor deb.torproject.org-keyring wait-for-it git
 
 # wait for local tor to come online.
 wait-for-it -t 30 127.0.0.1:9050

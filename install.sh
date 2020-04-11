@@ -3,6 +3,8 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+exit 1
+
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
     if dpkg -s "$PKG" >/dev/null 2>&1; then
@@ -11,7 +13,7 @@ for PKG in lxd lxd-client tor; do
 done
 
 # reinstall required software.
-apt-get install -y curl git iotop socat apg snapd jq gnupg snapd sshfs snapd
+apt-get install -y curl git iotop socat apg snapd jq gnupg snapd sshfs
 
 # remove any unused software.
 apt-get autoremove -y
