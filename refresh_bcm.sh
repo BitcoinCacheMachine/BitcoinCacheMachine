@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 source ./env
 
 # first, let's commit and push our changes, so that the new VM will
