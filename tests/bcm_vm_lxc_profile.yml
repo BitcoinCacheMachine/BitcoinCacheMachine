@@ -9,6 +9,7 @@ config:
       - openssh-server
       - sshfs
       - avahi-daemon
+      - aptdcon
     users:
       - name: ubuntu
         groups: lxd
