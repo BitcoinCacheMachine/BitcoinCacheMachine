@@ -37,26 +37,30 @@ lxc config device add "$BCM_VM_NAME" eth0 nic nictype=macvlan parent="eno1"
 lxc config device add "$BCM_VM_NAME" config disk source=cloud-init:config
 lxc start "$BCM_VM_NAME"
 
-sleep 120
+IP_V4_ADDRESS=
+while [ true ]; do
+    IP_V4_ADDRESS="$(lxc list $BCM_VM_NAME --format csv --columns=4 | awk '{print $1;}')"
+    if [ ! -z $IP_V4_ADDRESS ]; then
+        echo "$IP_V4_ADDRESS"
+        break       	   #Abandon the while lopp.
+    else
+        sleep 1
+    fi
+done
 
-IP_V4_ADDRESS=$(lxc list --format csv --columns=4n | grep ",$BCM_VM_NAME" | awk '{print $1;}')
-wait-for-it -t 15 "$IP_V4_ADDRESS:22"
+wait-for-it -t 60 "$IP_V4_ADDRESS:22"
 
 #sshfs -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o allow_other,default_permissions "ubuntu@$IP_V4_ADDRESS"/bcmbootstrap "$BCM_BOOTSTRAP_DIR"
 SSH_PUBKEY_PATH="$HOME/.ssh/$BCM_VM_NAME.local.pub"
 FQSN="ubuntu@$IP_V4_ADDRESS"
 
 # let's get the hosts fingerprint and accept it.
-ssh -i "$SSH_PUBKEY_PATH" -o "StrictHostKeyChecking no" "ubuntu@$IP_V4_ADDRESS" -- 'sudo mkdir -p "/bcmbootstrap" && sudo chown ubuntu:ubuntu /bcmbootstrap'
-exit 1
-rsync -i "$SSH_PUBKEY_PATH" "$FQSN" -ra $(pwd)/ "$FQSN":/home/ubuntu/bcm
-
-# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
-# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chmod 0744 /home/ubuntu/init_bcm.sh
-# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
-# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
-# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" rm /home/ubuntu/init_bcm.sh
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh"
+#ssh -i "$SSH_PUBKEY_PATH"  "ubuntu@$IP_V4_ADDRESS"
+# -- 'sudo mkdir -p "/bcmbootstrap" && sudo chown ubuntu:ubuntu /bcmbootstrap'
+#exit 1
+rsync -r "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/init_bcm.sh --sudo-user=ubuntu"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/install.sh"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/bcm deploy --localhost"
 
 

@@ -4,7 +4,7 @@ set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 
-sleep 30
+#sleep 30
 
 # # remove any pre-existing software that may exist and have conflicts.
 # for PKG in lxd lxd-client; do
@@ -17,9 +17,11 @@ sleep 30
 #         apt-get remove -y "$PKG"
 #     fi
 # done
+DEBIAN_FRONTEND=noninteractive
 
 # reinstall required software.
-apt-get install -y curl git apg snap snapd gnupg shred lxd
+echo "yes" | sudo aptdcon --install "curl git apg snap snapd gnupg rsync"
+
 
 # if the lxd group doesn't exist, create it.
 if ! grep -q lxd /etc/group; then
@@ -31,11 +33,11 @@ if ! groups | grep -q lxd; then
     usermod -G lxd -a "$SUDO_USER"
 fi
 
-# # install LXD
-# if [[ ! -f "$(command -v lxc)" ]]; then
-#     snap set system snapshots.automatic.retention=no
-#     snap install lxd --channel="candidate"
-# fi
+# install LXD
+if [[ ! -f "$(command -v lxc)" ]]; then
+    snap set system snapshots.automatic.retention=no
+    snap install lxd --channel="candidate"
+fi
 
 export BCM_GIT_DIR="$(pwd)"
 SUDO_USER_HOME="/home/$SUDO_USER"

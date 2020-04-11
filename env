@@ -4,6 +4,7 @@
 # your active environment is shown with 'bcm info'
 export BCM_ACTIVE_CHAIN="mainnet"
 export BCM_DEBUG="0"
+export BCM_GIT_DIR="$(pwd)"
 
 #export BCM_SSH_HOSTNAME="$(hostname)"
 #export BCM_SSH_USERNAME="$(whoami)"

@@ -3,11 +3,13 @@ config:
     #cloud-config
     apt_mirror: http://us.archive.ubuntu.com/ubuntu/
     package_update: true
-    package_upgrade: true
-    package_reboot_if_required: true
+    #package_upgrade: true
+    #package_reboot_if_required: true
     packages:
       - openssh-server
       - avahi-daemon
+      - aptdaemon
+      - rsync
     users:
       - name: ubuntu
         groups: lxd

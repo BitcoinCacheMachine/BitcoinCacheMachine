@@ -27,4 +27,4 @@ lxc profile delete "$BCM_VM_NAME-vm"
 #     rm "$FILE"
 # fi
 
-#ssh-keygen -R "$BCM_VM_NAME.local"
+ssh-keygen -R "$BCM_VM_NAME.local"
