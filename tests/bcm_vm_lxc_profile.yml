@@ -9,6 +9,11 @@ config:
       - openssh-server
       - avahi-daemon
       - aptdcon
+      - snap
+      - snapd
+      - gnupg
+      - git
+      - apg
     users:
       - name: ubuntu
         groups: lxd
