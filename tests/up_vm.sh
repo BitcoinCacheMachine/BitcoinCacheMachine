@@ -1,8 +1,7 @@
 #!/bin/bash
 
 set -Eeoux pipefail
-
-BCM_GIT_DIR=$(pwd)
+cd "$(dirname "$0")"
 
 if [[ -z $BCM_BOOTSTRAP_DIR ]]; then
     echo "ERROR: BCM_BOOTSTRAP_DIR IS not defined. Please set your environment."
