@@ -371,7 +371,7 @@ if [[ "$TOR_ONLY" = 0 ]]; then
     SUDO_USER_HOME="/home/$SUDO_USER"
     #BCM_GIT_DIR="$(pwd)"
     export BCM_GIT_DIR="$BCM_GIT_DIR"
-    if [[ ! -d $BCM_GIT_DIR ]]; then
+    if [[ -d $BCM_GIT_DIR ]]; then
         git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
         chown -R "$SUDO_USER:$SUDO_USER" "$BCM_GIT_DIR"
         cd "$BCM_GIT_DIR" && git checkout dev

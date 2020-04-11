@@ -61,14 +61,10 @@ ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o "StrictHostKeyChecking no" "ubuntu
 
 #sshfs -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o allow_other,default_permissions "ubuntu@$IP_V4_ADDRESS"/bcmbootstrap "$BCM_BOOTSTRAP_DIR"
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
-
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" chmod 0744 /home/ubuntu/init_bcm.sh
-
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
-
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" sudo bash -c /home/ubuntu/init_bcm.sh
-
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" bash -c /usr/local/bin/bcm deploy
+ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" bash -c "/usr/local/bin/bcm deploy"
 
 # # make the script executable then run it
 # # scripts installs TOR, then git pulls the BCM source code from github
