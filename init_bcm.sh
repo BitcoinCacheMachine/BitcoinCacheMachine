@@ -9,8 +9,6 @@ set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TOR_ONLY=0
-BCM_GIT_DIR="$HOME/bcm"
-mkdir -p "$BCM_GIT_DIR"
 BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 
 for i in "$@"; do
@@ -22,11 +20,18 @@ for i in "$@"; do
             BCM_GITHUB_REPO_URL="${i#*=}"
             shift # past argument=value
         ;;
+        --sudo-user=*)
+            SUDO_USER=="${i#*=}"
+            shift
+        ;;
         *)
             # unknown option
         ;;
     esac
 done
+
+BCM_GIT_DIR="/home/$SUDO_USER/bcm"
+mkdir -p "$BCM_GIT_DIR"
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root. Try 'sudo bash -c ./install.sh'"

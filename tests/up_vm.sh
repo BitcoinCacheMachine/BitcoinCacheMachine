@@ -49,7 +49,7 @@ ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o "StrictHostKeyChecking no" "ubuntu
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" chmod 0744 /home/ubuntu/init_bcm.sh
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
-ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" sudo bash -c /home/ubuntu/init_bcm.sh
+ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
 ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" "ubuntu@$IP_V4_ADDRESS" bash -c "/home/ubuntu/bin/bcm deploy"
 
 # # make the script executable then run it
