@@ -3,15 +3,10 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-export DEBIAN_FRONTEND=noninteractive
-
-apt-get update
-apt-get install -y aptdcon
-
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
     if dpkg -s "$PKG" >/dev/null 2>&1; then
-        aptdcon -y --remove "$PKG"
+        apt-get remove -y "$PKG"
     fi
 done
 
