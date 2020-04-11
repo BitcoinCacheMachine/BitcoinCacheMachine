@@ -63,7 +63,7 @@ chmod 0744 ./init_bcm.sh
 sudo bash -c ./init_bcm.sh
 ```
 
-The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the bcm directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs, which is useful if you want to run multiple BCM instances on shared hardware. You can also use BCM shell scripts to deploy BCM server-side infrastructure to a remote SSH endpoint (or SSH exposed as an onion service).
+The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the bcm directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs. Type 1 VMs are useful if you want to run multiple BCM instances on shared hardware (e.g., a full node for each family member). Finally, you can use BCM to deploy BCM server-side infrastructure to a remote SSH endpoint (or SSH exposed as an onion service).
 
 After you have the BCM scripts, run the installer:
 
@@ -72,7 +72,9 @@ sudo bash -c ./install_bcm.sh
 ```
 
 Next, decide how you want to run BCM:
-. If you want to run BCM in Type-1 vms, use BCM_GIT_DIR/test/refresh_bcm.sh.
+
+. If you want to run BCM in Type-1 vms, use `./refresh_bcm.sh`.
+  If you want to run BCM directly on your localhost, run `sudo bash -c ./install.sh`
 
 ## Deploying your own BCM Infrastructure
 
