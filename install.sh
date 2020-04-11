@@ -5,6 +5,9 @@ cd "$(dirname "$0")"
 
 export DEBIAN_FRONTEND=noninteractive
 
+apt-get update
+apt-get install -y aptdcon
+
 # remove any pre-existing software that may exist and have conflicts.
 for PKG in lxd lxd-client tor; do
     if dpkg -s "$PKG" >/dev/null 2>&1; then
@@ -13,7 +16,7 @@ for PKG in lxd lxd-client tor; do
 done
 
 # reinstall required software.
-apt-get install -y curl git apg snap snapd gnupg aptdcon shred
+apt-get install -y curl git apg snap snapd gnupg shred
 
 # remove any unused software.
 apt-get autoremove -y
