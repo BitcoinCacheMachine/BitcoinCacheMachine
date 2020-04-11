@@ -14,18 +14,12 @@ if [[ -z $BCM_VM_NAME ]]; then
     exit
 fi
 
-# # install multipass; all bcm back-end instances exist as multipass vms.
-# if [[ ! -f "$(command -v multipass)" ]]; then
-#     sudo snap install --edge --classic multipass
-# fi
-
-# if ! multipass list | grep -q bcm; then
-#     multipass launch --disk="50GB" --mem="4098MB" --cpus="4" --name="$BCM_VM_NAME" daily:20.04
-#     #daily:lts
-# fi
-# if ! lxc network list | grep bcmmacvlan; then
-#     lxc network create bcmmacvlan
-# fi
+# first, let's commit and push our changes, so that the new VM will
+# pull git from the published location. Note we do NOT mount BCM_GIT_DIR
+# from the controller; it's always pulled from the GIT server endpoint
+git add *
+git commit --message="automated commit push."
+git push
 
 # lxc profile device set bcmmacvlan eth0 nictype=macvlan parent="eno1"
 

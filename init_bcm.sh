@@ -10,11 +10,16 @@ cd "$(dirname "$0")"
 
 TOR_ONLY=0
 BCM_GIT_DIR="/usr/local/bin"
+BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/tree/dev"
 
 for i in "$@"; do
     case $i in
         --tor-only)
             TOR_ONLY=1
+        ;;
+        --git-repo=*)
+            BCM_GITHUB_REPO_URL="${i#*=}"
+            shift # past argument=value
         ;;
         *)
             # unknown option
@@ -364,7 +369,7 @@ wait-for-it -t 30 127.0.0.1:9050
 
 if [[ "$TOR_ONLY" = 0 ]]; then
     # configure git to download through the local tor proxy.
-    BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
+    BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine/tree/dev"
     git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
     
     # clone the BCM repo to /home/$SUDO_USER/bcm
