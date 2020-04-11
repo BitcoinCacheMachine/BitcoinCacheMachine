@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # remove any pre-existing software that may exist and have conflicts.
@@ -78,8 +78,10 @@ fi
 BASHRC_FILE="$SUDO_USER_HOME/.profile"
 BASHRC_TEXT="export PATH=$""PATH:/snap/bin"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
-    { 
-        echo "$BASHRC_TEXT" 
-        echo "DEBIAN_FRONTEND=noninteractive" 
+    {
+        echo "$BASHRC_TEXT"
+        echo "DEBIAN_FRONTEND=noninteractive"
     } >> "$BASHRC_FILE"
 fi
+
+bash -c ./commands/cluster/cluster_create.sh

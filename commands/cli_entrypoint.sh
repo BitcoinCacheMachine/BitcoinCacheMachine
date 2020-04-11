@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeou pipefail
 cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
@@ -83,8 +83,14 @@ export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
 # export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
 # export CLUSTER_ENDPOINTS="$CLUSTER_ENDPOINTS"
 
-if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
-    ./cluster/entrypoint.sh "$@"
+# if [[ "$BCM_CLI_COMMAND" == "cluster" ]]; then
+#     ./cluster/entrypoint.sh "$@"
+#     exit
+# fi
+
+
+if [[ "$BCM_CLI_COMMAND" == "clear" ]]; then
+    ./clear_lxd.sh "$@"
     exit
 fi
 
@@ -100,10 +106,6 @@ if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
     exit
 fi
 
-if [[ "$BCM_CLI_COMMAND" == "tier" ]]; then
-    ./tier/entrypoint.sh "$@"
-    exit
-fi
 
 if [[ "$BCM_CLI_COMMAND" == "restore" ]]; then
     ./backuprestore/entrypoint.sh "$@" --restore
@@ -120,56 +122,56 @@ if [[ "$BCM_CLI_COMMAND" == "bitcoin-cli" || "$BCM_CLI_COMMAND" == "lightning-cl
     exit
 fi
 
-./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
-./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
-./controller/build_docker_image.sh --image-title="ots" --base-image="bcm-trezor:$BCM_VERSION"
+# ./controller/build_docker_image.sh --image-title="trezor" --base-image="$BASE_DOCKER_IMAGE"
+# ./controller/build_docker_image.sh --image-title="gpgagent" --base-image="bcm-trezor:$BCM_VERSION"
+# ./controller/build_docker_image.sh --image-title="ots" --base-image="bcm-trezor:$BCM_VERSION"
 
-if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
-    ./init.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "init" ]]; then
+#     ./init.sh "$@"
+#     exit
+# fi
 
 # set our GNUPGHOME to the user cert directory
 # if there is no certificate, go ahead and create it.
-if [[ ! -d "$GNUPGHOME/trezor" ]]; then
-    echo "ERROR: 'The '$GNUPGHOME/trezor' directory does not exist. Please run 'bcm init'."
-    exit
-fi
+# if [[ ! -d "$GNUPGHOME/trezor" ]]; then
+#     echo "ERROR: 'The '$GNUPGHOME/trezor' directory does not exist. Please run 'bcm init'."
+#     exit
+# fi
 
-if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
-    ./controller/entrypoint.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
+#     ./controller/entrypoint.sh "$@"
+#     exit
+# fi
 
-if [[ "$BCM_CLI_COMMAND" == "pass" ]]; then
-    ./pass/entrypoint.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "pass" ]]; then
+#     ./pass/entrypoint.sh "$@"
+#     exit
+# fi
 
-if [[ "$BCM_CLI_COMMAND" == "git" ]]; then
-    ./git/entrypoint.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "git" ]]; then
+#     ./git/entrypoint.sh "$@"
+#     exit
+# fi
 
-if [[ "$BCM_CLI_COMMAND" == "file" ]]; then
-    ./file/entrypoint.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "file" ]]; then
+#     ./file/entrypoint.sh "$@"
+#     exit
+# fi
 
-if [[ "$BCM_CLI_COMMAND" == "web" ]]; then
-    ./web/entrypoint.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "web" ]]; then
+#     ./web/entrypoint.sh "$@"
+#     exit
+# fi
 
-if [[ "$BCM_CLI_COMMAND" == "logs" ]]; then
-    ./stack_cli/entrypoint.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "logs" ]]; then
+#     ./stack_cli/entrypoint.sh "$@"
+#     exit
+# fi
 
-if [[ "$BCM_CLI_COMMAND" == "get-ip" ]]; then
-    ./get/entrypoint.sh "$@"
-    exit
-fi
+# if [[ "$BCM_CLI_COMMAND" == "get-ip" ]]; then
+#     ./get/entrypoint.sh "$@"
+#     exit
+# fi
 
 # run is for running docker containers AT the SDN controller (not in LXC)
 if [[ "$BCM_CLI_COMMAND" == "run" ]]; then

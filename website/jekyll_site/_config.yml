@@ -2,7 +2,7 @@
 title: Bitcoin Cache Machine - A Secure, Privacy-Preserving, Software-Defined Data Center
 email: info@bitcoincachemachine.org
 description: Privacy-preserving Bitcoin Payment infrastructure for home and office.
-url: http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch/
+#url: http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch/
 twitter_username: BTCCacheMachine
 github_username:  BitcoinCacheMachine
 permalink: /:year/:month/:day/:title:output_ext

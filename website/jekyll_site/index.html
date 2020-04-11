@@ -34,7 +34,8 @@ description: A Secure, Privacy-Preserving, Software-Defined Data Center
                     </h4>
                     {% endif %}
                 </a>
-                <p class="post-meta" style="margin-bottom:5px">Posted by {{ post.author }} on {{ post.date | date: "%B %-d, %Y" }}</p>
+                <p class="post-meta" style="margin-bottom:5px">Posted by {{ post.author }} on
+                    {{ post.date | date: "%B %-d, %Y" }}</p>
                 <!-- <div class="notepad-index-post-tags" style="">
                     {% for tag in post.tags %}<a href="{{ site.baseurl }}/search/index.html#{{ tag | cgi_encode }}" title="Other posts from the {{ tag | capitalize }} tag">{{
                         tag | capitalize }}</a>{% unless forloop.last %}&nbsp;{% endunless %}{% endfor %}
@@ -57,3 +58,52 @@ description: A Secure, Privacy-Preserving, Software-Defined Data Center
                 {% endif %}
             </ul>
             {% endif %}
+
+
+            <!-- <!DOCTYPE html>
+
+<html>
+<head>
+ <title>New ZeroNet site!</title>
+ <meta charset="utf-8">
+ <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+ <base href="" target="_top" id="base">
+ <script>base.href = document.location.href.replace("/media", "").replace("index.html", "").replace(/[&?]wrapper=False/, "").replace(/[&?]wrapper_nonce=[A-Za-z0-9]+/, "")</script>
+</head>
+<body>
+
+<div id="out"></div>
+
+<script type="text/javascript" src="js/ZeroFrame.js"></script>
+
+<script>
+
+class Page extends ZeroFrame {
+	setSiteInfo(site_info) {
+		var out = document.getElementById("out")
+		out.innerHTML =
+			"Page address: " + site_info.address +
+			"<br>- Peers: " + site_info.peers +
+			"<br>- Size: " + site_info.settings.size +
+			"<br>- Modified: " + (new Date(site_info.content.modified*1000))
+	}
+
+	onOpenWebsocket() {
+		this.cmd("siteInfo", [], function(site_info) {
+			page.setSiteInfo(site_info)
+		})
+	}
+
+	onRequest(cmd, message) {
+		if (cmd == "setSiteInfo")
+			this.setSiteInfo(message.params)
+		else
+			this.log("Unknown incoming message:", cmd)
+	}
+}
+page = new Page()
+
+</script>
+
+</body>
+</html> -->

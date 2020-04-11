@@ -3,19 +3,19 @@
   <channel>
     <title>Bitcoin Cache Machine - A Secure, Privacy-Preserving, Software-Defined Data Center</title>
     <description>Privacy-preserving Bitcoin Payment infrastructure for home and office.</description>
-    <link>http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//</link>
-    <atom:link href="http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 27 Mar 2020 16:02:28 -0500</pubDate>
-    <lastBuildDate>Fri, 27 Mar 2020 16:02:28 -0500</lastBuildDate>
-    <generator>Jekyll v3.7.4</generator>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Sat, 28 Mar 2020 16:25:54 -0500</pubDate>
+    <lastBuildDate>Sat, 28 Mar 2020 16:25:54 -0500</lastBuildDate>
+    <generator>Jekyll v3.8.5</generator>
     
       <item>
         <title>Using BCM to deploy fully-integrated Bitcoin-related software</title>
         <description>
 </description>
         <pubDate>Sat, 20 Jul 2019 17:00:00 -0500</pubDate>
-        <link>http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/07/20/deploy-your-bitcoin-stacks/</link>
-        <guid isPermaLink="true">http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/07/20/deploy-your-bitcoin-stacks/</guid>
+        <link>/2019/07/20/deploy-your-bitcoin-stacks/</link>
+        <guid isPermaLink="true">/2019/07/20/deploy-your-bitcoin-stacks/</guid>
         
         <category>documentation</category>
         
@@ -54,8 +54,8 @@ Use ‘bcm file’ commands to create and verify file signatures
 Use ‘bcm pass’ commands to create and manage passwords locally
 </description>
         <pubDate>Sat, 20 Jul 2019 17:00:00 -0500</pubDate>
-        <link>http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/07/20/initialize-your-gpg-certs/</link>
-        <guid isPermaLink="true">http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/07/20/initialize-your-gpg-certs/</guid>
+        <link>/2019/07/20/initialize-your-gpg-certs/</link>
+        <guid isPermaLink="true">/2019/07/20/initialize-your-gpg-certs/</guid>
         
         <category>documentation</category>
         
@@ -89,8 +89,8 @@ BCM scripts download and install pre-requisites. Software that BCM installs incl
 ##
 </description>
         <pubDate>Sat, 20 Jul 2019 17:00:00 -0500</pubDate>
-        <link>http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/07/20/getting-started-with-bcm/</link>
-        <guid isPermaLink="true">http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/07/20/getting-started-with-bcm/</guid>
+        <link>/2019/07/20/getting-started-with-bcm/</link>
+        <guid isPermaLink="true">/2019/07/20/getting-started-with-bcm/</guid>
         
         <category>documentation</category>
         
@@ -106,8 +106,8 @@ BCM scripts download and install pre-requisites. Software that BCM installs incl
         <description>Here’s the link to the presentation slides..
 </description>
         <pubDate>Sat, 12 Jan 2019 16:00:00 -0600</pubDate>
-        <link>http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/01/12/presentation-slides/</link>
-        <guid isPermaLink="true">http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2019/01/12/presentation-slides/</guid>
+        <link>/2019/01/12/presentation-slides/</link>
+        <guid isPermaLink="true">/2019/01/12/presentation-slides/</guid>
         
         <category>documentation</category>
         
@@ -155,8 +155,8 @@ Conclusion
 BCM dramatically lowers the barriers to deploying and operating your own privacy-preserving bitcoin payment infrastructure. This network and its components deploy in a fully automated way and run on commodity x86_64, so it’s likely you can start testing it today! You just need to provide CPU, memory, disk, a modern Linux kernel with LXD installed, and an Internet connection! Deploy any combination of BCM components to create the data center that suits your particular needs!
 </description>
         <pubDate>Tue, 27 Nov 2018 00:00:00 -0600</pubDate>
-        <link>http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2018/11/27/introducing-bitcoin-cache-machine/</link>
-        <guid isPermaLink="true">http://127.0.0.1:43110/1KqjsEPJ9cmbnHop5VneDG4ws9i9ufYbch//2018/11/27/introducing-bitcoin-cache-machine/</guid>
+        <link>/2018/11/27/introducing-bitcoin-cache-machine/</link>
+        <guid isPermaLink="true">/2018/11/27/introducing-bitcoin-cache-machine/</guid>
         
         <category>bitcoin</category>
         

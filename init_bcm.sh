@@ -2,13 +2,14 @@
 
 # this script installs TOR locally then ensures the BCM GIT repo is pulled over TOR.
 # use --tor-only if you want the host to just install tor and not perform a GIT PULL
-# of the BCM repo. This is useful if you've mounted the BCM GIT DIR to the remote
-# machine (e.g., using sshfs)
+# of the BCM repo. This script should be run on any new machine wishing to be a BCM
+# "controller"/BCM Administrator.
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TOR_ONLY=0
+BCM_GIT_DIR="/usr/local/bin"
 
 for i in "$@"; do
     case $i in
@@ -368,7 +369,7 @@ if [[ $TOR_ONLY = 0 ]]; then
     
     # clone the BCM repo to /home/$SUDO_USER/bcm
     SUDO_USER_HOME="/home/$SUDO_USER"
-    BCM_GIT_DIR="$(pwd)"
+    #BCM_GIT_DIR="$(pwd)"
     export BCM_GIT_DIR="$BCM_GIT_DIR"
     if [[ ! -d $BCM_GIT_DIR ]]; then
         git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"

@@ -1,0 +1,8 @@
+
+# SSHD CONFIG
+X11Forwarding yes
+AllowAgentForwarding yes
+PermitRootLogin yes
+LogLevel VERBOSE
+
+AuthorizedKeysFile /home/ubuntu/ssh/authorized-keys

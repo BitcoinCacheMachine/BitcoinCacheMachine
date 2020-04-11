@@ -33,7 +33,20 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 ## What is needed to Run Bitcoin Cache Machine
 
-If you can run Ubuntu, you can run BCM. BCM is deployed as a data-center back-end, so you'll want to deploy BCM to a computer with reliable power and internet connections. Some of the services deployed on BCM require contant Internet connectivity (e.g., market maker functionality for Bisq and JoinMarket, transaction relay for Lightning node). You can run BCM data-center workloads directly on your Ubuntu installation (best performance) or it can run in a hardware-based VM (useful if you're running multiple BCM instances [e.g., family members] on shared hardware). User-facing GUI applications such as Electrum Wallet run within the context of docker which is automatically installed via snap.
+You need an x86 machine capable of running a Debian-based Linux. This hardware should have two SSDs (formatted to BTRFS, min 500GB each) and mounted at `/tier1`. `/tier1` storage holds the base OS (with KVM hypervisor), Type 1 VMs OSs and other software, and is where data meant for fast storage is kept, such as the bitcoin chainstate and Lightning-based software. The `/tier2` storage is composed of a set of USB-based SPINNING disks, all configured in the same BTRFS pool. Things like bitcoin blocks and local backups are stored.
+
+## Roles & Responsiblities
+
+There exists two distinct roles in the BCM ecosystem. The Hardware Administrator and the Software Administrator. The Hardware Admin is responsible for powering hardware, adding and configuring storage (i.e., `/tier1` storage composed of SSDs, and `/tier2` storage for high-capacity, reliable, scalable commodity storage.). The Hardware administrator is responsible for providing compute, memory, and storage consumable by the Software Administrator. The software administrator exects the following:
+
+1. Compute
+2. Memory
+4. Reliable Internet connectivity
+5. Mesh network connectivity to local metro area (for redundnacy)
+3. Storage
+3a. `/tier1` high speed dual-SSDs configured in BTRFS pool
+3b. `/tier2` high capacity spinning disks in BTRFS pool
+4. SSH connection to base OS along with static IP.
 
 ## Getting Started
 

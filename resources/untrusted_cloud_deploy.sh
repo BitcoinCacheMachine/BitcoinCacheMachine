@@ -18,4 +18,4 @@ bcm ssh provision --hostname="$BCM_HOST_NAME" --username="$BCM_USER_NAME" --ssh-
 
 # # now let's provision the cluster on the remote SSH endpoint. This command
 # # deploys a bcm cluster to the current host/environment.
-# bcm cluster create
+# bash -c "$BCM_COMMAND_DIR/cluster/cluster_create.sh"

@@ -7,8 +7,8 @@ The only user interface to BCM is the Linux command line. BCM really is just a b
 If the cli is configured correctly, you can run `bcm info` to get an overview of your BCM environment:
 
 * GNUPGHOME:              Directory that contains your Trezor-backed GPG certificates.
-* PASSWORD_STORE_DIR:     Directory of your Trezor GPG-backed standard unix password manager store.
-* BCM_SSH_DIR:            Directory where SSH public keys (e.g., known_hosts) are placed.
+* PASSWDHOME:     Directory of your Trezor GPG-backed standard unix password manager store.
+* SSHHOME:            Directory where SSH public keys (e.g., known_hosts) are placed.
 * BCM_VERSION:            The version of BCM that the CLI is configured to target.
 * BCM_DEBUG:              [0|1] - Whether the 'bcm' CLI should emit detailed information.
 * BCM_CHAIN:      All `bcm stack` commands are deployed against the active chain: "testnet", "mainnet", or "regtest". BCM_CHAIN is used in defining [LXD projects](https://github.com/lxc/lxd/blob/master/doc/projects.md), which allows you to deploy distinct data centers on common hardware.

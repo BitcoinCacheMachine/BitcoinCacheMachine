@@ -27,11 +27,6 @@ if [[ $BCM_HELP_FLAG == 1 ]]; then
     exit
 fi
 
-# bcm cluster create provisions a new BCM cluster to the localhost
-if [[ $BCM_CLI_VERB == "create" ]]; then
-    bash -c "$BCM_COMMAND_DIR/cluster/cluster_create.sh"
-fi
-
 # this is where we implement 'bcm cluster destroy'
 if [[ $BCM_CLI_VERB == "clear" ]]; then
     bash -c "./clear_lxd.sh"

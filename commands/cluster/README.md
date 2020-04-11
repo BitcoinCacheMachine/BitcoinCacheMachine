@@ -11,8 +11,6 @@ If your localhost (e.g., SDN Controller) supports hardware virtualization and yo
 
 The only assumptions that BCM makes is that each machine is running a fresh installation of Ubuntu (Desktop or Server) and has SSH exposed on port 22 (for remote machines). Each remote machine you provision MUST be DNS-resolvable by your SDN controller, or be accessible as a TOR (v3) onion service for the management plane (i.e., SSH, LXD). The [server prep script](./server_prep.sh) helps you prepare a new server so you can remotely access it using TOR.
 
-Clusters are created and destroyed using the `bcm cluster create` and `bcm cluster destroy` commands, respectively. Add the `--help` flag to determine how best to use `bcm cluster` commands. Most users won't need to use these commands directly as they are automatically invoked when users start user-facing application using `bcm stack start` commands.
-
 ## BCM Deployment Mode
 
 You back-end can be deployed in standalone mode or cluster mode. 

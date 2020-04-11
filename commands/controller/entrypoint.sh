@@ -23,8 +23,6 @@ fi
 if [[ $BCM_CLI_VERB == "reset" ]]; then
     bcm controller destroy
     bcm controller build
-    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
-    bash -c "$BCM_GIT_DIR/controller/remove_all_bcm_docker_images.sh.sh"
     elif [[ $BCM_CLI_VERB == "build" ]]; then
     ./build.sh
 fi

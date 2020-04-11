@@ -4,10 +4,10 @@ FROM ${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN echo "deb https://mirror.netcologne.de/torproject.org bionic main" >> /etc/apt/sources.list
-RUN echo "deb-src https://mirror.netcologne.de/torproject.org bionic main" >> /etc/apt/sources.list
+RUN echo "deb https://deb.torproject.org/torproject.org focal main" >> /etc/apt/sources.list
+RUN echo "deb-src https://deb.torproject.org/torproject.org focal main" >> /etc/apt/sources.list
 
-COPY ./TOR-project-PGP.pub tor.pgp.pub
+COPY tor.pgp.pub tor.pgp.pub
 RUN gpg --import tor.pgp.pub
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 RUN gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -

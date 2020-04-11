@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox nounset
+set -Eeuo nounset
 cd "$(dirname "$0")"
 
 BCM_CLI_VERB=
@@ -39,7 +39,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     docker run -t --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg:rw \
-    -v "$PASSWORD_STORE_DIR":/home/user/.password-store:rw \
+    -v "$PASSWDHOME":/home/user/.password-store:rw \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" bash -c "pass generate $BCM_PASS_NAME --no-symbols 32 >>/dev/null"
@@ -56,7 +56,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     docker run -it --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg:rw \
-    -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
+    -v "$PASSWDHOME":/home/user/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" pass "$BCM_PASS_NAME"
@@ -65,7 +65,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     docker run -it --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg:ro \
-    -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
+    -v "$PASSWDHOME":/home/user/.password-store \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" pass ls
     
@@ -73,7 +73,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     docker run -it --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg:rw \
-    -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
+    -v "$PASSWDHOME":/home/user/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" pass rm "$BCM_PASS_NAME"
@@ -82,7 +82,7 @@ if [[ $BCM_CLI_VERB == "new" ]]; then
     docker run -it --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg:rw \
-    -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
+    -v "$PASSWDHOME":/home/user/.password-store \
     -e BCM_PASS_NAME="$BCM_PASS_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" pass insert "$BCM_PASS_NAME"

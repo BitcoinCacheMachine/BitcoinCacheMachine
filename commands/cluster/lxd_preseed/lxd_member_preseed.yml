@@ -18,7 +18,7 @@ profiles:
 cluster:
   enabled: true
   server_name: $BCM_SSH_HOSTNAME
-  server_address: $IP_OF_MACVLAN_INTERFACE8443
+  server_address: $IP_OF_MACVLAN_INTERFACE:8443
   cluster_address: $BCM_CLUSTER_MASTER_ENDPOINT_IP:8443
   cluster_certificate: "$BCM_LXD_CLUSTER_CERTIFICATE
 "

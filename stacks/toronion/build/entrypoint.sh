@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeux
+set -Eeoux
 
 echo "inside tor"
 

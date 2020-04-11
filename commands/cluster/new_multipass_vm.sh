@@ -65,8 +65,7 @@ echo "MEM_SIZE: $MEM_SIZE"
 echo "CPU_COUNT: $CPU_COUNT"
 
 # we need to update the cloud-init to include the bcm user and it's associated SSH key.
-# we'll create a temporary one here. It'll get purged AFTER the `bcm cluster create` process
-# when the Trezor SSH keys are placed up there.
+# we'll create a temporary one here. 
 
 # generate the custom cloud-init file.
 SSH_AUTHORIZED_KEY=$(<"$SSH_KEY_PATH.pub")

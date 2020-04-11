@@ -1,5 +1,7 @@
 #!/bin/bash
 
-bash -c ./destroy_multipass.sh
+source ../env
 
-bash -c ./run_multipass.sh
+bash -c ./destroy_vm.sh
+
+bash -c ./up_vm.sh

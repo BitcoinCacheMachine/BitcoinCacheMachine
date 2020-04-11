@@ -28,11 +28,6 @@ if ! lxc project list --format csv | grep -q "default (current)"; then
 fi
 
 
-# if the default storage driver doesn't exist, create it.
-if ! lxc storage list --format csv | grep -q "bcm"; then
-    lxc storage create bcm btrfs
-fi
-
 # create LXC profiles from templates.
 for PROFILE_NAME in bcm_disk docker_unprivileged docker_privileged; do
     # if the profile doesn't already exist, we create it.

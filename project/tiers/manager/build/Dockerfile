@@ -3,6 +3,7 @@ FROM ${BASE_IMAGE}
 
 RUN apt-get update \
     && apt-get install -y \
+    gnupg2 \
     wait-for-it \
     apt-transport-https \
     git \

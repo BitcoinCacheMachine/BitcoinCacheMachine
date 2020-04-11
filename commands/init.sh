@@ -71,11 +71,11 @@ if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
     
     echo "Your public key and public keyring material can be found at '$GNUPGHOME'."
     
-    mkdir -p "$PASSWORD_STORE_DIR"
+    mkdir -p "$PASSWDHOME"
     docker run -it --name pass --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
     -v "$GNUPGHOME":/home/user/.gnupg \
-    -v "$PASSWORD_STORE_DIR":/home/user/.password-store \
+    -v "$PASSWDHOME":/home/user/.password-store \
     -e BCM_CERT_NAME="$BCM_CERT_NAME" \
     -e BCM_CERT_USERNAME="$BCM_CERT_USERNAME" \
     -e BCM_CERT_HOSTNAME="$BCM_CERT_HOSTNAME" \

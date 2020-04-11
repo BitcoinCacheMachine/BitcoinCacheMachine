@@ -1,5 +1,0 @@
-Description:
-  Create an LXD cluster on your active SSH endpoint so you can deploy your BCM workloads to it.
-
-Example:
-  bcm cluster create

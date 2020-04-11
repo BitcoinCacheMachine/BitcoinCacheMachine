@@ -61,7 +61,7 @@ if [[ $BCM_HELP_FLAG == 1 ]]; then
 fi
 
 KEY_NAME="bcm_trezor_$BCM_SSH_HOSTNAME"".pub"
-TREZOR_PUB_KEY_PATH="$BCM_SSH_DIR/$KEY_NAME"
+TREZOR_PUB_KEY_PATH="$SSHHOME/$KEY_NAME"
 if [[ $BCM_CLI_VERB == "newkey" ]]; then
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
@@ -77,7 +77,7 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
     
     docker run -t --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/.ssh \
+    -v "$SSHHOME":/home/user/.ssh \
     -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
     -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
     -e KEY_NAME="$KEY_NAME" \
@@ -122,7 +122,7 @@ if [[ $BCM_CLI_VERB == "provision" ]]; then
     docker run -it \
     --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/.ssh \
+    -v "$SSHHOME":/home/user/.ssh \
     --device="$BCM_TREZOR_USB_PATH" \
     -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
     -e BCM_SSH_HOSTNAME="$SSH_HOSTNAME" \
@@ -133,7 +133,7 @@ if [[ $BCM_CLI_VERB == "connect" ]]; then
     docker system prune -f
     docker run -it --add-host="$BCM_SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/.ssh \
+    -v "$SSHHOME":/home/user/.ssh \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" trezor-agent --connect "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
 fi
@@ -142,7 +142,7 @@ if [[ $BCM_EXECUTE_FLAG == 1 ]]; then
     docker system prune -f
     docker run -it --add-host="$BCM_SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/.ssh \
+    -v "$SSHHOME":/home/user/.ssh \
     -e BCM_COMMAND="$BCM_COMMAND" \
     --device="$BCM_TREZOR_USB_PATH" \
     "bcm-trezor:$BCM_VERSION" trezor-agent --connect "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- bcm "$@"

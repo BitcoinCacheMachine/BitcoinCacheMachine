@@ -2,11 +2,11 @@
 
 set -Eeuo pipefail
 
-# # if the current cluster is not configured, let's bring it into existence.
-# if lxc info | grep -q "server_clustered: false"; then
-#     echo "ERROR: the current LXD instance '$BCM_SSH_HOSTNAME' has not been initialized. Try running 'bcm cluster create' or 'bcm stack start'."
-#     exit
-# fi
+# if the current cluster is not configured, let's bring it into existence.
+if lxc info | grep -q "server_clustered: false"; then
+    echo "ERROR: the current LXD instance '$BCM_SSH_HOSTNAME' has not been initialized."
+    exit
+fi
 
 echo ""
 echo "LXD system containers:"

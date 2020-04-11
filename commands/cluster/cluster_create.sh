@@ -2,23 +2,8 @@
 
 
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
-
-#BCM_SSH_HOSTNAME=localhost
-
-for i in "$@"; do
-    case $i in
-        --hostname=*)
-            BCM_SSH_HOSTNAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        
-        *)
-            # unknown option
-        ;;
-    esac
-done
 
 
 # since we're doing a local install; we can just connect our wirepoint
