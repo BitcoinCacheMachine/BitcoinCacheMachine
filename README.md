@@ -65,7 +65,7 @@ sudo bash -c ./init_bcm.sh
 
 The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the bcm directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs. Type 1 VMs are useful if you want to run multiple BCM instances on shared hardware (e.g., a full node for each family member). Finally, you can use BCM to deploy BCM server-side infrastructure to a remote SSH endpoint (or SSH exposed as an onion service).
 
-After you have the BCM scripts, run the installer:
+After you have the BCM scripts, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment. Running just `bcm` will give you a help menu.
 
 ```bash
 sudo bash -c ./install_bcm.sh
@@ -73,55 +73,14 @@ sudo bash -c ./install_bcm.sh
 
 Next, decide how you want to run BCM:
 
-. If you want to run BCM in Type-1 vms, use `./refresh_bcm.sh`.
-  If you want to run BCM directly on your localhost, run `sudo bash -c ./install.sh`
-
-## Deploying your own BCM Infrastructure
-
-After the BCM CLI is available, you can deploy your own infrastructure using the `bcm stack start` command. For example, to deploy the `spark` lightning web wallet and all its dependencies including `clightning` and `bitcoind`, run the `bcm stack start spark` command. Other components you can deploy either alone or in combination with other software include:
-
-| BCMStack | IsFunctional | AppType | DependsOn | InboundOutboundTor | AppServices
-|---|---|---|---|---|---|
-| tor | Yes | DC | tier bitcoin | n/a | n/a |
-| bitcoind | Yes | DC | tor | p2p (in/out) | bitcoind_rpc |
-| clightning | Yes | DC | bitcoind | p2p (in/out) | TBD |
-| spark | Yes | DC/web app | clightning | none | HTTP |
-| nbxplorer | Yes | DC | bitcoind | N/A | none |
-| btcpayserver | Partially | DC/web app | bitcoind, clightning, nbxplorer, lightning-charge | TBD | HTTP |
-| lnd | Partially | DC | bitcoind | p2p (in/out) | TBD |
-| ridethelightning | No | DC/web app | lnd | N/A | HTTP |
-| electrs | Yes | DC | bitcoind | none | ElectrumServerRPC |
-| electrum | Yes | Desktop GUI | electrs | none | N/A |
-| zap | No | Desktop GUI | zap | lnd | N/A |
-| esplora | No | DC/web app | bitcoind, electrs | none | HTTP |
-| lightning-charge | No | DC | clightning | none | TBD |
-| liquid | No | DC | bitcoind | TBD | TBD |
-
-`DC=data center`: processes that run in the "back-end" or "server-side". The back-end can run on a dedicated set Ubuntu machines (preferred for mainnet/production), or you can run the back-end on a user-facing desktop/laptop (useful for testnet/development). The back-end can run as a Type I VM or can be running under an LXD process installed on your localhost (local). There are trade-offs to using each approach (local/ssh/vm) which are discussed in more detail in the [Cluster directory](./cluster/README.md).
-
-User-facing applications can be either GUI-based or web-based apps (AppType). Desktop GUI applications are fully integrated into an automatically deployed back-end infrastructure. Web-based applications, such as [BTCPay Server](https://btcpayserver.org/) or [Spark](https://github.com/shesek/spark-wallet) run as server-side data center workloads but are accessed through a web browser. The eventual goal is to expose BCM application-level services locally (console), over the local network using a Wireguard VPN, and through authenticated TOR onion services when accessing BCM services over the Internet.
-
-Running `bcm stack start electrum` starts an Electrum wallet desktop application that's configured to consult a self-hosted Electrum server `electrs` which itself is configured to consult a self-hosted [Bitcoin Core](https://github.com/bitcoin/bitcoin) full node operating over [Tor](https://www.torproject.org/). Each `bcm stack start` command automatically deploys all required back-end infrastructure to the active cluster, helping you to operate in a more [trust-minimized manner](https://nakamotoinstitute.org/trusted-third-parties/).
-
-You can use the `bcm info` command to view your current BCM environment variables: certificate, password, ssh, wallet, and certificate stores, cluster under management, and target chain (i.e., mainnet, testnet, regtest). Run `bcm config set chain=mainnet` to instruct the BCM cli to deploy mainnet applications to the active cluster. At this time BCM deploys a full archival node, so your hardware must be beefy enough. Future BCM versions will support pruned mode if all protocols support that.
+. If you want to run BCM in Type-1 vms with hardware-enforced separation, use `bcm deploy`. Export BCM_VM_NAME to deploy more Type 1 VMs.
+  If you want to run BCM directly on your localhost, run the deployment script `bcm deploy --localhost`.
+  If you want to deploy BCM to a remote SSH endpoint, export BCM_SSH_HOSTNAME in your environment, and local `bcm` commands will be executed against the remote SSH host.
 
 ## Documentation
 
 The best documentation can be found using the CLI `--help` menus. You can also consult the README.md files in the major directories of this repo. Consult [CLI README](./commands/README.md) for notes on how to use the BCM CLI.
 
-## Related Projects
-
-Click the following link to view projects that are related to BCM:
-
-NodeLauncher
-CipherNode
-Nodl.it
-Casa
-
 ## How to contribute
 
-Users wanting to contribute to the project may submit pull requests for review. See [CONTRIBUTING.md](./CONTRIBUTING.md). Users wanting to contribute documentation can fork the BCM public website [here](https://github.com/BitcoinCacheMachine/bcmweb) and add blog posts in the `_posts` directory.
-
-You can also donate to the development of BCM by sending Bitcoin (BTC) to the following address.
-
-* Public on-chain donations: 3KNX4GTmXETtnFWFXvFqXg9sDJCbLvD8Zf
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for additional details of running BCM locally and contributing to the overall project.
