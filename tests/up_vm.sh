@@ -37,7 +37,7 @@ lxc config device add "$BCM_VM_NAME" eth0 nic nictype=macvlan parent="eno1"
 lxc config device add "$BCM_VM_NAME" config disk source=cloud-init:config
 lxc start "$BCM_VM_NAME"
 
-sleep 60
+sleep 120
 
 IP_V4_ADDRESS=$(lxc list --format csv --columns=4n | grep ",$BCM_VM_NAME" | awk '{print $1;}')
 wait-for-it -t 15 "$IP_V4_ADDRESS:22"
