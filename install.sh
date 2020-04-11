@@ -11,7 +11,7 @@ for PKG in lxd lxd-client tor; do
 done
 
 # reinstall required software.
-apt-get install -y curl git iotop socat apg snapd jq gnupg snapd sshfs
+apt-get install -y curl git iotop socat apg snap jq gnupg snapd sshfs
 
 # remove any unused software.
 apt-get autoremove -y

@@ -48,20 +48,13 @@ ssh -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o "StrictHostKeyChecking no" "ubuntu
 #sshfs -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o allow_other,default_permissions "ubuntu@$IP_V4_ADDRESS"/bcmbootstrap "$BCM_BOOTSTRAP_DIR"
 SSH_PUBKEY_PATH="$HOME/.ssh/$BCM_VM_NAME.local.pub"
 FQSN="ubuntu@$IP_V4_ADDRESS"
+
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chmod 0744 /home/ubuntu/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" chown ubuntu:ubuntu /home/ubuntu/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/init_bcm.sh --sudo-user=ubuntu"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" rm /home/ubuntu/init_bcm.sh
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/bcm deploy"
-
-# # make the script executable then run it
-# # scripts installs TOR, then git pulls the BCM source code from github
-# # TODO 1) move from github to zeronet
-# chmod 0744 ./init_bcm.sh
-# sudo bash -c ./init_bcm.sh
-
-
 
 
 
