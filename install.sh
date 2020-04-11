@@ -3,22 +3,20 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-# remove any pre-existing software that may exist and have conflicts.
-for PKG in lxd lxd-client tor; do
-    if dpkg -s "$PKG" >/dev/null 2>&1; then
-        while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
-            echo "Waiting for apt..."
-            sleep .5
-        done
-        
-        apt-get remove -y "$PKG"
-    fi
-done
+# # remove any pre-existing software that may exist and have conflicts.
+# for PKG in lxd lxd-client; do
+#     if dpkg -s "$PKG" >/dev/null 2>&1; then
+#         while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
+#             echo "Waiting for apt..."
+#             sleep .5
+#         done
 
-
+#         apt-get remove -y "$PKG"
+#     fi
+# done
 
 # reinstall required software.
-apt-get install -y curl git apg snap snapd gnupg shred
+apt-get install -y curl git apg snap snapd gnupg shred lxd
 
 # if the lxd group doesn't exist, create it.
 if ! grep -q lxd /etc/group; then
