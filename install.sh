@@ -3,6 +3,9 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+
+sleep 30
+
 # # remove any pre-existing software that may exist and have conflicts.
 # for PKG in lxd lxd-client; do
 #     if dpkg -s "$PKG" >/dev/null 2>&1; then
