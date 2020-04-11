@@ -5,7 +5,7 @@
 # of the BCM repo. This script should be run on any new machine wishing to be a BCM
 # "controller"/BCM Administrator.
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TOR_ONLY=0
@@ -362,7 +362,7 @@ apt-get install -y tor deb.torproject.org-keyring wait-for-it
 # wait for local tor to come online.
 wait-for-it -t 30 127.0.0.1:9050
 
-if [[ $TOR_ONLY = 0 ]]; then
+if [[ "$TOR_ONLY" = 0 ]]; then
     # configure git to download through the local tor proxy.
     BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
     git config --global http.$BCM_GITHUB_REPO_URL.proxy socks5://127.0.0.1:9050
