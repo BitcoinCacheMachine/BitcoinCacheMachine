@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeoux pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 IMAGE_NAME="nofish/zeronet"

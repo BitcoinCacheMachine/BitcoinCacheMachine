@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 # download the main ubuntu image if it doesn't exist.
@@ -22,31 +22,32 @@ if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
 fi
 
 
-# the way we provision a network on a cluster of count 1 is DIFFERENT
-# than one that's larger than 1.
-if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
-    # we run the following command if it's a cluster having more than 1 LXD node.
-    for ENDPOINT in $CLUSTER_ENDPOINTS; do
-        lxc network create --target "$ENDPOINT" bcmbr0
-    done
-else
-    if ! lxc network list --format csv | grep -q bcmbr0; then
-        # but if it's just one node, we just create the network.
-        lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
-    fi
-fi
+# # the way we provision a network on a cluster of count 1 is DIFFERENT
+# # than one that's larger than 1.
+# if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
+#     # we run the following command if it's a cluster having more than 1 LXD node.
+#     for ENDPOINT in $CLUSTER_ENDPOINTS; do
+#         lxc network create --target "$ENDPOINT" bcmbr0
+#     done
+# else
+#     if ! lxc network list --format csv | grep -q bcmbr0; then
+#         # but if it's just one node, we just create the network.
+#         lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
+#     fi
+# fi
 
 # If there was more than one node, this is the last command we need
 # to run to initiailze the network across the cluster. This isn't
 # executed when we have a cluster of size 1.
-if lxc network list --format csv | grep bcmbr0 | grep -q PENDING; then
+if ! lxc network list --format csv | grep -q bcmbr0; then
     lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
 fi
 
 if ! lxc list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     echo "Creating host '$LXC_BCM_BASE_IMAGE_NAME'."
-    lxc init bcm-lxc-base -p bcm_disk -p docker_privileged -n bcmbr0 "$LXC_BCM_BASE_IMAGE_NAME"
+    lxc init --quiet bcm-lxc-base --network="bcmbr0" --profile="bcm-ssd" --profile="bcm-privileged" "$LXC_BCM_BASE_IMAGE_NAME"
 fi
+
 
 if lxc list --format csv -c=ns | grep "$LXC_BCM_BASE_IMAGE_NAME" | grep -q STOPPED; then
     lxc start "$LXC_BCM_BASE_IMAGE_NAME"
@@ -79,7 +80,7 @@ if lxc list --format csv -c=ns | grep "$LXC_BCM_BASE_IMAGE_NAME" | grep -q STOPP
     #stop the template since we don't need it running anymore.
     lxc stop "$LXC_BCM_BASE_IMAGE_NAME"
     
-    lxc profile remove "$LXC_BCM_BASE_IMAGE_NAME" docker_privileged
+    lxc profile remove "$LXC_BCM_BASE_IMAGE_NAME" privileged
     lxc network detach bcmbr0 "$LXC_BCM_BASE_IMAGE_NAME"
 fi
 

@@ -5,7 +5,7 @@
 # of the BCM repo. This script should be run on any new machine wishing to be a BCM
 # "controller"/BCM Administrator.
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TOR_ONLY=0

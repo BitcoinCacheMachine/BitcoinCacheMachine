@@ -17,9 +17,9 @@ for i in "$@"; do
     esac
 done
 
-echo "$YAML_TEXT" | sudo lxd init --preseed
+# echo "$YAML_TEXT" | sudo lxd init --preseed
 
-# all LXC operations use the local unix socket; BCM DOES NOT
-# employ HTTPS -based LXD. All management plane operations are
-# via SSH.
-lxc remote set-default "local"
+# # all LXC operations use the local unix socket; BCM DOES NOT
+# # employ HTTPS -based LXD. All management plane operations are
+# # via SSH.
+# lxc remote set-default "local"

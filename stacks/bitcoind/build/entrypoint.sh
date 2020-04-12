@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeou
+set -Eeuo
 
 if [[ -z $BITCOIND_RPC_PORT ]]; then
     echo "ERROR: BITCOIND_RPC_PORT was not defined."

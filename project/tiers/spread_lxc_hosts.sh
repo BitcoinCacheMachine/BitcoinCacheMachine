@@ -39,7 +39,7 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
     # create the LXC host with the attached profiles.
     if ! lxc list --format csv -c=n | grep -q "$LXC_HOSTNAME"; then
         # first, check to see if LXC_BCM_BASE_IMAGE_NAME exists.
-        lxc init --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile="bcm_disk" --profile="docker_privileged" --profile="$PROFILE_NAME"
+        lxc init --quiet --target "$ENDPOINT" "$LXC_BCM_BASE_IMAGE_NAME" "$LXC_HOSTNAME" --profile="bcm_disk" --profile="privileged" --profile="$PROFILE_NAME"
     fi
     
     # last, attach the storage volume to the container.

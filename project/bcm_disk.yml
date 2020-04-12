@@ -1,8 +1,0 @@
-config: {}
-description: Default BCM profile consisting of root BTRFS backend.
-devices:
-  root:
-    path: /
-    pool: bcm
-    type: disk
-name: default

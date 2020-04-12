@@ -1,0 +1,9 @@
+config: {}
+description: Profile with HDD storage backend only.
+devices:
+  hdd:
+    path: /hdd
+    pool: bcm_hdd
+    type: disk
+    source: bcm_hdd
+name: hdd

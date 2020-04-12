@@ -3,25 +3,18 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-
-#sleep 30
-
-# # remove any pre-existing software that may exist and have conflicts.
-# for PKG in lxd lxd-client; do
-#     if dpkg -s "$PKG" >/dev/null 2>&1; then
-#         while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
-#             echo "Waiting for apt..."
-#             sleep .5
-#         done
-
-#         apt-get remove -y "$PKG"
-#     fi
-# done
 DEBIAN_FRONTEND=noninteractive
 
-# reinstall required software.
-echo "yes" | sudo aptdcon --install "curl git apg snap snapd gnupg rsync"
+# # reinstall required software.
+# echo "yes" | sudo aptdcon --install "curl git apg snap snapd gnupg rsync jq"
 
+# let's wait for apt upgrade/software locks to be released.
+while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
+    sleep 1
+done
+
+#install necessary software.
+apt-get install -y curl git apg snap snapd gnupg rsync jq
 
 # if the lxd group doesn't exist, create it.
 if ! grep -q lxd /etc/group; then
@@ -36,12 +29,12 @@ fi
 # install LXD
 if [[ ! -f "$(command -v lxc)" ]]; then
     snap set system snapshots.automatic.retention=no
-    snap install lxd --channel="candidate"
+    snap install lxd --channel="latest/edge"
 fi
 
 export BCM_GIT_DIR="$(pwd)"
 SUDO_USER_HOME="/home/$SUDO_USER"
-bash -c "$BCM_GIT_DIR/commands/cluster/cluster_create.sh"
+# bash -c "$BCM_GIT_DIR/commands/cluster/cluster_create.sh"
 
 # # if there's no group called lxd, create it.
 # if ! groups "$(whoami)" | grep -q lxd; then
@@ -91,4 +84,41 @@ if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     } >> "$BASHRC_FILE"
 fi
 
-bash -c ./commands/cluster/cluster_create.sh
+# In this part, we configure the default LXC profile for LXC containers
+# to MACVLAN against the physical interface where our default route is
+# TODO add CLI option to specify the interface manually.
+MACVLAN_INTERFACE="$(ip route | grep default | sed -n '1p' | cut -d " " -f 5)"
+IP_OF_MACVLAN_INTERFACE="$(ip addr show "$MACVLAN_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
+export BCM_LXD_SECRET="$BCM_LXD_SECRET"
+export MACVLAN_INTERFACE="$MACVLAN_INTERFACE"
+LXD_SERVER_NAME="$(hostname)"
+# these two lines are so that ssh hosts can have the correct naming convention for LXD node info.
+if [[ ! "$LXD_SERVER_NAME" == *"-01"* ]]; then
+    LXD_SERVER_NAME="$LXD_SERVER_NAME-01"
+fi
+
+if [[ ! "$LXD_SERVER_NAME" == *"bcm-"* ]]; then
+    LXD_SERVER_NAME="bcm-$LXD_SERVER_NAME"
+fi
+
+export LXD_SERVER_NAME="$LXD_SERVER_NAME"
+export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
+PRESEED_YAML="$(envsubst <./resources/lxd_master_preseed.yml)"
+echo "$PRESEED_YAML" | lxd init --preseed
+
+
+# create LXC profiles from templates.
+for PROFILE_NAME in ssd hdd sd unprivileged privileged; do
+    # if the profile doesn't already exist, we create it.
+    if ! lxc profile list --format csv | grep -q "bcm-$PROFILE_NAME"; then
+        lxc profile create "bcm-$PROFILE_NAME"
+        cat "./project/$PROFILE_NAME.yml" | lxc profile edit "bcm-$PROFILE_NAME"
+    fi
+done
+
+
+# init --auto [--network-address=IP] [--network-port=8443] [--storage-backend=dir]
+#               [--storage-create-device=DEVICE] [--storage-create-loop=SIZE]
+#               [--storage-pool=POOL] [--trust-password=PASSWORD]
+#sudo lxd init --auto --network-address=127.0.0.1 --storage-create-loop=15 --storage-backend=btrfs --storage-create-loop=30 --storage-backend=btrfs --storage-create-loop=60 --storage-backend=btrfs --trust-password="$BCM_LXD_SECRET"

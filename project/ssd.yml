@@ -1,0 +1,8 @@
+config: {}
+description: Profile with SSD storage backend only.
+devices:
+  root:
+    path: /
+    pool: bcm_ssd
+    type: disk
+name: ssd_only

@@ -54,10 +54,11 @@ config:
               #PermitEmptyPasswords no
 description: Default BCM profile.
 devices:
-  root:
-    path: /
-    pool: bcm
-    type: disk
+  eth0:
+    name: eth0
+    nictype: macvlan
+    parent: $PHYSICAL_NETWORK_INTERFACE
+    type: nic
 name: bcmvm
 used_by: []
 

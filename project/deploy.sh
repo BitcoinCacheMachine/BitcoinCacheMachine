@@ -1,12 +1,11 @@
 #!/bin/bash
 
+set -Eeuox pipefail
+cd "$(dirname "$0")"
 
 # purpose of this script is to call the scripts that are necessary to deploy BCM
 # we start bottom up (i.e., LXC image, LXC containers, docker images, docker containers, etc)
 # and terminate each script upon service activation.
-
-set -Eeuo pipefail
-cd "$(dirname "$0")"
 
 FRONT_END=0
 
@@ -21,21 +20,14 @@ for i in "$@"; do
     esac
 done
 
-
-
 if ! lxc project list --format csv | grep -q "default (current)"; then
     lxc project switch default
 fi
 
-
-# create LXC profiles from templates.
-for PROFILE_NAME in bcm_disk docker_unprivileged docker_privileged; do
-    # if the profile doesn't already exist, we create it.
-    if ! lxc profile list --format csv | grep -q "$PROFILE_NAME"; then
-        lxc profile create "$PROFILE_NAME"
-        cat "./$PROFILE_NAME.yml" | lxc profile edit $PROFILE_NAME
-    fi
-done
+if ! lxc storage list --format csv | grep -q "bcm_"; then
+    echo "WARNING: The lxc storage pool 'bcm_root' doesn't exist. You may need to run 'sudo bash -c BCM_GIT_DIR/install.sh'."
+    exit
+fi
 
 # We start by defining a LXC System Image to run our docker daemon's in.
 if ! lxc image list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then

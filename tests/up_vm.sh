@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeoux pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 if [[ -z $BCM_BOOTSTRAP_DIR ]]; then
@@ -23,58 +23,58 @@ fi
 # generate the custom cloud-init file. Cloud init installs and configures sshd
 SSH_AUTHORIZED_KEY=$(<"$HOME/.ssh/$BCM_VM_NAME.local.pub")
 export SSH_AUTHORIZED_KEY="$SSH_AUTHORIZED_KEY"
+export PHYSICAL_NETWORK_INTERFACE="eno1"
 envsubst <./bcm_vm_lxc_profile.yml >"/tmp/cloud-init.yml"
 
 # let's create a profile for the BCM TYPE-1 VMs. This is per VM.
 VM_PROFILE_NAME="$BCM_VM_NAME-vm"
-lxc profile create "$VM_PROFILE_NAME"
-cat /tmp/cloud-init.yml | lxc profile edit "$VM_PROFILE_NAME"
-shred -uvz /tmp/cloud-init.yml
+if ! lxc profile list --format csv | grep -q "$VM_PROFILE_NAME"; then
+    lxc profile create "$VM_PROFILE_NAME"
+    cat /tmp/cloud-init.yml | lxc profile edit "$VM_PROFILE_NAME"
+fi
 
-lxc init images:ubuntu/focal/cloud --vm --profile="$VM_PROFILE_NAME" "$BCM_VM_NAME"
+shred -uz /tmp/cloud-init.yml
+
+if lxc list --format csv | grep -q "$BCM_VM_NAME"; then
+    lxc delete "$BCM_VM_NAME" --force
+fi
+
+if ! lxc image list --format csv --columns l | grep -q "lxc-vm-base"; then
+    lxc image copy images:ubuntu/focal/cloud local: --auto-update --alias bcm-vm-base --vm
+fi
+
+lxc init --vm \
+--profile="$VM_PROFILE_NAME" \
+--profile="bcm-ssd" \
+--profile="bcm-hdd" \
+--profile="bcm-sd" \
+bcm-vm-base \
+"$BCM_VM_NAME"
+
 #lxc network attach bcmmacvlan "$BCM_VM_NAME" eth0
-lxc config device add "$BCM_VM_NAME" eth0 nic nictype=macvlan parent="eno1"
+#lxc config device add "$BCM_VM_NAME" eth0 nic nictype=macvlan parent="eno1" name="eth0"
 lxc config device add "$BCM_VM_NAME" config disk source=cloud-init:config
 lxc start "$BCM_VM_NAME"
 
 IP_V4_ADDRESS=
-while [ true ]; do
-    IP_V4_ADDRESS="$(lxc list $BCM_VM_NAME --format csv --columns=4 | awk '{print $1;}')"
-    if [ ! -z $IP_V4_ADDRESS ]; then
-        echo "$IP_V4_ADDRESS"
-        break       	   #Abandon the while lopp.
+while [ 1 ]; do
+    IP_V4_ADDRESS="$(lxc list $BCM_VM_NAME --format csv --columns=4 | grep "enp5s0" | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')" || true
+    if [ ! -z "$IP_V4_ADDRESS" ]; then
+        break
     else
         sleep 1
     fi
 done
 
 wait-for-it -t 60 "$IP_V4_ADDRESS:22"
-
-#sshfs -i "$HOME/.ssh/$BCM_VM_NAME.local.pub" -o allow_other,default_permissions "ubuntu@$IP_V4_ADDRESS"/bcmbootstrap "$BCM_BOOTSTRAP_DIR"
 SSH_PUBKEY_PATH="$HOME/.ssh/$BCM_VM_NAME.local.pub"
 FQSN="ubuntu@$IP_V4_ADDRESS"
 
-# let's get the hosts fingerprint and accept it.
-#ssh -i "$SSH_PUBKEY_PATH"  "ubuntu@$IP_V4_ADDRESS"
-# -- 'sudo mkdir -p "/bcmbootstrap" && sudo chown ubuntu:ubuntu /bcmbootstrap'
-#exit 1
-rsync -r "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
+rsync -rv "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/init_bcm.sh --sudo-user=ubuntu"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/install.sh"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/bcm deploy --localhost"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
 
-
-
-
-
-# # launch the new VM with the custom cloud-init.
-# multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$BCM_TMP_DIR/cloud-init.yml" bionic
-# rm "$BCM_TMP_DIR/cloud-init.yml"
-
-# multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
-
-# multipass exec "$VM_NAME"  -- chmod 0755 /home/multipass/server_prep.sh
-# multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
 
 # # let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.
 # MGMT_PLANE_ONION_ADDRESS="$(multipass exec "$VM_NAME" -- sudo cat /var/lib/tor/ssh/hostname)"
@@ -85,60 +85,3 @@ ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/bcm deploy --localho
 #         echo "$MGMT_PLANE_ONION_ADDRESS"
 #     } >> "$ENDPOINT_DIR/mgmt-onion.env"
 # fi
-
-# multipass restart "$VM_NAME"
-
-# IPV4_ADDRESS=$(multipass list --format csv | grep $VM_NAME | awk -F "\"*,\"*" '{print $3}')
-# if [[ ! -z $IPV4_ADDRESS && ! -z $VM_NAME ]]; then
-#     echo "$IPV4_ADDRESS    $VM_NAME" | sudo tee -a /etc/hosts
-# fi
-
-# # let's do an ssh-keyscan so we can get the remote identity added to our BCM_KNOWN_HOSTS_FILE file
-# ssh-keyscan -H "$VM_NAME" >> "$BCM_KNOWN_HOSTS_FILE"
-
-# rm -rf "$ENDPOINT_DIR/cloud-init.yml"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# lxc exec "$BCM_VM_NAME" -- apt-get update && sudo apt-get install -y sshfs openssh-server
-#lxc file push ./vm_ssh_config "$BCM_VM_NAME":/etc/ssh/ssh_config
-#lxc exec "$BCM_VM_NAME" -- sudo chown root:root /etc/ssh/ssh_config && sudo systemctl restart ssh
-
-
-#Ciphers aes128-ctr,aes192-ctr,aes256-ctr
-#HostKeyAlgorithms ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-rsa,ssh-dss
-#KexAlgorithms ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha256
-#MACs hmac-sha2-256,hmac-sha2-512,hmac-sha1
-
-
-
-# multipass exec "$BCM_VM_NAME" -- apt-get update && apt-get install -y sshfs
-
-# multipass exec "$BCM_VM_NAME" -- mkdir -p /usr/local/bin
-# multipass exec "$BCM_VM_NAME" -- mkdir -p /home/ubuntu/.bcmbootstrap
-
-# multipass mount "$BCM_GIT_DIR"/../ "$BCM_VM_NAME:/usr/local/bin"
-# multipass mount "$BCM_BOOTSTRAP_DIR"/../ "$BCM_VM_NAME:/home/ubuntu/.bcmbootstrap"
-
-# # since we are mounting the BCM_GIT_DIR using multipass, we will do a tor-only bcm_init
-# multipass exec "$BCM_VM_NAME" -- sudo bash -c /usr/local/bin/init_bcm.sh --tor-only
-
-# # run the install script.
-# multipass exec "$BCM_VM_NAME" -- sudo bash -c /usr/local/bin/install.sh
-
-# multipass exec "$BCM_VM_NAME" -- bcm deploy

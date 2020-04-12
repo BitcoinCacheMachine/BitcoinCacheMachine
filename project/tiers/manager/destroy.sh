@@ -69,13 +69,14 @@ if [[ $DELETE_LXC_BASE == 1 ]]; then
 fi
 
 # delete profile 'docker-privileged'
-bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_privileged"
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=privileged"
 
 # delete profile 'docker-unprivileged'
-bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=docker_unprivileged"
+bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=unprivileged"
 
 # delete profile 'bcm_disk'
 bash -c "$BCM_LXD_OPS/delete_lxc_profile.sh --profile-name=bcm_disk"
+
 
 if lxc network list --format csv | grep "bcmbr0" | grep -q ",0,"; then
     lxc network delete bcmbr0

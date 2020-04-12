@@ -17,12 +17,8 @@ echo "LXD networks:"
 lxc network list
 
 echo ""
-if lxc storage list --format csv | grep -q "bcm"; then
-    echo "BTRFS volumes:"
-    lxc storage volume list bcm
-else
-    echo "INFO:  Storage volume 'bcm' does not exist."
-fi
+echo "LXD storage pools:"
+lxc storage list
 
 echo ""
 echo "LXD profiles:"
