@@ -1,0 +1,35 @@
+config:
+  core.https_address: 127.0.0.1:8443
+storage_pools:
+- config: {}
+  description: "BCM SSD storage. SHOULD be backed by TWO SSDs formatted with BTRFS."
+  name: bcm_ssd
+  driver: btrfs
+- config: {}
+  description: "BCM HDD storage. SHOULD be backed by one (MINIMUM) or two or more (PREFERRED) HDDs formatted with BTRFS."
+  name: bcm_hdd
+  driver: btrfs
+- config: {}
+  description: "BCM SD storage. SHOULD be backed by one (MINIMUM) or two (PREFERRED) SD cards formatted with BTRFS."
+  name: bcm_sd
+  driver: btrfs
+cluster:
+  server_name: $LXD_SERVER_NAME
+  server_address: $IP_OF_MACVLAN_INTERFACE:8443
+  enabled: true
+
+
+  # profiles:
+# - config: {}
+#   description: "Default BCM profile. Has BTRFS backend only; no networking."
+#   devices:
+#     root:
+#       path: /
+#       pool: bcm_ssd
+#       type: disk
+#     hdd:
+#       path: /hdd
+#       pool: bcm_hdd
+#       type: disk
+#       source: bcm_hdd
+  # name: default
