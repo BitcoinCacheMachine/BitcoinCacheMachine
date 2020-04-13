@@ -61,15 +61,15 @@ for ENDPOINT in $CLUSTER_ENDPOINTS; do
     # using MACVLAN to expose services on the physical network underlay network.
     if [[ $BCM_TIER_TYPE == 2 ]]; then
         # get the MACVLAN interface (the localhost's default gateway)
-        MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
+        BCM_MACVLAN_INTERFACE="$(ip route | grep default | cut -d " " -f 5)"
         
-        # wire up the interface if the MACVLAN_INTERFACE variable is defined.
-        if [[ ! -z "$MACVLAN_INTERFACE" ]]; then
-            if lxc network list --format csv | grep physical | grep -q "$MACVLAN_INTERFACE"; then
-                lxc config device add "$LXC_HOSTNAME" eth2 nic nictype=macvlan name=eth2 parent="$MACVLAN_INTERFACE"
+        # wire up the interface if the BCM_MACVLAN_INTERFACE variable is defined.
+        if [[ ! -z "$BCM_MACVLAN_INTERFACE" ]]; then
+            if lxc network list --format csv | grep physical | grep -q "$BCM_MACVLAN_INTERFACE"; then
+                lxc config device add "$LXC_HOSTNAME" eth2 nic nictype=macvlan name=eth2 parent="$BCM_MACVLAN_INTERFACE"
             fi
         else
-            echo "Error: MACVLAN_INTERFACE was not specified."
+            echo "Error: BCM_MACVLAN_INTERFACE was not specified."
         fi
         
         

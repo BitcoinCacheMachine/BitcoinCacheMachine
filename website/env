@@ -1,9 +1,0 @@
-
-export SITE_NAME="bcmweb"
-export SITE_PATH="$(pwd)/jekyll_site"
-export NGINX_IMAGE="nginx:latest"
-export BUILDCACHE_DOCKERVOL="$SITE_NAME-buildcache"
-export BCM_DOCKER_BASE_TAG="jekyll/jekyll"
-export DOMAIN_NAME="127.0.0.1"
-export EXTERNAL_PORT="28953"
-export SERVICE_ENDPOINT="$DOMAIN_NAME:$EXTERNAL_PORT"

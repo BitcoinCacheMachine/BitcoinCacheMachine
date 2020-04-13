@@ -47,12 +47,32 @@ BCM_DEBUG=${BCM_DEBUG:-0}
 export BCM_DEBUG="$BCM_DEBUG"
 export REBUILD_IMAGES="$REBUILD_IMAGES"
 
+BCM_BOOTSTRAP_DIR=${BCM_BOOTSTRAP_DIR:-"$HOME/bcmbootstrap"}
+if [[ ! -z $BCM_BOOTSTRAP_DIR ]]; then
+    BCM_BOOTSTRAP_DIR="$BCM_BOOTSTRAP_DIR"
+fi
+export BCM_BOOTSTRAP_DIR="$BCM_BOOTSTRAP_DIR"
+mkdir -p "$BCM_BOOTSTRAP_DIR"
+
+if [[ -z $ ]]; then
+    echo "ERROR: BCM_BOOTSTRAP_DIR IS not defined. Please set your environment."
+    exit
+fi
 
 BCM_SSH_HOSTNAME=${BCM_SSH_HOSTNAME:-"$(hostname)"}
 if [[ ! -z $BCM_SSH_HOSTNAME ]]; then
     BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
 fi
 export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
+
+
+BCM_MACVLAN_INTERFACE=${BCM_MACVLAN_INTERFACE:-"$(ip route | grep default | sed -n '1p' | cut -d ' ' -f 5)"}
+if [[ ! -z $BCM_MACVLAN_INTERFACE ]]; then
+    BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
+fi
+export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
+
+
 
 
 BCM_SSH_USERNAME=${BCM_SSH_USERNAME:-"$(whoami)"}
@@ -79,7 +99,7 @@ if [[ ! -z $BCM_DATACENTER ]]; then
 fi
 export BCM_DATACENTER="$BCM_DATACENTER"
 
-
+export BCM_LXC_BASE_IMAGE="ubuntu/20.04"
 export BCM_MAJOR_VERSION="0"
 export BCM_MINOR_VERSION="0"
 export BCM_PATCH_VERSION="1"

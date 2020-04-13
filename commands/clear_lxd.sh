@@ -3,6 +3,10 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
+if lxc list --format csv | grep -q "$BCM_VM_NAME"; then
+    lxc delete "$BCM_VM_NAME" --force
+fi
+
 ## Delete anything that's tied to a project
 for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
     for container in $(lxc query "/1.0/containers?recursion=1&project=${project}" | jq .[].name -r); do
@@ -10,15 +14,22 @@ for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
         lxc delete --project "${project}" -f "${container}"
     done
     
-    if [[ $ALL_FLAG == 1 ]]; then
-        for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
-            FINGERPRINT=${image:0:12}
-            if ! lxc image list --format csv --columns lf | grep "$FINGERPRINT" | grep -q "bcm-lxc-base"; then
+    
+    for image in $(lxc query "/1.0/images?recursion=1&project=${project}" | jq .[].fingerprint -r); do
+        FINGERPRINT=${image:0:12}
+        if ! lxc image list --format csv --columns lf | grep "$FINGERPRINT" | grep -q "bcm-lxc-base"; then
+            if ! lxc image list --format csv --columns lf | grep "$FINGERPRINT" | grep -q "bcm-vm-base"; then
                 echo "==> Deleting image ${FINGERPRINT} for project: ${project}"
                 lxc image delete --project "${project}" "${image}"
             fi
-        done
-    fi
+        fi
+        
+        if [[ $ALL_FLAG == 1 ]]; then
+            echo "==> Deleting image ${FINGERPRINT} for project: ${project}"
+            lxc image delete --project "${project}" "${image}"
+        fi
+    done
+    
 done
 
 for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
@@ -27,7 +38,7 @@ for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
             printf 'config: {}\ndevices: {}' | lxc profile edit --project "${project}" default
             continue
         fi
-        echo "==> Deleting profile 'profile'."
+        echo "==> Deleting profile '${profile}'."
         lxc profile delete --project "${project}" "${profile}"
     done
     
@@ -50,12 +61,6 @@ for storage_pool in $(lxc query "/1.0/storage-pools?recursion=1" | jq .[].name -
         lxc storage volume delete "${storage_pool}" "${volume}"
     done
     
-    
-    if [ ! $(echo "$storage_pool" | grep -q bcm) ] || [ "$ALL_FLAG" = "1" ]; then
-        ## Delete the custom storage volumes
-        echo "==> Deleting storage pool '${storage_pool}'"
-        lxc storage delete "${storage_pool}"
-    else
-        echo "INFO: Skipping the bcm-lxc-base (Ubuntu focal amd64), else we have to redownload."
-    fi
+    echo "==> Deleting storage pool '${storage_pool}'"
+    lxc storage delete "${storage_pool}"
 done

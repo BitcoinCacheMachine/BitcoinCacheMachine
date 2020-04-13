@@ -41,3 +41,7 @@ lxc image list
 echo ""
 echo "LXD Projects:"
 lxc project list
+
+echo ""
+echo "LXD Configuration"
+lxd init --dump

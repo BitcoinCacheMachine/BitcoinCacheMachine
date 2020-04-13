@@ -14,7 +14,7 @@ fi
 if [[ -d $SSHHOME ]]; then
     echo "  SSHHOME:               $SSHHOME"
 fi
-
+echo "  BCM_BOOTSTRAP_DIR:         $BCM_BOOTSTRAP_DIR"
 echo "  BCM_DEBUG:                 $BCM_DEBUG"
 echo "  BCM_SSH_HOSTNAME:          $BCM_SSH_HOSTNAME"
 echo "  BCM_SSH_USERNAME:          $BCM_SSH_USERNAME"

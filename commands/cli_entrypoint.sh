@@ -59,6 +59,45 @@ if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     exit
 fi
 
+if [[ "$BCM_CLI_COMMAND" == "clear" ]]; then
+    ./clear_lxd.sh "$@"
+    exit
+fi
+
+# This for loop makes sure that all subsequent commands have access to the
+# bcm LXD profiles.
+for STORAGE_POOL in ssd hdd sd; do
+    # if the profile doesn't already exist, we create it.
+    if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
+        # TODO, how to redirect storage device for the pool? I think ADMIN will have to mount
+        # to /ssd /sd and /hdd
+        STORAGE_POOL_DIR="/$STORAGE_POOL"
+        if [ "$STORAGE_POOL" = ssd ]; then
+            STORAGE_POOL_DIR="$HOME"
+        fi
+        
+        lxc storage create "bcm-$STORAGE_POOL" btrfs
+    fi
+done
+
+# This for loop makes sure that all subsequent commands have access to the
+# bcm LXD profiles.
+for PROFILE_NAME in ssd hdd sd unprivileged privileged; do
+    # if the profile doesn't already exist, we create it.
+    if ! lxc profile list --format csv | grep -q "bcm-$PROFILE_NAME"; then
+        lxc profile create "bcm-$PROFILE_NAME"
+        cat "./lxd_profiles/$PROFILE_NAME.yml" | lxc profile edit "bcm-$PROFILE_NAME"
+    fi
+done
+
+# commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
+if [[ "$BCM_CLI_COMMAND" == "vm" ]]; then
+    bash -c ./vm/destroy_vm.sh
+    bash -c ./vm/up_vm.sh
+    exit
+fi
+
+
 # commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
 if [[ "$BCM_CLI_COMMAND" == "deploy" ]]; then
     bash -c "$BCM_PROJECT_DIR/deploy.sh $@"
@@ -88,11 +127,6 @@ export BCM_VOLUMES_FLAG="$BCM_VOLUMES_FLAG"
 #     exit
 # fi
 
-
-if [[ "$BCM_CLI_COMMAND" == "clear" ]]; then
-    ./clear_lxd.sh "$@"
-    exit
-fi
 
 if [[ "$BCM_CLI_COMMAND" == "stack" ]]; then
     

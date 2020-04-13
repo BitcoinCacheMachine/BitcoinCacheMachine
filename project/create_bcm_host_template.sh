@@ -16,9 +16,21 @@ if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
         fi
     fi
     
-    LXC_BASE_VERSION="20.04"
-    echo "Copying the ubuntu/$LXC_BASE_VERSION lxc image from LXD image server '$LXD_IMAGE_REMOTE:' server to '$(lxc remote get-default):bcm-lxc-base'"
-    lxc image copy "$LXD_IMAGE_REMOTE:ubuntu/$LXC_BASE_VERSION" "$(lxc remote get-default):" --alias bcm-lxc-base --auto-update
+    # download and export the LXC base image if it doesn't exist on disk.
+    if ! lxc image list --format csv --columns l | grep -q "bcm-lxc-base"; then
+        if [ -f "$BCM_BOOTSTRAP_DIR/bcm-lxc-base" ]; then
+            lxc image import "$BCM_BOOTSTRAP_DIR/bcm-lxc-base" "$BCM_BOOTSTRAP_DIR/bcm-lxc-base.root" --alias bcm-lxc-base
+        else
+            lxc image copy "$LXD_IMAGE_REMOTE:$BCM_LXC_BASE_IMAGE" "$(lxc remote get-default):" --alias bcm-lxc-base
+            sleep 2
+        fi
+        
+        # cache the image to disk at BOOTSTRAP DIR to avoid network IO
+        if [ ! -f "$BCM_BOOTSTRAP_DIR/bcm-lxc-base" ]; then
+            lxc image export "bcm-lxc-base" "$BCM_BOOTSTRAP_DIR/bcm-lxc-base"
+        fi
+    fi
+    
 fi
 
 
@@ -40,12 +52,12 @@ fi
 # to run to initiailze the network across the cluster. This isn't
 # executed when we have a cluster of size 1.
 if ! lxc network list --format csv | grep -q bcmbr0; then
-    lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
+    lxc network create bcmbr0
 fi
 
 if ! lxc list --format csv | grep -q "$LXC_BCM_BASE_IMAGE_NAME"; then
     echo "Creating host '$LXC_BCM_BASE_IMAGE_NAME'."
-    lxc init --quiet bcm-lxc-base --network="bcmbr0" --profile="bcm-ssd" --profile="bcm-privileged" "$LXC_BCM_BASE_IMAGE_NAME"
+    lxc init bcm-lxc-base --network="bcmbr0" --profile="bcm-ssd" --profile="bcm-privileged" "$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
 
@@ -80,14 +92,13 @@ if lxc list --format csv -c=ns | grep "$LXC_BCM_BASE_IMAGE_NAME" | grep -q STOPP
     #stop the template since we don't need it running anymore.
     lxc stop "$LXC_BCM_BASE_IMAGE_NAME"
     
-    lxc profile remove "$LXC_BCM_BASE_IMAGE_NAME" privileged
+    lxc profile remove "$LXC_BCM_BASE_IMAGE_NAME" bcm-privileged
     lxc network detach bcmbr0 "$LXC_BCM_BASE_IMAGE_NAME"
 fi
 
 # Let's publish a snapshot. This will be the basis of our LXD image.
 lxc snapshot "$LXC_BCM_BASE_IMAGE_NAME" bcmHostSnapshot
 
-# publish the resulting image
-# other members of the LXD cluster will be able to pull and run this image
+# publish the resulting image for other members of the LXD cluster (TODO)
 echo "Publishing $LXC_BCM_BASE_IMAGE_NAME""/bcmHostSnapshot" "'$LXC_BCM_BASE_IMAGE_NAME' on cluster '$(lxc remote get-default)'."
 lxc publish "$LXC_BCM_BASE_IMAGE_NAME/bcmHostSnapshot" --alias "$LXC_BCM_BASE_IMAGE_NAME"

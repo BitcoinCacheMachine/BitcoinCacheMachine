@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 DEBIAN_FRONTEND=noninteractive
@@ -87,11 +87,11 @@ fi
 # In this part, we configure the default LXC profile for LXC containers
 # to MACVLAN against the physical interface where our default route is
 # TODO add CLI option to specify the interface manually.
-MACVLAN_INTERFACE="$(ip route | grep default | sed -n '1p' | cut -d " " -f 5)"
-IP_OF_MACVLAN_INTERFACE="$(ip addr show "$MACVLAN_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+#BCM_MACVLAN_INTERFACE="$(ip route | grep default | sed -n '1p' | cut -d " " -f 5)"
+IP_OF_MACVLAN_INTERFACE="$(ip addr show "$BCM_MACVLAN_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
-export MACVLAN_INTERFACE="$MACVLAN_INTERFACE"
+#export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
 LXD_SERVER_NAME="$(hostname)"
 # these two lines are so that ssh hosts can have the correct naming convention for LXD node info.
 if [[ ! "$LXD_SERVER_NAME" == *"-01"* ]]; then
@@ -106,19 +106,3 @@ export LXD_SERVER_NAME="$LXD_SERVER_NAME"
 export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
 PRESEED_YAML="$(envsubst <./resources/lxd_master_preseed.yml)"
 echo "$PRESEED_YAML" | lxd init --preseed
-
-
-# create LXC profiles from templates.
-for PROFILE_NAME in ssd hdd sd unprivileged privileged; do
-    # if the profile doesn't already exist, we create it.
-    if ! lxc profile list --format csv | grep -q "bcm-$PROFILE_NAME"; then
-        lxc profile create "bcm-$PROFILE_NAME"
-        cat "./project/$PROFILE_NAME.yml" | lxc profile edit "bcm-$PROFILE_NAME"
-    fi
-done
-
-
-# init --auto [--network-address=IP] [--network-port=8443] [--storage-backend=dir]
-#               [--storage-create-device=DEVICE] [--storage-create-loop=SIZE]
-#               [--storage-pool=POOL] [--trust-password=PASSWORD]
-#sudo lxd init --auto --network-address=127.0.0.1 --storage-create-loop=15 --storage-backend=btrfs --storage-create-loop=30 --storage-backend=btrfs --storage-create-loop=60 --storage-backend=btrfs --trust-password="$BCM_LXD_SECRET"
