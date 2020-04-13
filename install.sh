@@ -5,8 +5,7 @@ cd "$(dirname "$0")"
 
 DEBIAN_FRONTEND=noninteractive
 
-# # reinstall required software.
-# echo "yes" | sudo aptdcon --install "curl git apg snap snapd gnupg rsync jq"
+source ./env
 
 # let's wait for apt upgrade/software locks to be released.
 while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
@@ -106,3 +105,6 @@ export LXD_SERVER_NAME="$LXD_SERVER_NAME"
 export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
 PRESEED_YAML="$(envsubst <./resources/lxd_master_preseed.yml)"
 echo "$PRESEED_YAML" | lxd init --preseed
+
+mkdir -p "$SUDO_USER_HOME/.local/bcm/lxc"
+chown -R "$SUDO_USER:$SUDO_USER" "$SUDO_USER_HOME/.local/bcm"

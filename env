@@ -11,4 +11,10 @@ export BCM_GIT_DIR="$(pwd)"
 #export BCM_DATACENTER="default"
 #export GNUPGHOME="$HOME/.gnupg"
 #export PASSWDHOME="$HOME/.password-store"
-#export SSHHOME="$HOME/.ssh"
+export SSHHOME="$HOME/.ssh"
+
+BCM_MACVLAN_INTERFACE=${BCM_MACVLAN_INTERFACE:-"$(ip route | grep default | sed -n '1p' | cut -d ' ' -f 5)"}
+if [[ ! -z $BCM_MACVLAN_INTERFACE ]]; then
+    BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
+fi
+export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"

@@ -47,15 +47,14 @@ BCM_DEBUG=${BCM_DEBUG:-0}
 export BCM_DEBUG="$BCM_DEBUG"
 export REBUILD_IMAGES="$REBUILD_IMAGES"
 
-BCM_BOOTSTRAP_DIR=${BCM_BOOTSTRAP_DIR:-"$HOME/bcmbootstrap"}
-if [[ ! -z $BCM_BOOTSTRAP_DIR ]]; then
-    BCM_BOOTSTRAP_DIR="$BCM_BOOTSTRAP_DIR"
+BCM_CACHE_DIR=${BCM_CACHE_DIR:-"$HOME/.local/bcm"}
+if [[ ! -z $BCM_CACHE_DIR ]]; then
+    BCM_CACHE_DIR="$BCM_CACHE_DIR"
 fi
-export BCM_BOOTSTRAP_DIR="$BCM_BOOTSTRAP_DIR"
-mkdir -p "$BCM_BOOTSTRAP_DIR"
+export BCM_CACHE_DIR="$BCM_CACHE_DIR"
 
 if [[ -z $ ]]; then
-    echo "ERROR: BCM_BOOTSTRAP_DIR IS not defined. Please set your environment."
+    echo "ERROR: BCM_CACHE_DIR IS not defined. Please set your environment."
     exit
 fi
 
@@ -64,16 +63,6 @@ if [[ ! -z $BCM_SSH_HOSTNAME ]]; then
     BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
 fi
 export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
-
-
-BCM_MACVLAN_INTERFACE=${BCM_MACVLAN_INTERFACE:-"$(ip route | grep default | sed -n '1p' | cut -d ' ' -f 5)"}
-if [[ ! -z $BCM_MACVLAN_INTERFACE ]]; then
-    BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
-fi
-export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
-
-
-
 
 BCM_SSH_USERNAME=${BCM_SSH_USERNAME:-"$(whoami)"}
 if [[ ! -z $BCM_SSH_USERNAME ]]; then
@@ -123,7 +112,7 @@ export IS_FRONTEND="$IS_FRONTEND"
 
 # switch to 'master' for formal versions.
 export BCM_DEFAULT_GIT_BRANCH="dev"
-export SSHHOME="$HOME/.ssh" && mkdir -p "$SSHHOME"
+mkdir -p "$SSHHOME"
 export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
 export BASE_DOCKER_IMAGE="ubuntu:20.04"
 export BCM_TMP_DIR="/tmp/bcm" && mkdir -p "$BCM_TMP_DIR"

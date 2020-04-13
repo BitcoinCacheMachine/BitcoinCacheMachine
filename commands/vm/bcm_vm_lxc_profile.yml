@@ -1,4 +1,6 @@
 config:
+  limits.cpu: "4"
+  limits.memory: "4096MB"
   user.vendor-data: |
     #cloud-config
     apt_mirror: http://us.archive.ubuntu.com/ubuntu/

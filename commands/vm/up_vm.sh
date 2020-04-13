@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 if [[ -z $BCM_VM_NAME ]]; then
@@ -13,6 +13,7 @@ fi
 # let's make sure we have an ssh keypair for the new vm
 if [ ! -f "$HOME/.ssh/$BCM_VM_NAME.local" ]; then
     ssh-keygen -f "$HOME/.ssh/$BCM_VM_NAME.local" -t ecdsa -b 521
+    chmod 0600 "$HOME/.ssh/$BCM_VM_NAME.local"
 fi
 
 # generate the custom cloud-init file. Cloud init installs and configures sshd
@@ -31,16 +32,16 @@ fi
 shred -uz /tmp/cloud-init.yml
 
 if ! lxc image list --format csv --columns l | grep -q "bcm-vm-base"; then
-    if [ -f "$BCM_BOOTSTRAP_DIR/bcm-vm-base" ]; then
-        lxc image import "$BCM_BOOTSTRAP_DIR/bcm-vm-base" "$BCM_BOOTSTRAP_DIR/bcm-vm-base.root" --alias bcm-vm-base
+    if [ -f "$BCM_CACHE_DIR/bcm-vm-base" ]; then
+        lxc image import "$BCM_CACHE_DIR/bcm-vm-base" "$BCM_CACHE_DIR/bcm-vm-base.root" --alias bcm-vm-base
     else
         lxc image copy images:ubuntu/focal/cloud local: --alias bcm-vm-base --vm --public
         sleep 2
     fi
     
     # cache the image to disk at BOOTSTRAP DIR to avoid network IO
-    if [ ! -f "$BCM_BOOTSTRAP_DIR/bcm-vm-base" ]; then
-        lxc image export "bcm-vm-base" "$BCM_BOOTSTRAP_DIR/bcm-vm-base"
+    if [ ! -f "$BCM_CACHE_DIR/bcm-vm-base" ]; then
+        lxc image export "bcm-vm-base" "$BCM_CACHE_DIR/bcm-vm-base"
     fi
 fi
 
@@ -60,7 +61,7 @@ lxc start "$BCM_VM_NAME"
 
 IP_V4_ADDRESS=
 while [ 1 ]; do
-    IP_V4_ADDRESS="$(lxc list $BCM_VM_NAME --format csv --columns=4 | grep "enp5s0" | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')" || true
+    IP_V4_ADDRESS="$(lxc list $BCM_VM_NAME --format csv --columns=4 | grep $BCM_MACVLAN_INTERFACE | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')" || true
     if [ ! -z "$IP_V4_ADDRESS" ]; then
         break
     else
@@ -78,6 +79,7 @@ FQSN="ubuntu@$IP_V4_ADDRESS"
 rsync -rv "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/init_bcm.sh --sudo-user=ubuntu"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/install.sh"
+rsync -rv "$BCM_CACHE_DIR/lxc/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.local/bcm/lxc"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
 
 
