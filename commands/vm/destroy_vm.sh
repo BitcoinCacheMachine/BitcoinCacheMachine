@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 
 if [[ -z "$BCM_VM_NAME" ]]; then
     echo "ERROR: BCM_VM_NAME IS not defined. Please set your environment ~/.bashrc."

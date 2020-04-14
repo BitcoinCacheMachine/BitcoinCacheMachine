@@ -1,9 +1,19 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-DEBIAN_FRONTEND=noninteractive
+# first, let's check to ensure the Administrator has done their job with respect to storage
+if [[ ! -d /hdd ]]; then
+    echo "ERROR: The '/hdd' directory does not exist. Please read the BCM preparation instructions before running this script."
+    exit
+fi
+
+if [[ ! -d /sd ]]; then
+    echo "ERROR: The '/sd' directory does not exist. Please read the BCM preparation instructions before running this script."
+    exit
+fi
+
 
 source ./env
 
@@ -33,12 +43,6 @@ fi
 
 export BCM_GIT_DIR="$(pwd)"
 SUDO_USER_HOME="/home/$SUDO_USER"
-# bash -c "$BCM_GIT_DIR/commands/cluster/cluster_create.sh"
-
-# # if there's no group called lxd, create it.
-# if ! groups "$(whoami)" | grep -q lxd; then
-#     gpasswd -a "$(whoami)" lxd
-# fi
 
 # Let's make sure the .ssh folder exists. This will hold known SSH BCM hosts
 # SSH authentication to remote hosts uses the trezor
@@ -83,14 +87,48 @@ if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     } >> "$BASHRC_FILE"
 fi
 
-# In this part, we configure the default LXC profile for LXC containers
-# to MACVLAN against the physical interface where our default route is
-# TODO add CLI option to specify the interface manually.
-#BCM_MACVLAN_INTERFACE="$(ip route | grep default | sed -n '1p' | cut -d " " -f 5)"
-IP_OF_MACVLAN_INTERFACE="$(ip addr show "$BCM_MACVLAN_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+
+# in this section, we configure the underlying storage. We create LOOP devices storated
+# at /sd /ssd and /hdd. The ADMINISTRATOR MUST mount these directories BEFORE running this
+# install script.
+function createLoopDevice () {
+    IMAGE_PATH="$1/bcm-$2.img"
+
+    # let's first check to see if the loop device already exists.
+    LOOP_DEVICE=
+    if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
+        LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
+    fi
+
+    # remove the loop device and delete the image.
+    if [ ! -z "$LOOP_DEVICE" ]; then
+        losetup -d "$LOOP_DEVICE"
+
+        # remove the file so we can start anew.
+        if [ -f "$IMAGE_PATH" ]; then
+            sleep 2
+            rm "$IMAGE_PATH"
+        fi
+    fi
+
+    # create the actual file that's backing the loop device
+    dd if=/dev/zero of="$IMAGE_PATH" bs="$3""MB" count=10
+
+    # next, create the loop device
+    losetup -fP "$IMAGE_PATH"
+}
+
+
+createLoopDevice "/sd" "sd" "10"
+createLoopDevice "/home/$SUDO_USER" "ssd" "5000"
+createLoopDevice "/hdd" "hdd" "10000"
+
+
+# this section creates the yml necessary to run 'lxd init'
+# TODO add CLI option to specify the interface manually, then store the user's selection in ~/.bashrc
+IP_OF_MACVLAN_INTERFACE="$(ip addr show $BCM_MACVLAN_INTERFACE | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
-#export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
 LXD_SERVER_NAME="$(hostname)"
 # these two lines are so that ssh hosts can have the correct naming convention for LXD node info.
 if [[ ! "$LXD_SERVER_NAME" == *"-01"* ]]; then

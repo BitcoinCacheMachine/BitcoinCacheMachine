@@ -74,19 +74,15 @@ fi
 for STORAGE_POOL in hdd ssd sd; do
     # if the profile doesn't already exist, we create it.
     if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
-        # TODO, how to redirect storage device for the pool? I think ADMIN will have to mount
-        # to /ssd /sd and /hdd
-        STORAGE_POOL_DIR="/$STORAGE_POOL"
-        if [ "$STORAGE_POOL" = ssd ]; then
-            STORAGE_POOL_DIR="$HOME"
-            elif [ "$STORAGE_POOL" = hdd ]; then
-            STORAGE_POOL_DIR="$HOME/bcm_hdd"
+        # let's first check to see if the loop device already exists.
+        LOOP_DEVICE=
+        if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
+            LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
+            lxc storage create "bcm-$STORAGE_POOL" btrfs source="$LOOP_DEVICE"
+        else
+            echo "ERROR: Loop device for storage pool '$STORAGE_POOL' does not exist!"
+            exit
         fi
-
-        # TODO ensure the ADMIN mounts these with underlying BTRFS storage.
-        mkdir -p "$STORAGE_POOL_DIR"
-
-        lxc storage create "bcm-$STORAGE_POOL" btrfs size=2GB
     fi
 done
 

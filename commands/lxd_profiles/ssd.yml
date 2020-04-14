@@ -5,4 +5,3 @@ devices:
     path: /
     pool: bcm-ssd
     type: disk
-name: ssd_only

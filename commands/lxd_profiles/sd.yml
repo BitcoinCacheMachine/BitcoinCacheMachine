@@ -6,4 +6,3 @@ devices:
     pool: bcm-sd
     type: disk
     source: bcm-sd
-name: sd

@@ -60,11 +60,6 @@ devices:
   config:
     source: cloud-init:config
     type: disk
-  hdd:
-    path: /hdd
-    pool: bcm-hdd
-    type: disk
-    source: bcm-hdd
   eth0:
     name: eth0
     nictype: macvlan

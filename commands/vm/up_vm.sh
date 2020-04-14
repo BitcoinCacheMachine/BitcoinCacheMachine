@@ -48,7 +48,7 @@ lxc init --vm \
 bcm-vm-base \
 "$BCM_VM_NAME"
 
-#
+
 # --profile="bcm-sd" \
 
 #lxc network attach bcmmacvlan "$BCM_VM_NAME" eth0

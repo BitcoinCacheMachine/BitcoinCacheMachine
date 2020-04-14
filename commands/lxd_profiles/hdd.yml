@@ -6,4 +6,3 @@ devices:
     pool: bcm-hdd
     type: disk
     source: bcm-hdd
-name: hdd
