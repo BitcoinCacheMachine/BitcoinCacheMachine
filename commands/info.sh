@@ -12,6 +12,8 @@ if [[ -d $PASSWDHOME ]]; then
 fi
 
 echo "  SSHHOME:                   $SSHHOME"
+echo "  BCM_VM_NAME:               $BCM_VM_NAME"
+echo "  BCM_MACVLAN_INTERFACE:     $BCM_MACVLAN_INTERFACE"
 echo "  BCM_CACHE_DIR:             $BCM_CACHE_DIR"
 echo "  BCM_DEBUG:                 $BCM_DEBUG"
 echo "  BCM_SSH_HOSTNAME:          $BCM_SSH_HOSTNAME"

@@ -12,17 +12,17 @@ if lxc list --format csv | grep -q "$BCM_VM_NAME"; then
 fi
 
 if lxc profile list --format csv | grep -q "$BCM_VM_NAME-vm"; then
-    lxc profile delete "$BCM_VM_NAME-vm"
-fi
-
-FILE="$HOME/.ssh/$BCM_VM_NAME.local.pub"
-if [ -f "$FILE" ]; then
-    rm "$FILE"
-fi
-
-FILE="$HOME/.ssh/$BCM_VM_NAME.local"
-if [ -f "$FILE" ]; then
-    rm "$FILE"
+    lxc profile delete "$BCM_VM_NAME"
 fi
 
 ssh-keygen -R "$BCM_VM_NAME.local"
+
+# FILE="$SSHHOME/$BCM_VM_NAME.local.pub"
+# if [ -f "$FILE" ]; then
+#     rm "$FILE"
+# fi
+
+# FILE="$SSHHOME/$BCM_VM_NAME.local"
+# if [ -f "$FILE" ]; then
+#     rm "$FILE"
+# fi

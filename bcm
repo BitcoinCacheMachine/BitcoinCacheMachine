@@ -37,6 +37,7 @@ for i in "$@"; do
 done
 
 source ./env
+source "$HOME/.bashrc"
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./commands/help.txt

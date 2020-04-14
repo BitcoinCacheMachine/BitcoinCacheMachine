@@ -31,7 +31,6 @@ for i in "$@"; do
 done
 
 BCM_GIT_DIR="/home/$SUDO_USER/bcm"
-mkdir -p "$BCM_GIT_DIR"
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root. Try 'sudo bash -c ./install.sh'"

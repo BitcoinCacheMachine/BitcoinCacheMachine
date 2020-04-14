@@ -60,7 +60,7 @@ devices:
   eth0:
     name: eth0
     nictype: macvlan
-    parent: $PHYSICAL_NETWORK_INTERFACE
+    parent: $BCM_MACVLAN_INTERFACE
     type: nic
 name: bcmvm
 used_by: []
