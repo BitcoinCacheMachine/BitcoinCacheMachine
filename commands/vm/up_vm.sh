@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-if [[ -z $BCM_VM_NAME ]]; then
+if [[ -z "$BCM_VM_NAME" ]]; then
     echo "ERROR: BCM_VM_NAME IS not defined. Please set your environment ~/.bashrc."
     exit
 fi
@@ -11,8 +11,6 @@ fi
 # let's make sure we have an ssh keypair for the new vm
 if [ ! -f "$SSHHOME/$BCM_VM_NAME.local" ]; then
     ssh-keygen -f "$SSHHOME/$BCM_VM_NAME.local" -t ecdsa -b 521
-#    chmod 0600 "$SSHHOME/$BCM_VM_NAME.local"
-#    chmod 0600 "$SSHHOME/$BCM_VM_NAME.local.pub"
 fi
 
 # generate the custom cloud-init file. Cloud init installs and configures sshd
