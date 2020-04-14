@@ -57,6 +57,9 @@ config:
               #PermitEmptyPasswords no
 description: Default BCM profile.
 devices:
+  config:
+    source: cloud-init:config
+    type: disk
   eth0:
     name: eth0
     nictype: macvlan

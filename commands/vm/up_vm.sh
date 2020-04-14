@@ -44,15 +44,16 @@ fi
 lxc init --vm \
 --profile="$VM_PROFILE_NAME" \
 --profile="bcm-ssd" \
+--profile="bcm-hdd" \
 bcm-vm-base \
 "$BCM_VM_NAME"
 
-# --profile="bcm-hdd" \
+#
 # --profile="bcm-sd" \
 
 #lxc network attach bcmmacvlan "$BCM_VM_NAME" eth0
 #lxc config device add "$BCM_VM_NAME" eth0 nic nictype=macvlan parent="eno1" name="eth0"
-lxc config device add "$BCM_VM_NAME" config disk source=cloud-init:config
+#lxc config device add "$BCM_VM_NAME" config disk source=cloud-init:config
 lxc start "$BCM_VM_NAME"
 
 IP_V4_ADDRESS=
