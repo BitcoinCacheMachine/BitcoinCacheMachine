@@ -79,9 +79,10 @@ fi
 # let's ensure the image has /snap/bin in its PATH environment variable.
 # using .profile works for both bare-metal and VM-based (multipass) deployments.
 BASHRC_FILE="$SUDO_USER_HOME/.profile"
+BASHRC_TEXT="export PATH=$""PATH:/snap/bin:/home/$SUDO_USER/bcm"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     {
-        echo "export PATH=$""PATH:/snap/bin:/home/$SUDO_USER/bcm"
+        echo "$BASHRC_TEXT"
         echo "DEBIAN_FRONTEND=noninteractive"
     } >> "$BASHRC_FILE"
 fi
