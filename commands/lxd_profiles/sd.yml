@@ -5,4 +5,4 @@ devices:
     path: /sd
     pool: bcm-sd
     type: disk
-    source: bcm-sd
+    source: /sd

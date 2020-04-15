@@ -93,35 +93,35 @@ fi
 # install script.
 function createLoopDevice () {
     IMAGE_PATH="$1/bcm-$2.img"
-
+    
     # let's first check to see if the loop device already exists.
     LOOP_DEVICE=
     if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
-        LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
+        LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep "$IMAGE_PATH" | head -n1 | cut -d " " -f1)"
     fi
-
+    
     # remove the loop device and delete the image.
-    if [ ! -z "$LOOP_DEVICE" ]; then
+    if [ -n "$LOOP_DEVICE" ]; then
         losetup -d "$LOOP_DEVICE"
-
+        
         # remove the file so we can start anew.
         if [ -f "$IMAGE_PATH" ]; then
             sleep 2
             rm "$IMAGE_PATH"
         fi
     fi
-
+    
     # create the actual file that's backing the loop device
-    dd if=/dev/zero of="$IMAGE_PATH" bs="$3""MB" count=10
-
+    dd if=/dev/zero of="$IMAGE_PATH" bs="$3" count=1
+    
     # next, create the loop device
     losetup -fP "$IMAGE_PATH"
 }
 
 
-createLoopDevice "/sd" "sd" "10"
-createLoopDevice "/home/$SUDO_USER" "ssd" "5000"
-createLoopDevice "/hdd" "hdd" "10000"
+createLoopDevice "/sd" "sd" 262144000
+createLoopDevice "/home/$SUDO_USER" "ssd" 4194304000
+createLoopDevice "/hdd" "hdd" 1048576000
 
 
 # this section creates the yml necessary to run 'lxd init'

@@ -71,16 +71,22 @@ fi
 
 # This for loop makes sure that all subsequent commands have access to the
 # bcm LXD profiles.
-for STORAGE_POOL in hdd ssd sd; do
+for STORAGE_POOL in ssd hdd sd; do
     # if the profile doesn't already exist, we create it.
     if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
         # let's first check to see if the loop device already exists.
         LOOP_DEVICE=
+        IMAGE_PATH="$HOME/bcm-$STORAGE_POOL.img" #for ssd
+        if [ $STORAGE_POOL != "ssd" ] ; then
+            IMAGE_PATH="/$STORAGE_POOL/bcm-$STORAGE_POOL.img"
+        fi
+        
+        # if the loop device exists, let's pull it into LXC as a loop device-backed storage pool formatted with BTRFS
         if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
             LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
             lxc storage create "bcm-$STORAGE_POOL" btrfs source="$LOOP_DEVICE"
         else
-            echo "ERROR: Loop device for storage pool '$STORAGE_POOL' does not exist!"
+            echo "ERROR: Loop device for storage pool '$STORAGE_POOL' does not exist! You may need to run the BCM installer script."
             exit
         fi
     fi
