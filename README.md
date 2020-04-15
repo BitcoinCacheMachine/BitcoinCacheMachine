@@ -54,7 +54,7 @@ The first step to getting started with Bitcoin Cache Machine get the BCM scripts
 
 ```bash
 # download the BCM init script; VERIFY CONTENTS!
-wget -o pull_bcm.sh https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
+wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
 
 # make the script executable then run it 
 # scripts installs TOR, then git pulls the BCM source code from github 
