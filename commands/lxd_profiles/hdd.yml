@@ -5,4 +5,4 @@ devices:
     path: /hdd
     pool: bcm-hdd
     type: disk
-    source: /hdd
+    source: hdd
