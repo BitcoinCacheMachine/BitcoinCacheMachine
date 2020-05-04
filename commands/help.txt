@@ -15,7 +15,6 @@ Available Commands:
   #git          Sign git commits and git tags using your Trezor-backed GPG certificates.
   #file         Create and verify file signatures, encrypt and decrypt files with your Trezor.
   #ssh          Use your Trezor to issue SSH keys and perform SSH authentication.
-  #pass         Create and manage GPG-encrypted passwords protected by your Trezor.
   init         Create new Trezor-backed GPG certificates.
   controller   Manage your SDN controller.
 

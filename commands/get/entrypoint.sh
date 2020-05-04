@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE="${1:-}"
-if [ ! -z "${VALUE}" ]; then
+if [ -n "${VALUE}" ]; then
     BCM_CLI_VERB="$1"
 else
     echo "Please provide a command."

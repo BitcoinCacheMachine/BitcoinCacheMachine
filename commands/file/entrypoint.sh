@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
-if [ ! -z "${VALUE}" ]; then
+if [ -n "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     echo "Please provide a SSH command."

@@ -23,6 +23,6 @@ fi
 
 #/root/.cargo/bin/cargo run --release -- help
 
-if [[ ! -z $BITCOIND_RPC_IP_PORT ]]; then
+if [[ -n "$BITCOIND_RPC_IP_PORT" ]]; then
     cargo run --release -- -vvv --timestamp --network="$BCM_ACTIVE_CHAIN" --daemon-dir /root/.bitcoin --db-dir /root/.electrs/db --electrum-rpc-addr="0.0.0.0:$ELECTRS_RPC_PORT" --daemon-rpc-addr="$BITCOIND_RPC_IP_PORT"
 fi

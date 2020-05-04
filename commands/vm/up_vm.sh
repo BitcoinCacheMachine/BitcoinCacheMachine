@@ -44,11 +44,10 @@ fi
 lxc init --vm \
 --profile="$VM_PROFILE_NAME" \
 --profile="bcm-ssd" \
---profile="bcm-hdd" \
 bcm-vm-base \
 "$BCM_VM_NAME"
 
-
+#--profile="bcm-hdd" \
 # --profile="bcm-sd" \
 
 #lxc network attach bcmmacvlan "$BCM_VM_NAME" eth0
@@ -59,7 +58,7 @@ lxc start "$BCM_VM_NAME"
 IP_V4_ADDRESS=
 while [ 1 ]; do
     IP_V4_ADDRESS="$(lxc list $BCM_VM_NAME --format csv --columns=4 | grep enp5s0 | grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')" || true
-    if [ ! -z "$IP_V4_ADDRESS" ]; then
+    if [ -n "$IP_V4_ADDRESS" ]; then
         break
     else
         sleep 1
@@ -82,7 +81,7 @@ ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
 
 # # let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.
 # MGMT_PLANE_ONION_ADDRESS="$(multipass exec "$VM_NAME" -- sudo cat /var/bc`h/hostname)"
-# if [[ ! -z $MGMT_PLANE_ONION_ADDRESS ]]; then
+# if [[ -n $MGMT_PLANE_ONION_ADDRESS ]]; then
 #     touch "$ENDPOINT_DIR/mgmt-onion.env"
 #     {
 #         echo "#!/bin/bash"

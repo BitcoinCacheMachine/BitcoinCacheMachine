@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
 
-if [[ ! -z ${1+x} ]]; then
+if [[ -n ${1+x} ]]; then
     BCM_CLI_COMMAND="$1"
 else
     # if we get here, then the user didn't supply the correct resonse.
@@ -58,49 +58,6 @@ if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     ./show.sh "$@"
     exit
 fi
-
-if [[ "$BCM_CLI_COMMAND" == "clear" ]]; then
-    ./clear_lxd.sh "$@"
-    exit
-fi
-
-# for hdd storage pool
-# STORAGE_PATH="$HOME/bcm_storage_hdd"
-# mkdir -p "$STORAGE_PATH"
-# lxc storage create "bcm-hdd" btrfs size=20GB
-
-# This for loop makes sure that all subsequent commands have access to the
-# bcm LXD profiles.
-for STORAGE_POOL in ssd hdd sd; do
-    # if the profile doesn't already exist, we create it.
-    if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
-        # let's first check to see if the loop device already exists.
-        LOOP_DEVICE=
-        IMAGE_PATH="$HOME/bcm-$STORAGE_POOL.img" #for ssd
-        if [ $STORAGE_POOL != "ssd" ] ; then
-            IMAGE_PATH="/$STORAGE_POOL/bcm-$STORAGE_POOL.img"
-        fi
-        
-        # if the loop device exists, let's pull it into LXC as a loop device-backed storage pool formatted with BTRFS
-        if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
-            LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
-            lxc storage create "bcm-$STORAGE_POOL" btrfs source="$LOOP_DEVICE"
-        else
-            echo "ERROR: Loop device for storage pool '$STORAGE_POOL' does not exist! You may need to run the BCM installer script."
-            exit
-        fi
-    fi
-done
-
-# This for loop makes sure that all subsequent commands have access to the
-# bcm LXD profiles.
-for PROFILE_NAME in ssd hdd sd unprivileged privileged; do
-    # if the profile doesn't already exist, we create it.
-    if ! lxc profile list --format csv | grep -q "bcm-$PROFILE_NAME"; then
-        lxc profile create "bcm-$PROFILE_NAME"
-        cat "./lxd_profiles/$PROFILE_NAME.yml" | lxc profile edit "bcm-$PROFILE_NAME"
-    fi
-done
 
 # commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
 if [[ "$BCM_CLI_COMMAND" == "vm" ]]; then
@@ -186,11 +143,6 @@ fi
 
 # if [[ "$BCM_CLI_COMMAND" == "controller" ]]; then
 #     ./controller/entrypoint.sh "$@"
-#     exit
-# fi
-
-# if [[ "$BCM_CLI_COMMAND" == "pass" ]]; then
-#     ./pass/entrypoint.sh "$@"
 #     exit
 # fi
 

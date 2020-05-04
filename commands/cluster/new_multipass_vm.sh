@@ -83,7 +83,7 @@ multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
 
 # let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.
 MGMT_PLANE_ONION_ADDRESS="$(multipass exec "$VM_NAME" -- sudo cat /var/lib/tor/ssh/hostname)"
-if [[ ! -z $MGMT_PLANE_ONION_ADDRESS ]]; then
+if [[ -n $MGMT_PLANE_ONION_ADDRESS ]]; then
     touch "$ENDPOINT_DIR/mgmt-onion.env"
     {
         echo "#!/bin/bash"
@@ -94,7 +94,7 @@ fi
 multipass restart "$VM_NAME"
 
 IPV4_ADDRESS=$(multipass list --format csv | grep $VM_NAME | awk -F "\"*,\"*" '{print $3}')
-if [[ ! -z $IPV4_ADDRESS && ! -z $VM_NAME ]]; then
+if [[ -n "$IPV4_ADDRESS" && -n "$VM_NAME" ]]; then
     echo "$IPV4_ADDRESS    $VM_NAME" | sudo tee -a /etc/hosts
 fi
 

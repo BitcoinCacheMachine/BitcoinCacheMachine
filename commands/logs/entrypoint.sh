@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 # BCM_CLI_COMMAND=
 
-# if [[ ! -z ${1+x} ]]; then
+# if [[ -n ${1+x} ]]; then
 #     BCM_CLI_COMMAND="$1"
 # else
 #     cat ./help.txt

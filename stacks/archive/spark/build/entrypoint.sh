@@ -5,7 +5,7 @@ set -Eeuo pipefail
 mkdir -p /root/.spark-wallet
 
 SPARK_CONFIG_FILE="/root/.spark-wallet/config"
-if [[ ! -z $SPARK_USERNAME && ! -z $SPARK_PASSWORD ]]; then
+if [[ -n $SPARK_USERNAME && -n $SPARK_PASSWORD ]]; then
     touch "$SPARK_CONFIG_FILE"
     echo "login=$SPARK_USERNAME:$SPARK_PASSWORD" >> $SPARK_CONFIG_FILE
 fi

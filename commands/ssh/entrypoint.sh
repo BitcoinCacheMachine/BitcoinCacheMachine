@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
-if [ ! -z "${VALUE}" ]; then
+if [ -n "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     echo "Please provide a ssh command."
@@ -234,10 +234,10 @@ fi
 # # now we wait for the service to start, then we grab the new onion site and token
 # # then we add it to our config using bcm ssh add-onion
 # DOCKER_CONTAINER_ID=$(lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker ps | grep toronion | awk '{print $1}')
-# if [[ ! -z $DOCKER_CONTAINER_ID ]]; then
+# if [[ -n $DOCKER_CONTAINER_ID ]]; then
 #     ONION_CREDENTIALS="$(lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker exec -t "$DOCKER_CONTAINER_ID" cat /var/lib/tor/bcmonion/hostname)"
 
-#     if [[ ! -z $ONION_CREDENTIALS ]]; then
+#     if [[ -n $ONION_CREDENTIALS ]]; then
 #         ONION_URL="$(echo "$ONION_CREDENTIALS" | awk '{print $1;}')"
 #         ONION_TOKEN="$(echo "$ONION_CREDENTIALS" | awk '{print $2;}')"
 #         bcm ssh add-onion --onion="$ONION_URL" --token="$ONION_TOKEN" --title="$(lxc remote get-default)"

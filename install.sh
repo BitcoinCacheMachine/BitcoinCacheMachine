@@ -14,7 +14,7 @@ if [[ ! -d /sd ]]; then
     exit
 fi
 
-
+# shellcheck source=./env
 source ./env
 
 # let's wait for apt upgrade/software locks to be released.
@@ -23,7 +23,10 @@ while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 
 done
 
 #install necessary software.
-apt-get install -y curl git apg snap snapd gnupg rsync jq
+apt-get install -y curl git apg snap snapd gnupg rsync jq pass
+
+# removed unneeded software
+apt autoremove
 
 # if the lxd group doesn't exist, create it.
 if ! grep -q lxd /etc/group; then
@@ -41,7 +44,9 @@ if [[ ! -f "$(command -v lxc)" ]]; then
     snap install lxd --channel="latest/edge"
 fi
 
-export BCM_GIT_DIR="$(pwd)"
+BCM_GIT_DIR="$(pwd)"
+export BCM_GIT_DIR="$BCM_GIT_DIR"
+
 SUDO_USER_HOME="/home/$SUDO_USER"
 
 # Let's make sure the .ssh folder exists. This will hold known SSH BCM hosts
@@ -77,16 +82,15 @@ if [[ -f "$SSH_LOCAL_CONF" ]]; then
 fi
 
 # let's ensure the image has /snap/bin in its PATH environment variable.
-# using .profile works for both bare-metal and VM-based (multipass) deployments.
+# using .profile works for both bare-metal and VM-based deployments.
 BASHRC_FILE="$SUDO_USER_HOME/.profile"
-BASHRC_TEXT="export PATH=$""PATH:/snap/bin:/home/$SUDO_USER/bcm"
+BASHRC_TEXT="export PATH=\$PATH:/snap/bin:/home/$SUDO_USER/bcm"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     {
         echo "$BASHRC_TEXT"
         echo "DEBIAN_FRONTEND=noninteractive"
     } >> "$BASHRC_FILE"
 fi
-
 
 # in this section, we configure the underlying storage. We create LOOP devices storated
 # at /sd /ssd and /hdd. The ADMINISTRATOR MUST mount these directories BEFORE running this
@@ -103,30 +107,71 @@ function createLoopDevice () {
     # remove the loop device and delete the image.
     if [ -n "$LOOP_DEVICE" ]; then
         losetup -d "$LOOP_DEVICE"
-        
-        # remove the file so we can start anew.
-        if [ -f "$IMAGE_PATH" ]; then
-            sleep 2
-            rm "$IMAGE_PATH"
-        fi
+        losetup -D
     fi
-    
+
+    # if the loop file doesn't exist, create it.
+    if [ ! -f "$IMAGE_PATH" ]; then
+        touch "$IMAGE_PATH"
+    fi
+
+    truncate -s +"$3" "$IMAGE_PATH"
     # create the actual file that's backing the loop device
-    dd if=/dev/zero of="$IMAGE_PATH" bs="$3" count=1
+    #dd if=/dev/zero of="$IMAGE_PATH" bs="$3" count="$4"
     
     # next, create the loop device
     losetup -fP "$IMAGE_PATH"
+
+    # get the new loop device, then remove any existing filesystem entries with wipefs.
+    if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
+        LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep "$IMAGE_PATH" | head -n1 | cut -d " " -f1)"
+    fi
+
+    wipefs -a "$LOOP_DEVICE"
 }
 
+createLoopDevice /sd sd 64MB
+createLoopDevice "/home/$SUDO_USER" ssd 10GB
+createLoopDevice /hdd hdd 20GB
 
-createLoopDevice "/sd" "sd" 262144000
-createLoopDevice "/home/$SUDO_USER" "ssd" 4194304000
-createLoopDevice "/hdd" "hdd" 1048576000
+# This creates LXC storage pools for each of teh
+for STORAGE_POOL in ssd hdd sd; do
+    # if the profile doesn't already exist, we create it.
+    if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
+        # let's first check to see if the loop device already exists.
+        LOOP_DEVICE=
+        IMAGE_PATH="$SUDO_USER_HOME/bcm-$STORAGE_POOL.img" #for ssd
+        if [ $STORAGE_POOL != "ssd" ] ; then
+            IMAGE_PATH="/$STORAGE_POOL/bcm-$STORAGE_POOL.img"
+        fi
+        
+        # if the loop device exists, let's pull it into LXC as a loop device-backed storage pool formatted with BTRFS
+        if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
+            LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
+            lxc storage create "bcm-$STORAGE_POOL" btrfs source="$LOOP_DEVICE"
+        else
+            echo "ERROR: Loop device for storage pool '$STORAGE_POOL' does not exist! You may need to run the BCM installer script."
+            exit
+        fi
+        
+        # if the profile doesn't already exist, we create it.
+        export LOOP_DEVICE="$LOOP_DEVICE"
+        if ! lxc profile list --format csv | grep -q "bcm-$STORAGE_POOL"; then
+            lxc profile create "bcm-$STORAGE_POOL"
+        fi
+        
+        PROFILE_YAML="$(envsubst <./resources/lxd_profiles/$STORAGE_POOL.yml)"
+        echo "$PROFILE_YAML" | lxc profile edit "bcm-$STORAGE_POOL"
+    fi
+done
 
+mkdir -p "$SUDO_USER_HOME/.local/bcm/lxc"
+chown -R "$SUDO_USER:$SUDO_USER" "$SUDO_USER_HOME/.local/bcm"
 
 # this section creates the yml necessary to run 'lxd init'
 # TODO add CLI option to specify the interface manually, then store the user's selection in ~/.bashrc
-IP_OF_MACVLAN_INTERFACE="$(ip addr show $BCM_MACVLAN_INTERFACE | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+IP_OF_MACVLAN_INTERFACE="$(ip addr show "$BCM_MACVLAN_INTERFACE" | grep "inet " | cut -d/ -f1 | awk '{print $NF}')"
+
 BCM_LXD_SECRET="$(apg -n 1 -m 30 -M CN)"
 export BCM_LXD_SECRET="$BCM_LXD_SECRET"
 LXD_SERVER_NAME="$(hostname)"
@@ -141,8 +186,17 @@ fi
 
 export LXD_SERVER_NAME="$LXD_SERVER_NAME"
 export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
-PRESEED_YAML="$(envsubst <./resources/lxd_master_preseed.yml)"
+PRESEED_YAML="$(envsubst <./resources/lxd_profiles/lxd_master_preseed.yml)"
 echo "$PRESEED_YAML" | lxd init --preseed
 
-mkdir -p "$SUDO_USER_HOME/.local/bcm/lxc"
-chown -R "$SUDO_USER:$SUDO_USER" "$SUDO_USER_HOME/.local/bcm"
+
+# This for loop makes sure that all subsequent commands have access to the
+# bcm LXD profiles.
+for PROFILE_NAME in unprivileged privileged; do
+    # if the profile doesn't already exist, we create it.
+    if ! lxc profile list --format csv | grep -q "bcm-$PROFILE_NAME"; then
+        lxc profile create "bcm-$PROFILE_NAME"
+    fi
+    
+    cat "./resources/lxd_profiles/$PROFILE_NAME.yml" | lxc profile edit "bcm-$PROFILE_NAME"
+done

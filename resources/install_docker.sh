@@ -10,7 +10,7 @@ if ! grep -q docker /etc/group; then
 fi
 
 if ! groups "$SUDO_USER" | grep -q docker; then
-    adduser $SUDO_USER docker
+    adduser "$SUDO_USER" docker
 fi
 
 # next we need to determine the underlying file system so we can upload the correct daemon.json

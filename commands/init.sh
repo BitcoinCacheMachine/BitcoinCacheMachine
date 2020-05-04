@@ -58,7 +58,7 @@ bash -c "$BCM_COMMAND_DIR/git_init_dir.sh $GNUPGHOME"
 echo "Your certificate will appear as:  '$BCM_CERT_NAME $BCM_CERT_USERNAME@$BCM_CERT_HOSTNAME'"
 
 source "$BCM_GIT_DIR/controller/export_usb_path.sh"
-if [[ ! -z $BCM_TREZOR_USB_PATH ]]; then
+if [[ -n $BCM_TREZOR_USB_PATH ]]; then
     # run the container.
     docker run -it --name trezorgpg --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \

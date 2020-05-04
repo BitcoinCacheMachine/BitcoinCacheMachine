@@ -7,7 +7,7 @@ BCM_CLI_VERB=
 BCM_PASS_NAME=
 
 VALUE=${2:-}
-if [ ! -z "${VALUE}" ]; then
+if [ -n "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     cat ./help.txt

@@ -2,7 +2,7 @@ config: {}
 description: Profile with HDD storage backend only.
 devices:
   hdd:
-    path: /hdd
+    path: /root/hdd
     pool: bcm-hdd
     type: disk
-    source: hdd
+    source: test

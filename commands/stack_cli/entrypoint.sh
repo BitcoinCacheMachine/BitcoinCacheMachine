@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 BCM_CLI_COMMAND=
 
-if [[ ! -z ${1+x} ]]; then
+if [[ -n ${1+x} ]]; then
     BCM_CLI_COMMAND="$1"
 else
     cat ./help.txt
@@ -22,7 +22,7 @@ if [[ $BCM_CLI_COMMAND == "bitcoin-cli" ]]; then
     DOCKER_CONTAINER_ID=$(lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker ps | grep bcm-bitcoin-core: | awk '{print $1}')
     CMD_TEXT="$(echo "$@" | awk -F'bitcoin-cli ' '{print $2}')"
     
-    if [[ ! -z $DOCKER_CONTAINER_ID ]]; then
+    if [[ -n $DOCKER_CONTAINER_ID ]]; then
         lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker exec -t "$DOCKER_CONTAINER_ID" bitcoin-cli "$CHAIN_TEXT" "$CMD_TEXT"
     else
         echo "WARNING: Docker container not found for clightning. You may need to run 'bcm stack start bitcoind'."
@@ -31,7 +31,7 @@ if [[ $BCM_CLI_COMMAND == "bitcoin-cli" ]]; then
     elif [[ $BCM_CLI_COMMAND == "lightning-cli" ]]; then
     DOCKER_CONTAINER_ID="$(lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker ps | grep bcm-clightning: | awk '{print $1}')"
     CMD_TEXT="$(echo "$@" | awk -F'lightning-cli ' '{print $2}')"
-    if [[ ! -z "$DOCKER_CONTAINER_ID" ]]; then
+    if [[ -n "$DOCKER_CONTAINER_ID" ]]; then
         
         lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker exec -t "$DOCKER_CONTAINER_ID" lightning-cli "$CMD_TEXT"
     else
@@ -42,7 +42,7 @@ if [[ $BCM_CLI_COMMAND == "bitcoin-cli" ]]; then
     DOCKER_CONTAINER_ID="$(lxc exec "$BCM_BITCOIN_HOST_NAME" -- docker ps | grep bcm-lnd: | awk '{print $1}')"
     CMD_TEXT="$(echo "$@" | awk -F'lncli ' '{print $2}')"
     
-    if [[ ! -z "$DOCKER_CONTAINER_ID" ]]; then
+    if [[ -n "$DOCKER_CONTAINER_ID" ]]; then
         # if the command is interactive, it goes in the if clause,
         # if command is non-interactive, it is executed in the else clause.
         if echo "$CMD_TEXT" | grep -q "create"; then

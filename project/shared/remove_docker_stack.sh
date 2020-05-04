@@ -35,8 +35,8 @@ if lxc list --format csv | grep -q "$BCM_MANAGER_HOST_NAME"; then
         
         if [ -f "$BCM_STACKS_DIR/$STACK_NAME/env.sh" ]; then
             source "$BCM_STACKS_DIR/$STACK_NAME/env.sh"
-            if [[ ! -z $TIER_NAME ]]; then
-                if [[ $TIER_NAME != "kafka" ]]; then
+            if [[ -n "$TIER_NAME" ]]; then
+                if [[ "$TIER_NAME" != "kafka" ]]; then
                     TIER_LXC_HOST="$(lxc list --format csv --columns n | grep "bcm-$TIER_NAME")"
                     lxc exec "$TIER_LXC_HOST" -- docker system prune -f >> /dev/null &
                 fi

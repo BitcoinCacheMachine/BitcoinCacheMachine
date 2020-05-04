@@ -21,7 +21,7 @@ for i in "$@"; do
             shift # past argument=value
         ;;
         --sudo-user=*)
-            SUDO_USER=="${i#*=}"
+            SUDO_USER="${i#*=}"
             shift
         ;;
         *)
@@ -377,8 +377,6 @@ if [[ "$TOR_ONLY" = 0 ]]; then
     git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050
     
     # clone the BCM repo to /home/$SUDO_USER/bcm
-    SUDO_USER_HOME="/home/$SUDO_USER"
-    #BCM_GIT_DIR="$(pwd)"
     export BCM_GIT_DIR="$BCM_GIT_DIR"
     if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then
         git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"

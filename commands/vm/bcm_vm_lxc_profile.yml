@@ -31,6 +31,7 @@ config:
               PasswordAuthentication no
               UsePAM no
               AllowUsers ubuntu
+              PubkeyAuthentication yes
               #X11Forwarding yes
               #X11DisplayOffset 10
               #PrintMotd no
@@ -50,7 +51,6 @@ config:
               #LoginGraceTime 120
               #StrictModes yes
               #RSAAuthentication yes
-              #PubkeyAuthentication yes
               #IgnoreRhosts yes
               #RhostsRSAAuthentication no
               #HostbasedAuthentication no
