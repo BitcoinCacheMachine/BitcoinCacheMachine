@@ -65,7 +65,7 @@ wget "https://raw.githubusercontent.com/$GITHUB_REPO/master/get_bcm.sh"
 # scripts installs TOR, then git pulls the BCM source code from github 
 # TODO 1) move from github to zeronet
 chmod 0744 ./get_bcm.sh
-sudo bash -c ./get_bcm.sh --repo="$GITHUB_REPO"
+sudo bash -c "./get_bcm.sh --repo=$GITHUB_REPO"
 ```
 
 The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the `~/bcm` directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs. Type 1 VMs are useful if you want to run multiple BCM instances on shared hardware (e.g., a full node for each family member). Finally, you can use BCM to deploy server-side infrastructure via remote SSH service (local network or authenticated onion service).
