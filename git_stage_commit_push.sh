@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 source ./env
 
 # let's pull any changes from the upstream repo
-#git fetch upstream
+git fetch upstream
 
 
 # first, let's commit and push our changes, so that the new VM will
