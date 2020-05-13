@@ -50,20 +50,25 @@ There exists two distinct roles in the BCM ecosystem. The Hardware Administrator
 
 ## Getting Started
 
-The first step to getting started with Bitcoin Cache Machine get the BCM scripts (git repo) to your computer, a user-facing desktop or laptop running a Debian-based OS. The instructions below can be executed that will help you get started.
+Run the following commands to run the BCM `git_bcm.sh` script. If you want to collaborate on BCM, first fork it to your github account then run the commands below, updating the `BITHUB_REPO` environment variable. command below with your URL of your forked repository.
 
 ```bash
 # download the BCM init script; VERIFY CONTENTS!
-wget https://raw.githubusercontent.com/BitcoinCacheMachine/BitcoinCacheMachine/dev/init_bcm.sh
+GITHUB_REPO="BitcoinCacheMachine/BitcoinCacheMachine"
+wget "https://raw.githubusercontent.com/$GITHUB_REPO/get_bcm.sh"
+
+# WARNING: YOU SHOULD ALWAYS DO YOUR DUE DILLEGENCE BEFORE RUNNING
+# A SCRIPT ON YOUR COMPUTER. YOU SHOULD NOT TRUST THIS SOFTWARE UNLESS
+# YOU HAVE VIEWED AND AUDITED ITS CODE.
 
 # make the script executable then run it 
 # scripts installs TOR, then git pulls the BCM source code from github 
 # TODO 1) move from github to zeronet
-chmod 0744 ./init_bcm.sh
-sudo bash -c ./init_bcm.sh
+chmod 0744 ./get_bcm.sh
+sudo bash -c ./get_bcm.sh --"$GITHUB_REPO"
 ```
 
-The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the bcm directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs. Type 1 VMs are useful if you want to run multiple BCM instances on shared hardware (e.g., a full node for each family member). Finally, you can use BCM to deploy BCM server-side infrastructure to a remote SSH endpoint (or SSH exposed as an onion service).
+The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the `~/bcm` directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs. Type 1 VMs are useful if you want to run multiple BCM instances on shared hardware (e.g., a full node for each family member). Finally, you can use BCM to deploy server-side infrastructure via remote SSH service (local network or authenticated onion service).
 
 After you have the BCM scripts, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment. Running just `bcm` will give you a help menu.
 
