@@ -5,11 +5,12 @@
 # of the BCM repo. This script should be run on any new machine wishing to be a BCM
 # "controller"/BCM Administrator.
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 TOR_ONLY=0
-REPO="BitcoinCacheMachine/BitcoinCacheMachine"
+REPO=
+UPSTREAM_REPO="BitcoinCacheMachine/BitcoinCacheMachine"
 
 for i in "$@"; do
     case $i in
@@ -29,6 +30,10 @@ for i in "$@"; do
         ;;
     esac
 done
+
+if [[ -z $REPO ]]; then
+    REPO="$UPSTREAM_REPO"
+fi
 
 BCM_GITHUB_REPO_URL="https://github.com/$REPO"
 BCM_GIT_DIR="/home/$SUDO_USER/bcm"
@@ -390,7 +395,6 @@ if [[ "$TOR_ONLY" = 0 ]]; then
         if ! git remote | grep -q upstream; then
             git remote add upstream "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.git"
         fi
-        
         cd -
     fi
 fi
