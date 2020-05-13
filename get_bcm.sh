@@ -382,6 +382,15 @@ if [[ "$TOR_ONLY" = 0 ]]; then
     if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then
         git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
         chown -R "$SUDO_USER:$SUDO_USER" "$BCM_GIT_DIR"
-        #cd "$BCM_GIT_DIR" && git checkout dev
+        
+        # set WORKING DIR to the new repo
+        cd "$BCM_GIT_DIR"
+        
+        # let's make sure our local repo has the upstream repo
+        if ! git remote | grep -q upstream; then
+            git remote add upstream "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.git"
+        fi
+        
+        cd -
     fi
 fi
