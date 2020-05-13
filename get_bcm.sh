@@ -9,7 +9,8 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 TOR_ONLY=0
-REPO="BitcoinCacheMachine/BitcoinCacheMachine"
+REPO=
+UPSTREAM_REPO="BitcoinCacheMachine/BitcoinCacheMachine"
 
 for i in "$@"; do
     case $i in
@@ -29,6 +30,10 @@ for i in "$@"; do
         ;;
     esac
 done
+
+if [[ -z $REPO ]]; then
+    REPO="$UPSTREAM_REPO"
+fi
 
 BCM_GITHUB_REPO_URL="https://github.com/$REPO"
 BCM_GIT_DIR="/home/$SUDO_USER/bcm"
@@ -382,6 +387,13 @@ if [[ "$TOR_ONLY" = 0 ]]; then
     if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then
         git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
         chown -R "$SUDO_USER:$SUDO_USER" "$BCM_GIT_DIR"
-        #cd "$BCM_GIT_DIR" && git checkout dev
+        
+        cd "$BCM_GIT_DIR"
+        # let's make sure our local repo has the upstream repo.
+        # other scripts fetch the latest upstream master HEAD; all commits are made against master on $REPO
+        if ! git remote | grep -q upstream; then
+            git remote add upstream "https://github.com/$REPO.git"
+        fi
+        cd -
     fi
 fi

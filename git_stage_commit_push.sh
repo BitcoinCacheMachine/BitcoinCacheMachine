@@ -2,13 +2,8 @@
 
 source ./env
 
-# let's make sure our local repo has the upstream repo
-if ! git remote | grep -q upstream; then
-    git remote add upstream "https://github.com/BitcoinCacheMachine/BitcoinCacheMachine.git"
-fi
-
 # let's pull any changes from the upstream repo
-git fetch upstream
+#git fetch upstream
 
 
 # first, let's commit and push our changes, so that the new VM will
