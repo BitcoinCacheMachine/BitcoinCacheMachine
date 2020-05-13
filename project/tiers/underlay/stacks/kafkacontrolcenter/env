@@ -1,7 +1,6 @@
-export DOCKERHUB_IMAGE="confluentinc/cp-enterprise-control-center:5.1.0"
+export DOCKER_HUB_IMAGE="confluentinc/cp-enterprise-control-center:5.4.0"
 export IMAGE_NAME="bcm-kafka-control-center"
-export IMAGE_TAG="5.1.0"
-export BCM_TIER_NAME="underlay"
+export TIER_NAME="underlay"
 export STACK_NAME="kafkacontrolcenter"
 export SERVICE_NAME="control-center"
 export BCM_SERVICE_PORT=8003

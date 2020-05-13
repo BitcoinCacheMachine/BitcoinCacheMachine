@@ -36,7 +36,6 @@ if [[ -z $SERVICE_NAME ]]; then
 fi
 
 # let's scale the schema registry count to UP TO 3.
-CLUSTER_NODE_COUNT=$(bcm cluster list endpoints | wc -l)
 if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
     REPLICAS=$CLUSTER_NODE_COUNT
     

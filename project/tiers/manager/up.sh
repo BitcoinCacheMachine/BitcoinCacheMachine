@@ -3,42 +3,18 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# only continue if the necessary image exists.
-bash -c "$BCM_GIT_DIR/project/create_bcm_host_template.sh"
-
-if bcm tier list | grep -q bcm-manager; then
-    exit
-fi
-
-# It's at this point that we start discerning amount mainnet,testnet,regtest boundaries.
-if ! lxc project list --format csv  | grep -q "$BCM_PROJECT"; then
-    lxc project create "$BCM_PROJECT"
-    
-    # these two commands means that each project will
-    # inherit profiles and images contained in the default project.
-    lxc project set "$BCM_PROJECT" features.images false
-    lxc project set "$BCM_PROJECT" features.profiles false
-fi
-
-if ! lxc project list --format csv | grep -q "$BCM_PROJECT (current)"; then
-    lxc project switch "$BCM_PROJECT"
-fi
-
 export TIER_NAME=manager
 
-# shellcheck source=../../project/shared/env.sh
-#source "$BCM_GIT_DIR/project/shared/env.sh"
-
 # first, create the profile that represents the tier.
-bash -c "$BCM_LXD_OPS/create_tier_profile.sh --tier-name=$TIER_NAME --yaml-path=$(pwd)/tier_profile.yml"
+../create_tier_profile.sh --tier-name="$TIER_NAME"
 
 # the way we provision a network on a cluster of count 1 is DIFFERENT
 # than one that's larger than 1.
-if [[ $(bcm cluster list endpoints | wc -l) -gt 1 ]]; then
+if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
     # create and populate the required network
     
     # we have to do this for each cluster node
-    for endpoint in $(bcm cluster list endpoints); do
+    for endpoint in $CLUSTER_ENDPOINTS; do
         lxc network create --target "$endpoint" bcmbrGWNat
         lxc network create --target "$endpoint" bcmNet
     done
@@ -53,6 +29,7 @@ function createBCMBRGW() {
 function createBCMNet() {
     if ! lxc network list --format csv | grep -q bcmNet; then
         lxc network create bcmNet bridge.mode=fan dns.mode=dynamic
+        # fan.underlay_subnet=172.17.0.0/24
     fi
 }
 
@@ -75,7 +52,7 @@ if ! lxc network list --format csv | grep -q bcmNet; then
 fi
 
 # get all the bcm-manager-xx containers deployed to the cluster.
-bash -c "$BCM_LXD_OPS/spread_lxc_hosts.sh --tier-name=manager"
+../spread_lxc_hosts.sh --tier-name="manager"
 
 # let's start the LXD container on the LXD cluster master.
 lxc file push ./dhcpd_conf.yml "$BCM_MANAGER_HOST_NAME/etc/netplan/10-lxc.yaml"
@@ -85,61 +62,68 @@ if lxc list --format csv -c=ns | grep "$BCM_MANAGER_HOST_NAME" | grep -q STOPPED
     lxc start "$BCM_MANAGER_HOST_NAME"
 fi
 
-bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
+bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
 
 # prepare the host.
 lxc exec "$BCM_MANAGER_HOST_NAME" -- ifmetric eth0 50
-lxc exec "$BCM_MANAGER_HOST_NAME" -- docker pull registry:latest
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker image pull registry:latest
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag registry:latest bcm-registry:latest
 
 # only do this if the swarm hasn't already been initialized.
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker swarm init --advertise-addr eth1 >> /dev/null
 
 # upload the docker daemon config to BCM_MANAGER_HOST_NAME
-lxc file push ./daemon1.json "$BCM_MANAGER_HOST_NAME"/etc/docker/daemon.json
+# TODO update this to use a tmpfs mount for temp storage.
+mkdir -p "$BCM_TMP_DIR"
+envsubst <./daemon1.json > "$BCM_TMP_DIR/daemon-updated.json"
+lxc file push "$BCM_TMP_DIR/daemon-updated.json" "$BCM_MANAGER_HOST_NAME"/etc/docker/daemon.json
+rm "$BCM_TMP_DIR/daemon-updated.json"
 
 # restart the host so it runs with new dockerd daemon config.
 lxc restart "$BCM_MANAGER_HOST_NAME"
-bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
+bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
 
 # push the stack files up tthere.
 lxc file push  -p -r ./stacks/ "$BCM_MANAGER_HOST_NAME"/root/manager/
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="bcm-registry:latest" \
-TARGET_PORT=5000 \
+TARGET_PORT="$BCM_REGISTRY_MIRROR_PORT" \
 TARGET_HOST="$BCM_MANAGER_HOST_NAME" \
 REGISTRY_PROXY_REMOTEURL="https://$BCM_DOCKER_IMAGE_CACHE_FQDN" \
 docker stack deploy -c "/root/$TIER_NAME/stacks/registry/regmirror.yml" regmirror
 
-lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:5000"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:$BCM_REGISTRY_MIRROR_PORT"
 
 lxc exec "$BCM_MANAGER_HOST_NAME" -- env DOCKER_IMAGE="bcm-registry:latest" \
-TARGET_PORT=5010 \
+TARGET_PORT="$BCM_PRIVATE_REGISTRY_PORT" \
 TARGET_HOST="$BCM_MANAGER_HOST_NAME" \
 docker stack deploy -c "/root/manager/stacks/registry/privreg.yml" privateregistry
 
-lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:5010"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- wait-for-it -t 30 "$BCM_MANAGER_HOST_NAME:$BCM_PRIVATE_REGISTRY_PORT"
 
 # tag and push the registry image to our local private registry.
-BCM_PRIVATE_REGISTRY="127.0.0.1:5010"
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker tag registry:latest "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$BCM_PRIVATE_REGISTRY/bcm-registry:latest"
 
 # build and push the docker-base docker image.
-./build_push_docker_base.sh
+IMAGE_NAME="bcm-docker-base"
+lxc file push -p -r ./build/ "$BCM_MANAGER_HOST_NAME"/root/manager/
+IMAGE_NAME="$BCM_PRIVATE_REGISTRY/$IMAGE_NAME:$BCM_VERSION"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker image pull "$BASE_DOCKER_IMAGE"
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker build --build-arg BASE_IMAGE="$BASE_DOCKER_IMAGE" -t "$IMAGE_NAME" /root/manager/build/
+lxc exec "$BCM_MANAGER_HOST_NAME" -- docker push "$IMAGE_NAME"
 
 
 # let's cycle through the other cluster members (other than the master)
 # and get their bcm-manager host going.
 # shellcheck disable=SC1090
-source "$BCM_LXD_OPS/get_docker_swarm_tokens.sh"
-
+source "$BCM_GIT_DIR/project/tiers/get_docker_swarm_tokens.sh"
 
 ## TODO this probably doesn't work with multiple manager containers at the moment.
 # todo need to update daemon.json to populate with hostname of manager-01
-MASTER_NODE=$(bcm cluster list endpoints | grep '01')
+MASTER_NODE=$(echo "$CLUSTER_ENDPOINTS" | grep '01')
 HOSTNAME=
-for ENDPOINT in $(bcm cluster list endpoints); do
+for ENDPOINT in $CLUSTER_ENDPOINTS; do
     if [[ $ENDPOINT != "$MASTER_NODE" ]]; then
         HOST_ENDING=$(echo "$ENDPOINT" | tail -c 2)
         HOSTNAME="bcm-manager-$(printf %02d "$HOST_ENDING")"
@@ -150,13 +134,13 @@ for ENDPOINT in $(bcm cluster list endpoints); do
             
             lxc start "$HOSTNAME"
             
-            bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$HOSTNAME"
+            bash -c "$BCM_LXD_OPS/wait_for_dockerd.sh --container-name=$HOSTNAME"
             
             # make sure manager and kafka hosts can reach the swarm master.
             # this steps helps resolve networking before we issue any meaningful
             # commands.
             lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 -q "$BCM_MANAGER_HOST_NAME":2377
-            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 -q "$BCM_MANAGER_HOST_NAME":5000
+            lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 -q "$BCM_MANAGER_HOST_NAME:$BCM_REGISTRY_MIRROR_PORT"
             lxc exec "$LXC_HOSTNAME" -- wait-for-it -t 10 "$BCM_PRIVATE_REGISTRY"
             
             if [[ $HOST_ENDING -le 3 ]]; then
@@ -170,7 +154,7 @@ for ENDPOINT in $(bcm cluster list endpoints); do
             # another registry mirror and private registry in case node1 goes offline.
             # We will only have 2 locations for docker image distribution.
             if [[ $HOST_ENDING == 2 ]]; then
-                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:latest" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-manager-01:5000" docker stack deploy -c "/root/manager/stacks/registry/regmirror.yml" regmirror2
+                lxc exec "$LXC_HOSTNAME" -- env DOCKER_IMAGE="$BCM_PRIVATE_REGISTRY/bcm-registry:$BCM_VERSION" TARGET_PORT=5001 TARGET_HOST="$HOSTNAME" REGISTRY_PROXY_REMOTEURL="http://bcm-manager-01:$BCM_REGISTRY_MIRROR_PORT" docker stack deploy -c "/root/manager/stacks/registry/regmirror.yml" regmirror2
             fi
         fi
     fi

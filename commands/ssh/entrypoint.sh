@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
-if [ ! -z "${VALUE}" ]; then
+if [ -n "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     echo "Please provide a ssh command."
@@ -12,31 +12,21 @@ else
     exit
 fi
 
-SSH_USERNAME=
-SSH_HOSTNAME=
-SSH_PUSH=0
 SSH_KEY_PATH=
-ENDPOINT_DIR=
 ONION_ADDRESS=
 AUTH_TOKEN=
 TITLE=
+BCM_COMMAND=
+BCM_EXECUTE_FLAG=0
 
 for i in "$@"; do
     case $i in
-        --hostname=*)
-            SSH_HOSTNAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --username=*)
-            SSH_USERNAME="${i#*=}"
-            shift # past argument=value
-        ;;
-        --endpoint-dir=*)
-            ENDPOINT_DIR="${i#*=}"
-            shift # past argument=value
-        ;;
         --ssh-key-path=*)
             SSH_KEY_PATH="${i#*=}"
+            shift # past argument=value
+        ;;
+        --command=*)
+            BCM_COMMAND="${i#*=}"
             shift # past argument=value
         ;;
         --onion=*)
@@ -51,9 +41,9 @@ for i in "$@"; do
             TITLE="${i#*=}"
             shift # past argument=value
         ;;
-        --push)
-            SSH_PUSH=1
-            shift # past argument=value
+        --execute)
+            BCM_EXECUTE_FLAG=1
+            shift
         ;;
         *)
             # unknown option
@@ -61,23 +51,18 @@ for i in "$@"; do
     esac
 done
 
-if [[ ! -d "$BCM_SSH_DIR" ]]; then
-    mkdir "$BCM_SSH_DIR"
-fi
-
 if [[ ! -f "$BCM_KNOWN_HOSTS_FILE" ]]; then
     touch "$BCM_KNOWN_HOSTS_FILE"
 fi
-
 
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./help.txt
     exit
 fi
 
+KEY_NAME="bcm_trezor_$BCM_SSH_HOSTNAME"".pub"
+TREZOR_PUB_KEY_PATH="$SSHHOME/$KEY_NAME"
 if [[ $BCM_CLI_VERB == "newkey" ]]; then
-    
-    
     # shellcheck disable=SC1090
     source "$BCM_GIT_DIR/controller/export_usb_path.sh"
     if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
@@ -90,67 +75,77 @@ if [[ $BCM_CLI_VERB == "newkey" ]]; then
         exit
     fi
     
-    KEY_NAME="id_rsa_trezor.pub"
-    TREZOR_PUB_KEY_PATH="$ENDPOINT_DIR/$KEY_NAME"
-    
     docker run -t --rm \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$ENDPOINT_DIR":/home/user/.ssh \
-    -e SSH_USERNAME="$SSH_USERNAME" \
-    -e SSH_HOSTNAME="$SSH_HOSTNAME" \
+    -v "$SSHHOME":/home/user/.ssh \
+    -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
+    -e BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME" \
     -e KEY_NAME="$KEY_NAME" \
     --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME > /home/user/.ssh/$KEY_NAME"
+    "bcm-trezor:$BCM_VERSION" bash -c "trezor-agent $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME > /home/user/.ssh/$KEY_NAME"
     
     if [[ ! -f "$TREZOR_PUB_KEY_PATH" ]]; then
         echo "Error: SSH Key did not generate successfully!"
         exit
     fi
     
-    #echo "Congratulations! Your new SSH public key can be found at '$TREZOR_PUB_KEY_PATH'"
+    chmod 0400 "$TREZOR_PUB_KEY_PATH"
     
-    # We'll stop here unless instructed to push the new key.
-    if [[ $SSH_PUSH != 1 ]]; then
-        exit
+    echo "INFO! Your new Trezor-backed SSH public key for host '$BCM_SSH_HOSTNAME' can be found at '$TREZOR_PUB_KEY_PATH'"
+fi
+
+# shellcheck disable=SC1090
+source "$BCM_GIT_DIR/controller/export_usb_path.sh"
+if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
+    echo "Could not determine Trezor USB PATH."
+    exit
+fi
+IP_ADDRESS=$(dig +short "$BCM_SSH_HOSTNAME" | head -n 1)
+
+# this command pushes a Trezor public SSH key to an existing SSH host which is AUTHENTICATED using an external SSH keypair.
+# the existing keypair will be removed from the remote node such that ONLY trezor can authenticate you to the endpoint.
+if [[ $BCM_CLI_VERB == "provision" ]]; then
+    
+    # let's add the remote hosts fingerprint to known hosts so we don't get interactive input.
+    ssh-keyscan -H "$BCM_SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
+    if [[ ! -f $TREZOR_PUB_KEY_PATH ]]; then
+        # generate a new SSH key for the remote hostname.
+        bash -c "$BCM_COMMAND_DIR/ssh newkey --hostname=$BCM_SSH_HOSTNAME --username=$BCM_SSH_USERNAME
+        < $TREZOR_PUB_KEY_PATH ssh -i $SSH_KEY_PATH $BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME cat > /home/\$(whoami)/.ssh/authorized_keys"
     fi
     
-    if [[ -f $SSH_KEY_PATH ]]; then
-        # push the trezor ssh pubkey to the destination.
-        ssh-copy-id -i "$SSH_KEY_PATH" -o UserKnownHostsFile="$BCM_KNOWN_HOSTS_FILE" "$SSH_USERNAME@$SSH_HOSTNAME"
-        
-        # remove the entry for the host in your BCM_KNOWN_HOSTS_FILE
-        ssh-keygen -f "$BCM_KNOWN_HOSTS_FILE" -R "$SSH_HOSTNAME"  >> /dev/null
-        
-        # new key is up there, now let's do a ssh-keyscan from our SDN controller
-        # so we won't get any annoying warnings about keys changing.
-        ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
-        
-        exit
-    fi
+    # place the public SSH key on the remote SSH endpoint.
+    echo "WARNING: You can ONLY use your Trezor now to log into the host '$SSH_HOSTNAME'."
+    ssh-keyscan -H "$SSH_HOSTNAME" >> "$BCM_KNOWN_HOSTS_FILE"
+    
+    # shellcheck disable=SC2016
+    docker run -it \
+    --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$SSHHOME":/home/user/.ssh \
+    --device="$BCM_TREZOR_USB_PATH" \
+    -e BCM_SSH_USERNAME="$BCM_SSH_USERNAME" \
+    -e BCM_SSH_HOSTNAME="$SSH_HOSTNAME" \
+    "bcm-trezor:$BCM_VERSION" trezor-agent -c "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- 'set -ex && export BCM_GIT_DIR="$HOME/bcm" BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine" && set -e && echo "BCM_GIT_DIR:  $BCM_GIT_DIR" && echo "BCM_GITHUB_REPO_URL: $BCM_GITHUB_REPO_URL" && echo "deb https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && echo "deb-src https://deb.torproject.org/torproject.org bionic main" | sudo tee -a /etc/apt/sources.list && curl https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | sudo gpg --import && gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add - && sudo apt-get update && sudo apt-get install -y tor curl wait-for-it git deb.torproject.org-keyring && wait-for-it -t 30 127.0.0.1:9050 && git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050 && mkdir -p "$BCM_GIT_DIR" && if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then git clone --quiet --single-branch --branch dev "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"; fi && cd "$BCM_GIT_DIR" && git fetch && git checkout dev && git pull && bash -c "./commands/install/endpoint_provision.sh" && exit'
 fi
 
 if [[ $BCM_CLI_VERB == "connect" ]]; then
-    
-    if [[ $BCM_HELP_FLAG == 1 ]]; then
-        cat ./connect/help.txt
-        exit
-    fi
-    # shellcheck disable=SC1090
-    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
-    if [[ -z "$BCM_TREZOR_USB_PATH" ]]; then
-        echo "Could not determine Trezor USB PATH."
-        exit
-    fi
-    
-    IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
+    docker system prune -f
+    docker run -it --add-host="$BCM_SSH_HOSTNAME:$IP_ADDRESS" \
     -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -e SSH_USERNAME="$SSH_USERNAME" \
-    -e SSH_HOSTNAME="$SSH_HOSTNAME" \
+    -v "$SSHHOME":/home/user/.ssh \
     --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" bash -c "trezor-agent $SSH_USERNAME@$SSH_HOSTNAME --connect --verbose"
-    
-    exit
+    "bcm-trezor:$BCM_VERSION" trezor-agent --connect "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME"
+fi
+
+if [[ $BCM_EXECUTE_FLAG == 1 ]]; then
+    docker system prune -f
+    docker run -it --add-host="$BCM_SSH_HOSTNAME:$IP_ADDRESS" \
+    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
+    -v "$SSHHOME":/home/user/.ssh \
+    -e BCM_COMMAND="$BCM_COMMAND" \
+    --device="$BCM_TREZOR_USB_PATH" \
+    "bcm-trezor:$BCM_VERSION" trezor-agent --connect "$BCM_SSH_USERNAME@$BCM_SSH_HOSTNAME" -- bcm "$@"
 fi
 
 
@@ -191,7 +186,6 @@ if [[ $BCM_CLI_VERB == "add-onion" ]]; then
     
     exit
 fi
-
 
 if [[ $BCM_CLI_VERB == "remove-onion" ]]; then
     if [[ $BCM_HELP_FLAG == 1 ]]; then
@@ -234,23 +228,20 @@ if [[ $BCM_CLI_VERB == "list-onion" ]]; then
 fi
 
 
-if [[ $BCM_CLI_VERB == "push-key" ]]; then
-    if [[ $BCM_HELP_FLAG == 1 ]]; then
-        cat ./push/help.txt
-        exit
-    fi
-    
-    # shellcheck disable=SC1090
-    source "$BCM_GIT_DIR/controller/export_usb_path.sh"
-    
-    IP_ADDRESS=$(dig +short "$SSH_HOSTNAME" | head -n 1)
-    docker run -it --rm --add-host="$SSH_HOSTNAME:$IP_ADDRESS" \
-    -v "$BCM_TREZOR_USB_PATH":"$BCM_TREZOR_USB_PATH" \
-    -v "$BCM_SSH_DIR":/home/user/.ssh \
-    -v "$GIT_REPO_DIR":/gitrepo \
-    -e GIT_CLIENT_USERNAME="$GIT_CLIENT_USERNAME" \
-    -e SSH_USERNAME="$SSH_USERNAME" \
-    -e SSH_HOSTNAME="$SSH_HOSTNAME" \
-    --device="$BCM_TREZOR_USB_PATH" \
-    "bcm-trezor:$BCM_VERSION" trezor-agent $SSH_USERNAME@$SSH_HOSTNAME -- service tor start && wait-for-it -t 10 127.0.0.1:9050 && git config --local http.proxy socks5://127.0.0.1:9050 && git config --local user.name "$GIT_CLIENT_USERNAME" && git push
-fi
+
+# this script grabs the onion site and adds it to your local /etc/tor/torrc
+
+# # now we wait for the service to start, then we grab the new onion site and token
+# # then we add it to our config using bcm ssh add-onion
+# DOCKER_CONTAINER_ID=$(lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker ps | grep toronion | awk '{print $1}')
+# if [[ -n $DOCKER_CONTAINER_ID ]]; then
+#     ONION_CREDENTIALS="$(lxc exec "$BCM_UNDERLAY_HOST_NAME" -- docker exec -t "$DOCKER_CONTAINER_ID" cat /var/lib/tor/bcmonion/hostname)"
+
+#     if [[ -n $ONION_CREDENTIALS ]]; then
+#         ONION_URL="$(echo "$ONION_CREDENTIALS" | awk '{print $1;}')"
+#         ONION_TOKEN="$(echo "$ONION_CREDENTIALS" | awk '{print $2;}')"
+#         bcm ssh add-onion --onion="$ONION_URL" --token="$ONION_TOKEN" --title="$(lxc remote get-default)"
+#     fi
+# else
+#     echo "WARNING: Docker container not found for 'toronion'. You may need to run 'bcm stack start toronion'."
+# fi

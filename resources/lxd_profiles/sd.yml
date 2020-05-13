@@ -1,0 +1,8 @@
+config: {}
+description: Profile with SD storage backend only.
+devices:
+  sd:
+    path: /root/sd
+    pool: bcm-sd
+    type: disk
+    source: test

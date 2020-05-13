@@ -3,33 +3,13 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# first, let's make sure we deploy our direct dependencies.
-if ! bcm tier list | grep -q "bitcoin$BCM_ACTIVE_CHAIN"; then
-    bash -c "$BCM_GIT_DIR/project/tiers/bitcoin/up.sh"
-fi
-
-# this brings up the onion site that exposes all our
-# services to users having the onion token.
-if ! bcm stack list | grep -q toronion; then
-    bcm stack start toronion
-fi
-
-# this is so services like bitcoind and lightningd, etc.
-# have a SOCKS5 proxy to TOR.
-if ! bcm stack list | grep -q torproxy; then
-    bcm stack start torproxy
-fi
-
+# shellcheck source=env.sh
 source ./env.sh
 
-# env.sh has some of our naming conventions for DOCKERVOL and HOSTNAMEs and such.
-# shellcheck source=../../project/shared/env.sh
-source "$BCM_GIT_DIR/project/shared/env.sh"
-
 # prepare the image.
-"$BCM_GIT_DIR/project/shared/docker_image_ops.sh" \
+"$BCM_LXD_OPS/docker_image_ops.sh" \
 --build-context="$(pwd)/build/" \
---container-name="$LXC_HOSTNAME" \
+--container-name="$BCM_BITCOIN_HOST_NAME" \
 --image-name="$IMAGE_NAME"
 
 # push the stack and build files
@@ -46,7 +26,7 @@ UPLOAD_BLOCKS=1
 UPLOAD_CHAINSTATE=0
 
 SRC_DIR="$HOME/.bitcoin"
-DEST_DIR="/var/lib/docker/volumes/bitcoind-$BCM_ACTIVE_CHAIN""_data/_data"
+DEST_DIR="/var/lib/docker/volumes/bitcoind-$BCM_ACTIVE_CHAIN""_blocks/_data"
 if [[ $BCM_ACTIVE_CHAIN == "testnet" ]]; then
     SRC_DIR="$HOME/.bitcoin/testnet3"
     DEST_DIR="$DEST_DIR/testnet3"
@@ -59,7 +39,7 @@ fi
 
 # let's make sure docker has the 'data' volume defined so we can do restore or preseed block/chainstate data
 NEW_INSTALL=0
-LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
+LXC_HOSTNAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-01"
 if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "$DOCKER_VOLUME_NAME"; then
     lxc exec "$LXC_HOSTNAME" -- docker volume create "$DOCKER_VOLUME_NAME"
     
@@ -86,11 +66,11 @@ fi
 # if an existing bcm backup exists, then we will restore THAT first. This helps
 # avoid IDB using your Internet connection. If there's no backup, we can try uploading blocks
 # manually if they're in ~/.bitcoin. If all else fails, we will do IDB over Internet.
-BACKUP_DIR="$BCM_CLUSTERS_DIR/$BCM_CLUSTER_NAME/backups/$STACK_NAME"
+
 INITIAL_BLOCK_DOWNLOAD=1
-if [[ -d $BACKUP_DIR ]]; then
+if [[ -d "$BCM_BACKUP_DIR" ]]; then
     if ! lxc exec "$LXC_HOSTNAME" -- docker volume list | grep -q "bitcoind-$BCM_ACTIVE_CHAIN""-data"; then
-        bcm restore bitcoind
+        bash -c "$BCM_LXD_OPS/backup_restore.sh --stack=bitcoind --lxc-host=$BCM_BITCOIN_HOST_NAME"
     fi
 else
     if [[ $NEW_INSTALL == 1 ]]; then

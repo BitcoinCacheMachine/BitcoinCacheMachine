@@ -32,7 +32,7 @@ sudo sed -i "/bcm-/d" /etc/hosts
 if [ -x "$(command -v multipass)" ]; then
     sudo snap remove multipass
 else
-    echo "Info: multipass was not installed."
+    echo "INFO: multipass was not installed."
 fi
 
 if [ -x "$(command -v lxc)" ]; then
@@ -40,11 +40,11 @@ if [ -x "$(command -v lxc)" ]; then
     
     sudo snap remove lxd
 else
-    echo "Info: lxd was not installed."
+    echo "INFO: lxd was not installed."
 fi
 
 if [ -x "$(command -v docker)" ]; then
     sudo snap remove docker
 else
-    echo "Info: docker was not installed."
+    echo "INFO: docker was not installed."
 fi

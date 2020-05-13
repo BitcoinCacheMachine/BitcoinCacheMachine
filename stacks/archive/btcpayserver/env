@@ -1,0 +1,5 @@
+export IMAGE_NAME="bcm-btcpayserver"
+export TIER_NAME="bitcoin"
+export STACK_NAME="btcpayserver"
+export SERVICE_NAME="btcpayserver"
+export SERVICE_PORT="49392"

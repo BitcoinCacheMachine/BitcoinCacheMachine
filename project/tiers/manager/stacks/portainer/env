@@ -1,6 +1,6 @@
-export DOCKERHUB_IMAGE="portainer/portainer:1.20.2"
+export DOCKER_HUB_IMAGE="portainer/portainer:1.22.1"
 export IMAGE_NAME="bcm-portainer"
-export BCM_TIER_NAME="manager"
+export TIER_NAME="manager"
 export STACK_NAME="portainer"
 export SERVICE_NAME="portainer"
 export BCM_SERVICE_PORT=3010

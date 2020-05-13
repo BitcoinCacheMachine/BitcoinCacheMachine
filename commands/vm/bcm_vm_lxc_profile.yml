@@ -1,0 +1,71 @@
+config:
+  limits.cpu: "4"
+  limits.memory: "4096MB"
+  user.vendor-data: |
+    #cloud-config
+    apt_mirror: http://us.archive.ubuntu.com/ubuntu/
+    package_update: true
+    #package_upgrade: true
+    #package_reboot_if_required: true
+    packages:
+      - openssh-server
+      - avahi-daemon
+      - aptdaemon
+      - rsync
+      - htop
+    users:
+      - name: ubuntu
+        groups: lxd
+        shell: /bin/bash
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        ssh_authorized_keys:
+          - $SSH_AUTHORIZED_KEY
+    write_files:
+      - path: /etc/ssh/ssh_config
+        content: |
+              Port 22
+              ListenAddress 0.0.0.0
+              Protocol 2
+              PermitRootLogin no
+              ChallengeResponseAuthentication no
+              PasswordAuthentication no
+              UsePAM no
+              AllowUsers ubuntu
+              PubkeyAuthentication yes
+              #X11Forwarding yes
+              #X11DisplayOffset 10
+              #PrintMotd no
+              #PrintLastLog yes
+              #TCPKeepAlive yes
+              #AcceptEnv LANG LC_*
+              #Subsystem sftp /usr/lib/openssh/sftp-server
+              #HostKey /etc/ssh/ssh_host_rsa_key
+              #HostKey /etc/ssh/ssh_host_dsa_key
+              #HostKey /etc/ssh/ssh_host_ecdsa_key
+              #HostKey /etc/ssh/ssh_host_ed25519_key
+              #UsePrivilegeSeparation yes
+              #KeyRegenerationInterval 3600
+              #ServerKeyBits 1024
+              #SyslogFacility AUTH
+              #LogLevel INFO
+              #LoginGraceTime 120
+              #StrictModes yes
+              #RSAAuthentication yes
+              #IgnoreRhosts yes
+              #RhostsRSAAuthentication no
+              #HostbasedAuthentication no
+              #PermitEmptyPasswords no
+description: Default BCM profile.
+devices:
+  config:
+    source: cloud-init:config
+    type: disk
+  eth0:
+    name: eth0
+    nictype: macvlan
+    parent: $BCM_MACVLAN_INTERFACE
+    type: nic
+name: bcmvm
+used_by: []
+
+#    source: bcm-hdd

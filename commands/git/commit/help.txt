@@ -6,5 +6,11 @@ Usage:
   bcm git commit --message="Git commit message."
 
 Parameters:
-  --message   The required message to be included in the git commit.
- 
+  --message=       The required message to be included in the git commit.
+  --git-repo-dir=  Set the PATH of the repo to be committed.
+
+  --branch-name=   Commit staged changes to a specific branch.
+
+Flags:
+  --stage         Automatically stage all outstanding edits.
+  --push          Automatically push the commit to origin.

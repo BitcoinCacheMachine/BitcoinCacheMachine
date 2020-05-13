@@ -20,7 +20,7 @@ echo "Waiting for dockerd on LXC host '$LXC_HOST'."
 
 if lxc list --format csv -c=n | grep -q "$LXC_HOST"; then
     while true; do
-        if lxc info $LXC_HOST | grep -q docker0; then
+        if lxc info "$LXC_HOST" | grep -q docker0; then
             echo "dockerd on LXC host '$LXC_HOST' is running."
             break
         else

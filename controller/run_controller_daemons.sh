@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 # bootstrap related data, e.g., LXC images, docker base images, etc; things that would
 # benefit from IPFS integration.
 
-docker pull ipfs/go-ipfs
+docker image pull ipfs/go-ipfs
 
 if docker ps | grep -q ipfs_host; then
     docker kill ipfs_host

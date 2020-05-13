@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# uncomment the following lines and values to override defaults.
+# your active environment is shown with 'bcm info'
+export BCM_ACTIVE_CHAIN="mainnet"
+export BCM_DEBUG="0"
+BCM_GIT_DIR="$(pwd)"
+export BCM_GIT_DIR="$BCM_GIT_DIR"
+
+#export BCM_SSH_HOSTNAME="$(hostname)"
+#export BCM_SSH_USERNAME="$(whoami)"
+#export BCM_DATACENTER="default"
+#export GNUPGHOME="$HOME/.gnupg"
+
+export SSHHOME="$HOME/.ssh"
+
+BCM_MACVLAN_INTERFACE=${BCM_MACVLAN_INTERFACE:-"$(ip route | grep default | sed -n '1p' | cut -d ' ' -f 5)"}
+if [[ -n $BCM_MACVLAN_INTERFACE ]]; then
+    BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
+fi
+export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
+
+BCM_VM_NAME=${BCM_VM_NAME:-"bcm-$(whoami)-vm"}
+if [[ -n $BCM_VM_NAME ]]; then
+    BCM_VM_NAME="$BCM_VM_NAME"
+fi
+export BCM_VM_NAME="$BCM_VM_NAME"
+
+
+PASSWDHOME="$HOME/.password-store" && mkdir -p "$PASSWDHOME"
+export PASSWDHOME="$PASSWDHOME"

@@ -2,7 +2,7 @@
 
 1. Ensure ALL management is SSH based for remote machines, either via local network/direct SSH, or via TOR hidden service. Similarly, all LXD operation will be local on the target device and use the local unix socket. That is, if deploying locally, the local LXD unix socket will be used. If SSHed into a remote machine (ssh or SSHoTor), the local unix socket on the remote machine will be used. This results in better performance and simplifies the management plane.
 
-9. Back $BCM_RUNTIME_DIR as a mounted loop device with a LUKS partition, the password of which is stored in the $HOME/.password_store protected by the GPG certificate in $HOME/.gnupg/trezor
+9. Back $BCM_RUNTIME_DIR as a mounted loop device with a LUKS partition, the password of which is stored in the $HOME/.password-store protected by the GPG certificate in $GNUPGHOME
 
 2. Wire up Kafka logging for the LXD system containers. The Kafka stack is in place, but downstream LXD system containers (docker engines) are not configured to log to the kafka stack. A mechanism (logging_facility) will be implemented that switches the current logging between LXD (for development) and the kafka stack.
 

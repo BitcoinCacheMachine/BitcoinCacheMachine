@@ -9,9 +9,7 @@ The BCM CLI can provision a cluster running on your localhost. This cluster can 
 
 If your localhost (e.g., SDN Controller) supports hardware virtualization and you choose to deploy a `vm`, [multipass](https://github.com/CanonicalLtd/multipass) will be installed locally and BCM data-center components will be deployed to that. If your hardware doesn't support virtualization, BCM can still be installed using directly to your Ubuntu OS. VM is a good choice if you're just testing or developing BCM applications. You won't achieve any kind of local HA when deploying BCM in VMs (since the VMs run on the same hardware), however. For that, you MUST install BCM to the native OS via 'local' or 'ssh' deployment methods. Since 'local' and 'ssh' avoid hardware virtualization, they are generally more performant.
 
-The only assumptions that BCM makes is that each machine is running a fresh installation of Ubuntu 18.04 (Desktop or Server) and has SSH exposed on port 22 (for remote machines). Each remote machine you provision MUST be DNS-resolvable by your SDN controller, or be accessible as a TOR (v3) onion service for the management plane (i.e., SSH, LXD). The [server prep script](./server_prep.sh) helps you prepare a new server so you can remotely access it using TOR.
-
-Clusters are created and destroyed using the `bcm cluster create` and `bcm cluster destroy` commands, respectively. Add the `--help` flag to determine how best to use `bcm cluster` commands. Most users won't need to use these commands directly as they are automatically invoked when users start user-facing application using `bcm stack start` commands.
+The only assumptions that BCM makes is that each machine is running a fresh installation of Ubuntu (Desktop or Server) and has SSH exposed on port 22 (for remote machines). Each remote machine you provision MUST be DNS-resolvable by your SDN controller, or be accessible as a TOR (v3) onion service for the management plane (i.e., SSH, LXD). The [server prep script](./server_prep.sh) helps you prepare a new server so you can remotely access it using TOR.
 
 ## BCM Deployment Mode
 
@@ -27,7 +25,7 @@ Cluster mode is when you run BCM data center workloads on more than one LXD inst
 
 # How to prepare a physical server for BCM workloads
 
-If you want to run BCM on one or more dedicated server machines (e.g., an old NUC on your home network), you must first prepare it. It is recommended that you install a fresh copy of Ubuntu 18.04 Server on these machines using the instructions below. You will need Ubuntu 18.04 Server [installed on a USB thumb drive](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-ubuntu#0). Ensure the drive is first plugged into the computer. Also ensure the computer is plugged into a functional network.
+If you want to run BCM on one or more dedicated server machines (e.g., an old NUC on your home network), you must first prepare it. It is recommended that you install a fresh copy of Ubuntu Server on these machines using the instructions below. You will need Ubuntu Server [installed on a USB thumb drive](https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-ubuntu#0). Ensure the drive is first plugged into the computer. Also ensure the computer is plugged into a functional network.
 
 1. Boot to the USB medium. You may have to enter the BIOS to select a boot device, or press an F-key (e.g., F2, F8, F11) at boot to ensure the device boots from the USB thumb drive.
 2. Press enter to accept the defaults regarding keyboard layout (US English).

@@ -50,11 +50,6 @@ if [[ -z $VM_NAME ]]; then
     exit
 fi
 
-if multipass list | grep -q "$VM_NAME"; then
-    echo "bcm cluster destroy --cluster-name=$VM_NAME"
-    exit
-fi
-
 if [[ -f "$ENDPOINT_DIR/id_rsa" ]]; then
     SSH_KEY_PATH="$ENDPOINT_DIR/id_rsa"
 else
@@ -70,18 +65,16 @@ echo "MEM_SIZE: $MEM_SIZE"
 echo "CPU_COUNT: $CPU_COUNT"
 
 # we need to update the cloud-init to include the bcm user and it's associated SSH key.
-# we'll create a temporary one here. It'll get purged AFTER the `bcm cluster create` process
-# when the Trezor SSH keys are placed up there.
+# we'll create a temporary one here. 
 
 # generate the custom cloud-init file.
 SSH_AUTHORIZED_KEY=$(<"$SSH_KEY_PATH.pub")
 export SSH_AUTHORIZED_KEY="$SSH_AUTHORIZED_KEY"
-mkdir -p /tmp/bcm
-envsubst <./cloud_init_template.yml >"/tmp/bcm/cloud-init.yml"
+envsubst <./cloud_init_template.yml >"$BCM_TMP_DIR/cloud-init.yml"
 
 # launch the new VM with the custom cloud-init.
-multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "/tmp/bcm/cloud-init.yml" bionic
-rm /tmp/bcm/cloud-init.yml
+multipass launch --disk="$DISK_SIZE""GB" --mem="$MEM_SIZE" --cpus="$CPU_COUNT" --name="$VM_NAME" --cloud-init "$BCM_TMP_DIR/cloud-init.yml" bionic
+rm "$BCM_TMP_DIR/cloud-init.yml"
 
 multipass copy-files ./server_prep.sh "$VM_NAME:/home/multipass/server_prep.sh"
 
@@ -90,7 +83,7 @@ multipass exec "$VM_NAME"  -- bash -c /home/multipass/server_prep.sh
 
 # let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.
 MGMT_PLANE_ONION_ADDRESS="$(multipass exec "$VM_NAME" -- sudo cat /var/lib/tor/ssh/hostname)"
-if [[ ! -z $MGMT_PLANE_ONION_ADDRESS ]]; then
+if [[ -n $MGMT_PLANE_ONION_ADDRESS ]]; then
     touch "$ENDPOINT_DIR/mgmt-onion.env"
     {
         echo "#!/bin/bash"
@@ -101,7 +94,7 @@ fi
 multipass restart "$VM_NAME"
 
 IPV4_ADDRESS=$(multipass list --format csv | grep $VM_NAME | awk -F "\"*,\"*" '{print $3}')
-if [[ ! -z $IPV4_ADDRESS && ! -z $VM_NAME ]]; then
+if [[ -n "$IPV4_ADDRESS" && -n "$VM_NAME" ]]; then
     echo "$IPV4_ADDRESS    $VM_NAME" | sudo tee -a /etc/hosts
 fi
 

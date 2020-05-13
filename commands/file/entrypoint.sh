@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE=${2:-}
-if [ ! -z "${VALUE}" ]; then
+if [ -n "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     echo "Please provide a SSH command."
@@ -53,21 +53,8 @@ if [[ ! -d "$OUTPUT_DIR" ]]; then
     exit
 fi
 
-if [[ ! -d "$GNUPGHOME" ]]; then
-    echo "Error: $GNUPGHOME doesn't exist. Exiting."
-    exit
-fi
-
-if [[ ! -f "$GNUPGHOME/env" ]]; then
-    echo "Error: $GNUPGHOME/env does not exist. '$INPUT_FILE_NAME' cannot be encrypted."
-    exit
-fi
-
 INPUT_DIR=$(dirname $INPUT_FILE_PATH)
 INPUT_FILE_NAME=$(basename $INPUT_FILE_PATH)
-
-# shellcheck disable=SC1090
-source "$GNUPGHOME/env"
 
 if [[ $BCM_CLI_VERB == "encrypt" ]]; then
     # start the container / trezor-gpg-agent

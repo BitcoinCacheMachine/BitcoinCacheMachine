@@ -1,5 +1,5 @@
 {
-    "registry-mirrors": ["http://cachestack.lxd:5000"],
+    "registry-mirrors": ["http://cachestack.lxd:$BCM_REGISTRY_MIRROR_PORT"],
     "insecure-registries": [ "http://cachestack.lxd" ],
     "labels": [
         "purpose=bitcoin"

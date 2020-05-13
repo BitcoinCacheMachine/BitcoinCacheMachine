@@ -1,12 +1,12 @@
 {
     "storage-driver": "btrfs",
     "registry-mirrors": [
-        "http://$BCM_MANAGER_HOST_NAME:5000"
+        "http://$BCM_MANAGER_HOST_NAME:$BCM_REGISTRY_MIRROR_PORT"
     ],
     "insecure-registries": [
-        "$BCM_MANAGER_HOST_NAME:5010"
+        "$BCM_MANAGER_HOST_NAME:$BCM_PRIVATE_REGISTRY_PORT"
     ],
     "labels": [
-        "bcm-bitcoin$BCM_ACTIVE_CHAIN=true"
+        "bcm-bitcoin-$BCM_ACTIVE_CHAIN=true"
     ]
 }

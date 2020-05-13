@@ -4,7 +4,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 VALUE="${2:-}"
-if [ ! -z "${VALUE}" ]; then
+if [ -n "${VALUE}" ]; then
     BCM_CLI_VERB="$2"
 else
     echo "Please provide a 'controller' command."
@@ -23,8 +23,6 @@ fi
 if [[ $BCM_CLI_VERB == "reset" ]]; then
     bcm controller destroy
     bcm controller build
-    elif [[ $BCM_CLI_VERB == "destroy" ]]; then
-    bash -c "$BCM_GIT_DIR/controller/destroy.sh"
     elif [[ $BCM_CLI_VERB == "build" ]]; then
-    bash -c "$BCM_GIT_DIR/controller/build.sh"
+    ./build.sh
 fi

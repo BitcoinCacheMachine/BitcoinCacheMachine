@@ -30,7 +30,7 @@ if lxc list --format csv | grep "RUNNING" | grep -q "$BCM_MANAGER_HOST_NAME"; th
     RESULT="$(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker node ls --format '{{.ID}},{{.Hostname}}' | grep "$NODE_NAME" | cut -d: -f1)"
     NODE_ID="$(echo "$RESULT" | grep "$NODE_NAME" )"
     
-    if [[ ! -z $NODE_ID ]]; then
+    if [[ -n "$NODE_ID" ]]; then
         # we would only perform this step if we're not removing the last node.
         if ! echo "$RESULT" | grep -q "$BCM_MANAGER_HOST_NAME"; then
             lxc exec "$BCM_MANAGER_HOST_NAME" -- docker node remove "$NODE_ID" --force

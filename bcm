@@ -1,24 +1,34 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+# note the absense of -u allows you to use environment variables from the parent shell
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-export BCM_GIT_DIR="$(pwd)"
-export BCM_LXD_OPS="$BCM_GIT_DIR/project/shared"
-export BCM_MAJOR_VERSION="0"
-export BCM_MINOR_VERSION="0"
-export BCM_PATCH_VERSION="1"
-export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION"
-export BCM_DOCKER_BASE_TAG="18.10"
-export BCM_RUNTIME_DIR="$HOME/.bcm" && mkdir -p "$BCM_RUNTIME_DIR"
+# if this is 1, then we assume we are running BCM WITHOUT the front-end (e.g., dockerd on bare metal)
+IS_FRONTEND=1
 BCM_HELP_FLAG=0
-export BCM_DATACENTER="default"
-export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
+REBUILD_IMAGES=0
+
+# when 0, we assume we are targeting SSH connections to remote BCM_SSH_HOSTNAME instead of executing locally.
+DEPLOY_LOCALHOST=0
+
+# make snap commands available to the script.
+PATH="$PATH:/snap/bin"
+export PATH="$PATH"
 
 for i in "$@"; do
     case $i in
         --help)
             BCM_HELP_FLAG=1
+        ;;
+        --backend-only)
+            IS_FRONTEND=0
+        ;;
+        --rebuild)
+            REBUILD_IMAGES=1
+        ;;
+        --localhost)
+            DEPLOY_LOCALHOST=1
         ;;
         *)
             # unknown option
@@ -26,92 +36,143 @@ for i in "$@"; do
     esac
 done
 
-export BCM_HELP_FLAG="$BCM_HELP_FLAG"
-
-# commands in ~/.bashrc are delimited by these literals.
-BASHRC_FILE="$HOME/.bashrc"
-if [[ ! -f $BASHRC_FILE ]]; then
-    touch "$BASHRC_FILE"
-    sudo chmod 0644 "$BASHRC_FILE"
+# make sure LXD is installed before we even think of continuing
+if [[ ! -f "$(command -v lxc)" ]]; then
+    echo "ERROR: LXD does not seem to be installed. Please run the BCM installer script."
+    exit
 fi
 
-BASHRC_TEXT="export PATH=$""PATH:""$(pwd)"
-source "$BASHRC_FILE"
-if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
-    echo "$BASHRC_TEXT" >>"$BASHRC_FILE"
+if lxc info | grep -q "server_clustered: false"; then
+echo "ERROR: The LXD server does not appear to be in the correct state. Please re-run the BCM installer."
+exit
 fi
 
-export BCM_ACTIVE_CHAIN="testnet"
-export BCM_SSH_DIR="$HOME/.ssh" && mkdir -p "$BCM_SSH_DIR"
 
-export ELECTRUM_DIR="$BCM_RUNTIME_DIR/electrum" && mkdir -p "$ELECTRUM_DIR"
-export BCM_CLUSTERS_DIR="$BCM_RUNTIME_DIR/clusters" && mkdir -p "$BCM_CLUSTERS_DIR"
-export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
-export BCM_DEBUG=1
+source ./env
+source "$HOME/.bashrc"
 
-GNUPGHOME="$HOME/.gnupg"
-PASSWORD_STORE_DIR="$HOME/.password_store" && mkdir -p "$PASSWORD_STORE_DIR"
+if [[ $BCM_HELP_FLAG == 1 ]]; then
+    cat ./commands/help.txt
+    exit
+fi
 
+BCM_DEBUG=${BCM_DEBUG:-0}
+export BCM_DEBUG="$BCM_DEBUG"
+export REBUILD_IMAGES="$REBUILD_IMAGES"
+
+BCM_CACHE_DIR=${BCM_CACHE_DIR:-"$HOME/.local/bcm"}
+if [[ -n $BCM_CACHE_DIR ]]; then
+    BCM_CACHE_DIR="$BCM_CACHE_DIR"
+fi
+export BCM_CACHE_DIR="$BCM_CACHE_DIR"
+
+if [[ -z $ ]]; then
+    echo "ERROR: BCM_CACHE_DIR IS not defined. Please set your environment."
+    exit
+fi
+
+BCM_SSH_HOSTNAME=${BCM_SSH_HOSTNAME:-"$(hostname)"}
+if [[ -n $BCM_SSH_HOSTNAME ]]; then
+    BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
+fi
+export BCM_SSH_HOSTNAME="$BCM_SSH_HOSTNAME"
+
+BCM_SSH_USERNAME=${BCM_SSH_USERNAME:-"$(whoami)"}
+if [[ -n $BCM_SSH_USERNAME ]]; then
+    BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
+fi
+export BCM_SSH_USERNAME="$BCM_SSH_USERNAME"
+
+BCM_ACTIVE_CHAIN=${BCM_ACTIVE_CHAIN:-"testnet"}
+if [[ -n $BCM_ACTIVE_CHAIN ]]; then
+    BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN"
+fi
+export BCM_ACTIVE_CHAIN="$BCM_ACTIVE_CHAIN"
+
+GNUPGHOME=${GNUPGHOME:-"$HOME/.gnupg"}
+if [[ -n $GNUPGHOME ]]; then
+    GNUPGHOME="$GNUPGHOME"
+fi
 export GNUPGHOME="$GNUPGHOME"
-export PASSWORD_STORE_DIR="$PASSWORD_STORE_DIR"
-export ELECTRUM_DIR="$ELECTRUM_DIR"
+
+BCM_DATACENTER=${BCM_DATACENTER:-"default"}
+if [[ -n $BCM_DATACENTER ]]; then
+    BCM_DATACENTER="$BCM_DATACENTER"
+fi
+export BCM_DATACENTER="$BCM_DATACENTER"
+
+export BCM_LXC_BASE_IMAGE="ubuntu/20.04"
+export BCM_MAJOR_VERSION="0"
+export BCM_MINOR_VERSION="0"
+export BCM_PATCH_VERSION="1"
+export BCM_VERSION_FLAG="beta"
+export BCM_VERSION="v$BCM_MAJOR_VERSION.$BCM_MINOR_VERSION.$BCM_PATCH_VERSION-$BCM_VERSION_FLAG"
+
+BCM_GIT_DIR="$(pwd)"
+export BCM_GIT_DIR="$BCM_GIT_DIR"
+export BCM_PROJECT_DIR="$BCM_GIT_DIR/project"
+export BCM_LXD_OPS="$BCM_PROJECT_DIR/shared"
+export BCM_COMMAND_DIR="$BCM_GIT_DIR/commands"
+
+# todo; convert this to a temp encrypted ramdisk that exists for the duration of each bcm call.
+BCM_HELP_FLAG=0
+
+export BCM_PROJECT="bcm-$BCM_DATACENTER""_""$BCM_VERSION"
+
+export BCM_HELP_FLAG="$BCM_HELP_FLAG"
+export IS_FRONTEND="$IS_FRONTEND"
+
+
+# switch to 'master' for formal versions.
+export BCM_DEFAULT_GIT_BRANCH="dev"
+mkdir -p "$SSHHOME"
+export BCM_STACKS_DIR="$BCM_GIT_DIR/stacks"
+export BASE_DOCKER_IMAGE="ubuntu:20.04"
+export BCM_TMP_DIR="/tmp/bcm" && mkdir -p "$BCM_TMP_DIR"
+
 export LXC_BCM_BASE_IMAGE_NAME="bcm-template"
 
 BCM_MANAGER_HOST_NAME="bcm-manager-01"
 BCM_KAFKA_HOST_NAME="bcm-kafka-01"
 BCM_UNDERLAY_HOST_NAME="bcm-underlay-01"
-BCM_BITCOIN_HOST_NAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
+BCM_BITCOIN_HOST_NAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-01"
 
 export BCM_MANAGER_HOST_NAME="$BCM_MANAGER_HOST_NAME"
 export BCM_KAFKA_HOST_NAME="$BCM_KAFKA_HOST_NAME"
 export BCM_UNDERLAY_HOST_NAME="$BCM_UNDERLAY_HOST_NAME"
 export BCM_BITCOIN_HOST_NAME="$BCM_BITCOIN_HOST_NAME"
+export BCM_GITHUB_REPO_URL="https://github.com/BitcoinCacheMachine/BitcoinCacheMachine"
 
-export BCM_PRIVATE_REGISTRY="$BCM_MANAGER_HOST_NAME:5010"
-export BCM_KNOWN_HOSTS_FILE="$BCM_SSH_DIR/known_hosts"
+export BCM_REGISTRY_MIRROR_PORT="5000"
+export BCM_PRIVATE_REGISTRY_PORT="5010"
+export BCM_PRIVATE_REGISTRY="$BCM_MANAGER_HOST_NAME:$BCM_PRIVATE_REGISTRY_PORT"
+export BCM_KNOWN_HOSTS_FILE="$SSHHOME/known_hosts"
 
 export BCM_DOCKER_IMAGE_CACHE_FQDN="registry-1.docker.io"
 export BCM_LXD_IMAGE_CACHE="images.linuxcontainers.org"
 
-# ensure the lxc and docker clients are installed.
-bash -c "$BCM_GIT_DIR/controller/install_lxc_client.sh"
-
-bash -c "$BCM_GIT_DIR/controller/install_docker_client.sh"
-
-# let's make sure the local git client is using TOR for git pull operations.
-# this should have been configured on a global level already when the user initially
-# downloaded BCM from github
-BCM_TOR_PROXY="socks5://localhost:9050"
-if [[ $(git config --get --local http.proxy) != "$BCM_TOR_PROXY" ]]; then
-    echo "Setting git client to use local SOCKS5 TOR proxy for push/pull operations."
-    git config --local http.proxy "$BCM_TOR_PROXY"
+OLD_GNUPGHOME="$GNUPGHOME"
+export GNUPGHOME="$GNUPGHOME/trezor"
+DEFAULT_KEY_ID=
+if [ -d "$GNUPGHOME" ]; then
+    DEFAULT_KEY_ID=$(gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
+    DEFAULT_KEY_ID="${DEFAULT_KEY_ID#*/}"
+    DEFAULT_KEY_ID="$(echo "$DEFAULT_KEY_ID" | awk '{print $1}')"
 fi
 
-# this section configured the local SSH client on the Controller
-# so it uses the local SOCKS5 proxy for any SSH host that has a
-# ".onion" address. We use SSH tunneling to expose the remote onion
-# server's LXD API and access it on the controller via a locally
-# expose port (after SSH tunneling)
-SSH_LOCAL_CONF="$HOME/.ssh/config"
-if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
-    # if the .ssh/config file doesn't exist, create it.
-    mkdir -p "$HOME/.ssh"
-    touch "$SSH_LOCAL_CONF"
-fi
+export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
+export GNUPGHOME="$OLD_GNUPGHOME"
 
-# Next, paste in the necessary .ssh/config settings for accessing
-# remote LXD servers over TOR hidden services. This will make any 'ssh' command
-# redirect all .onion hostnames to your localhost:9050 tor SOCKS5 proxy.
-if [[ -f "$SSH_LOCAL_CONF" ]]; then
-    SSH_ONION_TEXT="Host *.onion"
-    if ! grep -Fxq "$SSH_ONION_TEXT" "$SSH_LOCAL_CONF"; then
-        echo "Info (IMPORTANT): Updating your /etc/ssh/sshd_config file so it redirects all *.onion names out your local Tor proxy."
-        {
-            echo "$SSH_ONION_TEXT"
-            echo "    ProxyCommand nc -xlocalhost:9050 -X5 %h %p"
-        } >>"$SSH_LOCAL_CONF"
-    fi
-fi
+RUNNING_CONTAINERS="$(lxc list --format csv --columns ns | grep "RUNNING")" || true
+CLUSTER_ENDPOINTS="$(lxc cluster list --format csv | grep "$BCM_SSH_HOSTNAME" | awk -F"," '{print $1}')"
+CLUSTER_NODE_COUNT=$(echo "$CLUSTER_ENDPOINTS" | wc -l)
+export RUNNING_CONTAINERS="$RUNNING_CONTAINERS"
+export CLUSTER_NODE_COUNT="$CLUSTER_NODE_COUNT"
+export CLUSTER_ENDPOINTS="$CLUSTER_ENDPOINTS"
 
-# call the CLI entrypoint.
+# Install docker if we're running this command on a front-end
 ./commands/cli_entrypoint.sh "$@"
+
+
+#TODO
+#DEPLOY_LOCALHOST

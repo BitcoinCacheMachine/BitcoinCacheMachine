@@ -1,7 +1,7 @@
-export DOCKERHUB_IMAGE="confluentinc/cp-schema-registry:5.2.2"
+
+export DOCKER_HUB_IMAGE="confluentinc/cp-schema-registry:5.4.0"
 export IMAGE_NAME="bcm-kafka-schema-registry"
-export IMAGE_TAG="5.1.0"
-export BCM_TIER_NAME="kafka"
+export TIER_NAME="kafka"
 export STACK_NAME="kafkaschemareg"
 export SERVICE_NAME="schema-registry"
 export MAX_INSTANCES=2

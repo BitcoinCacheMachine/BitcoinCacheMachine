@@ -26,8 +26,6 @@ if [[ $BCM_CLI_VERB != "list" && $BCM_CLI_VERB != "start" && $BCM_CLI_VERB != "s
     exit
 fi
 
-BCM_BACKUP_DIR="$BCM_CLUSTER_DIR/$(lxc remote get-default)/backups"
-export BACKUP_DIR="$BCM_BACKUP_DIR"
 
 if [[ $BCM_CLI_VERB == "start" ]]; then
     STACK_NAME=
@@ -44,9 +42,10 @@ if [[ $BCM_CLI_VERB == "start" ]]; then
     if [[ -f "$UP_FILE" ]]; then
         BCM_BACKUP_DIR="$BCM_BACKUP_DIR" bash -c "$UP_FILE" "$@"
     else
-        echo "Error: BCM does not support this stack name."
+        echo "Error: BCM does not support stack '$STACK_NAME'. Check your spelling."
     fi
 fi
+
 
 if [[ $BCM_CLI_VERB == "stop" ]]; then
     validateStackParam "$BCM_CLI_VERB"
@@ -68,14 +67,16 @@ if [[ $BCM_CLI_VERB == "stop" ]]; then
             
             # if there are some volumes defined, then we ca remove each one.
             # however, some containers do not write persistent data.
-            if [ ! -z ${STACK_DOCKER_VOLUMES+x} ]; then
+            if [ -n "${STACK_DOCKER_VOLUMES+x}" ]; then
                 for DOCKER_VOLUME in $STACK_DOCKER_VOLUMES; do
                     LXC_HOSTNAME="$TIER_NAME"
-                    if [[ $TIER_NAME == bitcoin* ]]; then
-                        LXC_HOSTNAME="bcm-bitcoin$BCM_ACTIVE_CHAIN-01"
+                    
+                    CONTAINER_NAME="$LXC_HOSTNAME"
+                    if [[ $LXC_HOSTNAME == *"-bitcoin-"* ]]; then
+                        CONTAINER_NAME="bcm-bitcoin-$BCM_ACTIVE_CHAIN-$(printf %02d "$HOST_ENDING")"
                     fi
                     
-                    bash -c "$BCM_GIT_DIR/project/shared/delete_docker_volume.sh --lxc-hostname=$LXC_HOSTNAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
+                    bash -c "$BCM_LXD_OPS/delete_docker_volume.sh --lxc-hostname=$CONTAINER_NAME --stack-name=$STACK_NAME --volume-name=$DOCKER_VOLUME"
                 done
             fi
         else
@@ -83,29 +84,6 @@ if [[ $BCM_CLI_VERB == "stop" ]]; then
             exit
         fi
         
-    fi
-fi
-
-if [[ $BCM_CLI_VERB == "list" ]]; then
-    PREFIX="-$BCM_ACTIVE_CHAIN"
-    
-    
-    if ! lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME"; then
-        echo "Warning! '$BCM_MANAGER_HOST_NAME' does not exist. Considering running 'bcm stack start' command."
-        exit
-    fi
-    
-    if lxc list --format csv --columns n,s | grep -q "$BCM_MANAGER_HOST_NAME,STOPPED"; then
-        lxc start "$BCM_MANAGER_HOST_NAME"
-        bash -c "$BCM_GIT_DIR/project/shared/wait_for_dockerd.sh --container-name=$BCM_MANAGER_HOST_NAME"
-    fi
-    
-    if lxc list --format csv -c=n | grep -q "$BCM_MANAGER_HOST_NAME"; then
-        CHAIN=$BCM_ACTIVE_CHAIN
-        for STACK in $(lxc exec "$BCM_MANAGER_HOST_NAME" -- docker stack list --format '{{ .Name }}' | grep "$CHAIN"); do
-            STACK=${STACK%"$PREFIX"}
-            echo "$STACK"
-        done
     fi
 fi
 

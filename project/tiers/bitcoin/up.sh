@@ -3,16 +3,13 @@
 set -Eeuo pipefail
 cd "$(dirname "$0")"
 
-# don't even think about proceeding unless the manager BCM tier is up and running.
-if bcm tier list | grep -q "bitcoin$BCM_ACTIVE_CHAIN"; then
-    echo "The 'bitcoin$BCM_ACTIVE_CHAIN' tier is already provisioned."
-    exit
+# let's make sure the underlay tier exists before we deploy bitcoin
+if ! lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-underlay"; then
+    bash -c "$BCM_GIT_DIR/project/tiers/underlay/up.sh"
 fi
 
-# don't even think about proceeding unless the manager BCM tier is up and running.
-if ! bcm tier list | grep -q "underlay"; then
-    bcm tier create underlay
+# deploy the bitcoin tier if it doesn't already exist.
+if ! lxc list --format csv --columns ns | grep "RUNNING" | grep -q "bcm-bitcoin-$BCM_ACTIVE_CHAIN"; then
+    # Let's provision the system containers to the cluster.
+    ../create_tier.sh --tier-name="bitcoin-$BCM_ACTIVE_CHAIN"
 fi
-
-# Let's provision the system containers to the cluster.
-bash -c "$BCM_LXD_OPS/create_tier.sh --tier-name=bitcoin$BCM_ACTIVE_CHAIN"

@@ -1,0 +1,52 @@
+version: '3.7'
+services:
+  lightning-charge:
+    image: ${IMAGE_NAME}
+    networks:
+      bitcoindrpcnet:
+      clightningnet:
+      lightningchargenet:
+        aliases:
+          - lightningchargerpc-${BCM_ACTIVE_CHAIN:-}
+    volumes:
+      - lightning-charge-data:/opt/charged
+      - clightning-data:/etc/lightning
+      - bitcoin-data:/etc/bitcoin
+      - bitcoin-cli:/usr/local/bin
+    environment:
+      API_TOKEN: ${LIGHTNING_CHARGE_API_TOKEN:-CHANGEME}
+      LN_PATH: /etc/lightning
+      NETWORK: ${BCM_ACTIVE_CHAIN:-testnet}
+      LXC_HOSTNAME: ${LXC_HOSTNAME}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - engine.labels.bcm-bitcoin-${BCM_ACTIVE_CHAIN:-} == true
+
+volumes:
+  lightning-charge-data:
+  clightning-data:
+    external: true
+    name: clightning-${BCM_ACTIVE_CHAIN:-}_data
+
+  bitcoin-data:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_data
+
+  bitcoin-cli:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_cli
+
+networks:
+  lightningchargenet:
+    attachable: true
+
+  bitcoindrpcnet:
+    external: true
+    name: bitcoind-${BCM_ACTIVE_CHAIN:-}_bitcoindrpcnet
+
+  clightningnet:
+    external: true
+    name: clightning-${BCM_ACTIVE_CHAIN:-}_clightningrpcnet

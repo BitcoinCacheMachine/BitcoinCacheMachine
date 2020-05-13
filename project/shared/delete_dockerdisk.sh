@@ -32,7 +32,6 @@ if [[ -z $CLUSTER_ENDPOINT ]]; then
 fi
 
 VOLUME_NAME="$LXC_HOSTNAME-docker"
-
 if lxc storage volume list bcm --format csv | grep "$VOLUME_NAME" | grep -q "$CLUSTER_ENDPOINT"; then
     lxc storage volume delete bcm "$VOLUME_NAME" --target "$CLUSTER_ENDPOINT"
 fi
