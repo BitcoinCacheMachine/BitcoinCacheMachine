@@ -14,11 +14,11 @@ for i in "$@"; do
             shift
         ;;
         --cache)
-            DELETE_CACHE="${i#*=}"
+            DELETE_CACHE=1
             shift
         ;;
         --lxd)
-            UNINSTALL_LXD="${i#*=}"
+            UNINSTALL_LXD=1
             shift
         ;;
         *)
