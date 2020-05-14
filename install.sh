@@ -156,11 +156,14 @@ function createLoopDevice () {
     
     # TODO; probably require user prompt when doing this for tagged BCMs.
     # let's wipe any existing filesystems
+    if cat /proc/mounts | grep -a "$LOOP_DEVICE"; then
+        umount "$LOOP_DEVICE"
+    fi
     wipefs -a "$LOOP_DEVICE"
     
     # if the storage pool doesn't exist, we create it.
     if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
-
+        
         # if the loop device exists, let's pull it into LXC as a loop device backed storage pool formatted with BTRFS
         if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
             LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
