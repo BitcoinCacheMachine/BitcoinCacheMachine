@@ -3,14 +3,39 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
+SD_PATH="/home/$SUDO_USER"
+HDD_PATH="/home/$SUDO_USER"
+SSD_PATH="/home/$SUDO_USER"
+
+for i in "$@"; do
+    case $i in
+        --ssd-path=*)
+            SSD_PATH="${i#*=}"
+            shift # past argument=value
+        ;;
+        --sd-path=*)
+            SD_PATH="${i#*=}"
+            shift # past argument=value
+        ;;
+        --hdd-path=*)
+            HDD_PATH="${i#*=}"
+            shift # past argument=value
+        ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
+
 # first, let's check to ensure the Administrator has done their job with respect to storage
-if [[ ! -d /hdd ]]; then
-    echo "ERROR: The '/hdd' directory does not exist. Please read the BCM preparation instructions before running this script."
+if [[ ! -d "$HDD_PATH" ]]; then
+    echo "ERROR: The '$HDD_PATH' directory does not exist. Please read the BCM preparation instructions before running this script."
     exit
 fi
 
-if [[ ! -d /sd ]]; then
-    echo "ERROR: The '/sd' directory does not exist. Please read the BCM preparation instructions before running this script."
+if [[ ! -d "$SD_PATH" ]]; then
+    echo "ERROR: The '$SD_PATH' directory does not exist. Please read the BCM preparation instructions before running this script."
     exit
 fi
 
@@ -96,7 +121,9 @@ fi
 # at /sd /ssd and /hdd. The ADMINISTRATOR MUST mount these directories BEFORE running this
 # install script.
 function createLoopDevice () {
-    IMAGE_PATH="$1/bcm-$2.img"
+    LOOP_DEVICE_PATH="$1"
+    STORAGE_POOL="$2"
+    IMAGE_PATH="$LOOP_DEVICE_PATH/bcm-$STORAGE_POOL.img"
     
     # let's first check to see if the loop device already exists.
     LOOP_DEVICE=
@@ -109,43 +136,35 @@ function createLoopDevice () {
         losetup -d "$LOOP_DEVICE"
         losetup -D
     fi
-
+    
     # if the loop file doesn't exist, create it.
     if [ ! -f "$IMAGE_PATH" ]; then
         touch "$IMAGE_PATH"
     fi
-
+    
     truncate -s +"$3" "$IMAGE_PATH"
     # create the actual file that's backing the loop device
     #dd if=/dev/zero of="$IMAGE_PATH" bs="$3" count="$4"
     
     # next, create the loop device
     losetup -fP "$IMAGE_PATH"
-
+    
     # get the new loop device, then remove any existing filesystem entries with wipefs.
     if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
         LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep "$IMAGE_PATH" | head -n1 | cut -d " " -f1)"
     fi
-
+    
+    # TODO; probably require user prompt when doing this for tagged BCMs.
+    # let's wipe any existing filesystems
+    if cat /proc/mounts | grep -a "$LOOP_DEVICE"; then
+        umount "$LOOP_DEVICE"
+    fi
     wipefs -a "$LOOP_DEVICE"
-}
-
-createLoopDevice /sd sd 64MB
-createLoopDevice "/home/$SUDO_USER" ssd 10GB
-createLoopDevice /hdd hdd 20GB
-
-# This creates LXC storage pools for each of teh
-for STORAGE_POOL in ssd hdd sd; do
-    # if the profile doesn't already exist, we create it.
+    
+    # if the storage pool doesn't exist, we create it.
     if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
-        # let's first check to see if the loop device already exists.
-        LOOP_DEVICE=
-        IMAGE_PATH="$SUDO_USER_HOME/bcm-$STORAGE_POOL.img" #for ssd
-        if [ $STORAGE_POOL != "ssd" ] ; then
-            IMAGE_PATH="/$STORAGE_POOL/bcm-$STORAGE_POOL.img"
-        fi
         
-        # if the loop device exists, let's pull it into LXC as a loop device-backed storage pool formatted with BTRFS
+        # if the loop device exists, let's pull it into LXC as a loop device backed storage pool formatted with BTRFS
         if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
             LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
             lxc storage create "bcm-$STORAGE_POOL" btrfs source="$LOOP_DEVICE"
@@ -163,7 +182,14 @@ for STORAGE_POOL in ssd hdd sd; do
         PROFILE_YAML="$(envsubst <./resources/lxd_profiles/$STORAGE_POOL.yml)"
         echo "$PROFILE_YAML" | lxc profile edit "bcm-$STORAGE_POOL"
     fi
-done
+    
+}
+
+createLoopDevice "$SD_PATH" sd 64MB
+createLoopDevice "$SSD_PATH" ssd 10GB
+createLoopDevice "$HDD_PATH" hdd 20GB
+
+# This creates LXC storage pools for each of teh
 
 mkdir -p "$SUDO_USER_HOME/.local/bcm/lxc"
 chown -R "$SUDO_USER:$SUDO_USER" "$SUDO_USER_HOME/.local/bcm"

@@ -50,7 +50,7 @@ There exists two distinct roles in the BCM ecosystem. The Hardware Administrator
 
 ## Getting Started
 
-Run the following commands to run the BCM `git_bcm.sh` script. If you want to collaborate on BCM, first fork it to your github account then run the commands below, updating the `BITHUB_REPO` environment variable. command below with your URL of your forked repository.
+Run the following commands to run the BCM `git_bcm.sh` script. If you want to collaborate on BCM, first fork it to your github account then run the commands below, updating the `BITHUB_REPO` environment variable with your repo.
 
 ```bash
 # download the BCM init script; VERIFY CONTENTS!
@@ -59,11 +59,9 @@ wget "https://raw.githubusercontent.com/$GITHUB_REPO/master/get_bcm.sh"
 
 # WARNING: YOU SHOULD ALWAYS DO YOUR DUE DILLEGENCE BEFORE RUNNING
 # A SCRIPT ON YOUR COMPUTER. YOU SHOULD NOT TRUST THIS SOFTWARE UNLESS
-# YOU HAVE VIEWED AND AUDITED ITS CODE.
+# YOU HAVE VIEWED AND AUDITED ITS CODE PERSONALLY!
 
-# make the script executable then run it 
-# scripts installs TOR, then git pulls the BCM source code from github 
-# TODO 1) move from github to zeronet
+# make the script executable then run it
 chmod 0744 ./get_bcm.sh
 sudo bash -c "./get_bcm.sh --repo=$GITHUB_REPO"
 ```

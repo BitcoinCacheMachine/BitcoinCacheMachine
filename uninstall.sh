@@ -18,13 +18,13 @@ done
 
 # install LXD
 if [[ -f "$(command -v lxc)" ]]; then
-
+    
     source ./env
-
+    
     if lxc list --format csv | grep -q "$BCM_VM_NAME"; then
         lxc delete "$BCM_VM_NAME" --force
     fi
-
+    
     ## Delete anything that's tied to a project
     for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
         for container in $(lxc query "/1.0/containers?recursion=1&project=${project}" | jq .[].name -r); do
@@ -49,7 +49,7 @@ if [[ -f "$(command -v lxc)" ]]; then
         done
         
     done
-
+    
     for project in $(lxc query "/1.0/projects?recursion=1" | jq .[].name -r); do
         for profile in $(lxc query "/1.0/profiles?recursion=1&project=${project}" | jq .[].name -r); do
             if [ "${profile}" = "default" ]; then
@@ -65,13 +65,13 @@ if [[ -f "$(command -v lxc)" ]]; then
             lxc project delete "${project}"
         fi
     done
-
+    
     ## Delete the networks
     for network in $(lxc query "/1.0/networks?recursion=1" | jq '.[] | select(.managed) | .name' -r); do
         echo "==> Deleting network '$network'."
         lxc network delete "${network}"
     done
-
+    
     ## Delete the storage pools
     for storage_pool in $(lxc query "/1.0/storage-pools?recursion=1" | jq .[].name -r); do
         for volume in $(lxc query "/1.0/storage-pools/${storage_pool}/volumes/custom?recursion=1" | jq .[].name -r); do
@@ -91,5 +91,18 @@ if [ $ALL_FLAG = 1 ]; then
     if [ -d "$HOME/.local/bcm" ]; then
         rm -rf "$HOME/.local/bcm"
     fi
-
+    
+    
+    # delete the loop files.
+    # TODO ADD COMMAND LINE PARAM
+    for LOOP_FILE in hdd sd ssd; do
+        if [ -f "$HOME/bcm-$LOOP_FILE.img" ]; then
+            FILE_PATH="$HOME/bcm-$LOOP_FILE.img"
+            read -rp "WARNING: Are you sure you want to delete the file '$FILE_PATH'.? (y/n):  "   CHOICE
+            
+            if [ CHOICE = y ]; then
+                rm "$HOME/bcm-$LOOP_FILE.img"
+            fi
+        fi
+    done
 fi

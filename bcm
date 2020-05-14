@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # note the absense of -u allows you to use environment variables from the parent shell
-set -Eeuox pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")"
 
 # if this is 1, then we assume we are running BCM WITHOUT the front-end (e.g., dockerd on bare metal)
@@ -38,13 +38,13 @@ done
 
 # make sure LXD is installed before we even think of continuing
 if [[ ! -f "$(command -v lxc)" ]]; then
-    echo "ERROR: LXD does not seem to be installed. Please run the BCM installer script."
+    echo "ERROR: LXD does not seem to be installed. Please run the BCM installer script ('sudo bash -c $HOME/bcm/install.sh')."
     exit
 fi
 
 if lxc info | grep -q "server_clustered: false"; then
-echo "ERROR: The LXD server does not appear to be in the correct state. Please re-run the BCM installer."
-exit
+    echo "ERROR: The LXD server does not appear to be in the correct state. Please re-run the BCM installer/uninstaller scripts."
+    exit
 fi
 
 
