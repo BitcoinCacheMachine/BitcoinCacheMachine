@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 if [[ -z "$BCM_VM_NAME" ]]; then
@@ -10,7 +10,9 @@ fi
 
 # let's make sure we have an ssh keypair for the new vm
 if [ ! -f "$SSHHOME/$BCM_VM_NAME.local" ]; then
-    ssh-keygen -f "$SSHHOME/$BCM_VM_NAME.local" -t ecdsa -b 521
+
+
+    ssh-keygen -f "$SSHHOME/$BCM_VM_NAME.local" -t ecdsa -b 521 -N "$(pass bcm/$BCM_VM_NAME)"
 fi
 
 # generate the custom cloud-init file. Cloud init installs and configures sshd
@@ -73,7 +75,7 @@ SSH_PUBKEY_PATH="$SSHHOME/$BCM_VM_NAME.local"
 FQSN="ubuntu@$IP_V4_ADDRESS"
 
 rsync -rv "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/init_bcm.sh --sudo-user=ubuntu"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/install.sh --sudo-user=ubuntu"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/install.sh"
 rsync -rv "$BCM_CACHE_DIR/lxc/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.local/bcm/lxc"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'

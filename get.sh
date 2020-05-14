@@ -37,10 +37,10 @@ if [[ -z $REPO ]]; then
 fi
 
 BCM_GITHUB_REPO_URL="https://github.com/$REPO"
-BCM_GIT_DIR="/home/$SUDO_USER/bcm"
+BCM_GIT_DIR="$HOME/bcm"
 
 if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root. Try 'sudo bash -c ./install.sh'"
+    echo "This script must be run as root. Try 'bash -c ./install.sh'"
     exit 1
 fi
 
@@ -51,11 +51,11 @@ CODE_NAME="$(< /etc/os-release grep VERSION_CODENAME | cut -d "=" -f 2)"
 TOR_PROJECT_LINE="deb https://deb.torproject.org/torproject.org $CODE_NAME main"
 TOR_PROJECT_LINE2="deb-src https://deb.torproject.org/torproject.org $CODE_NAME main"
 if ! grep -Fxq "$TOR_PROJECT_LINE" /etc/apt/sources.list; then
-    echo "$TOR_PROJECT_LINE" | tee -a /etc/apt/sources.list
+    echo "$TOR_PROJECT_LINE" | sudo tee -a /etc/apt/sources.list
 fi
 
 if ! grep -Fxq "$TOR_PROJECT_LINE2" /etc/apt/sources.list; then
-    echo "$TOR_PROJECT_LINE2" | tee -a /etc/apt/sources.list
+    echo "$TOR_PROJECT_LINE2" | sudo tee -a /etc/apt/sources.list
 fi
 
 # download the tor PGP key and add it as a trusted key to apt
@@ -368,13 +368,14 @@ sGsEejVHxvX7/iOE3rM=
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
 
-gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -
+# import the debian-tor certificate 
+gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
 
-
-apt-get update
+# update manifests
+sudo apt-get update
 
 # reinstall required software.
-apt-get install -y tor deb.torproject.org-keyring wait-for-it git
+sudo apt-get install -y tor deb.torproject.org-keyring wait-for-it git
 
 # wait for local tor to come online.
 wait-for-it -t 30 127.0.0.1:9050
@@ -384,11 +385,11 @@ if [[ "$TOR_ONLY" = 0 ]]; then
     git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050
     git config --global "http.$UPSTREAM_REPO_URL.proxy" socks5://127.0.0.1:9050
     
-    # clone the BCM repo to /home/$SUDO_USER/bcm
+    # clone the BCM repo to $HOME/bcm
     export BCM_GIT_DIR="$BCM_GIT_DIR"
     if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then
         git clone "$BCM_GITHUB_REPO_URL" "$BCM_GIT_DIR"
-        chown -R "$SUDO_USER:$SUDO_USER" "$BCM_GIT_DIR"
+        chown -R "$USER:$USER" "$BCM_GIT_DIR"
         
         # set WORKING DIR to the new repo
         cd "$BCM_GIT_DIR"

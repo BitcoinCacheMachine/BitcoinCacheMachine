@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage: './update_bcm.sh --commit-push --commit-message="message"'
+# usage: './update.sh --commit-push --commit-message="message"'
 
 set -Eeuo pipefail
 cd "$(dirname "$0")"

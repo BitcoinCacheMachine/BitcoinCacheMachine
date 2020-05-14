@@ -33,5 +33,17 @@ fi
 export BCM_VM_NAME="$BCM_VM_NAME"
 
 
-PASSWDHOME="$HOME/.password-store" && mkdir -p "$PASSWDHOME"
+PASSWDHOME="$HOME/.bcm"
 export PASSWDHOME="$PASSWDHOME"
+
+DEFAULT_KEY_ID=
+if [ -d "$HOME/.gnupg" ]; then
+    DEFAULT_KEY_ID="$(cat $HOME/.gnupg/gpg.conf | grep 'default-key' | awk  '{print $2}')"
+    
+    if [ -z $DEFAULT_KEY_ID ]; then
+        echo "ERROR: your GPG default key ID cannot be found. You need to configure your GPG configuration before continuing."
+        exit
+    fi
+fi
+
+export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
