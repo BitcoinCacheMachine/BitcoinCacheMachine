@@ -37,6 +37,10 @@ if [ $COMMIT_PUSH = 1 ]; then
     # TODO write guidance on setting required variables and having GPG up on GITHUB
     git commit -S -m="$COMMIT_MESSAGE"
     
+    # we first pull from the remote to ensure we are at the same HEAD. This could happen if you
+    # created a local commit, then undid it, then re-committed.
+    git pull
+    
     # push the new commit up to origin/master
     # Note all PULLS are based on the upstream git remote BitcoinCacheMachine/BitcoinCacheMachine
     git push origin master
