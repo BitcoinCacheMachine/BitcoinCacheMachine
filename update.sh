@@ -2,7 +2,7 @@
 
 # usage: './update.sh --commit-push --commit-message="message"'
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 COMMIT_PUSH=0
