@@ -88,4 +88,8 @@ The best documentation can be found using the CLI `--help` menus. You can also c
 
 ## How to contribute
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for additional details of running BCM locally and contributing to the overall project.
+See [How to Contribute](./CONTRIBUTING.md) for additional details on contributing to the overall project. We need testers software testers, documentation, and of course BASH Developers capable of programming LXD and Docker, among many other mostly back-end software.
+
+## Issues
+
+Currently BCM tracks "issues" with the software using `# TODO` stanzas in the code itself. Once BCM becomes stable enough, public accounting of issues will be allowed. In the meantime, collaborate with developers using the Keybase group.

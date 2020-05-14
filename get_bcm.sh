@@ -383,7 +383,7 @@ if [[ "$TOR_ONLY" = 0 ]]; then
     # configure git to download through the local tor proxy.
     git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050
     git config --global "http.$UPSTREAM_REPO_URL.proxy" socks5://127.0.0.1:9050
-
+    
     # clone the BCM repo to /home/$SUDO_USER/bcm
     export BCM_GIT_DIR="$BCM_GIT_DIR"
     if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then

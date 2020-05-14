@@ -23,3 +23,7 @@ echo "BCM_ACTIVE_CHAIN:          $BCM_ACTIVE_CHAIN"
 
 echo ""
 echo "INFO: override these values by updating $BCM_GIT_DIR/env"
+
+if [ -z $BCM_VM_NAME ]; then
+    echo "NOTE: Your system doesn't support Type-1 VMs. Multi-tenancy will be accomplished using LXD datacenters instead."
+fi

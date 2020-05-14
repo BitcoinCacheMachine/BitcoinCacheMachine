@@ -20,9 +20,15 @@ if [[ -n $BCM_MACVLAN_INTERFACE ]]; then
 fi
 export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
 
+
 BCM_VM_NAME=${BCM_VM_NAME:-"bcm-vm-$(whoami)-$(hostname)"}
 if [[ -n $BCM_VM_NAME ]]; then
     BCM_VM_NAME="$BCM_VM_NAME"
+fi
+
+# if the machine doesn't support Type-1 VMs, then we set BCM_VM_NAME to null
+if ! lxc info | grep -q "virtual-machines"; then
+    BCM_VM_NAME=
 fi
 export BCM_VM_NAME="$BCM_VM_NAME"
 
