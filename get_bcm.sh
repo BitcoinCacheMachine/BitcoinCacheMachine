@@ -11,6 +11,7 @@ cd "$(dirname "$0")"
 TOR_ONLY=0
 REPO=
 UPSTREAM_REPO="BitcoinCacheMachine/BitcoinCacheMachine"
+UPSTREAM_REPO_URL="https://github.com/$UPSTREAM_REPO"
 
 for i in "$@"; do
     case $i in
@@ -381,7 +382,8 @@ wait-for-it -t 30 127.0.0.1:9050
 if [[ "$TOR_ONLY" = 0 ]]; then
     # configure git to download through the local tor proxy.
     git config --global "http.$BCM_GITHUB_REPO_URL.proxy" socks5://127.0.0.1:9050
-    
+    git config --global "http.$UPSTREAM_REPO_URL.proxy" socks5://127.0.0.1:9050
+
     # clone the BCM repo to /home/$SUDO_USER/bcm
     export BCM_GIT_DIR="$BCM_GIT_DIR"
     if [[ ! -d "$BCM_GIT_DIR/.git" ]]; then
