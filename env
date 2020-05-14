@@ -20,7 +20,7 @@ if [[ -n $BCM_MACVLAN_INTERFACE ]]; then
 fi
 export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
 
-BCM_VM_NAME=${BCM_VM_NAME:-"bcm-$(whoami)-vm"}
+BCM_VM_NAME=${BCM_VM_NAME:-"bcm-vm-$(whoami)-$(hostname)"}
 if [[ -n $BCM_VM_NAME ]]; then
     BCM_VM_NAME="$BCM_VM_NAME"
 fi
