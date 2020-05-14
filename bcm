@@ -155,7 +155,7 @@ OLD_GNUPGHOME="$GNUPGHOME"
 export GNUPGHOME="$GNUPGHOME/trezor"
 DEFAULT_KEY_ID=
 if [ -d "$GNUPGHOME" ]; then
-    DEFAULT_KEY_ID=$(gpg --no-permission-warning --list-keys --keyid-format LONG | grep nistp256 | grep pub | sed 's/^[^/]*:/:/')
+    DEFAULT_KEY_ID=$(cat ~/.gnupg/gpg.conf | grep 'default-key' | awk  '{print $2}')
     DEFAULT_KEY_ID="${DEFAULT_KEY_ID#*/}"
     DEFAULT_KEY_ID="$(echo "$DEFAULT_KEY_ID" | awk '{print $1}')"
 fi

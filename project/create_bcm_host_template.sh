@@ -44,7 +44,7 @@ if [[ $CLUSTER_NODE_COUNT -gt 1 ]]; then
 else
     if ! lxc network list --format csv | grep -q bcmbr0; then
         # but if it's just one node, we just create the network.
-        lxc network create bcmbr0 ipv4.nat=true ipv6.nat=false
+        lxc network create bcmbr0 ipv4.nat=true ipv4.address=10.10.10.1/24 ipv6.address=none
     fi
 fi
 

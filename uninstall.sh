@@ -3,12 +3,23 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-ALL_FLAG=0
+REMOVE_STORAGE=0
+DELETE_CACHE=0
+UNINSTALL_LXD=0
 
 for i in "$@"; do
     case $i in
-        --all)
-            ALL_FLAG=1
+        --storage)
+            REMOVE_STORAGE=1
+            shift
+        ;;
+        --cache)
+            DELETE_CACHE="${i#*=}"
+            shift
+        ;;
+        --lxd)
+            UNINSTALL_LXD="${i#*=}"
+            shift
         ;;
         *)
             # unknown option
@@ -42,7 +53,7 @@ if [[ -f "$(command -v lxc)" ]]; then
                 fi
             fi
             
-            if [[ $ALL_FLAG == 1 ]]; then
+            if [[ $REMOVE_STORAGE == 1 ]]; then
                 echo "==> Deleting image ${FINGERPRINT} for project: ${project}"
                 lxc image delete --project "${project}" "${image}"
             fi
@@ -84,25 +95,30 @@ if [[ -f "$(command -v lxc)" ]]; then
     done
 fi
 
-if [ $ALL_FLAG = 1 ]; then
+if [ $UNINSTALL_LXD = 1 ]; then
     sudo snap remove lxd
-    
-    # delete locally cached files.
-    if [ -d "$HOME/.local/bcm" ]; then
-        rm -rf "$HOME/.local/bcm"
-    fi
-    
-    
+fi
+
+if [ $REMOVE_STORAGE = 1 ]; then
     # delete the loop files.
     # TODO ADD COMMAND LINE PARAM
     for LOOP_FILE in hdd sd ssd; do
         if [ -f "$HOME/bcm-$LOOP_FILE.img" ]; then
             FILE_PATH="$HOME/bcm-$LOOP_FILE.img"
+            CHOICE=0
             read -rp "WARNING: Are you sure you want to delete the file '$FILE_PATH'.? (y/n):  "   CHOICE
+            echo $CHOICE
             
-            if [ CHOICE = y ]; then
-                rm "$HOME/bcm-$LOOP_FILE.img"
+            if [ $CHOICE = y ]; then
+                rm -f "$HOME/bcm-$LOOP_FILE.img"
             fi
         fi
     done
+fi
+
+if [ $DELETE_CACHE = 1 ]; then
+    # delete locally cached files.
+    if [ -d "$HOME/.local/bcm" ]; then
+        rm -rf "$HOME/.local/bcm"
+    fi
 fi
