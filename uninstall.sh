@@ -6,19 +6,31 @@ cd "$(dirname "$0")"
 REMOVE_STORAGE=0
 DELETE_CACHE=0
 UNINSTALL_LXD=0
+DELETE_PASSWD=0
 
 for i in "$@"; do
     case $i in
+        --all)
+            REMOVE_STORAGE=1
+            DELETE_CACHE=1
+            UNINSTALL_LXD=1
+            DELETE_PASSWD=1
+            shift
+        ;;
         --storage)
             REMOVE_STORAGE=1
             shift
         ;;
         --cache)
-            DELETE_CACHE="${i#*=}"
+            DELETE_CACHE=1
             shift
         ;;
         --lxd)
-            UNINSTALL_LXD="${i#*=}"
+            UNINSTALL_LXD=1
+            shift
+        ;;
+        --pass)
+            DELETE_PASSWD=1
             shift
         ;;
         *)
@@ -97,28 +109,34 @@ fi
 
 if [ $UNINSTALL_LXD = 1 ]; then
     sudo snap remove lxd
+    sleep 5
 fi
 
 if [ $REMOVE_STORAGE = 1 ]; then
     # delete the loop files.
     # TODO ADD COMMAND LINE PARAM
+    DISK_DIR="$HOME/bcm_disks"
+    mkdir -p "$DISK_DIR"
     for LOOP_FILE in hdd sd ssd; do
-        if [ -f "$HOME/bcm-$LOOP_FILE.img" ]; then
-            FILE_PATH="$HOME/bcm-$LOOP_FILE.img"
-            CHOICE=0
-            read -rp "WARNING: Are you sure you want to delete the file '$FILE_PATH'.? (y/n):  "   CHOICE
-            echo $CHOICE
-            
-            if [ $CHOICE = y ]; then
-                rm -f "$HOME/bcm-$LOOP_FILE.img"
-            fi
+        FILE_PATH="$DISK_DIR/$LOOP_FILE.img"
+        if [ -f "$FILE_PATH" ]; then
+            rm -f "$FILE_PATH"
         fi
     done
+    
+    sudo losetup -D
 fi
 
 if [ $DELETE_CACHE = 1 ]; then
     # delete locally cached files.
     if [ -d "$HOME/.local/bcm" ]; then
         rm -rf "$HOME/.local/bcm"
+    fi
+fi
+
+if [ $DELETE_PASSWD = 1 ]; then
+    # delete locally cached files.
+    if [ -d "$PASSWDHOME" ]; then
+        rm -rf "$PASSWDHOME"
     fi
 fi

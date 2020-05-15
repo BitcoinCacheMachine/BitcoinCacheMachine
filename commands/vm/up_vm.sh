@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 if [[ -z "$BCM_VM_NAME" ]]; then
@@ -10,7 +10,7 @@ fi
 
 # let's make sure we have an ssh keypair for the new vm
 if [ ! -f "$SSHHOME/$BCM_VM_NAME.local" ]; then
-    ssh-keygen -f "$SSHHOME/$BCM_VM_NAME.local" -t ecdsa -b 521
+    ssh-keygen -f "$SSHHOME/$BCM_VM_NAME.local" -t ecdsa -b 521 -N "$(pass bcm/$BCM_VM_NAME)"
 fi
 
 # generate the custom cloud-init file. Cloud init installs and configures sshd
@@ -27,19 +27,27 @@ fi
 cat /tmp/cloud-init.yml | lxc profile edit "$VM_PROFILE_NAME"
 shred -uz /tmp/cloud-init.yml
 
-if ! lxc image list --format csv --columns l | grep -q "bcm-vm-base"; then
-    if [ -f "$BCM_CACHE_DIR/bcm-vm-base" ]; then
-        lxc image import "$BCM_CACHE_DIR/bcm-vm-base" "$BCM_CACHE_DIR/bcm-vm-base.root" --alias bcm-vm-base
-    else
-        lxc image copy images:ubuntu/focal/cloud local: --alias bcm-vm-base --vm --public
-        sleep 2
+for LXC_IMAGE in bcm-vm-base bcm-lxc-base; do
+    if ! lxc image list --format csv --columns l | grep -q "$LXC_IMAGE"; then
+        # if we have the image locally in our disk cache, let's import it.
+        if [ -f "$BCM_CACHE_DIR/$LXC_IMAGE" ]; then
+            lxc image import "$BCM_CACHE_DIR/$LXC_IMAGE" "$BCM_CACHE_DIR/$LXC_IMAGE.root" --alias "$LXC_IMAGE"
+        else
+            # if the image doesn't exist, download it from Ubuntu's image server
+            # TODO see if we can fetch this file from a more censorship-resistant source, e.g., ipfs
+            if [[ "$LXC_IMAGE" == *"-vm-"* ]]; then
+                lxc image copy images:ubuntu/focal/cloud local: --alias "$LXC_IMAGE" --vm --public
+            else
+                lxc image copy images:ubuntu/focal/cloud local: --alias "$LXC_IMAGE" --public
+            fi
+        fi
+        
+        # if the cache'd entry doesn't exist, let's cache it out to avoid subsequent network IO
+        if [ ! -f "$BCM_CACHE_DIR/$LXC_IMAGE" ]; then
+            lxc image export "$LXC_IMAGE" "$BCM_CACHE_DIR/$LXC_IMAGE"
+        fi
     fi
-    
-    # cache the image to disk at BOOTSTRAP DIR to avoid network IO
-    if [ ! -f "$BCM_CACHE_DIR/bcm-vm-base" ]; then
-        lxc image export "bcm-vm-base" "$BCM_CACHE_DIR/bcm-vm-base"
-    fi
-fi
+done
 
 lxc init --vm \
 --profile="$VM_PROFILE_NAME" \
@@ -51,8 +59,8 @@ bcm-vm-base \
 # --profile="bcm-sd" \
 
 #lxc network attach bcmmacvlan "$BCM_VM_NAME" eth0
-#lxc config device add "$BCM_VM_NAME" eth0 nic nictype=macvlan parent="eno1" name="eth0"
-#lxc config device add "$BCM_VM_NAME" config disk source=cloud-init:config
+lxc config device add "$BCM_VM_NAME" eth0 nic nictype=macvlan parent="$BCM_MACVLAN_INTERFACE" name="eth0"
+lxc config device add "$BCM_VM_NAME" config disk source=cloud-init:config
 lxc start "$BCM_VM_NAME"
 
 IP_V4_ADDRESS=
@@ -68,13 +76,15 @@ done
 # TODO add snapshot to VM image so when we run 'bcm vm' we can start from a prepared image
 # TODO maybe we can use the 'bcm vm --fresh' command to make it clear we want to start with a fresh non-snapshotted image
 
-wait-for-it -t 120 "$IP_V4_ADDRESS:22"
+#lxc file push "$BCM_GIT_DIR" "$BCM_VM_NAME/home/ubuntu/bcm" -r -p
+
+wait-for-it -t 120 "$BCM_VM_NAME.local:22"
 SSH_PUBKEY_PATH="$SSHHOME/$BCM_VM_NAME.local"
-FQSN="ubuntu@$IP_V4_ADDRESS"
+FQSN="ubuntu@$BCM_VM_NAME.local"
 
 rsync -rv "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/init_bcm.sh --sudo-user=ubuntu"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" sudo bash -c "/home/ubuntu/bcm/install.sh"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh"
+
 rsync -rv "$BCM_CACHE_DIR/lxc/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.local/bcm/lxc"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
 

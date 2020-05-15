@@ -14,23 +14,7 @@ if ! lxc image list --format csv | grep -q "bcm-lxc-base"; then
         if ! lxc remote list --format csv | grep -q "$LXD_IMAGE_REMOTE"; then
             lxc remote add "$LXD_IMAGE_REMOTE" "$BCM_LXD_IMAGE_CACHE:8443"
         fi
-    fi
-    
-    # download and export the LXC base image if it doesn't exist on disk.
-    if ! lxc image list --format csv --columns l | grep -q "bcm-lxc-base"; then
-        if [ -f "$BCM_CACHE_DIR/bcm-lxc-base" ]; then
-            lxc image import "$BCM_CACHE_DIR/bcm-lxc-base" "$BCM_CACHE_DIR/bcm-lxc-base.root" --alias bcm-lxc-base
-        else
-            lxc image copy "$LXD_IMAGE_REMOTE:$BCM_LXC_BASE_IMAGE" "$(lxc remote get-default):" --alias bcm-lxc-base
-            sleep 2
-        fi
-        
-        # cache the image to disk at BOOTSTRAP DIR to avoid network IO
-        if [ ! -f "$BCM_CACHE_DIR/bcm-lxc-base" ]; then
-            lxc image export "bcm-lxc-base" "$BCM_CACHE_DIR/bcm-lxc-base"
-        fi
-    fi
-    
+    fi    
 fi
 
 

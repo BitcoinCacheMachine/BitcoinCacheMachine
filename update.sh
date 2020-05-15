@@ -1,7 +1,8 @@
 #!/bin/bash
 
+# usage: './update.sh --commit-push --message="message"'
 
-set -Eeuo pipefail
+set -Eeuox pipefail
 cd "$(dirname "$0")"
 
 COMMIT_PUSH=0
@@ -13,7 +14,7 @@ for i in "$@"; do
             COMMIT_PUSH=1
             shift # past argument=value
         ;;
-        --commit-message=*)
+        --message=*)
             COMMIT_MESSAGE="${i#*=}"
             shift # past argument=value
         ;;
@@ -35,7 +36,7 @@ if [ $COMMIT_PUSH = 1 ]; then
     
     # TODO check for user.name and user.email and commit-sign key, etc.
     # TODO write guidance on setting required variables and having GPG up on GITHUB
-    git commit -S -m="$COMMIT_MESSAGE"
+    git commit -S --message="$COMMIT_MESSAGE"
     
     # we first pull from the remote to ensure we are at the same HEAD. This could happen if you
     # created a local commit, then undid it, then re-committed.

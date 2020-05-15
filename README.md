@@ -55,15 +55,15 @@ Run the following commands to run the BCM `git_bcm.sh` script. If you want to co
 ```bash
 # download the BCM init script; VERIFY CONTENTS!
 GITHUB_REPO="BitcoinCacheMachine/BitcoinCacheMachine"
-wget "https://raw.githubusercontent.com/$GITHUB_REPO/master/get_bcm.sh"
+wget "https://raw.githubusercontent.com/$GITHUB_REPO/master/get.sh"
 
 # WARNING: YOU SHOULD ALWAYS DO YOUR DUE DILLEGENCE BEFORE RUNNING
 # A SCRIPT ON YOUR COMPUTER. YOU SHOULD NOT TRUST THIS SOFTWARE UNLESS
 # YOU HAVE VIEWED AND AUDITED ITS CODE PERSONALLY!
 
 # make the script executable then run it
-chmod 0744 ./get_bcm.sh
-sudo bash -c "./get_bcm.sh --repo=$GITHUB_REPO"
+chmod 0744 ./get.sh
+sudo bash -c "./get.sh --repo=$GITHUB_REPO"
 ```
 
 The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the `~/bcm` directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs. Type 1 VMs are useful if you want to run multiple BCM instances on shared hardware (e.g., a full node for each family member). Finally, you can use BCM to deploy server-side infrastructure via remote SSH service (local network or authenticated onion service).
@@ -71,7 +71,7 @@ The script above install the latest tor proxy, the pulls the BCM git clones the 
 After you have the BCM scripts, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment. Running just `bcm` will give you a help menu.
 
 ```bash
-sudo bash -c ./install.sh
+bash -c ./install.sh
 ```
 
 You may want to log out for your group membership to update. 

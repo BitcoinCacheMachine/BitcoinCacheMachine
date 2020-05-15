@@ -3,9 +3,12 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-SD_PATH="/home/$SUDO_USER"
-HDD_PATH="/home/$SUDO_USER"
-SSD_PATH="/home/$SUDO_USER"
+
+DISKS_DIR="$HOME/bcm_disks"
+SD_PATH="$DISKS_DIR"
+HDD_PATH="$DISKS_DIR"
+SSD_PATH="$DISKS_DIR"
+mkdir -p "$DISKS_DIR"
 
 for i in "$@"; do
     case $i in
@@ -40,7 +43,7 @@ if [[ ! -d "$SD_PATH" ]]; then
 fi
 
 # shellcheck source=./env
-source ./env
+#source ./env
 
 # let's wait for apt upgrade/software locks to be released.
 while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
@@ -48,38 +51,42 @@ while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 
 done
 
 #install necessary software.
-apt-get install -y curl git apg snap snapd gnupg rsync jq pass
+sudo apt-get install -y curl git apg snap snapd gnupg rsync jq pass
 
 # removed unneeded software
-apt autoremove
+sudo apt autoremove
+
+DEFAULT_KEY_ID=
+if [ -f "$HOME/.gnupg/gpg.conf" ]; then
+    DEFAULT_KEY_ID="$(cat $HOME/.gnupg/gpg.conf | grep 'default-key' | awk  '{print $2}')"
+fi
 
 # if the lxd group doesn't exist, create it.
 if ! grep -q lxd /etc/group; then
     addgroup --system lxd
 fi
 
-# add the SUDO_USER user to the lxd group
+# add the user user to the lxd group
 if ! groups | grep -q lxd; then
-    usermod -G lxd -a "$SUDO_USER"
+    usermod -G lxd -a "$(whoami)"
 fi
 
 # install LXD
 if [[ ! -f "$(command -v lxc)" ]]; then
-    snap set system snapshots.automatic.retention=no
-    snap install lxd --channel="latest/edge"
+    sudo snap set system snapshots.automatic.retention=no
+    sudo snap install lxd --channel="latest/edge"
+    sleep 3
 fi
 
 BCM_GIT_DIR="$(pwd)"
 export BCM_GIT_DIR="$BCM_GIT_DIR"
 
-SUDO_USER_HOME="/home/$SUDO_USER"
-
 # Let's make sure the .ssh folder exists. This will hold known SSH BCM hosts
 # SSH authentication to remote hosts uses the trezor
-mkdir -p "$SUDO_USER_HOME/.ssh"
-if [[ ! -f "$SUDO_USER_HOME/.ssh/authorized_keys" ]]; then
-    touch "$SUDO_USER_HOME/.ssh/authorized_keys"
-    chown "$SUDO_USER:$SUDO_USER" -R "$SUDO_USER_HOME/.ssh"
+mkdir -p "$HOME/.ssh"
+if [[ ! -f "$HOME/.ssh/authorized_keys" ]]; then
+    touch "$HOME/.ssh/authorized_keys"
+    chown "$USER:$USER" -R "$HOME/.ssh"
 fi
 
 # this section configured the local SSH client on the Controller
@@ -87,7 +94,7 @@ fi
 # ".onion" address. We use SSH tunneling to expose the remote onion
 # server's LXD API and access it on the controller via a locally
 # expose port (after SSH tunneling)
-SSH_LOCAL_CONF="$SUDO_USER_HOME/.ssh/config"
+SSH_LOCAL_CONF="$HOME/.ssh/config"
 if [[ ! -f "$SSH_LOCAL_CONF" ]]; then
     # if the .ssh/config file doesn't exist, create it.
     touch "$SSH_LOCAL_CONF"
@@ -108,8 +115,8 @@ fi
 
 # let's ensure the image has /snap/bin in its PATH environment variable.
 # using .profile works for both bare-metal and VM-based deployments.
-BASHRC_FILE="$SUDO_USER_HOME/.profile"
-BASHRC_TEXT="export PATH=\$PATH:/snap/bin:/home/$SUDO_USER/bcm"
+BASHRC_FILE="$HOME/.profile"
+BASHRC_TEXT="export PATH=\$PATH:/snap/bin:/home/$USER/bcm"
 if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     {
         echo "$BASHRC_TEXT"
@@ -133,8 +140,8 @@ function createLoopDevice () {
     
     # remove the loop device and delete the image.
     if [ -n "$LOOP_DEVICE" ]; then
-        losetup -d "$LOOP_DEVICE"
-        losetup -D
+        sudo losetup -d "$LOOP_DEVICE"
+        sudo losetup -D
     fi
     
     # if the loop file doesn't exist, create it.
@@ -147,7 +154,7 @@ function createLoopDevice () {
     #dd if=/dev/zero of="$IMAGE_PATH" bs="$3" count="$4"
     
     # next, create the loop device
-    losetup -fP "$IMAGE_PATH"
+    sudo losetup -fP "$IMAGE_PATH"
     
     # get the new loop device, then remove any existing filesystem entries with wipefs.
     if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
@@ -157,9 +164,9 @@ function createLoopDevice () {
     # TODO; probably require user prompt when doing this for tagged BCMs.
     # let's wipe any existing filesystems
     if cat /proc/mounts | grep -a "$LOOP_DEVICE"; then
-        umount "$LOOP_DEVICE"
+        sudo umount "$LOOP_DEVICE"
     fi
-    wipefs -a "$LOOP_DEVICE"
+    sudo wipefs -a "$LOOP_DEVICE"
     
     # if the storage pool doesn't exist, we create it.
     if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
@@ -185,14 +192,14 @@ function createLoopDevice () {
     
 }
 
-createLoopDevice "$SD_PATH" sd 64MB
+createLoopDevice "$SD_PATH" sd 256MB
 createLoopDevice "$SSD_PATH" ssd 10GB
 createLoopDevice "$HDD_PATH" hdd 20GB
 
 # This creates LXC storage pools for each of teh
 
-mkdir -p "$SUDO_USER_HOME/.local/bcm/lxc"
-chown -R "$SUDO_USER:$SUDO_USER" "$SUDO_USER_HOME/.local/bcm"
+mkdir -p "$HOME/.local/bcm/lxc"
+chown -R "$USER:$USER" "$HOME/.local/bcm"
 
 # this section creates the yml necessary to run 'lxd init'
 # TODO add CLI option to specify the interface manually, then store the user's selection in ~/.bashrc
@@ -213,6 +220,8 @@ fi
 export LXD_SERVER_NAME="$LXD_SERVER_NAME"
 export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
 PRESEED_YAML="$(envsubst <./resources/lxd_profiles/lxd_master_preseed.yml)"
+PASSWDHOME="$HOME/.bcm"
+echo "$PRESEED_YAML" | gpg --batch --yes --output "$PASSWDHOME/$LXD_SERVER_NAME-lxd-preseed-yaml.gpg" --encrypt --recipient "$DEFAULT_KEY_ID"
 echo "$PRESEED_YAML" | lxd init --preseed
 
 

@@ -59,18 +59,19 @@ if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
     exit
 fi
 
-# commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
-if [[ "$BCM_CLI_COMMAND" == "vm" ]]; then
-    bash -c ./vm/destroy_vm.sh
-    bash -c ./vm/up_vm.sh
-    exit
-fi
-
 
 # commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
 if [[ "$BCM_CLI_COMMAND" == "deploy" ]]; then
-    bash -c "$BCM_PROJECT_DIR/deploy.sh $@"
-    exit
+    # If the machine supports Type-1 VMs, then that's how we'll do multitenancy.
+    if [ -n $BCM_VM_NAME ]; then
+        bash -c ./vm/destroy_vm.sh
+        bash -c ./vm/up_vm.sh
+        exit
+    else
+        # otherwise, we just deploy on the localhost.
+        bash -c "$BCM_PROJECT_DIR/deploy.sh $@"
+        exit
+    fi
 fi
 
 
@@ -177,9 +178,4 @@ if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
     exit
 fi
 
-# run is for running docker containers AT the SDN controller (not in LXC)
-if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
-    ./run/entrypoint.sh "$@"
-    exit
-fi
 # fi

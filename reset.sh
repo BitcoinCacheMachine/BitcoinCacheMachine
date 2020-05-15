@@ -3,9 +3,14 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-bash -c "./uninstall.sh --storage"
+# let's remove everything bcm related;
+./uninstall.sh --storage --cache --lxd
 # --storage
 # --cache
 # --lxd
 
-sudo bash -c ./install.sh
+# install bcm
+./install.sh
+
+# then deploy
+#bcm deploy
