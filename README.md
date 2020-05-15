@@ -54,7 +54,7 @@ chmod 0744 ./get.sh
 sudo bash -c "./get.sh --repo=$GITHUB_REPO"
 ```
 
-The script above install the latest tor proxy, then pulls the specified BCM git repo to your machine at `~/bcm`. Next, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment.
+The script above installs the latest tor proxy, then pulls the specified BCM git repo to your machine at `~/bcm`. Next, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment.
 
 ```bash
 ./install.sh

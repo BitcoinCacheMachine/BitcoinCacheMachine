@@ -22,10 +22,6 @@ for i in "$@"; do
             REPO="${i#*=}"
             shift # past argument=value
         ;;
-        --sudo-user=*)
-            SUDO_USER="${i#*=}"
-            shift
-        ;;
         *)
             # unknown option
         ;;
