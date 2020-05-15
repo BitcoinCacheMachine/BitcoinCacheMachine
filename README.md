@@ -5,7 +5,7 @@ Bitcoin Cache Machine is open-source software that allows you to create and mana
 
 ## Project Status
 
-**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged using [GPG.asc](./GPG.asc) once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM. The 'dev' branch has the latest version of BCM.
+**IMPORTANT!** BCM is brand new and unstable, only use testnet coins! Builds will be formally tagged using the public key [PGP.pub](./PGP.pub) once a stable proof-of-concept has been created. The master branch represents the most up-to-date stable, and tested, version of BCM. Main development occurs on this fork [farscapian/BitcoinCacheMachine](https://github.com/farscapian/BitcoinCacheMachine).
 
 BCM HAS NOT undergone formal security evaluation and should be considered for TESTING PURPOSES ONLY.
 
@@ -13,9 +13,9 @@ BCM HAS NOT undergone formal security evaluation and should be considered for TE
 
 ## Why Bitcoin Cache Machine Exists
 
-If you're involved with Bitcoin or care about your privacy, you will undoubtedly understand the importance of [running your own fully-validating bitcoin node](https://medium.com/@lopp/securing-your-financial-sovereignty-3af6fe834603). Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your software up-to-date? Is your wallet software configured to consult your trusted full node (and ONLY your node)? Has TOR for these services been configured? Are you backing up user critical data in real time? In practice, there are ton of considerations that need to be addressed.
+If you're involved with Bitcoin or care about your privacy, you will undoubtedly understand the importance of [running your own node](https://www.youtube.com/watch?v=UYUfXWlAleA). Running a fully-validating node is easy enough--just download the software and run it on your home machine, but is that really enough to preserve your overall privacy? Did you configure it correctly? Are you also running a properly configured block explorer? Is your software up-to-date? Are you ensuring that all your UTXOs are unlinked from your identity and all your services using Tor?
 
-There are many areas where your privacy can be compromised if you're not careful. BCM is meant to handle many of these concerns by creating a software-defined data center at your home or office that's pre-configured to protect your overall privacy. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest. BCM dramatically lowers the barriers to deploying and operating your own bitcoin payment infrastructure.
+There are many areas where your privacy can be compromised if you're not careful. BCM is meant to handle many of these concerns by creating a software-defined data center at your home or office that's pre-configured to protect your overall privacy. If you can provide the necessary hardware (CPU, memory, disk), a LAN segment, and an internet gateway, BCM can do much of the rest.
 
 For more information about the motivations behind Bitcoin Cache Machine, visit the [public website](https://www.bitcoincachemachine.org/2018/11/27/introducing-bitcoin-cache-machine/).
 
@@ -25,6 +25,7 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 * Provide a self-contained, distributed, event-driven, software-defined data center that focuses on operational Bitcoin and Lightning-related IT infrastructure.
 * Enable small-to-medium-sized scalability by adding commodity x86_x64 hardware for home and small office settings.
+* Allow for multi-tenancy; support multiple users on the same hardware.
 * Integrate free and open source software ([FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software))!
 * Create a composable framework for deploying Bitcoin and Lightning-related components, databases, visualizations, web-interfaces, etc., allowing app developers to start with a fully-operational baseline data center.
 * Automate the deployment and operation (e.g., backups, updates, vulnerability assessments, key and password management, etc.) of BCM deployments.
@@ -33,20 +34,7 @@ Here are some of the development goals for Bitcoin Cache Machine:
 
 ## What is needed to Run Bitcoin Cache Machine
 
-You need an x86 machine capable of running a Debian-based Linux. This hardware should have two SSDs (formatted to BTRFS, min 500GB each) and mounted at `/tier1`. `/tier1` storage holds the base OS (with KVM hypervisor), Type 1 VMs OSs and other software, and is where data meant for fast storage is kept, such as the bitcoin chainstate and Lightning-based software. The `/tier2` storage is composed of a set of USB-based SPINNING disks, all configured in the same BTRFS pool. Things like bitcoin blocks and local backups are stored.
-
-## Roles & Responsiblities
-
-There exists two distinct roles in the BCM ecosystem. The Hardware Administrator and the Software Administrator. The Hardware Admin is responsible for powering hardware, adding and configuring storage (i.e., `/tier1` storage composed of SSDs, and `/tier2` storage for high-capacity, reliable, scalable commodity storage.). The Hardware administrator is responsible for providing compute, memory, and storage consumable by the Software Administrator. The software administrator exects the following:
-
-1. Compute
-2. Memory
-4. Reliable Internet connectivity
-5. Mesh network connectivity to local metro area (for redundnacy)
-3. Storage
-3a. `/tier1` high speed dual-SSDs configured in BTRFS pool
-3b. `/tier2` high capacity spinning disks in BTRFS pool
-4. SSH connection to base OS along with static IP.
+You need an x86 machine capable of running a Debian-based Linux. At least 2 Network Iterfaces are required (wireless works, not recommended). At a minimum, you need AT LEAST ONE SSD. Better to have two configured in a BTRFS pool. For better disaster recovery, you should have AT LEAST ONE SD card attached as well. Again, if you have TWO configured in a BTRFS pool, even better. Finally, you can add ONE OR MORE spinning HDDs all configured in a BTRFS pool for capacity. See the public website for instructions on configuring the various tiers of storage used by BCM.
 
 ## Getting Started
 
