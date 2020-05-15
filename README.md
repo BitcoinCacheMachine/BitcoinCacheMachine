@@ -54,21 +54,15 @@ chmod 0744 ./get.sh
 sudo bash -c "./get.sh --repo=$GITHUB_REPO"
 ```
 
-The script above install the latest tor proxy, the pulls the BCM git clones the repo using TOR transport. Now that you have the code (in the `~/bcm` directory), you can decide how you want to deploy BCM. You can deploy it locally on bare-metal (best performance, good for single-user use) or in Type-1 VMs. Type 1 VMs are useful if you want to run multiple BCM instances on shared hardware (e.g., a full node for each family member). Finally, you can use BCM to deploy server-side infrastructure via remote SSH service (local network or authenticated onion service).
-
-After you have the BCM scripts, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment. Running just `bcm` will give you a help menu.
+The script above install the latest tor proxy, then pulls the specified BCM git repo to your machine at `~/bcm`. Next, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment.
 
 ```bash
-bash -c ./install.sh
+./install.sh
 ```
 
 You may want to log out for your group membership to update. 
 
-Next, decide how you want to run BCM:
-
-. If you want to run BCM in Type-1 vms with hardware-enforced separation, use `bcm deploy`. Export BCM_VM_NAME to deploy more Type 1 VMs.
-  If you want to run BCM directly on your localhost, run the deployment script `bcm deploy --localhost`.
-  If you want to deploy BCM to a remote SSH endpoint, export BCM_SSH_HOSTNAME in your environment, and local `bcm` commands will be executed against the remote SSH host.
+Next, run `bcm deploy` at the command line to deploy your first BCM instance. If your machine supports Type-1 VMs, `bcm` is deployed using fully-fledged virtual machines. If not, BCM uses [LXD projects](https://lxd.readthedocs.io/en/latest/projects/) to provide tenant separation.
 
 ## Documentation
 
