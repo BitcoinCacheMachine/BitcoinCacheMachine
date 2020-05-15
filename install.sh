@@ -3,9 +3,12 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-SD_PATH="/home/$USER"
-HDD_PATH="/home/$USER"
-SSD_PATH="/home/$USER"
+
+DISKS_DIR="$HOME/bcm_disks"
+SD_PATH="$DISKS_DIR"
+HDD_PATH="$DISKS_DIR"
+SSD_PATH="$DISKS_DIR"
+mkdir -p "$DISKS_DIR"
 
 for i in "$@"; do
     case $i in
@@ -40,7 +43,7 @@ if [[ ! -d "$SD_PATH" ]]; then
 fi
 
 # shellcheck source=./env
-source ./env
+#source ./env
 
 # let's wait for apt upgrade/software locks to be released.
 while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
@@ -58,11 +61,6 @@ if [ -f "$HOME/.gnupg/gpg.conf" ]; then
     DEFAULT_KEY_ID="$(cat $HOME/.gnupg/gpg.conf | grep 'default-key' | awk  '{print $2}')"
 fi
 
-# where we store gpg-encrypted secrets.
-if [ ! -f "$PASSWDHOME" ]; then
-    mkdir -p "$PASSWDHOME"
-fi
-
 # if the lxd group doesn't exist, create it.
 if ! grep -q lxd /etc/group; then
     addgroup --system lxd
@@ -75,8 +73,9 @@ fi
 
 # install LXD
 if [[ ! -f "$(command -v lxc)" ]]; then
-    snap set system snapshots.automatic.retention=no
-    snap install lxd --channel="latest/edge"
+    sudo snap set system snapshots.automatic.retention=no
+    sudo snap install lxd --channel="latest/edge"
+    sleep 3
 fi
 
 BCM_GIT_DIR="$(pwd)"
@@ -165,7 +164,7 @@ function createLoopDevice () {
     # TODO; probably require user prompt when doing this for tagged BCMs.
     # let's wipe any existing filesystems
     if cat /proc/mounts | grep -a "$LOOP_DEVICE"; then
-        umount "$LOOP_DEVICE"
+        sudo umount "$LOOP_DEVICE"
     fi
     sudo wipefs -a "$LOOP_DEVICE"
     
@@ -193,7 +192,7 @@ function createLoopDevice () {
     
 }
 
-createLoopDevice "$SD_PATH" sd 64MB
+createLoopDevice "$SD_PATH" sd 256MB
 createLoopDevice "$SSD_PATH" ssd 10GB
 createLoopDevice "$HDD_PATH" hdd 20GB
 
@@ -221,7 +220,7 @@ fi
 export LXD_SERVER_NAME="$LXD_SERVER_NAME"
 export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
 PRESEED_YAML="$(envsubst <./resources/lxd_profiles/lxd_master_preseed.yml)"
-echo "$PRESEED_YAML" | gpg --output "$PASSWDHOME/$LXD_SERVER_NAME-lxd-preseed-yaml.gpg" --encrypt --recipient "$DEFAULT_KEY_ID"
+echo "$PRESEED_YAML" | gpg --batch --yes --output "$PASSWDHOME/$LXD_SERVER_NAME-lxd-preseed-yaml.gpg" --encrypt --recipient "$DEFAULT_KEY_ID"
 echo "$PRESEED_YAML" | lxd init --preseed
 
 

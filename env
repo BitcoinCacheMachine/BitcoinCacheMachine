@@ -26,14 +26,8 @@ if [[ -n $BCM_VM_NAME ]]; then
     BCM_VM_NAME="$BCM_VM_NAME"
 fi
 
-# if the machine doesn't support Type-1 VMs, then we set BCM_VM_NAME to null
-if ! lxc info | grep -q "virtual-machines"; then
-    BCM_VM_NAME=
-fi
-export BCM_VM_NAME="$BCM_VM_NAME"
-
-
 PASSWDHOME="$HOME/.bcm"
+mkdir -p "$PASSWDHOME"
 export PASSWDHOME="$PASSWDHOME"
 
 DEFAULT_KEY_ID=

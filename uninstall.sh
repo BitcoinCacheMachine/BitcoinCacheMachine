@@ -10,6 +10,13 @@ DELETE_PASSWD=0
 
 for i in "$@"; do
     case $i in
+        --all)
+            REMOVE_STORAGE=1
+            DELETE_CACHE=1
+            UNINSTALL_LXD=1
+            DELETE_PASSWD=1
+            shift
+        ;;
         --storage)
             REMOVE_STORAGE=1
             shift
@@ -102,17 +109,22 @@ fi
 
 if [ $UNINSTALL_LXD = 1 ]; then
     sudo snap remove lxd
+    sleep 5
 fi
 
 if [ $REMOVE_STORAGE = 1 ]; then
     # delete the loop files.
     # TODO ADD COMMAND LINE PARAM
+    DISK_DIR="$HOME/bcm_disks"
+    mkdir -p "$DISK_DIR"
     for LOOP_FILE in hdd sd ssd; do
-        FILE_PATH="$HOME/bcm-$LOOP_FILE.img"
+        FILE_PATH="$DISK_DIR/$LOOP_FILE.img"
         if [ -f "$FILE_PATH" ]; then
             rm -f "$FILE_PATH"
         fi
     done
+    
+    sudo losetup -D
 fi
 
 if [ $DELETE_CACHE = 1 ]; then

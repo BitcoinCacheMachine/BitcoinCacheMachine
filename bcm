@@ -51,6 +51,16 @@ fi
 source ./env
 source "$HOME/.bashrc"
 
+# make sure LXD is installed before we even think of continuing
+if [[ ! -f "$(command -v lxc)" ]]; then
+    # if the machine doesn't support Type-1 VMs, then we set BCM_VM_NAME to null
+    if ! lxc info | grep -q "virtual-machines"; then
+        BCM_VM_NAME="$(hostname)"
+    fi
+fi
+export BCM_VM_NAME="$BCM_VM_NAME"
+
+
 if [[ $BCM_HELP_FLAG == 1 ]]; then
     cat ./commands/help.txt
     exit

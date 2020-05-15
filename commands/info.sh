@@ -6,10 +6,6 @@ echo "BCM_TARGET_VERSION:        $BCM_VERSION"
 echo "GNUPGHOME:                 $GNUPGHOME"
 echo "DEFAULT_KEY_ID:            $DEFAULT_KEY_ID"
 
-if [[ -d $PASSWDHOME ]]; then
-    echo "PASSWDHOME:                $PASSWDHOME"
-fi
-
 echo "SSHHOME:                   $SSHHOME"
 echo "BCM_VM_NAME:               $BCM_VM_NAME"
 echo "BCM_MACVLAN_INTERFACE:     $BCM_MACVLAN_INTERFACE"

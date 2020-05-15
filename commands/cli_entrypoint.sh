@@ -178,9 +178,4 @@ if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
     exit
 fi
 
-# run is for running docker containers AT the SDN controller (not in LXC)
-if [[ "$BCM_CLI_COMMAND" == "run" ]]; then
-    ./run/entrypoint.sh "$@"
-    exit
-fi
 # fi
