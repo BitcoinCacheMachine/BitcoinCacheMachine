@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage: './update.sh --commit-push --commit-message="message"'
+# usage: './update.sh --commit-push --message="message"'
 
 set -Eeuox pipefail
 cd "$(dirname "$0")"
@@ -14,7 +14,7 @@ for i in "$@"; do
             COMMIT_PUSH=1
             shift # past argument=value
         ;;
-        --commit-message=*)
+        --message=*)
             COMMIT_MESSAGE="${i#*=}"
             shift # past argument=value
         ;;

@@ -78,15 +78,15 @@ done
 
 #lxc file push "$BCM_GIT_DIR" "$BCM_VM_NAME/home/ubuntu/bcm" -r -p
 
-wait-for-it -t 120 "$IP_V4_ADDRESS:22"
+wait-for-it -t 120 "$BCM_VM_NAME.local:22"
 SSH_PUBKEY_PATH="$SSHHOME/$BCM_VM_NAME.local"
-FQSN="ubuntu@$IP_V4_ADDRESS"
+FQSN="ubuntu@$BCM_VM_NAME.local"
 
 rsync -rv "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh"
 
-# rsync -rv "$BCM_CACHE_DIR/lxc/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.local/bcm/lxc"
-# ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
+rsync -rv "$BCM_CACHE_DIR/lxc/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.local/bcm/lxc"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
 
 
 # # let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.

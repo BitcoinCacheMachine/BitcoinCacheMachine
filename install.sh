@@ -220,6 +220,7 @@ fi
 export LXD_SERVER_NAME="$LXD_SERVER_NAME"
 export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
 PRESEED_YAML="$(envsubst <./resources/lxd_profiles/lxd_master_preseed.yml)"
+PASSWDHOME="$HOME/.bcm"
 echo "$PRESEED_YAML" | gpg --batch --yes --output "$PASSWDHOME/$LXD_SERVER_NAME-lxd-preseed-yaml.gpg" --encrypt --recipient "$DEFAULT_KEY_ID"
 echo "$PRESEED_YAML" | lxd init --preseed
 
