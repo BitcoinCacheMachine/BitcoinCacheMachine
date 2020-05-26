@@ -3,12 +3,18 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-
+STORAGE_IS_CONFIGURED=0
 DISKS_DIR="$HOME/bcm_disks"
-SD_PATH="$DISKS_DIR"
-HDD_PATH="$DISKS_DIR"
-SSD_PATH="$DISKS_DIR"
 mkdir -p "$DISKS_DIR"
+
+SD_PATH="$DISKS_DIR"
+SD_SIZE="256MB"
+
+HDD_PATH="$DISKS_DIR"
+HDD_SIZE="20GB"
+
+SSD_PATH="$DISKS_DIR"
+SSD_SIZE="10GB"
 
 for i in "$@"; do
     case $i in
@@ -16,12 +22,24 @@ for i in "$@"; do
             SSD_PATH="${i#*=}"
             shift # past argument=value
         ;;
+        --ssd-size=*)
+            SSD_SIZE="${i#*=}"
+            shift # past argument=value
+        ;;
         --sd-path=*)
             SD_PATH="${i#*=}"
             shift # past argument=value
         ;;
+        --sd-size=*)
+            SD_SIZE="${i#*=}"
+            shift # past argument=value
+        ;;
         --hdd-path=*)
             HDD_PATH="${i#*=}"
+            shift # past argument=value
+        ;;
+        --hdd-size=*)
+            HDD_SIZE="${i#*=}"
             shift # past argument=value
         ;;
         *)
@@ -43,7 +61,7 @@ if [[ ! -d "$SD_PATH" ]]; then
 fi
 
 # shellcheck source=./env
-#source ./env
+source ./env
 
 # let's wait for apt upgrade/software locks to be released.
 while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do
@@ -54,7 +72,7 @@ done
 sudo apt-get install -y curl git apg snap snapd gnupg rsync jq pass
 
 # removed unneeded software
-sudo apt autoremove
+sudo apt-get autoremove
 
 DEFAULT_KEY_ID=
 if [ -f "$HOME/.gnupg/gpg.conf" ]; then
@@ -124,6 +142,14 @@ if ! grep -qF "$BASHRC_TEXT" "$BASHRC_FILE"; then
     } >> "$BASHRC_FILE"
 fi
 
+# append some quick BCM_SPECIFIC aliases to ~/.bashrc.
+{
+    echo ""
+    echo "alias bcmreset='$HOME/bcm/reset.sh'"
+    echo "alias bcminst='$HOME/bcm/install.sh'"
+    echo "alias bcmuninst='$HOME/bcm/uninstall.sh'"
+} >> "$HOME/.bashrc"
+
 # in this section, we configure the underlying storage. We create LOOP devices storated
 # at /sd /ssd and /hdd. The ADMINISTRATOR MUST mount these directories BEFORE running this
 # install script.
@@ -169,12 +195,12 @@ function createLoopDevice () {
     sudo wipefs -a "$LOOP_DEVICE"
     
     # if the storage pool doesn't exist, we create it.
-    if ! lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
-        
+    # we use the full path to LXC so we can avoid a relogin to refresh the user's environment.
+    if ! /snap/bin/lxc storage list --format csv | grep -q "bcm-$STORAGE_POOL"; then
         # if the loop device exists, let's pull it into LXC as a loop device backed storage pool formatted with BTRFS
         if losetup --list --output NAME,BACK-FILE | grep -q "$IMAGE_PATH"; then
             LOOP_DEVICE="$(losetup --list --output NAME,BACK-FILE | grep $IMAGE_PATH | head -n1 | cut -d " " -f1)"
-            lxc storage create "bcm-$STORAGE_POOL" btrfs source="$LOOP_DEVICE"
+            /snap/bin/lxc storage create "bcm-$STORAGE_POOL" btrfs source="$LOOP_DEVICE"
         else
             echo "ERROR: Loop device for storage pool '$STORAGE_POOL' does not exist! You may need to run the BCM installer script."
             exit
@@ -182,19 +208,19 @@ function createLoopDevice () {
         
         # if the profile doesn't already exist, we create it.
         export LOOP_DEVICE="$LOOP_DEVICE"
-        if ! lxc profile list --format csv | grep -q "bcm-$STORAGE_POOL"; then
-            lxc profile create "bcm-$STORAGE_POOL"
+        if ! /snap/bin/lxc profile list --format csv | grep -q "bcm-$STORAGE_POOL"; then
+            /snap/bin/lxc profile create "bcm-$STORAGE_POOL"
         fi
         
         PROFILE_YAML="$(envsubst <./resources/lxd_profiles/$STORAGE_POOL.yml)"
-        echo "$PROFILE_YAML" | lxc profile edit "bcm-$STORAGE_POOL"
+        echo "$PROFILE_YAML" | /snap/bin/lxc profile edit "bcm-$STORAGE_POOL"
     fi
     
 }
 
-createLoopDevice "$SD_PATH" sd 256MB
-createLoopDevice "$SSD_PATH" ssd 10GB
-createLoopDevice "$HDD_PATH" hdd 20GB
+createLoopDevice "$SD_PATH" sd "$SD_SIZE"
+createLoopDevice "$SSD_PATH" ssd "$SSD_SIZE"
+createLoopDevice "$HDD_PATH" hdd "$HDD_SIZE"
 
 # This creates LXC storage pools for each of teh
 
@@ -229,9 +255,9 @@ echo "$PRESEED_YAML" | lxd init --preseed
 # bcm LXD profiles.
 for PROFILE_NAME in unprivileged privileged; do
     # if the profile doesn't already exist, we create it.
-    if ! lxc profile list --format csv | grep -q "bcm-$PROFILE_NAME"; then
-        lxc profile create "bcm-$PROFILE_NAME"
+    if ! /snap/bin/lxc profile list --format csv | grep -q "bcm-$PROFILE_NAME"; then
+        /snap/bin/lxc profile create "bcm-$PROFILE_NAME"
     fi
     
-    cat "./resources/lxd_profiles/$PROFILE_NAME.yml" | lxc profile edit "bcm-$PROFILE_NAME"
+    cat "./resources/lxd_profiles/$PROFILE_NAME.yml" | /snap/bin/lxc profile edit "bcm-$PROFILE_NAME"
 done

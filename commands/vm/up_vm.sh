@@ -40,6 +40,7 @@ for LXC_IMAGE in bcm-vm-base bcm-lxc-base; do
             else
                 lxc image copy images:ubuntu/focal/cloud local: --alias "$LXC_IMAGE" --public
             fi
+            sleep 2
         fi
         
         # if the cache'd entry doesn't exist, let's cache it out to avoid subsequent network IO
@@ -83,7 +84,7 @@ SSH_PUBKEY_PATH="$SSHHOME/$BCM_VM_NAME.local"
 FQSN="ubuntu@$BCM_VM_NAME.local"
 
 rsync -rv "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh --"
 
 rsync -rv "$BCM_CACHE_DIR/lxc/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.local/bcm/lxc"
 ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
