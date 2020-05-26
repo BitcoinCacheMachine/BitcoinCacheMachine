@@ -51,7 +51,7 @@ wget "https://raw.githubusercontent.com/$GITHUB_REPO/master/get.sh"
 
 # make the script executable then run it
 chmod 0744 ./get.sh
-bash -c "./get.sh --repo=$GITHUB_REPO"
+./get.sh --repo="$GITHUB_REPO"
 ```
 
 The script above installs the latest tor proxy, then pulls the specified BCM git repo to your machine at `~/bcm`. Next, run the installer script. This installs necessary software as well as makes the `bcm` command available to the user's shell environment.

@@ -140,3 +140,6 @@ if [ $DELETE_PASSWD = 1 ]; then
         rm -rf "$PASSWDHOME"
     fi
 fi
+
+# let's clear all BCM aliases $HOME/.bashrc
+sed -i '/alias bcm/d' "$HOME/.bashrc"
