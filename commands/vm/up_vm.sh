@@ -31,6 +31,7 @@ for LXC_IMAGE in bcm-vm-base bcm-lxc-base; do
     if ! lxc image list --format csv --columns l | grep -q "$LXC_IMAGE"; then
         # if we have the image locally in our disk cache, let's import it.
         if [ -f "$BCM_CACHE_DIR/$LXC_IMAGE" ]; then
+            # TODO only import vm-base image IF the system supports TYPE-1 VMs. Otherwise, we assume only the LXC image will be required
             lxc image import "$BCM_CACHE_DIR/$LXC_IMAGE" "$BCM_CACHE_DIR/$LXC_IMAGE.root" --alias "$LXC_IMAGE"
         else
             # if the image doesn't exist, download it from Ubuntu's image server
@@ -78,17 +79,18 @@ done
 # TODO maybe we can use the 'bcm vm --fresh' command to make it clear we want to start with a fresh non-snapshotted image
 
 #lxc file push "$BCM_GIT_DIR" "$BCM_VM_NAME/home/ubuntu/bcm" -r -p
-
 wait-for-it -t 120 "$BCM_VM_NAME.local:22"
+
+# Right now, LXC does not support 'lxc exec' (remotes) for VMs. That's OK, we'll use SSH.
 SSH_PUBKEY_PATH="$SSHHOME/$BCM_VM_NAME.local"
 FQSN="ubuntu@$BCM_VM_NAME.local"
 
-rsync -rv "$BCM_GIT_DIR/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" bash -c "/home/ubuntu/bcm/install.sh --"
+rsync -rv "$HOME/bcm/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/bcm"
+rsync -rv "$HOME/.gnupg/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.gnupg"
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" /home/ubuntu/bcm/install.sh --storage=mapped
 
 rsync -rv "$BCM_CACHE_DIR/lxc/" -e "ssh -i $SSH_PUBKEY_PATH -o 'StrictHostKeyChecking=accept-new'" "$FQSN:/home/ubuntu/.local/bcm/lxc"
-ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash '/home/ubuntu/bcm/bcm deploy'
-
+ssh -i "$SSH_PUBKEY_PATH" "$FQSN" -- bash -c "/home/ubuntu/bcm/project/bcm"
 
 # # let's get the onion address and add it as a bcm-onion site. This is a management plane admin interface.
 # MGMT_PLANE_ONION_ADDRESS="$(multipass exec "$VM_NAME" -- sudo cat /var/bc`h/hostname)"

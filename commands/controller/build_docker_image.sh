@@ -10,11 +10,11 @@ for i in "$@"; do
     case $i in
         --image-title=*)
             IMAGE_TITLE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --base-image=*)
             BASE_IMAGE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

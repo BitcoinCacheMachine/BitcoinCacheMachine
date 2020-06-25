@@ -20,6 +20,8 @@ for i in "$@"; do
     esac
 done
 
+alias lxc="/snap/bin/lxc"
+
 if ! lxc project list --format csv | grep -q "default (current)"; then
     lxc project switch default
 fi

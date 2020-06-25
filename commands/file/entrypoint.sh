@@ -17,16 +17,16 @@ OUTPUT_DIR=
 
 for i in "$@"; do
     case $i in
-    --file=*)
-        INPUT_FILE_PATH="${i#*=}"
-        shift # past argument=value
+        --file=*)
+            INPUT_FILE_PATH="${i#*=}"
+            shift
         ;;
-    --output-dir=*)
-        OUTPUT_DIR="${i#*=}"
-        shift # past argument=value
+        --output-dir=*)
+            OUTPUT_DIR="${i#*=}"
+            shiftalue
         ;;
-    *)
-        # unknown option
+        *)
+            # unknown option
         ;;
     esac
 done
@@ -59,24 +59,24 @@ INPUT_FILE_NAME=$(basename $INPUT_FILE_PATH)
 if [[ $BCM_CLI_VERB == "encrypt" ]]; then
     # start the container / trezor-gpg-agent
     docker run -it --rm --name trezorencryptor \
-        -v "$GNUPGHOME":/home/user/.gnupg \
-        -v "$INPUT_DIR":/inputdir \
-        -v "$OUTPUT_DIR":/outputdir \
-        "bcm-trezor:$BCM_VERSION" gpg --output "/inputdir/$INPUT_FILE_NAME.gpg" --encrypt --armor --recipient "$DEFAULT_KEY_ID" "/outputdir/$INPUT_FILE_NAME"
-
+    -v "$GNUPGHOME":/home/user/.gnupg \
+    -v "$INPUT_DIR":/inputdir \
+    -v "$OUTPUT_DIR":/outputdir \
+    "bcm-trezor:$BCM_VERSION" gpg --output "/inputdir/$INPUT_FILE_NAME.gpg" --encrypt --armor --recipient "$DEFAULT_KEY_ID" "/outputdir/$INPUT_FILE_NAME"
+    
     if [[ -f "$INPUT_FILE_PATH.gpg" ]]; then
         echo "Encrypted file created at $INPUT_FILE_PATH.gpg"
-
+        
         # if [[ $DELETE_INPUT_FILE_FLAG == 1 ]]; then
         #     rm "$INPUT_FILE_PATH"
         # fi
     fi
-
-elif [[ $BCM_CLI_VERB == "decrypt" ]]; then
+    
+    elif [[ $BCM_CLI_VERB == "decrypt" ]]; then
     ./decrypt/decrypt.sh "$@"
-elif [[ $BCM_CLI_VERB == "createsignature" ]]; then
+    elif [[ $BCM_CLI_VERB == "createsignature" ]]; then
     ./create_signature/create_signature.sh "$@"
-elif [[ $BCM_CLI_VERB == "verifysignature" ]]; then
+    elif [[ $BCM_CLI_VERB == "verifysignature" ]]; then
     ./verify_signature/verify_signature.sh "$@"
 else
     cat ./help.txt

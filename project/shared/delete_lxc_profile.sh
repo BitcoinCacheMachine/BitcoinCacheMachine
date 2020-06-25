@@ -8,7 +8,7 @@ for i in "$@"; do
     case $i in
         --profile-name=*)
             PROFILE_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

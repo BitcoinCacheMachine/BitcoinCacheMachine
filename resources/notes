@@ -1,0 +1,34 @@
+# this can go int he lxd_master_preseed
+  # storage_pools:
+# - config: {}
+#   description: "BCM SSD storage. SHOULD be backed by TWO SSDs formatted with BTRFS."
+#   name: bcm_ssd
+#   driver: btrfs
+# - config: {}
+#   description: "BCM HDD storage. SHOULD be backed by one (MINIMUM) or two or more (PREFERRED) HDDs formatted with BTRFS."
+#   name: bcm_hdd
+#   driver: btrfs
+# - config: {}
+#   description: "BCM SD storage. SHOULD be backed by one (MINIMUM) or two (PREFERRED) SD cards formatted with BTRFS."
+#   name: bcm_sd
+#   driver: btrfs
+# place this under the device  
+ #- config: {}
+    # size: 200MB
+    # source: /sd/bcm_ssd.img
+
+
+  # profiles:
+# - config: {}
+#   description: "Default BCM profile. Has BTRFS backend only; no networking."
+#   devices:
+#     root:
+#       path: /
+#       pool: bcm_ssd
+#       type: disk
+#     hdd:
+#       path: /hdd
+#       pool: bcm_hdd
+#       type: disk
+#       source: bcm_hdd
+  # name: default

@@ -9,7 +9,7 @@ for i in "$@"; do
     case $i in
         --tier-name=*)
             TIER_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

@@ -10,11 +10,11 @@ for i in "$@"; do
     case $i in
         --stack=*)
             STACK_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --lxc-host=*)
             LXC_HOST="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --restore)
             BACKUP=0

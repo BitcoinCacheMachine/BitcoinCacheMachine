@@ -21,23 +21,23 @@ for i in "$@"; do
     case $i in
         --vm-name=*)
             VM_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --disk-size=*)
             DISK_SIZE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --mem-size=*)
             MEM_SIZE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --cups=*)
             CPU_COUNT="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --endpoint-dir=*)
             ENDPOINT_DIR="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option
@@ -65,7 +65,7 @@ echo "MEM_SIZE: $MEM_SIZE"
 echo "CPU_COUNT: $CPU_COUNT"
 
 # we need to update the cloud-init to include the bcm user and it's associated SSH key.
-# we'll create a temporary one here. 
+# we'll create a temporary one here.
 
 # generate the custom cloud-init file.
 SSH_AUTHORIZED_KEY=$(<"$SSH_KEY_PATH.pub")

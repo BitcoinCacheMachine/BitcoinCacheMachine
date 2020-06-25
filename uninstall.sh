@@ -41,9 +41,8 @@ done
 
 # install LXD
 if [[ -f "$(command -v lxc)" ]]; then
-    
-    source ./env
-    
+    bash -c ./commands/vm/destroy_vm.sh
+
     if lxc list --format csv | grep -q "$BCM_VM_NAME"; then
         lxc delete "$BCM_VM_NAME" --force
     fi
@@ -108,8 +107,10 @@ if [[ -f "$(command -v lxc)" ]]; then
 fi
 
 if [ $UNINSTALL_LXD = 1 ]; then
-    sudo snap remove lxd
-    sleep 5
+    if snap list | grep -q lxd; then
+        sudo snap remove lxd
+        sleep 5
+    fi
 fi
 
 if [ $REMOVE_STORAGE = 1 ]; then

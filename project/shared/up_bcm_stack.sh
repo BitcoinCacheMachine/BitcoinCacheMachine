@@ -8,7 +8,7 @@ for i in "$@"; do
     case $i in
         --stack-name=*)
             STACK_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

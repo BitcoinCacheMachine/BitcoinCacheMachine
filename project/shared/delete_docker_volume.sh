@@ -11,15 +11,15 @@ for i in "$@"; do
     case $i in
         --lxc-hostname=*)
             LXC_HOST="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --stack-name=*)
             STACK_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --volume-name=*)
             VOLUME_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

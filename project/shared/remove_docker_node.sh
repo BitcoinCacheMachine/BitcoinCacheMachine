@@ -10,7 +10,7 @@ for i in "$@"; do
     case $i in
         --node-name=*)
             NODE_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

@@ -9,15 +9,15 @@ for i in "$@"; do
     case $i in
         --env-file-path=*)
             MAX_INSTANCES="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --stack-name=*)
             STACK_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --service-name=*)
             SERVICE_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

@@ -3,9 +3,11 @@
 set -Eeuox pipefail
 cd "$(dirname "$0")"
 
-STORAGE_IS_CONFIGURED=0
+echo "!!!!!!!!!!! STARTING install.sh ON $(hostname) !!!!!!!!!!!"
+
+STORAGE_STRATEGY=configure
+
 DISKS_DIR="$HOME/bcm_disks"
-mkdir -p "$DISKS_DIR"
 
 SD_PATH="$DISKS_DIR"
 SD_SIZE="256MB"
@@ -18,47 +20,39 @@ SSD_SIZE="10GB"
 
 for i in "$@"; do
     case $i in
+        --storage=*)
+            STORAGE_STRATEGY="${i#*=}"
+            shift
+        ;;
         --ssd-path=*)
             SSD_PATH="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --ssd-size=*)
             SSD_SIZE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --sd-path=*)
             SD_PATH="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --sd-size=*)
             SD_SIZE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --hdd-path=*)
             HDD_PATH="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --hdd-size=*)
             HDD_SIZE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option
         ;;
     esac
 done
-
-
-# first, let's check to ensure the Administrator has done their job with respect to storage
-if [[ ! -d "$HDD_PATH" ]]; then
-    echo "ERROR: The '$HDD_PATH' directory does not exist. Please read the BCM preparation instructions before running this script."
-    exit
-fi
-
-if [[ ! -d "$SD_PATH" ]]; then
-    echo "ERROR: The '$SD_PATH' directory does not exist. Please read the BCM preparation instructions before running this script."
-    exit
-fi
 
 # shellcheck source=./env
 source ./env
@@ -77,6 +71,11 @@ sudo apt-get autoremove
 DEFAULT_KEY_ID=
 if [ -f "$HOME/.gnupg/gpg.conf" ]; then
     DEFAULT_KEY_ID="$(cat $HOME/.gnupg/gpg.conf | grep 'default-key' | awk  '{print $2}')"
+else
+    # if the file DOES NOT exist, then we generate new GPG certificates and set them as the default.
+    # TODO, These GPG certificates SHOULD be backed by a smartcard or something. This might have to be documented
+    # in the pre-installation instructions.
+    gpg --full-gen-key
 fi
 
 # if the lxd group doesn't exist, create it.
@@ -92,7 +91,7 @@ fi
 # install LXD
 if [[ ! -f "$(command -v lxc)" ]]; then
     sudo snap set system snapshots.automatic.retention=no
-    sudo snap install lxd --channel="latest/edge"
+    sudo snap install lxd --channel="latest/candidate"
     sleep 3
 fi
 
@@ -145,9 +144,9 @@ fi
 # append some quick BCM_SPECIFIC aliases to ~/.bashrc.
 {
     echo ""
-    echo "alias bcmreset='$HOME/bcm/reset.sh'"
-    echo "alias bcminst='$HOME/bcm/install.sh'"
-    echo "alias bcmuninst='$HOME/bcm/uninstall.sh'"
+    echo "alias lxc='/snap/bin/lxc'"
+    # echo "alias bcminst='$HOME/bcm/install.sh'"
+    # echo "alias bcmuninst='$HOME/bcm/uninstall.sh'"
 } >> "$HOME/.bashrc"
 
 # in this section, we configure the underlying storage. We create LOOP devices storated
@@ -215,17 +214,23 @@ function createLoopDevice () {
         PROFILE_YAML="$(envsubst <./resources/lxd_profiles/$STORAGE_POOL.yml)"
         echo "$PROFILE_YAML" | /snap/bin/lxc profile edit "bcm-$STORAGE_POOL"
     fi
-    
 }
 
-createLoopDevice "$SD_PATH" sd "$SD_SIZE"
-createLoopDevice "$SSD_PATH" ssd "$SSD_SIZE"
-createLoopDevice "$HDD_PATH" hdd "$HDD_SIZE"
+if [[ $STORAGE_STRATEGY = *configure* ]]; then
+    mkdir -p "$DISKS_DIR"
+    createLoopDevice "$SD_PATH" sd "$SD_SIZE"
+    createLoopDevice "$SSD_PATH" ssd "$SSD_SIZE"
+    createLoopDevice "$HDD_PATH" hdd "$HDD_SIZE"
+    elif [[ $STORAGE_STRATEGY = *mapped* ]]; then
+    echo "TODO - figure out what we need to do here, if anything"
+    sleep 5
+fi
 
 # This creates LXC storage pools for each of teh
-
-mkdir -p "$HOME/.local/bcm/lxc"
-chown -R "$USER:$USER" "$HOME/.local/bcm"
+if [ ! -d "$HOME/.local/bcm/lxc" ]; then
+    mkdir -p "$HOME/.local/bcm/lxc"
+    chown -R "$USER:$USER" "$HOME/.local/bcm"
+fi
 
 # this section creates the yml necessary to run 'lxd init'
 # TODO add CLI option to specify the interface manually, then store the user's selection in ~/.bashrc
@@ -248,7 +253,7 @@ export IP_OF_MACVLAN_INTERFACE="$IP_OF_MACVLAN_INTERFACE"
 PRESEED_YAML="$(envsubst <./resources/lxd_profiles/lxd_master_preseed.yml)"
 PASSWDHOME="$HOME/.bcm"
 echo "$PRESEED_YAML" | gpg --batch --yes --output "$PASSWDHOME/$LXD_SERVER_NAME-lxd-preseed-yaml.gpg" --encrypt --recipient "$DEFAULT_KEY_ID"
-echo "$PRESEED_YAML" | lxd init --preseed
+echo "$PRESEED_YAML" | /snap/bin/lxd init --preseed
 
 
 # This for loop makes sure that all subsequent commands have access to the

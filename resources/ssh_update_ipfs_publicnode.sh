@@ -9,7 +9,7 @@ for i in "$@"; do
     case $i in
         --key-path=*)
             PRIVATE_KEY_PATH="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

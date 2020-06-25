@@ -12,11 +12,11 @@ for i in "$@"; do
     case $i in
         --container-name=*)
             CONTAINER_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --env-file-path=*)
             ENV_FILE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

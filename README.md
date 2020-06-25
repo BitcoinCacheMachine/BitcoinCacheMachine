@@ -62,7 +62,7 @@ The script above installs the latest tor proxy, then pulls the specified BCM git
 
 You may want to log out for your group membership to update. 
 
-Next, run `bcm deploy` at the command line to deploy your first BCM instance. If your machine supports Type-1 VMs, `bcm` is deployed using fully-fledged virtual machines. If not, BCM uses [LXD projects](https://lxd.readthedocs.io/en/latest/projects/) to provide tenant separation.
+Next, run `bcm deploy` at the command line to deploy your first BCM instance. If your machine supports Type-1 VMs, `bcm` is deployed using fully-fledged virtual machines. If not, BCM uses [LXD projects](https://lxd.readthedocs.io/en/latest/projects/) to provide tenant separation. Once fully deployed, BCM exposes services on your local network.
 
 ## Documentation
 

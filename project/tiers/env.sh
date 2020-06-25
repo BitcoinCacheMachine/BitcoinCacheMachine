@@ -8,7 +8,7 @@ for i in "$@"; do
     case $i in
         --host-ending=*)
             HOST_ENDING="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

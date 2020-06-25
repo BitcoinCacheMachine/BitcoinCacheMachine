@@ -60,20 +60,6 @@ if [[ "$BCM_CLI_COMMAND" == "show" ]]; then
 fi
 
 
-# commands BEFORE the the build stage DO NOT REQUIRE docker images at the controller.
-if [[ "$BCM_CLI_COMMAND" == "deploy" ]]; then
-    # If the machine supports Type-1 VMs, then that's how we'll do multitenancy.
-    if [ -n $BCM_VM_NAME ]; then
-        bash -c ./vm/destroy_vm.sh
-        bash -c ./vm/up_vm.sh
-        exit
-    else
-        # otherwise, we just deploy on the localhost.
-        bash -c "$BCM_PROJECT_DIR/deploy.sh $@"
-        exit
-    fi
-fi
-
 
 # # If our local CLI target SSH hostname is on another machine, then
 # # we should execute it on the reomte machine.

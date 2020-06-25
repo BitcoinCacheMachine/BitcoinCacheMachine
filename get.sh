@@ -20,7 +20,7 @@ for i in "$@"; do
         ;;
         --repo=*)
             REPO="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option
@@ -364,7 +364,7 @@ sGsEejVHxvX7/iOE3rM=
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
 
-# import the debian-tor certificate 
+# import the debian-tor certificate
 gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
 
 # update manifests
@@ -373,7 +373,7 @@ sudo apt-get update
 # reinstall required software.
 sudo apt-get install -y tor deb.torproject.org-keyring wait-for-it git
 
-# wait for local tor to come online.
+# wait for local tor proxy to come online.
 wait-for-it -t 30 127.0.0.1:9050
 
 if [[ "$TOR_ONLY" = 0 ]]; then
