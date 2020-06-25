@@ -9,11 +9,11 @@ for i in "$@"; do
     case $i in
         --container-name=*)
             LXC_HOSTNAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --endpoint=*)
             CLUSTER_ENDPOINT="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

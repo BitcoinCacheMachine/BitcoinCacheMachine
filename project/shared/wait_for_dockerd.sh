@@ -8,7 +8,7 @@ for i in "$@"; do
     case $i in
         --container-name=*)
             LXC_HOST="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

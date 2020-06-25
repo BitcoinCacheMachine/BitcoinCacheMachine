@@ -9,7 +9,7 @@ for i in "$@"; do
     case $i in
         --yaml-text=*)
             YAML_TEXT="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

@@ -23,23 +23,23 @@ for i in "$@"; do
     case $i in
         --ssh-key-path=*)
             SSH_KEY_PATH="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --command=*)
             BCM_COMMAND="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --onion=*)
             ONION_ADDRESS="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --token=*)
             AUTH_TOKEN="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --title=*)
             TITLE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --execute)
             BCM_EXECUTE_FLAG=1

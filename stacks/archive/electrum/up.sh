@@ -9,7 +9,7 @@ for i in "$@"; do
     case $i in
         --mode=*)
             MODE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

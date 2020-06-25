@@ -21,7 +21,7 @@ fi
 export BCM_MACVLAN_INTERFACE="$BCM_MACVLAN_INTERFACE"
 
 
-BCM_VM_NAME=${BCM_VM_NAME:-"bcm-vm-$(whoami)-$(hostname)"}
+BCM_VM_NAME=${BCM_VM_NAME:-"bcm-base"}
 if [[ -n $BCM_VM_NAME ]]; then
     BCM_VM_NAME="$BCM_VM_NAME"
 fi
@@ -41,3 +41,16 @@ if [ -d "$HOME/.gnupg" ]; then
 fi
 
 export DEFAULT_KEY_ID="$DEFAULT_KEY_ID"
+
+
+
+BCM_CACHE_DIR=${BCM_CACHE_DIR:-"$HOME/.local/bcm"}
+if [[ -n $BCM_CACHE_DIR ]]; then
+    BCM_CACHE_DIR="$BCM_CACHE_DIR"
+fi
+export BCM_CACHE_DIR="$BCM_CACHE_DIR"
+
+if [[ -z $ ]]; then
+    echo "ERROR: BCM_CACHE_DIR IS not defined. Please set your environment."
+    exit
+fi

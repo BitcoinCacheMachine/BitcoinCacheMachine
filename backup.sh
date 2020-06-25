@@ -14,7 +14,7 @@ for i in "$@"; do
     case $i in
         --backup-path=*)
             BACKUP_PATH="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

@@ -24,27 +24,27 @@ for i in "$@"; do
     case $i in
         --git-repo-dir=*)
             GIT_REPO_DIR="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --message=*)
             GIT_COMMIT_MESSAGE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --tag=*)
             BCM_GIT_TAG_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --stage)
             STAGE_OUTSTANDING=1
-            shift # past argument=value
+            shift
         ;;
         --branch-name=*)
             BCM_GIT_BRANCH="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --push)
             BCM_GIT_PUSH=1
-            shift # past argument=value
+            shift
         ;;
         *)
     esac

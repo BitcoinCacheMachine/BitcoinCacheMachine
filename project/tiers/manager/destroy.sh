@@ -11,16 +11,16 @@ for i in "$@"; do
     case $i in
         --keep-template=*)
             DELETE_BCM_IMAGE=0
-            shift # past argument=value
+            shift
         ;;
         --keep-bcmbase=*)
             DELETE_LXC_BASE=0
-            shift # past argument=value
+            shift
         ;;
         ---keep-all)
             DELETE_BCM_IMAGE=0
             DELETE_LXC_BASE=0
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

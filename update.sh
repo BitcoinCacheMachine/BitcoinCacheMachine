@@ -12,11 +12,11 @@ for i in "$@"; do
     case $i in
         --commit-push)
             COMMIT_PUSH=1
-            shift # past argument=value
+            shift
         ;;
         --message=*)
             COMMIT_MESSAGE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         *)
             # unknown option

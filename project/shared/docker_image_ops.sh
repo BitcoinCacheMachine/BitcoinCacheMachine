@@ -14,19 +14,19 @@ for i in "$@"; do
     case $i in
         --container-name=*)
             LXC_HOST="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --docker-hub-image-name=*)
             DOCKER_HUB_IMAGE="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --image-name=*)
             IMAGE_NAME="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --build-context=*)
             BUILD_CONTEXT="${i#*=}"
-            shift # past argument=value
+            shift
         ;;
         --rebuild)
             REBUILD=1
